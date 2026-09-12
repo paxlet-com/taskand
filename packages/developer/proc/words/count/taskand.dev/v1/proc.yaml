@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/words/count/v1
+name: count
+version: "1.0.0"
+role: worker
+interface:
+  stdin: { text: string }
+  stdout: { ok: boolean, totalWords: number }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

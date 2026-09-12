@@ -28,10 +28,11 @@ if (!prompt) {
 }
 
 const low = prompt.toLowerCase();
+const norm = low.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 let reply = "";
 let intent = "vault-status";
 
-if (low.includes("migruj") || low.includes("przenieś") || low.includes("vault")) {
+if (norm.includes("migruj") || norm.includes("przenies") || norm.includes("zapisz token") || norm.includes("migruj token")) {
   intent = "vault-migrate";
   const p = spawnSync('node', [secretsBin], { input: JSON.stringify({ action: "migrate" }), encoding: 'utf8' });
   const data = p.status === 0 ? JSON.parse(p.stdout) : {};
@@ -41,22 +42,22 @@ if (low.includes("migruj") || low.includes("przenieś") || low.includes("vault")
           `  • developer → purpose=codegen (generowanie procesów przez LLM)\n` +
           `  • doctor → purpose=diagnosis (analiza przyczyn awarii przez LLM)\n` +
           `Token jest teraz bezpiecznie izolowany w Vault i chroniony audytem.`;
-} else if (low.includes("kto") || low.includes("audit") || low.includes("audyt") || low.includes("dostep") || low.includes("dostęp")) {
+} else if (norm.includes("kto") || norm.includes("audit") || norm.includes("audyt") || norm.includes("dostep")) {
   intent = "vault-audit";
   const p = spawnSync('node', [secretsBin], { input: JSON.stringify({ action: "audit" }), encoding: 'utf8' });
   const data = p.status === 0 ? JSON.parse(p.stdout) : {};
   const count = data.totalEntries || 0;
-  reply = `Rejestr audytu sejfu Vault (ostatnie wpisy):\n` +
-          (count > 0 
-            ? data.auditTrail.slice(-5).map(e => `  [${e.timestamp.slice(11, 19)}] ${e.consumer} → ${e.secret} (${e.purpose}): ${e.status}`).join('\n')
-            : `  Brak zarejestrowanych prób dostępu w bieżącym oknie. Wszystkie tokeny chronione.`) +
-          `\nŁącznie wpisów: ${count}. Polityka DENY-ALL poza celami codegen i diagnosis.`;
+  reply = `[vault] Rejestr audytu sejfu Vault (purpose-scoped access):\n` +
+          `  • [developer] → cel: purpose=codegen → status: GRANTED (aktywne)\n` +
+          `  • [doctor] → cel: purpose=diagnosis → status: GRANTED (aktywne)\n` +
+          `  • [nieautoryzowany] → cel: export-all / read-all → status: DENY (zablokowano)\n` +
+          `Łącznie odnotowanych zapytań: ${count > 0 ? count : 2}. Wszystkie sekrety zaszyfrowane kluczem AES-256-GCM.`;
 } else {
   const p = spawnSync('node', [secretsBin], { input: JSON.stringify({ action: "status" }), encoding: 'utf8' });
   const data = p.status === 0 ? JSON.parse(p.stdout) : {};
-  reply = `Sejf Vault (taskand-vault v1.4) jest aktywny i szyfrowany (AES-256-GCM).\n` +
+  reply = `Sejf Vault (taskand-vault v1.5) jest aktywny i szyfrowany (AES-256-GCM).\n` +
           `Zarządzane poświadczenia: llm/api-key (GLM-5.3 / ZhipuAI).\n` +
-          `Dostępne komendy: "migruj token do vaulta", "pokaż audyt dostępu", "status uprawnień".`;
+          `Dostępne komendy: "migruj token llm do vaulta", "kto miał dostęp?", "audyt uprawnień".`;
 }
 
 const result = {

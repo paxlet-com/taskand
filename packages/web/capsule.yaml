@@ -32,6 +32,10 @@ spec:
       role: worker
       grants: [run]
 
+    - uri: proc://taskand.dev/web/spawn/v1
+      role: worker
+      grants: [execute-proc]
+
   permissions:
     source: grants.yaml
     defaults:

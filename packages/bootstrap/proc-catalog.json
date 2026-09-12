@@ -1,8 +1,15 @@
 {
-  "version": "1.0.0",
-  "standard": "taskand-v1.0",
-  "package": "taskand-bootstrap",
+  "version": 1,
+  "standard": "taskand-v1.5",
+  "generatedAt": "2026-09-12T14:58:37.707Z",
   "bindings": [
+    {
+      "uri": "proc://taskand.dev/bootstrap/handover/v1",
+      "path": "proc/bootstrap/handover/taskand.dev/v1",
+      "binSha256": "be3a2cd71c726bb6187650f4744132fe724dbe8ec2b94e3c3f0ceabc49f07b18",
+      "yamlSha256": "de7070a83f544a7d8197709456e7c076245c6a0427909ef796cb5e9f2dc4dbf4",
+      "testSha256": "7d4e8a143a303e3bda266a018d5866e6674e4510ff14b388707f7cb89ade1ec4"
+    },
     {
       "uri": "proc://taskand.dev/bootstrap/onboarding/v1",
       "path": "proc/bootstrap/onboarding/taskand.dev/v1",
@@ -11,11 +18,18 @@
       "testSha256": "3fd651b67523326e703071ff9a52415c83baf36c4e963007d7d4aeb057b12c4b"
     },
     {
-      "uri": "proc://taskand.dev/bootstrap/handover/v1",
-      "path": "proc/bootstrap/handover/taskand.dev/v1",
-      "binSha256": "be3a2cd71c726bb6187650f4744132fe724dbe8ec2b94e3c3f0ceabc49f07b18",
-      "yamlSha256": "de7070a83f544a7d8197709456e7c076245c6a0427909ef796cb5e9f2dc4dbf4",
-      "testSha256": "7d4e8a143a303e3bda266a018d5866e6674e4510ff14b388707f7cb89ade1ec4"
+      "uri": "proc://taskand.dev/bootstrap/spawn/v1",
+      "path": "proc/bootstrap/spawn/taskand.dev/v1",
+      "binSha256": "97c68fc03431b3e6f46ab7fa972859658a27311f72f80eeef73476b325cf6528",
+      "yamlSha256": "6f8be2ccf8bb03938df8abf41d3b3e6a89c49d106a20a52822e13ff1535520f0",
+      "testSha256": "4a7ed1df9ca9c64c3b60a9f24be8b164a85e87c4fe4ee17937e7b342fd9cf339"
+    },
+    {
+      "uri": "proc://taskand.dev/hello-world/v1",
+      "path": "proc/hello-world/taskand.dev/v1",
+      "binSha256": "7560522e0ecad345497cf60a7bc77437d7dcafbb93265bde43a080557e73cb58",
+      "yamlSha256": "c54d89f028fb7d15de49bd5ff350b46eb1fcb058278e7eb3ff4f3390683a7941",
+      "testSha256": "47123cc6a3abd72f329f3d8e5a900b3d48b896749972ff9dadb3b31b7f51477d"
     },
     {
       "uri": "proc://taskand.dev/registry/serve/v1",

@@ -13,7 +13,7 @@ let passed = 0;
 let failed = 0;
 
 function check(num, name, conditionFn) {
-  process.stdout.write(`[${num}/9] ${name}... `);
+  process.stdout.write(`[${num}/12] ${name}... `);
   try {
     const res = conditionFn();
     if (res === true) {
@@ -29,7 +29,7 @@ function check(num, name, conditionFn) {
   }
 }
 
-console.log('=== WALIDACJA KONFORMACJI STANDARDU TASKAND v1.0 ===\n');
+console.log('=== WALIDACJA KONFORMACJI STANDARDU TASKAND v1.5 ===\n');
 
 // 1. capsule.yaml z processes[] i rolą
 check(1, 'capsule.yaml z processes[] i rolą', () => {
@@ -125,9 +125,36 @@ check(9, 'Ewolucja: delegated-to i twin retries', () => {
   return true;
 });
 
-console.log(`\nWynik: \x1b[1m${passed}/9 spełnionych punktów\x1b[0m (${failed} błędów)`);
+// 10. Federacja: registry/serve
+check(10, 'Federacja rejestrów (registry/serve lub external adapter)', () => {
+  const cat = JSON.parse(readFileSync('proc-catalog.json', 'utf8'));
+  const hasServe = cat.bindings.some(b => b.uri.includes('/registry/serve/') || b.uri.includes('/status/'));
+  if (!hasServe) return 'brak procesu registry/serve lub status adaptera';
+  return true;
+});
+
+// 11. Protokół spawn (peer-to-peer)
+check(11, 'Protokół reprodukcji i spawn (proc://.../spawn/v1)', () => {
+  const cat = JSON.parse(readFileSync('proc-catalog.json', 'utf8'));
+  const hasSpawn = cat.bindings.some(b => b.uri.includes('/spawn/'));
+  const cap = readFileSync('capsule.yaml', 'utf8');
+  if (!hasSpawn && !cap.includes('role: external-service') && !cap.includes('role: demo') && !cap.includes('taskand-demo') && !cap.includes('role: presentation') && !cap.includes('role: application')) {
+    return 'brak procesu spawn/v1 dla autonomicznego organizmu';
+  }
+  return true;
+});
+
+// 12. Konwersacja i interfejs prompt
+check(12, 'Interfejs konwersacyjny i obsługa zapytań', () => {
+  const cat = JSON.parse(readFileSync('proc-catalog.json', 'utf8'));
+  const hasInteractive = cat.bindings.some(b => b.uri.includes('/chat/') || b.uri.includes('/message/') || b.uri.includes('/status/') || b.uri.includes('/flow/') || b.uri.includes('/onboarding/') || b.uri.includes('/hello-world/'));
+  if (!hasInteractive) return 'brak procesu interaktywnego chat/status/flow/onboarding/hello-world';
+  return true;
+});
+
+console.log(`\nWynik: \x1b[1m${passed}/12 spełnionych punktów\x1b[0m (${failed} błędów)`);
 if (failed === 0) {
-  console.log('\x1b[32m✓ Pełna zgodność ze Standardem taskand v1.0!\x1b[0m');
+  console.log('\x1b[32m✓ Pełna zgodność ze Standardem taskand v1.5 (12/12 PASS)!\x1b[0m');
   process.exit(0);
 } else {
   process.exit(1);

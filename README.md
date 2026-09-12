@@ -1,9 +1,9 @@
-# taskand-glm53 v1.4 — Standard taskand v1.4: Konwersacyjny Interfejs CLI/Web, Ekosystem Organizmów & Security Vault
+# taskand-glm53 v1.5 — Samo-Replikujący się Ekosystem Organizmów (Standard v1.5)
 
-Kompletna implementacja **Standardu taskand v1.4**: federacyjny ekosystem, w którym wszystko jest zasobem URI (`proc://`, `session://`, `artifact:`), a użytkownik komunikuje się **bezpośrednio z każdym autonomicznym organizmem** przez CLI (`taskand <organizm> "prompt"`) lub Web Cockpit. Poświadczenia i tokeny LLM są chronione przez dedykowany sejf **`taskand-vault`** w oparciu o uprawnienia purpose-scoped (`developer:codegen`, `doctor:diagnosis`).
+Kompletna implementacja **Standardu taskand v1.5**: samo-replikujący się system organizmów, w którym bootstrap (zygota) czyta genom (`genome.yaml`) z rejestru git, powołuje autonomiczne organizmy, a każdy z nich może powoływać kolejne protokołem peer-to-peer (`proc://.../spawn/v1`). Wszystko jest zasobem URI (`proc://`, `session://`, `vault://`, `artifact:`), ewolucja podlega bramkom kwalifikacji w Digital Twin, a użytkownik komunikuje się z organizmami przez konwersacyjne CLI v1.5 lub Web Cockpit.
 
 * Oficjalne repozytorium: **https://github.com/semcod/taskand-glm53**
-* Kompletna specyfikacja Standardu v1.4: [docs/standard-v1.4.md](docs/standard-v1.4.md) oraz [STANDARD-v1.4.md](STANDARD-v1.4.md)
+* Kompletna specyfikacja Standardu v1.5: [docs/standard-v1.5.md](docs/standard-v1.5.md) oraz [STANDARD-v1.5.md](STANDARD-v1.5.md)
 * Architektura federacji, LLM i rollbacków: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 * Standard zarządzania sekretami i sejfem Vault: [docs/SECRETS.md](docs/SECRETS.md)
 
@@ -11,40 +11,43 @@ Kompletna implementacja **Standardu taskand v1.4**: federacyjny ekosystem, w kt�
 
 ## 🧬 Ekosystem Organizmów (Pakiety jako Autonomiczne Kapsuły)
 
-W systemie taskand każda paczka w `packages/` stanowi niezależny organizm z własnym manifestem `capsule.yaml`, uprawnieniami `grants.yaml`, procesami `proc://` oraz interfejsem konwersacyjnym:
+W systemie taskand v1.5 każda paczka w `packages/` stanowi niezależny organizm z własnym manifestem `capsule.yaml`, uprawnieniami `grants.yaml`, procesami `proc://`, protokołem reprodukcji `spawn/v1` oraz interfejsem konwersacyjnym:
 
-| Organizm (Paczka) | Alias CLI | Rola w ekosystemie | Kluczowe procesy URI | Zarządzanie Tokenem LLM (GLM-5.3) |
+| Organizm (Paczka) | Alias CLI | Rola w ekosystemie | Kluczowe procesy URI | Zdolność Reprodukcji (Spawn) |
 |---|---|---|---|---|
-| **`taskand-developer`** | `taskand dev` | **Regeneracja i ewolucja**: generowanie procesów przez LLM, autotesty, Digital Twin, dozbrajanie usług | `dev/chat`, `dev/codegen`, `dev/plan`, `dev/heal`, `developer/test-auto` | **Izolowany w Vault (`purpose=codegen`)** |
-| **`taskand-doctor`** | `taskand doc` | **Strażnik zdrowia (SRE)**: ciągła diagnostyka WWW (:8090) i API (:8077), autoleczenie, trendy | `doctor/chat`, `doctor/diagnose`, `doctor/prescribe` | **Dostęp brokerski w Vault (`purpose=diagnosis`)** |
-| **`taskand-vault`** | `taskand sec` | **Sejf poświadczeń**: szyfrowanie AES-256-GCM, migracja z `.env`, audyt dostępu, purpose grants | `vault/chat`, `vault/secrets` | **Główny dysponent i broker poświadczeń** |
-| **`taskand-chat` & `web`**| `taskand chat`| **Zmysły i mowa**: dialog z użytkownikiem, Web Speech API (PL), synteza TTS, analiza stron | `chat/message`, `chat/voice`, `browser/session`, `flow/login` | Kontekstowy przez proces czatu |
-| **`taskand-nginx`** | `taskand arm` | **Dozbrojona usługa zewnętrzna**: bezprzerwowy adapter HTTP (:8090) jako kapsuła | `nginx/status` | Nie wymaga tokenu |
-| **`taskand-bootstrap`**| `bootstrap` | **Narodziny i rozruch**: onboarding, weryfikacja środowiska i przekazanie kontroli | `bootstrap/onboarding`, `bootstrap/handover` | Deterministyczny start |
-| **`taskand-demo`** | `demo` | **Przykłady i szablony**: referencyjne procesy testowe | `hello-world/v1` | Nie |
+| **`taskand-developer`** | `taskand dev` | **Regeneracja i ewolucja**: generowanie procesów, autotesty, Digital Twin, dozbrajanie usług | `dev/chat`, `dev/codegen`, `dev/heal`, `developer/spawn` | **✓ CAN-SPAWN (`developer/spawn/v1`)** |
+| **`taskand-doctor`** | `taskand doc` | **Strażnik zdrowia (SRE)**: ciągła diagnostyka WWW (:8090) i API (:8077), autoleczenie, trendy LB | `doctor/chat`, `doctor/diagnose`, `doctor/spawn` | **✓ CAN-SPAWN (`doctor/spawn/v1`)** |
+| **`taskand-vault`** | `taskand sec` | **Sejf poświadczeń**: szyfrowanie AES-256-GCM, audyt dostępu, purpose-scoped grants | `vault/chat`, `vault/secrets`, `vault/spawn` | **✓ CAN-SPAWN (`vault/spawn/v1`)** |
+| **`taskand-chat` & `web`**| `taskand chat`| **Zmysły i interakcja**: dialog z użytkownikiem, Web Speech API, sesje browsera, analizy stron | `chat/message`, `browser/session`, `flow/login`, `web/spawn` | **✓ CAN-SPAWN (`chat/spawn/v1`, `web/spawn/v1`)** |
+| **`taskand-bootstrap`**| `bootstrap` | **Narodziny i rozruch (zygota)**: czytanie genomu, onboarding, przekazanie kontroli | `bootstrap/onboarding`, `bootstrap/handover`, `bootstrap/spawn` | **✓ CAN-SPAWN (`bootstrap/spawn/v1`)** |
+| **`taskand-nginx`** | `taskand arm` | **Dozbrojona usługa zewnętrzna**: bezprzerwowy adapter HTTP (:8090) jako kapsuła | `nginx/status` | — (adapter zewnętrzny) |
+| **`taskand-demo`** | `demo` | **Przykłady i szablony**: referencyjne procesy testowe | `hello-world/v1` | — (baza demonstracyjna) |
 
 ---
 
-## 💬 Interfejs Konwersacyjny CLI (Standard v1.4)
+## 💬 Interfejs Konwersacyjny CLI (Standard v1.5)
 
 ```bash
-# Rozmawiaj bezpośrednio z developerem (dozbrajanie usług, tworzenie procesów)
+# Rozmawiaj bezpośrednio z developerem (tworzenie procesów, arming, spawn potomków)
+taskand dev "cześć, co potrafisz?"
+taskand dev "stwórz proces liczący słowa"
 taskand dev "dozbrój nginx na :8090"
-taskand dev "stwórz nowy proces proc://taskand.dev/auth/v1"
+taskand dev "stwórz vault"
 
-# Rozmawiaj ze strażnikiem zdrowia doctor (diagnoza, autoleczenie, trendy SRE)
-taskand doc "sprawdź stan całego systemu"
-taskand doc "coś nie działa ze stroną WWW"
+# Rozmawiaj ze strażnikiem zdrowia doctor (diagnoza, autoleczenie, rekomendacje SRE)
+taskand doc "sprawdź czy wszystko działa"
+taskand doc "co nie działa?"
+taskand doc "sprawdź czy potrzebujemy LB"
 
-# Rozmawiaj z sejfem Vault (migracja tokenów LLM, audyt dostępu)
-taskand sec "migruj token llm do vaulta"
-taskand sec "pokaż audyt uprawnień"
+# Rozmawiaj z sejfem Vault (migracja tokenów LLM, audyt dostępu purpose-scoped)
+taskand sec "migruj token llm"
+taskand sec "kto miał dostęp?"
 
-# Rozmowa z asystentem czatu i kolejkowanie zadań
-taskand chat "jaki jest aktualny status środowiska?"
-
-# Szybkie dozbrojenie dowolnej działającej usługi w trybie zero-downtime:
-taskand arm nginx 8090
+# Inspekcja ekosystemu i procesów
+taskand procs                 # Pełna lista zarejestrowanych procesów proc:// we wszystkich rejestrach
+taskand fed --can-spawn       # Weryfikacja federacji rejestrów i statusu zdolności spawn
+taskand log 50                # Podgląd ostatnich 50 linii z dziennika ewolucji log/evolution.log
+taskand proc "proc://taskand.dev/words/count/v1" '{"text": "ala ma kota"}'
 ```
 
 ---
@@ -52,59 +55,19 @@ taskand arm nginx 8090
 ## ⚡ Szybki start
 
 ```bash
-# 1. Sprawdź 9/9 punktów konformacji Standardu v1.0 / v1.1
+# 1. Sprawdź 12/12 punktów konformacji Standardu v1.5
 make conformance
 
-# 2. Przetestuj wszystkie autonomiczne paczki (bootstrap, chat, developer, doctor, web, demo)
+# 2. Przetestuj wszystkie autonomiczne paczki i ich procesy kontraktowe
 make packages-test
 
 # 3. Zweryfikuj sumy SHA-256 w katalogu procesów
 make verify
 
-# 4. Spakuj paczkę kapsuły do formatu dystrybucyjnego .tgz
-make pack
-
-# 5. Uruchom Web Cockpit ze sterowaniem głosowym i diagnostyką
-make web
-# → Otwórz w przeglądarce: http://localhost:8090
+# 4. Sprawdź status federacji i zdolność reprodukcji
+taskand fed --can-spawn
+taskand procs
 ```
-
----
-
-## 🌐 Uniwersalna Bramka REST API (port 8077)
-
-Kontener `taskand-gateway` udostępnia pełne API dla frontendu, procesów zewnętrznych i systemów federacyjnych:
-
-| Metoda i Endpoint | Opis operacji | Przykładowe wywołanie |
-|---|---|---|
-| `GET /api/federation` | Zwraca listę wszystkich 6 rejestrów federacji i procesów | `curl http://localhost:8077/api/federation` |
-| `POST /api/chat` | Wywołuje proces konwersacji `proc://taskand.dev/chat/message/v1` | `curl -X POST :8077/api/chat -d '{"message":"..."}'` |
-| `POST /api/voice` | Translacja mowy Web Speech API przez `proc://taskand.dev/chat/voice/v1` | `curl -X POST :8077/api/voice -d '{"transcript":"..."}'` |
-| `POST /api/proc/call` | Wywołuje dowolny proces URI (JSON stdin -> JSON stdout) | `curl -X POST :8077/api/proc/call -d '{"uri":"..."}'` |
-| `GET /api/doctor` | Raport diagnostyczny zdrowia stron i usług | `curl http://localhost:8077/api/doctor` |
-| `POST /api/doctor` | Diagnostyka z automatycznym zleceniem naprawy do dewelopera | `curl -X POST :8077/api/doctor -d '{"autoSubmit":true}'` |
-| `POST /api/restart` | Bezpieczny restart kontenera (np. landing :8090) z weryfikacją | `curl -X POST :8077/api/restart -d '{"service":"landing"}'` |
-| `GET /api/tasks` | Lista zadań w kolejce `inbox.yaml` oraz wykonanych `done.yaml` | `curl http://localhost:8077/api/tasks` |
-| `POST /api/tasks` | Dodanie nowego zadania do wykonania | `curl -X POST :8077/api/tasks -d '{"z":"..."}'` |
-| `POST /api/twin` | Uruchomienie testu w piaskownicy Digital Twin | `curl -X POST :8077/api/twin -d '{"prompt":"..."}'` |
-| `POST /api/rollback` | Przywrócenie stanu z wybranej migawki | `curl -X POST :8077/api/rollback -d '{"id":"snap-..."}'` |
-
----
-
-## 🔒 Bezpieczeństwo, Tokeny LLM i Reguły Restartu
-
-Szczegółowy opis w [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) oraz [docs/SECRETS.md](docs/SECRETS.md):
-
-1. **Dostęp do tokenu GLM-5.3**:
-   - Klucz API znajduje się wyłącznie w pliku `.env` na hoście i jest montowany w runtime.
-   - `taskand-developer` posiada dostęp do tokenu, aby generować kod (`dev/codegen`) i tworzyć łatki naprawcze.
-   - `taskand-doctor` **nie posiada bezpośredniego dostępu do klucza LLM** (Zasada Najmniejszych Uprawnień). Doctor wykonuje szybkie, deterministyczne testy HTTP i w razie problemu **zleca zadanie `evolve-fix` deweloperowi**.
-2. **Restart usług z poziomu interfejsu Web (:8090)**:
-   - Zgodnie z zasadą `self-restart = DENY`, kontener WWW (`taskand-landing`) nie ma dostępu do gniazda Dockera (`docker.sock`).
-   - Użytkownik zleca restart z poziomu przeglądarki lub komendy głosowej (*"zrestartuj stronę"*).
-   - Przeglądarka wysyła żądanie do `taskand-gateway`, która weryfikuje uprawnienia, wykonuje restart i odpytuje `taskand-doctor`, aby upewnić się, że usługa wstała i odpowiada kodem HTTP 200.
-3. **Procedura automatycznego rollbacku**:
-   - Jeśli usługa po restarcie nie wstanie w czasie 3 sekund lub zwróci błąd, bramka API i `taskand-doctor` natychmiast zgłaszają awarię `502 Bad Gateway` i przywracają poprzednią migawkę (`history.py rollback <snap_id>`).
 
 ---
 
@@ -112,8 +75,8 @@ Szczegółowy opis w [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) oraz [docs/SEC
 
 | Komenda | Opis |
 |---|---|
-| `make conformance` | Automatyczny audyt 9/9 punktów Listy Sprawdzającej Standardu |
-| `make packages-test` | Uruchamia testy, weryfikację sum i konformację dla wszystkich 6 paczek |
+| `make conformance` | Automatyczny audyt 12/12 punktów Listy Sprawdzającej Standardu v1.5 |
+| `make packages-test` | Uruchamia testy kontraktu, weryfikację sum i konformację dla wszystkich paczek |
 | `make test` | Uruchamia testy kontraktu (`test.mjs`) procesów URI (fail-closed: 0/1/2) |
 | `make verify` | Sprawdza sumy SHA-256 `bin.mjs` i `proc.yaml` względem `proc-catalog.json` |
 | `make run URI=...` | Uruchamia wskazany proces URI z payloadem JSON przez stdin |
@@ -121,25 +84,3 @@ Szczegółowy opis w [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) oraz [docs/SEC
 | `make web` | Uruchamia stronę landing page i Web Cockpit na porcie 8090 |
 | `make up` / `make down` | Uruchomienie / zatrzymanie kontenerów w tle (`docker compose`) |
 | `make status` | Status aktywnych kontenerów i usług |
-
----
-
-## ↺ Historia zadań, Migawki i Rollback
-
-W katalogu `history/` system utrzymuje rejestr migawek stanu plików oraz sumy kontrolne SHA-256 każdego zarchiwizowanego pliku:
-
-```text
-history/
-├── history.yaml            # Rejestr migawek i zrealizowanych zadań
-└── snapshots/
-    └── snap-t1789203598/   # Dedykowany punkt przywracania
-        ├── manifest.json   # Manifest z sumami SHA-256 plików i całości
-        └── files/          # Bezpieczna kopia danych (np. katalog taskand)
-```
-
-Przywrócenie stanu z wybranej migawki:
-```bash
-taskand rollback snap-t1789203598
-# lub przez API:
-curl -X POST http://localhost:8077/api/rollback -H "Content-Type: application/json" -d '{"id":"snap-t1789203598"}'
-```

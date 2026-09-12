@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "standard": "taskand-v1.0",
-  "generatedAt": "2026-09-12T14:43:08.826Z",
+  "standard": "taskand-v1.5",
+  "generatedAt": "2026-09-12T14:58:37.733Z",
   "bindings": [
     {
       "uri": "proc://taskand.dev/nginx/status/v1",

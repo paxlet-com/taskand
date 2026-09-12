@@ -1,6 +1,7 @@
 {
   "version": 1,
-  "standard": "taskand-v1.0",
+  "standard": "taskand-v1.5",
+  "generatedAt": "2026-09-12T14:58:37.722Z",
   "bindings": [
     {
       "uri": "proc://taskand.dev/hello-world/v1",

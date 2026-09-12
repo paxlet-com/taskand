@@ -1,0 +1,13 @@
+apiVersion: taskand.dev/v1
+kind: Capsule
+metadata:
+  name: taskand-vault
+  version: "1.0.0"
+  description: "Szablon organizmu bezpieczeństwa (Vault)"
+spec:
+  role: security
+  processes:
+    - uri: proc://taskand.dev/registry/serve/v1
+    - uri: proc://taskand.dev/vault/secrets/v1
+    - uri: proc://taskand.dev/vault/chat/v1
+    - uri: proc://taskand.dev/vault/spawn/v1

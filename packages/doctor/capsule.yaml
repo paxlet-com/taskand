@@ -18,6 +18,12 @@ spec:
     - uri: proc://taskand.dev/doctor/prescribe/v1
       role: worker
       grants: [execute-proc]
+    - uri: proc://taskand.dev/doctor/chat/v1
+      role: worker
+      grants: [execute-proc]
+    - uri: proc://taskand.dev/doctor/spawn/v1
+      role: worker
+      grants: [execute-proc]
 
   permissions:
     source: grants.yaml

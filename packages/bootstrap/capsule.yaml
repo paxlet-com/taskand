@@ -18,6 +18,9 @@ spec:
     - uri: proc://taskand.dev/bootstrap/handover/v1
       role: worker
       grants: [execute-proc]
+    - uri: proc://taskand.dev/bootstrap/spawn/v1
+      role: worker
+      grants: [execute-proc]
 
   permissions:
     source: grants.yaml

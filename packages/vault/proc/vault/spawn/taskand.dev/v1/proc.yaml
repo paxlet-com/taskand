@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/vault/spawn/v1
+name: spawn
+version: "1.0.0"
+role: security
+interface:
+  stdin: { organism: string, template?: string, role?: string }
+  stdout: { spawned: boolean, organism: string, healthy: boolean }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

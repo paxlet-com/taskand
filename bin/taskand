@@ -111,57 +111,178 @@ case "$cmd" in
     call_organism "dev" "dozbrój $SRV na :$PORT"
     ;;
   fed|federation)
-    if curl -s -f http://localhost:8077/federation >/dev/null 2>&1; then
-      curl -s http://localhost:8077/federation | python3 -m json.tool
-    else
-      echo "=== Lokalne rejestry federacji (proc-catalog.json) ==="
-      for p in "$PROJECT_DIR"/packages/*/proc-catalog.json; do
-        if [ -f "$p" ]; then
-          pkg_name="$(basename "$(dirname "$p")")"
-          echo "[$pkg_name]:"
-          python3 -c 'import sys, json; b=json.load(open(sys.argv[1])).get("bindings", []); [print(f"  - {x.get(\"uri\")}") for x in b]' "$p"
-        fi
-      done
+    shift || true
+    CAN_SPAWN=0
+    if [ "${1:-}" = "--can-spawn" ]; then
+      CAN_SPAWN=1
     fi
+    python3 - "$CAN_SPAWN" "$PROJECT_DIR" << 'EOF'
+import sys, os, json, urllib.request
+
+can_spawn = sys.argv[1] == "1"
+root = sys.argv[2]
+pkgs_dir = os.path.join(root, "packages")
+
+pkgs = []
+if os.path.isdir(pkgs_dir):
+    for name in sorted(os.listdir(pkgs_dir)):
+        p = os.path.join(pkgs_dir, name)
+        if os.path.isdir(p) and os.path.isfile(os.path.join(p, "proc-catalog.json")):
+            pkgs.append((name, p))
+
+if can_spawn:
+    print("=== Federacja Rejestrów — Zdolność Reprodukcji (Standard v1.5 Cz. II · 8) ===")
+    print(f"\033[1m{'Rejestr (Paczka)':<22} | {'Rola':<12} | {'Proces Reprodukcji':<38} | {'Status Spawn'}\033[0m")
+    print("-" * 22 + "-+-" + "-" * 12 + "-+-" + "-" * 38 + "-+-" + "-" * 14)
+    for name, p in pkgs:
+        cat_file = os.path.join(p, "proc-catalog.json")
+        role = "unknown"
+        capsule_file = os.path.join(p, "capsule.yaml")
+        if os.path.isfile(capsule_file):
+            for line in open(capsule_file, encoding="utf-8"):
+                if line.strip().startswith("role:"):
+                    role = line.strip().split(":", 1)[1].strip()
+                    break
+        try:
+            cat = json.load(open(cat_file, encoding="utf-8"))
+        except Exception:
+            cat = {}
+        bindings = cat.get("bindings", [])
+        spawn_proc = next((b.get("uri") for b in bindings if "spawn" in b.get("uri", "")), None)
+        if spawn_proc:
+            print(f"{name:<22} | {role:<12} | {spawn_proc:<38} | \033[32m✓ CAN-SPAWN\033[0m")
+        else:
+            status = "— (adapter)" if "adapter" in role or name == "nginx" else "— (brak spawn)"
+            print(f"{name:<22} | {role:<12} | {'none':<38} | \033[33m{status}\033[0m")
+else:
+    try:
+        req = urllib.request.Request("http://localhost:8077/federation")
+        with urllib.request.urlopen(req, timeout=1) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            print(json.dumps(data, indent=2, ensure_ascii=False))
+            sys.exit(0)
+    except Exception:
+        pass
+    print("=== Lokalne rejestry federacji (proc-catalog.json) ===")
+    for name, p in pkgs:
+        print(f"[{name}]:")
+        cat = json.load(open(os.path.join(p, "proc-catalog.json"), encoding="utf-8"))
+        for b in cat.get("bindings", []):
+            print(f"  - {b.get('uri')}")
+EOF
+    ;;
+  procs|processes)
+    python3 - "$PROJECT_DIR" << 'EOF'
+import sys, os, json
+
+root = sys.argv[1]
+pkgs_dir = os.path.join(root, "packages")
+print("=== Wszystkie procesy proc:// w ekosystemie taskand (Standard v1.5) ===")
+
+total = 0
+if os.path.isdir(pkgs_dir):
+    for name in sorted(os.listdir(pkgs_dir)):
+        cat_file = os.path.join(pkgs_dir, name, "proc-catalog.json")
+        if os.path.isfile(cat_file):
+            try:
+                cat = json.load(open(cat_file, encoding="utf-8"))
+                bindings = cat.get("bindings", [])
+                print(f"\n📦 paczka: packages/{name} ({len(bindings)} procesów)")
+                for b in bindings:
+                    uri = b.get("uri")
+                    rel_path = b.get("path")
+                    print(f"   • {uri:<46} → {rel_path}")
+                    total += 1
+            except Exception as e:
+                print(f"   ✗ błąd odczytu {name}: {e}")
+print(f"\nRazem zarejestrowanych procesów proc:// w federacji: {total}")
+EOF
     ;;
   proc)
     shift || true
     URI="${1:-}"
-    DATA="${2:-{}}"
+    DATA="${2:-}"
+    [ -n "$DATA" ] || DATA="{}"
     if [ -z "$URI" ]; then
       echo "Użycie: taskand proc <uri> [json_payload]"
       exit 1
     fi
-    if curl -s -f http://localhost:8077/health >/dev/null 2>&1; then
-      curl -s -X POST http://localhost:8077/api/proc \
-        -H "Content-Type: application/json" \
-        -d "{\"uri\":\"$URI\",\"data\":$DATA}" | python3 -m json.tool
-    else
-      python3 -c '
-import sys, json, os, subprocess
+    python3 - "$URI" "$DATA" "$PROJECT_DIR" << 'EOF'
+import sys, json, os, subprocess, urllib.request, urllib.error
+
 uri = sys.argv[1]
-data = json.loads(sys.argv[2])
+raw_data = sys.argv[2]
 root = sys.argv[3]
-target_bin = None
-for p in [os.path.join(root, "proc-catalog.json")] + [os.path.join(root, "packages", d, "proc-catalog.json") for d in os.listdir(os.path.join(root, "packages")) if os.path.isdir(os.path.join(root, "packages", d))]:
-    if os.path.exists(p):
-        cat = json.load(open(p))
-        base_d = os.path.dirname(p)
-        for b in cat.get("bindings", []):
-            if b.get("uri") == uri:
-                target_bin = os.path.join(base_d, b.get("path"), "bin.mjs")
-                break
-    if target_bin: break
-if not target_bin or not os.path.exists(target_bin):
-    print(json.dumps({"ok": False, "error": f"Nie znaleziono {uri}"}))
-    sys.exit(1)
-res = subprocess.run(["node", target_bin], input=json.dumps(data), text=True, capture_output=True)
+
 try:
-    print(json.dumps(json.loads(res.stdout), indent=2))
-except:
+    data_obj = json.loads(raw_data)
+except Exception:
+    data_obj = {"input": raw_data}
+
+# 1. Try Gateway if available
+gw_ok = False
+try:
+    req = urllib.request.Request("http://localhost:8077/health")
+    with urllib.request.urlopen(req, timeout=0.5) as r:
+        if r.status == 200:
+            gw_ok = True
+except Exception:
+    gw_ok = False
+
+if gw_ok:
+    try:
+        body = json.dumps({"uri": uri, "data": data_obj}).encode("utf-8")
+        req = urllib.request.Request(
+            "http://localhost:8077/api/proc",
+            data=body,
+            headers={"Content-Type": "application/json"}
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            res = json.loads(r.read().decode("utf-8"))
+            print(json.dumps(res, indent=2, ensure_ascii=False))
+            sys.exit(0)
+    except urllib.error.HTTPError as he:
+        try:
+            err_data = json.loads(he.read().decode("utf-8"))
+            print(json.dumps(err_data, indent=2, ensure_ascii=False))
+        except Exception:
+            print(f"HTTP Error {he.code}: {he.reason}")
+        sys.exit(1)
+    except Exception:
+        pass
+
+# 2. Local fallback
+target_bin = None
+catalogs = [os.path.join(root, "proc-catalog.json")]
+pkgs_d = os.path.join(root, "packages")
+if os.path.isdir(pkgs_d):
+    for d in sorted(os.listdir(pkgs_d)):
+        catalogs.append(os.path.join(pkgs_d, d, "proc-catalog.json"))
+
+for p in catalogs:
+    if os.path.exists(p):
+        try:
+            cat = json.load(open(p, encoding="utf-8"))
+            base_d = os.path.dirname(p)
+            for b in cat.get("bindings", []):
+                if b.get("uri") == uri:
+                    target_bin = os.path.join(base_d, b.get("path"), "bin.mjs")
+                    break
+        except Exception:
+            pass
+    if target_bin:
+        break
+
+if not target_bin or not os.path.exists(target_bin):
+    print(json.dumps({"ok": False, "error": f"Nie znaleziono procesu dla URI: {uri}"}, indent=2, ensure_ascii=False))
+    sys.exit(1)
+
+res = subprocess.run(["node", target_bin], input=json.dumps(data_obj), text=True, capture_output=True)
+try:
+    print(json.dumps(json.loads(res.stdout), indent=2, ensure_ascii=False))
+except Exception:
     print(res.stdout)
-' "$URI" "$DATA" "$PROJECT_DIR"
-    fi
+EOF
     ;;
   add)
     shift || true
@@ -274,7 +395,22 @@ except:
     ;;
   logs|log)
     shift || true
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs -f "${@:-nucleus}"
+    ARG="${1:-}"
+    case "$ARG" in
+      ''|*[0-9]*)
+        N="${ARG:-50}"
+        LOGFILE="$PROJECT_DIR/log/evolution.log"
+        if [ -f "$LOGFILE" ]; then
+          echo "=== Ostatnie $N linii z $LOGFILE ==="
+          tail -n "$N" "$LOGFILE"
+        else
+          docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs --tail="$N" nucleus
+        fi
+        ;;
+      *)
+        docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs -f "$@"
+        ;;
+    esac
     ;;
   ps|status)
     docker compose -f "$PROJECT_DIR/docker-compose.yaml" ps
@@ -326,30 +462,31 @@ except:
     sh "$PROJECT_DIR/serve.sh" "${1:-8080}"
     ;;
   help|-h|--help|"")
-    echo "taskand v1.4 — federacyjny system organizmów sterowany konwersacyjnie"
+    echo "taskand v1.5 — samo-replikujący się federacyjny system organizmów"
     echo ""
     echo "Użycie: taskand <organizm|komenda> [argumenty]"
     echo ""
-    echo "Rozmowa z organizmami (Standard v1.4):"
-    echo "  taskand dev \"prompt\"       Rozmawiaj z developerem (tworzenie procesów, dozbrajanie usług, codegen)"
+    echo "Rozmowa z organizmami (Standard v1.5):"
+    echo "  taskand dev \"prompt\"       Rozmawiaj z developerem (tworzenie procesów, reprodukcja, codegen)"
     echo "  taskand doc [\"prompt\"]     Rozmawiaj z doctorem (diagnoza zdrowia, samonaprawa, weryfikacja)"
-    echo "  taskand sec \"prompt\"       Rozmawiaj z vaultem (zarządzanie sekretami, migracja tokenów LLM, audyt)"
+    echo "  taskand sec \"prompt\"       Rozmawiaj z vaultem (zarządzanie sekretami, audyt uprawnień)"
     echo "  taskand chat \"prompt\"      Rozmawiaj z asystentem chat / kolejkowanie zadań"
     echo "  taskand arm <usługa> [port] Szybkie dozbrojenie istniejącej usługi (np. arm nginx 8090)"
     echo ""
-    echo "Federacja i procesy URI:"
-    echo "  taskand fed                 Lista zarejestrowanych procesów w rejestrach federacji"
+    echo "Federacja i procesy URI (Standard v1.5):"
+    echo "  taskand procs               Lista wszystkich proc:// w całym ekosystemie"
+    echo "  taskand fed [--can-spawn]   Rejestry federacji oraz weryfikacja zdolności reprodukcji (spawn/v1)"
     echo "  taskand proc <uri> [data]   Bezpośrednie wykonanie dowolnego procesu proc://"
     echo ""
-    echo "Zarządzanie kontenerami i zadaniami:"
+    echo "Zarządzanie kontenerami, zadaniami i ewolucją:"
     echo "  taskand add \"opis\"          Dodaj zadanie i śledź wykonanie na żywo"
     echo "  taskand add -d \"opis\"       Dodaj zadanie w tle (async)"
+    echo "  taskand log [n]             Wyświetl n ostatnich linii z log/evolution.log (lub logi kontenera)"
     echo "  taskand clean               Uruchom czyszczenie zbędnych plików i duplikatów"
     echo "  taskand history             Wyświetl historię zadań i migawek"
     echo "  taskand twin <id> [opis]    Testuj proces w Digital Twin Sandbox"
     echo "  taskand rollback <snap-id>  Przywróć stan plików z wybranej migawki"
     echo "  taskand snapshot            Utwórz ręczną migawkę stanu plików"
-    echo "  taskand logs [usługa]       Śledź logi na żywo"
     echo "  taskand status              Status kontenerów (docker compose ps)"
     echo "  taskand up / down           Uruchom / zatrzymaj środowisko"
     echo "  taskand restart             Zrestartuj kontenery z weryfikacją doctorem"

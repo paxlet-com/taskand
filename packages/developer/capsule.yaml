@@ -27,6 +27,14 @@ spec:
       role: worker
       grants: [run]
 
+    - uri: proc://taskand.dev/dev/chat/v1
+      role: worker
+      grants: [execute-proc]
+
+    - uri: proc://taskand.dev/developer/spawn/v1
+      role: worker
+      grants: [execute-proc]
+
   permissions:
     source: grants.yaml
     defaults:
