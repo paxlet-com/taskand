@@ -472,3 +472,172 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-e22adcbf
+    name: Fix ast-duplicate-imports issues
+    description: Resolve 2 ast-duplicate-imports issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: ast-duplicate-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a831034e
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2432c0cb
+    name: Fix ast-string-concat issues
+    description: Resolve 1 ast-string-concat issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: ast-string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-75b2307f
+    name: Fix ast-print-statements issues
+    description: Resolve 6 ast-print-statements issues in scripts/planner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/planner.py
+    rule_id: ast-print-statements
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0c871516
+    name: Fix ast-missing-return-type issues
+    description: Resolve 8 ast-missing-return-type issues in scripts/planner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/planner.py
+    rule_id: ast-missing-return-type
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e388fb9e
+    name: Fix ruff-print-statements issues
+    description: Resolve 6 ruff-print-statements issues in scripts/planner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/planner.py
+    rule_id: ruff-print-statements
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-709130f7
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-6c8b3679
+    name: Fix smart-return-type issues
+    description: Resolve 8 smart-return-type issues in scripts/planner.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/planner.py
+    rule_id: smart-return-type
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fd58695e
+    name: Fix string-concat-fstring issues
+    description: Resolve 2 string-concat-fstring issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: string-concat-fstring
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-879546b3
+    name: Fix importchecker-duplicate-imports issues
+    description: Resolve 1 importchecker-duplicate-imports issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: importchecker-duplicate-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a49b83cb
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0cd93b0d
+    name: Fix ai-boilerplate issues
+    description: Resolve 2 ai-boilerplate issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: ai-boilerplate
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-67b6cf3b
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in scripts/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/planner.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

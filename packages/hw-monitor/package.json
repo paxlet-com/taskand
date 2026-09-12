@@ -1,0 +1,10 @@
+{
+  "name": "taskand-hw-monitor",
+  "version": "1.0.0",
+  "description": "Monitorowanie sprzętu RPi5 i symulacji VM (Standard v1.6)",
+  "type": "module",
+  "scripts": {
+    "test": "make test",
+    "conformance": "make conformance"
+  }
+}

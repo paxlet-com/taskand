@@ -1,62 +1,353 @@
-# code2llm | 45f 2706L | yaml:7,shell:5,json:3,python:3 | 2026-09-12
-# generated in 0.01s
-# CC̅=3.5 | critical:3/35 | dups:0 | cycles:0
+# code2llm | 224f 10677L | yaml:75,javascript:73,json:29,shell:5,python:4 | 2026-09-12
+# generated in 0.09s
+# CC̅=3.1 | critical:15/473 | dups:0 | cycles:0
 
-HEALTH[3]:
+HEALTH[15]:
+  🟡 CC    portIdx CC=15 (limit:15)
+  🟡 CC    port CC=15 (limit:15)
+  🟡 CC    server CC=15 (limit:15)
+  🟡 CC    low CC=17 (limit:15)
+  🟡 CC    norm CC=17 (limit:15)
+  🟡 CC    targetDevice CC=15 (limit:15)
+  🟡 CC    VNC CC=15 (limit:15)
+  🟡 CC    low CC=20 (limit:15)
+  🟡 CC    norm CC=20 (limit:15)
+  🟡 CC    webUrl CC=19 (limit:15)
+  🟡 CC    gatewayUrl CC=19 (limit:15)
+  🟡 CC    mockResults CC=19 (limit:15)
   🟡 CC    validate_dod CC=19 (limit:15)
   🟡 CC    list_history CC=21 (limit:15)
   🟡 CC    rollback CC=20 (limit:15)
 
 REFACTOR[1]:
-  1. split 3 high-CC methods  (CC>15)
+  1. split 15 high-CC methods  (CC>15)
 
-PIPELINES[6]:
-  [1] Src [validate_dod]: validate_dod → run_cmd
+PIPELINES[379]:
+  [1] Src [updateMode]: updateMode
       PURITY: 100% pure
-  [2] Src [verify_and_evolve]: verify_and_evolve → print
+  [2] Src [binContent]: binContent
       PURITY: 100% pure
-  [3] Src [create_snapshot]: create_snapshot → ensure_dirs
+  [3] Src [yamlContent]: yamlContent
       PURITY: 100% pure
-  [4] Src [list_history]: list_history → ensure_dirs
+  [4] Src [testContent]: testContent
       PURITY: 100% pure
-  [5] Src [show_details]: show_details → ensure_dirs
+  [5] Src [catalog]: catalog
       PURITY: 100% pure
-  [6] Src [rollback]: rollback → ensure_dirs
+  [6] Src [errCount]: errCount
+      PURITY: 100% pure
+  [7] Src [curBinHash]: curBinHash
+      PURITY: 100% pure
+  [8] Src [curYamlHash]: curYamlHash
+      PURITY: 100% pure
+  [9] Src [raw]: raw
+      PURITY: 100% pure
+  [10] Src [dir]: dir
+      PURITY: 100% pure
+  [11] Src [r]: r
+      PURITY: 100% pure
+  [12] Src [raw]: raw
+      PURITY: 100% pure
+  [13] Src [checkDocker]: checkDocker
+      PURITY: 100% pure
+  [14] Src [checkGit]: checkGit
+      PURITY: 100% pure
+  [15] Src [checkEnv]: checkEnv
+      PURITY: 100% pure
+  [16] Src [dir]: dir
+      PURITY: 100% pure
+  [17] Src [bad]: bad
+      PURITY: 100% pure
+  [18] Src [good]: good
+      PURITY: 100% pure
+  [19] Src [raw]: raw
+      PURITY: 100% pure
+  [20] Src [targetRole]: targetRole
+      PURITY: 100% pure
+  [21] Src [dir]: dir
+      PURITY: 100% pure
+  [22] Src [bad]: bad
+      PURITY: 100% pure
+  [23] Src [good]: good
+      PURITY: 100% pure
+  [24] Src [raw]: raw
+      PURITY: 100% pure
+  [25] Src [targetOrg]: targetOrg
+      PURITY: 100% pure
+  [26] Src [getRepoRoot]: getRepoRoot
+      PURITY: 100% pure
+  [27] Src [cur]: cur
+      PURITY: 100% pure
+  [28] Src [content]: content
+      PURITY: 100% pure
+  [29] Src [pkgDir]: pkgDir
+      PURITY: 100% pure
+  [30] Src [alreadyExists]: alreadyExists
+      PURITY: 100% pure
+  [31] Src [gTxt]: gTxt
+      PURITY: 100% pure
+  [32] Src [dir]: dir
+      PURITY: 100% pure
+  [33] Src [bad]: bad
+      PURITY: 100% pure
+  [34] Src [noOrg]: noOrg
+      PURITY: 100% pure
+  [35] Src [good]: good
+      PURITY: 100% pure
+  [36] Src [out]: out
+      PURITY: 100% pure
+  [37] Src [loadCatalog]: loadCatalog
+      PURITY: 100% pure
+  [38] Src [p]: p
+      PURITY: 100% pure
+  [39] Src [portIdx]: portIdx
+      PURITY: 100% pure
+  [40] Src [port]: port
+      PURITY: 100% pure
+  [41] Src [catalog]: catalog
+      PURITY: 100% pure
+  [42] Src [server]: server
+      PURITY: 100% pure
+  [43] Src [processes]: processes
+      PURITY: 100% pure
+  [44] Src [m]: m
+      PURITY: 100% pure
+  [45] Src [filePath]: filePath
+      PURITY: 100% pure
+  [46] Src [raw]: raw
+      PURITY: 100% pure
+  [47] Src [action]: action
+      PURITY: 100% pure
+  [48] Src [dir]: dir
+      PURITY: 100% pure
+  [49] Src [bad]: bad
+      PURITY: 100% pure
+  [50] Src [good]: good
       PURITY: 100% pure
 
 LAYERS:
-  scripts/                        CC̄=8.7    ←in:0  →out:51  !! split
+  scripts/                        CC̄=4.7    ←in:0  →out:57  !! split
   │ !! history                    309L  0C    6m  CC=21     ←0
   │ digital_twin               249L  0C    6m  CC=9      ←0
+  │ planner                    234L  0C    8m  CC=11     ←0
+  │ verify-conformance.mjs     199L  0C   25m  CC=7      ←0
+  │ taskand-new-pkg.sh         165L  0C    0m  CC=0.0    ←0
   │ !! dod_validator               79L  0C    2m  CC=19     ←0
+  │ taskand-runner.mjs          54L  0C    9m  CC=2      ←0
   │
-  ./                              CC̄=0.0    ←in:0  →out:0
-  │ Dockerfile                 369L  0C    2m  CC=0.0    ←0
-  │ Makefile                    99L  0C    0m  CC=0.0    ←0
+  packages/                       CC̄=3.0    ←in:0  →out:0
+  │ bin.mjs                    318L  0C   36m  CC=8      ←0
+  │ bin.mjs                    147L  0C   15m  CC=4      ←0
+  │ bin.mjs                    145L  0C   16m  CC=2      ←0
+  │ !! bin.mjs                    133L  0C   11m  CC=15     ←0
+  │ !! bin.mjs                    125L  0C   12m  CC=19     ←0
+  │ !! bin.mjs                    120L  0C    7m  CC=15     ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ bin.mjs                    108L  0C   12m  CC=8      ←0
+  │ !! bin.mjs                     94L  0C   11m  CC=20     ←0
+  │ bin.mjs                     82L  0C    9m  CC=3      ←0
+  │ bin.mjs                     76L  0C    3m  CC=10     ←0
+  │ !! bin.mjs                     73L  0C    9m  CC=17     ←0
+  │ proc-catalog.json           63L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                63L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                62L  0C    0m  CC=0.0    ←0
+  │ test.mjs                    61L  0C    8m  CC=3      ←0
+  │ bin.mjs                     52L  0C    3m  CC=2      ←0
+  │ capsule.yaml                51L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           49L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           49L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     47L  0C    5m  CC=3      ←0
+  │ capsule.yaml                45L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           42L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                42L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           42L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                42L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                42L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                42L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ Makefile                    40L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     39L  0C    2m  CC=2      ←0
+  │ bin.mjs                     39L  0C    3m  CC=2      ←0
+  │ bin.mjs                     38L  0C    3m  CC=2      ←0
+  │ bin.mjs                     37L  0C    2m  CC=2      ←0
+  │ bin.mjs                     36L  0C    4m  CC=2      ←0
+  │ test.mjs                    36L  0C    4m  CC=7      ←0
+  │ bin.mjs                     36L  0C    5m  CC=7      ←0
+  │ test.mjs                    35L  0C    5m  CC=6      ←0
+  │ test.mjs                    35L  0C    6m  CC=9      ←0
+  │ bin.mjs                     35L  0C    2m  CC=2      ←0
+  │ bin.mjs                     35L  0C    4m  CC=11     ←0
+  │ proc-catalog.json           35L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           35L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           35L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     33L  0C    5m  CC=2      ←0
+  │ test.mjs                    33L  0C    4m  CC=6      ←0
+  │ Makefile                    33L  0C    0m  CC=0.0    ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ bin.mjs                     30L  0C    3m  CC=2      ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ bin.mjs                     30L  0C    1m  CC=2      ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ test.mjs                    30L  0C    5m  CC=7      ←0
+  │ capsule.yaml                30L  0C    0m  CC=0.0    ←0
+  │ qualification.yaml          30L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     29L  0C    2m  CC=2      ←0
+  │ test.mjs                    27L  0C    4m  CC=3      ←0
+  │ test.mjs                    27L  0C    4m  CC=3      ←0
+  │ test.mjs                    27L  0C    4m  CC=3      ←0
+  │ test.mjs                    27L  0C    4m  CC=3      ←0
+  │ test.mjs                    27L  0C    4m  CC=3      ←0
+  │ bin.mjs                     26L  0C    2m  CC=2      ←0
+  │ bin.mjs                     26L  0C    2m  CC=2      ←0
+  │ test.mjs                    24L  0C    4m  CC=7      ←0
+  │ bin.mjs                     24L  0C    3m  CC=2      ←0
+  │ test.mjs                    24L  0C    4m  CC=6      ←0
+  │ capsule.yaml                24L  0C    0m  CC=0.0    ←0
+  │ test.mjs                    23L  0C    3m  CC=3      ←0
+  │ test.mjs                    23L  0C    3m  CC=3      ←0
+  │ test.mjs                    22L  0C    3m  CC=3      ←0
+  │ test.mjs                    22L  0C    3m  CC=4      ←0
+  │ proc-catalog.json           21L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   20L  0C    0m  CC=0.0    ←0
+  │ test.mjs                    19L  0C    3m  CC=3      ←0
+  │ test.mjs                    19L  0C    3m  CC=3      ←0
+  │ bin.mjs                     19L  0C    1m  CC=2      ←0
+  │ test.mjs                    17L  0C    3m  CC=1      ←0
+  │ test.mjs                    16L  0C    3m  CC=3      ←0
+  │ claim-crm-retry.yaml        16L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ claim-environment-immutable.yaml    14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     13L  0C    1m  CC=2      ←0
+  │ twin.compose.yaml           13L  0C    0m  CC=0.0    ←0
+  │ test.mjs                    12L  0C    3m  CC=1      ←0
+  │ test.mjs                    12L  0C    3m  CC=1      ←0
+  │ test.mjs                    12L  0C    3m  CC=1      ←0
+  │ test.mjs                    12L  0C    3m  CC=1      ←0
+  │ test.mjs                    11L  0C    2m  CC=1      ←0
+  │ grants.yaml                 11L  0C    0m  CC=0.0    ←0
+  │ qualification.yaml          11L  0C    0m  CC=0.0    ←0
+  │ grants.yaml                 11L  0C    0m  CC=0.0    ←0
+  │ grants.yaml                 11L  0C    0m  CC=0.0    ←0
+  │ qualification.yaml          11L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   10L  0C    0m  CC=0.0    ←0
+  │ grants.yaml                 10L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   10L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                   10L  0C    0m  CC=0.0    ←0
+  │ package.json                10L  0C    0m  CC=0.0    ←0
+  │ package.json                10L  0C    0m  CC=0.0    ←0
+  │ test.mjs                     9L  0C    3m  CC=1      ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    9L  0C    0m  CC=0.0    ←0
+  │ claim-developer.yaml         8L  0C    0m  CC=0.0    ←0
+  │ claim-chat.yaml              8L  0C    0m  CC=0.0    ←0
+  │ test.mjs                     7L  0C    2m  CC=1      ←0
+  │ test.mjs                     7L  0C    2m  CC=1      ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ package.json                 5L  0C    0m  CC=0.0    ←0
+  │ spec.yaml                    3L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=1.8    ←in:0  →out:0
+  │ !! planfile.yaml              643L  0C    0m  CC=0.0    ←0
+  │ !! goal.yaml                  523L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                 374L  0C    2m  CC=0.0    ←0
+  │ genome.yaml                149L  0C    0m  CC=0.0    ←0
+  │ Makefile                   139L  0C    0m  CC=0.0    ←0
+  │ prefact.yaml                94L  0C    0m  CC=0.0    ←0
+  │ capsule.yaml                82L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yaml         81L  0C    0m  CC=0.0    ←0
+  │ verify-catalog.mjs          71L  0C    8m  CC=5      ←0
   │ taskand.sh                  59L  0C    1m  CC=0.0    ←0
   │ project.sh                  59L  0C    0m  CC=0.0    ←0
-  │ docker-compose.yaml         43L  0C    0m  CC=0.0    ←0
+  │ environment.yaml            43L  0C    0m  CC=0.0    ←0
+  │ proc-catalog.json           42L  0C    0m  CC=0.0    ←0
+  │ federation-spec.yaml        37L  0C    0m  CC=0.0    ←0
+  │ grants.yaml                 34L  0C    0m  CC=0.0    ←0
   │ serve.sh                    21L  0C    0m  CC=0.0    ←0
-  │ tree.sh                      1L  0C    0m  CC=0.0    ←0
+  │ package.json                10L  0C    0m  CC=0.0    ←0
+  │
+  templates/                      CC̄=1.8    ←in:0  →out:0
+  │ status.template.mjs         25L  0C    4m  CC=2      ←0
+  │ capsule.template.yaml       13L  0C    0m  CC=0.0    ←0
+  │
+  gateway/                        CC̄=0.0    ←in:57  →out:0
+  │ Dockerfile                 453L  1C   10m  CC=0.0    ←3
   │
   bootstrap/                      CC̄=0.0    ←in:0  →out:0
-  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0
-  │
-  gateway/                        CC̄=0.0    ←in:51  →out:0
-  │ Dockerfile                 199L  1C    8m  CC=0.0    ←2
+  │ Dockerfile                 374L  0C    2m  CC=0.0    ←0
   │
   history/                        CC̄=0.0    ←in:0  →out:0
-  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0
   │ Dockerfile                  63L  1C    6m  CC=0.0    ←0
   │ docker-compose.yaml         56L  0C    0m  CC=0.0    ←0
   │ manifest.json               18L  0C    0m  CC=0.0    ←0
-  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0
   │ history.yaml                 9L  0C    0m  CC=0.0    ←0
-  │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0
+  │
+  schemas/                        CC̄=0.0    ←in:0  →out:0
+  │ capsule.v1.json             39L  0C    0m  CC=0.0    ←0
+  │ envelope.v1.json            30L  0C    0m  CC=0.0    ←0
+  │ cloudevents.v1.json         22L  0C    0m  CC=0.0    ←0
+  │ browser-session.v1.json     15L  0C    0m  CC=0.0    ←0
+  │ browser-command.v1.json     14L  0C    0m  CC=0.0    ←0
+  │
+  strategy/                       CC̄=0.0    ←in:0  →out:0
+  │ default.yaml                13L  0C    0m  CC=0.0    ←0
+  │
+  vms/                            CC̄=0.0    ←in:0  →out:0
+  │ Dockerfile                   9L  0C    0m  CC=0.0    ←0
   │
   tasks/                          CC̄=0.0    ←in:0  →out:0
-  │ done.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ done.yaml                   16L  0C    0m  CC=0.0    ←0
   │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0
+  │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-api-smoke.testql.toon.yaml    39L  0C    0m  CC=0.0    ←0
+  │
+  skills/                         CC̄=0.0    ←in:0  →out:0
+  │ browser-automation.yaml     11L  0C    0m  CC=0.0    ←0
   │
   evolution/                      CC̄=0.0    ←in:0  →out:0
   │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
@@ -64,6 +355,8 @@ LAYERS:
   │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  23L  0C    0m  CC=0.0    ←0
@@ -82,23 +375,24 @@ LAYERS:
   │ Dockerfile                   3L  0C    0m  CC=0.0    ←0
   │
   landing/                        CC̄=0.0    ←in:0  →out:0
-  │ serve.sh                    21L  0C    0m  CC=0.0    ←0
   │ Dockerfile                   5L  0C    0m  CC=0.0    ←0
   │
   answers/                        CC̄=0.0    ←in:0  →out:0
   │ taskand.answers.yaml         5L  0C    0m  CC=0.0    ←0
   │
+  proc/                           CC̄=0.0    ←in:0  →out:0
+  │ spawn-remote.sh             35L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
-     history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml  0L
      tasks/inbox.yaml                          0L
 
 COUPLING:
            gateway  scripts
-  gateway       ──      ←51  hub
-  scripts       51       ──  !! fan-out
+  gateway       ──      ←57  hub
+  scripts       57       ──  !! fan-out
   CYCLES: none
-  HUB: gateway/ (fan-in=51)
-  SMELL: scripts/ fan-out=51 → split needed
+  HUB: gateway/ (fan-in=57)
+  SMELL: scripts/ fan-out=57 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

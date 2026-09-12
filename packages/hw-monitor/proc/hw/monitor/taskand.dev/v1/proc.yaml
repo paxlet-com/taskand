@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/hw/monitor/v1
+name: monitor
+version: "1.0.0"
+role: worker
+interface:
+  stdin: { metric: string, pin?: number, device?: string }
+  stdout: { ok: boolean, device: string, cpu_temp?: number, gpio?: object, disk_free_gb?: number }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

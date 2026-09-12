@@ -1,52 +1,52 @@
-# glm53 | 35 func | 9f | 2706L | yaml | 2026-09-12
+# glm53 | 473 func | 82f | 10677L | yaml | 2026-09-12
 # generated in 0.00s
 
 HEALTH:
-  CC̄=3.5  critical=4 (limit:10)  dup=1  cycles=0
+  CC̄=3.1  critical=20 (limit:10)  dup=1  cycles=0
 
-ALERTS[10]:
+ALERTS[20]:
   !!! high_fan_out     rollback = 24 (limit:10)
   !!! high_fan_out     list_history = 22 (limit:10)
   !!! high_fan_out     create_snapshot = 20 (limit:10)
   !!  cc_exceeded      list_history = 21 (limit:15)
+  !!  cc_exceeded      low = 20 (limit:15)
+  !!  cc_exceeded      norm = 20 (limit:15)
   !!  cc_exceeded      rollback = 20 (limit:15)
+  !!  high_fan_out     low = 17 (limit:10)
+  !!  high_fan_out     norm = 17 (limit:10)
   !!  high_fan_out     ask_llm_for_repair = 16 (limit:10)
-  !   cc_exceeded      validate_dod = 19 (limit:15)
-  !   high_fan_out     verify_and_evolve = 14 (limit:10)
-  !   high_fan_out     show_details = 12 (limit:10)
-  !   high_fan_out     compute_dir_hash = 11 (limit:10)
 
-MODULES[45] (top by size):
-  M[Dockerfile] 369L C:0 F:2 CC↑0 D:0 ()
+MODULES[224] (top by size):
+  M[planfile.yaml] 643L C:0 F:0 CC↑0 D:0 (yaml)
+  M[goal.yaml] 523L C:0 F:0 CC↑0 D:0 (yaml)
+  M[gateway/Dockerfile] 453L C:1 F:10 CC↑0 D:3 ()
+  M[Dockerfile] 374L C:0 F:2 CC↑0 D:0 ()
+  M[bootstrap/Dockerfile] 374L C:0 F:2 CC↑0 D:0 ()
+  M[packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs] 318L C:0 F:36 CC↑8 D:0 (javascript)
   M[scripts/history.py] 309L C:0 F:6 CC↑21 D:0 (python)
-  M[bootstrap/Dockerfile] 286L C:0 F:2 CC↑0 D:0 ()
-  M[history/snapshots/snap-t1789203598/files/taskand/Dockerfile] 286L C:0 F:2 CC↑0 D:0 ()
   M[scripts/digital_twin.py] 249L C:0 F:6 CC↑9 D:0 (python)
-  M[gateway/Dockerfile] 199L C:1 F:8 CC↑0 D:2 ()
-  M[Makefile] 99L C:0 F:0 CC↑0 D:0 ()
-  M[scripts/dod_validator.py] 79L C:0 F:2 CC↑19 D:0 (python)
-  M[history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile] 63L C:1 F:6 CC↑0 D:0 ()
-  M[project.sh] 59L C:0 F:0 CC↑0 D:0 (shell)
-  M[taskand.sh] 59L C:0 F:1 CC↑0 D:0 (shell)
-  M[history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml] 56L C:0 F:0 CC↑0 D:0 (yaml)
-  M[docker-compose.yaml] 43L C:0 F:0 CC↑0 D:0 (yaml)
-  M[evolution/t1789204317/Dockerfile] 43L C:0 F:0 CC↑0 D:0 ()
-  M[evolution/t1789204647/Dockerfile] 43L C:0 F:0 CC↑0 D:0 ()
-  LANGS: other:27/yaml:7/shell:5/python:3/json:3
+  M[scripts/planner.py] 234L C:0 F:8 CC↑11 D:0 (python)
+  M[scripts/verify-conformance.mjs] 199L C:0 F:25 CC↑7 D:0 (javascript)
+  M[scripts/taskand-new-pkg.sh] 165L C:0 F:0 CC↑0 D:0 (shell)
+  M[genome.yaml] 149L C:0 F:0 CC↑0 D:0 (yaml)
+  M[packages/vault/proc/vault/secrets/taskand.dev/v1/bin.mjs] 147L C:0 F:15 CC↑4 D:0 (javascript)
+  M[packages/developer/proc/dev/codegen/taskand.dev/v1/bin.mjs] 145L C:0 F:16 CC↑2 D:0 (javascript)
+  M[Makefile] 139L C:0 F:0 CC↑0 D:0 ()
+  LANGS: yaml:75/javascript:73/other:38/json:29/shell:5/python:4
 
-HOTSPOTS[7]:
+HOTSPOTS[10]:
   ★ rollback fan=24  // Orchestrates 24 calls
   ★ list_history fan=22  // Orchestrates 22 calls
   ★ create_snapshot fan=20  // Orchestrates 20 calls
-  ★ ask_llm_for_repair fan=16  // Wysyła błąd z Digital Twin do LLM w celu wygenerowania samonaprawionego Dockerfi
-  ★ verify_and_evolve fan=14  // Główna pętla weryfikacji i ewolucji w Digital Twin.
+  ★ low fan=17  // Orchestrates 17 calls
+  ★ norm fan=17  // Orchestrates 17 calls
 
-REFACTOR[6]:
-  [1] M/L Split validate_dod (CC=19)
-  [2] M/L Split list_history (CC=21)
-  [3] M/L Split rollback (CC=20)
-  [4] M/M Reduce rollback fan-out (currently 24)
-  [5] M/M Reduce list_history fan-out (currently 22)
+REFACTOR[15]:
+  [1] H/H Split god module goal.yaml (523L, 0 classes)
+  [2] H/H Split god module planfile.yaml (643L, 0 classes)
+  [3] M/L Split portIdx (CC=15)
+  [4] M/L Split port (CC=15)
+  [5] M/L Split server (CC=15)
 
 EVOLUTION:
-  2026-09-12 CC̄=3.5 crit=4 2706L // Automated analysis
+  2026-09-12 CC̄=3.1 crit=20 10677L // Automated analysis

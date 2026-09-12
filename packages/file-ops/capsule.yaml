@@ -1,0 +1,42 @@
+apiVersion: taskand.dev/v1
+kind: Capsule
+metadata:
+  name: taskand-file-ops
+  version: "1.0.0"
+  description: "Zdalne operacje na plikach na urządzeniach (Standard v1.6)"
+
+spec:
+  role: worker
+
+  processes:
+    - uri: proc://taskand.dev/file/ops/v1
+      role: worker
+      grants: [run]
+    - uri: proc://taskand.dev/file-ops/chat/v1
+      role: worker
+      grants: [run]
+    - uri: proc://taskand.dev/file-ops/spawn/v1
+      role: worker
+      grants: [run]
+    - uri: proc://taskand.dev/registry/serve/v1
+      role: worker
+      grants: [run]
+
+  permissions:
+    source: grants.yaml
+    defaults:
+      deny: [policy-write, claims-delete, git-push, self-restart]
+
+  evolution:
+    delegated-to: capsule:taskand-developer
+    twin:
+      retries: 3
+    on-exhausted: keep-previous + report
+
+  deploy:
+    policy: twin-first
+    health:
+      on-fail: auto-rollback
+
+  storage:
+    kind: git

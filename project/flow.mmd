@@ -1,26 +1,26 @@
 flowchart TD
-%% generated in 0.00s
+%% generated in 0.02s
 
     %% Entry points (blue)
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
+        verify_catalog__updateMode["updateMode"]
+        verify_catalog__binContent["binContent"]
+        verify_catalog__yamlContent["yamlContent"]
+        verify_catalog__testContent["testContent"]
+        verify_catalog__catalog["catalog"]
+        verify_catalog__errCount["errCount"]
+        verify_catalog__curBinHash["curBinHash"]
+        verify_catalog__curYamlHash["curYamlHash"]
         taskand__safe_curl["safe_curl"]
         Dockerfile__plan["plan"]
         Dockerfile__gh_child["gh_child"]
-        bootstrap__Dockerfile__plan["plan"]
-        bootstrap__Dockerfile__gh_child["gh_child"]
-        gateway__Dockerfile__parse_yaml_tasks["parse_yaml_tasks"]
-        gateway__Dockerfile__send_cors_headers["send_cors_headers"]
-        gateway__Dockerfile__do_OPTIONS["do_OPTIONS"]
-        gateway__Dockerfile__send_json["send_json"]
-        gateway__Dockerfile__do_GET["do_GET"]
-        gateway__Dockerfile__do_POST["do_POST"]
-        gateway__Dockerfile__log_message["log_message"]
-        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__yaml_value["yaml_value"]
-        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__send_json["send_json"]
-        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__do_GET["do_GET"]
-        ...["+5 more"]
+        packages__bootstrap__proc__hello_world__taskand__dev__v1__bin__raw["raw"]
+        packages__bootstrap__proc__hello_world__taskand__dev__v1__test__dir["dir"]
+        packages__bootstrap__proc__hello_world__taskand__dev__v1__test__r["r"]
+        packages__bootstrap__proc__bootstrap__onboarding__taskand__dev__v1__bin__raw["raw"]
+        ...["+398 more"]
     end
 
-    class taskand__safe_curl,Dockerfile__plan,Dockerfile__gh_child,bootstrap__Dockerfile__plan,bootstrap__Dockerfile__gh_child,gateway__Dockerfile__parse_yaml_tasks,gateway__Dockerfile__send_cors_headers,gateway__Dockerfile__do_OPTIONS,gateway__Dockerfile__send_json,gateway__Dockerfile__do_GET entry
+    class verify_catalog__updateMode,verify_catalog__binContent,verify_catalog__yamlContent,verify_catalog__testContent,verify_catalog__catalog,verify_catalog__errCount,verify_catalog__curBinHash,verify_catalog__curYamlHash,taskand__safe_curl,Dockerfile__plan entry

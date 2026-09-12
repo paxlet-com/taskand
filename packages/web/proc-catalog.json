@@ -6,9 +6,9 @@
     {
       "uri": "proc://taskand.dev/browser/session/v1",
       "path": "proc/browser/session/taskand.dev/v1",
-      "binSha256": "f34472827eab3608b5ff12d81cbfd1e84892e1767916e68d7fa209b421b3d13e",
+      "binSha256": "4ddb515033a7d6a720fee246011377f94202a7cf031257e0a6138c915b5266a8",
       "yamlSha256": "237f84cf5ea7e24ef7080199f727916bf57c2fac52a799c516e77c592f8b694b",
-      "testSha256": "e2c2df56218e1a58f4c0708880d24cbfe86dc155b2f451b86f8c72d9594d5c9b"
+      "testSha256": "d6e8a2955c3b2e1dc57f0057520e74640159b29734555cdec4c57427ae7bb201"
     },
     {
       "uri": "proc://taskand.dev/flow/login/v1",

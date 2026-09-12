@@ -1,7 +1,9 @@
 flowchart TD
-%% generated in 0.00s
-    gateway__Dockerfile["gateway.Dockerfile<br/>8 funcs"]
+%% generated in 0.02s
+    gateway__Dockerfile["gateway.Dockerfile<br/>10 funcs"]
     scripts__digital_twin["scripts.digital_twin<br/>6 funcs"]
     scripts__history["scripts.history<br/>6 funcs"]
+    scripts__planner["scripts.planner<br/>8 funcs"]
     scripts__history ==>|48| gateway__Dockerfile
+    scripts__planner ==>|6| gateway__Dockerfile
     scripts__digital_twin -->|3| gateway__Dockerfile

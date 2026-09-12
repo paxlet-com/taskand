@@ -1,8 +1,236 @@
 source: code2llm
-# generated in 0.01s
+# generated in 0.07s
 schema: code2llm.planfile_tickets.v1
 project_root: /home/tom/github/semcod/taskand/glm53
 tickets:
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.port
+    (CC=15)'
+  description: 'code2llm reports `packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.port`
+    at `packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:29` with cyclomatic
+    complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.port
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.portIdx
+    (CC=15)'
+  description: 'code2llm reports `packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.portIdx`
+    at `packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:28` with cyclomatic
+    complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.portIdx
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.server
+    (CC=15)'
+  description: 'code2llm reports `packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.server`
+    at `packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:32` with cyclomatic
+    complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs:packages.bootstrap.proc.registry.serve.taskand.dev.v1.bin.server
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.low
+    (CC=20)'
+  description: 'code2llm reports `packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.low`
+    at `packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs:31` with cyclomatic
+    complexity 20 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs:packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.low
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.norm
+    (CC=20)'
+  description: 'code2llm reports `packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.norm`
+    at `packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs:32` with cyclomatic
+    complexity 20 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs:packages.doctor.proc.doctor.chat.taskand.dev.v1.bin.norm
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.gatewayUrl
+    (CC=19)'
+  description: 'code2llm reports `packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.gatewayUrl`
+    at `packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:19` with cyclomatic
+    complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.gatewayUrl
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.mockResults
+    (CC=19)'
+  description: 'code2llm reports `packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.mockResults`
+    at `packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:20` with cyclomatic
+    complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.mockResults
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.webUrl
+    (CC=19)'
+  description: 'code2llm reports `packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.webUrl`
+    at `packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:18` with cyclomatic
+    complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs:packages.doctor.proc.doctor.diagnose.taskand.dev.v1.bin.webUrl
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.vault.proc.vault.chat.taskand.dev.v1.bin.low
+    (CC=17)'
+  description: 'code2llm reports `packages.vault.proc.vault.chat.taskand.dev.v1.bin.low`
+    at `packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs:30` with cyclomatic
+    complexity 17 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs:packages.vault.proc.vault.chat.taskand.dev.v1.bin.low
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.vault.proc.vault.chat.taskand.dev.v1.bin.norm
+    (CC=17)'
+  description: 'code2llm reports `packages.vault.proc.vault.chat.taskand.dev.v1.bin.norm`
+    at `packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs:31` with cyclomatic
+    complexity 17 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs:packages.vault.proc.vault.chat.taskand.dev.v1.bin.norm
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.web.proc.browser.session.taskand.dev.v1.bin.VNC
+    (CC=15)'
+  description: 'code2llm reports `packages.web.proc.browser.session.taskand.dev.v1.bin.VNC`
+    at `packages/web/proc/browser/session/taskand.dev/v1/bin.mjs:22` with cyclomatic
+    complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/web/proc/browser/session/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/web/proc/browser/session/taskand.dev/v1/bin.mjs:packages.web.proc.browser.session.taskand.dev.v1.bin.VNC
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.web.proc.browser.session.taskand.dev.v1.bin.targetDevice
+    (CC=15)'
+  description: 'code2llm reports `packages.web.proc.browser.session.taskand.dev.v1.bin.targetDevice`
+    at `packages/web/proc/browser/session/taskand.dev/v1/bin.mjs:21` with cyclomatic
+    complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/web/proc/browser/session/taskand.dev/v1/bin.mjs
+  dedupe_key: code2llm:cc:packages/web/proc/browser/session/taskand.dev/v1/bin.mjs:packages.web.proc.browser.session.taskand.dev.v1.bin.targetDevice
 - signal: code2llm_cc
   title: 'Reduce cyclomatic complexity: scripts.dod_validator.validate_dod (CC=19)'
   description: 'code2llm reports `scripts.dod_validator.validate_dod` at `scripts/dod_validator.py:22`
@@ -74,6 +302,24 @@ tickets:
   dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:116:God Function:
     ask_llm_for_repair'
 - signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: call_llm'
+  description: 'code2llm reports `God Function: call_llm` in `scripts/planner.py:100`.
+
+
+    Function ''call_llm'' is oversized: CC=5, fan-out=12, mutations=13.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/planner.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/planner.py:100:God Function: call_llm'
+- signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: compute_dir_hash'
   description: 'code2llm reports `God Function: compute_dir_hash` in `scripts/history.py:22`.
 
@@ -110,6 +356,43 @@ tickets:
   - scripts/history.py
   dedupe_key: 'code2llm:smell:god_function:scripts/history.py:36:God Function: create_snapshot'
 - signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: issues'
+  description: 'code2llm reports `God Function: issues` in `packages/doctor/proc/doctor/prescribe/taskand.dev/v1/bin.mjs:18`.
+
+
+    Function ''issues'' is oversized: CC=10, fan-out=12, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - packages/doctor/proc/doctor/prescribe/taskand.dev/v1/bin.mjs
+  dedupe_key: 'code2llm:smell:god_function:packages/doctor/proc/doctor/prescribe/taskand.dev/v1/bin.mjs:18:God
+    Function: issues'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: load_dot_env'
+  description: 'code2llm reports `God Function: load_dot_env` in `scripts/planner.py:21`.
+
+
+    Function ''load_dot_env'' is oversized: CC=6, fan-out=8, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/planner.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/planner.py:21:God Function: load_dot_env'
+- signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: load_env'
   description: 'code2llm reports `God Function: load_env` in `scripts/digital_twin.py:23`.
 
@@ -128,6 +411,79 @@ tickets:
   - scripts/digital_twin.py
   dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:23:God Function:
     load_env'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `scripts/planner.py:193`.
+
+
+    Function ''main'' is oversized: CC=6, fan-out=10, mutations=15.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/planner.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/planner.py:193:God Function: main'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: out'
+  description: 'code2llm reports `God Function: out` in `packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs:239`.
+
+
+    Function ''out'' is oversized: CC=5, fan-out=12, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs
+  dedupe_key: 'code2llm:smell:god_function:packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs:239:God
+    Function: out'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: parse_plan'
+  description: 'code2llm reports `God Function: parse_plan` in `scripts/planner.py:163`.
+
+
+    Function ''parse_plan'' is oversized: CC=11, fan-out=6, mutations=11.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/planner.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/planner.py:163:God Function: parse_plan'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: parse_simple_yaml'
+  description: 'code2llm reports `God Function: parse_simple_yaml` in `scripts/planner.py:32`.
+
+
+    Function ''parse_simple_yaml'' is oversized: CC=6, fan-out=8, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/planner.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/planner.py:32:God Function: parse_simple_yaml'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: run_twin_verification'
   description: 'code2llm reports `God Function: run_twin_verification` in `scripts/digital_twin.py:68`.
@@ -165,6 +521,24 @@ tickets:
   files:
   - scripts/history.py
   dedupe_key: 'code2llm:smell:god_function:scripts/history.py:162:God Function: show_details'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: updateMode'
+  description: 'code2llm reports `God Function: updateMode` in `verify-catalog.mjs:12`.
+
+
+    Function ''updateMode'' is oversized: CC=3, fan-out=13, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - verify-catalog.mjs
+  dedupe_key: 'code2llm:smell:god_function:verify-catalog.mjs:12:God Function: updateMode'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: verify_and_evolve'
   description: 'code2llm reports `God Function: verify_and_evolve` in `scripts/digital_twin.py:181`.

@@ -414,14 +414,22 @@ class Gateway(BaseHTTPRequestHandler):
                 "sec": "proc://taskand.dev/vault/chat/v1",
                 "vault": "proc://taskand.dev/vault/chat/v1",
                 "chat": "proc://taskand.dev/chat/message/v1",
-                "c": "proc://taskand.dev/chat/message/v1"
+                "c": "proc://taskand.dev/chat/message/v1",
+                "file": "proc://taskand.dev/file-ops/chat/v1",
+                "file-ops": "proc://taskand.dev/file-ops/chat/v1",
+                "hw": "proc://taskand.dev/hw-monitor/chat/v1",
+                "hw-monitor": "proc://taskand.dev/hw-monitor/chat/v1"
             }
             target_proc = proc_map.get(org)
             if not target_proc:
-                self.send_json(404, {"ok": False, "error": f"Nieznany organizm: {org}. Dostępne: dev, doc, sec, chat"})
+                self.send_json(404, {"ok": False, "error": f"Nieznany organizm: {org}. Dostępne: dev, doc, sec, chat, file, hw"})
                 return
 
-            res = execute_proc(target_proc, {"message": msg, "prompt": msg})
+            dev = payload.get("device")
+            proc_input = {"message": msg, "prompt": msg}
+            if dev:
+                proc_input["device"] = dev
+            res = execute_proc(target_proc, proc_input)
             status_code = 200 if res.get("ok") else (422 if res.get("exit_code") == 2 else 500)
             self.send_json(status_code, {
                 "ok": res.get("ok", False),

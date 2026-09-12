@@ -1,16 +1,122 @@
 % ── Project Metadata ─────────────────────────────────────
-project_metadata('glm53', '0.0.0', 'python').
+project_metadata('glm53', '1.0.0', 'javascript').
 
 % ── Project Files ────────────────────────────────────────
-project_file('app.doql.less', 157, 'less').
+project_file('app.doql.less', 216, 'less').
 project_file('landing/serve.sh', 22, 'shell').
+project_file('packages/bootstrap/proc/bootstrap/handover/taskand.dev/v1/bin.mjs', 30, 'javascript').
+project_file('packages/bootstrap/proc/bootstrap/handover/taskand.dev/v1/test.mjs', 20, 'javascript').
+project_file('packages/bootstrap/proc/bootstrap/onboarding/taskand.dev/v1/bin.mjs', 37, 'javascript').
+project_file('packages/bootstrap/proc/bootstrap/onboarding/taskand.dev/v1/test.mjs', 20, 'javascript').
+project_file('packages/bootstrap/proc/bootstrap/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/bootstrap/proc/bootstrap/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('packages/bootstrap/proc/hello-world/taskand.dev/v1/bin.mjs', 14, 'javascript').
+project_file('packages/bootstrap/proc/hello-world/taskand.dev/v1/test.mjs', 12, 'javascript').
+project_file('packages/bootstrap/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/bootstrap/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/chat/proc/chat/message/taskand.dev/v1/bin.mjs', 36, 'javascript').
+project_file('packages/chat/proc/chat/message/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/chat/proc/chat/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/chat/proc/chat/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('packages/chat/proc/chat/voice/taskand.dev/v1/bin.mjs', 53, 'javascript').
+project_file('packages/chat/proc/chat/voice/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/chat/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/chat/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/demo/proc/hello-world/taskand.dev/v1/bin.mjs', 20, 'javascript').
+project_file('packages/demo/proc/hello-world/taskand.dev/v1/test.mjs', 12, 'javascript').
+project_file('packages/demo/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/demo/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs', 319, 'javascript').
+project_file('packages/developer/proc/dev/chat/taskand.dev/v1/test.mjs', 36, 'javascript').
+project_file('packages/developer/proc/dev/codegen/taskand.dev/v1/bin.mjs', 146, 'javascript').
+project_file('packages/developer/proc/dev/codegen/taskand.dev/v1/test.mjs', 24, 'javascript').
+project_file('packages/developer/proc/dev/heal/taskand.dev/v1/bin.mjs', 38, 'javascript').
+project_file('packages/developer/proc/dev/heal/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/developer/proc/dev/plan/taskand.dev/v1/bin.mjs', 40, 'javascript').
+project_file('packages/developer/proc/dev/plan/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/developer/proc/developer/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/developer/proc/developer/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('packages/developer/proc/developer/test-auto/taskand.dev/v1/bin.mjs', 31, 'javascript').
+project_file('packages/developer/proc/developer/test-auto/taskand.dev/v1/test.mjs', 18, 'javascript').
+project_file('packages/developer/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/developer/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/developer/proc/words/count/taskand.dev/v1/bin.mjs', 25, 'javascript').
+project_file('packages/developer/proc/words/count/taskand.dev/v1/test.mjs', 10, 'javascript').
+project_file('packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs', 95, 'javascript').
+project_file('packages/doctor/proc/doctor/chat/taskand.dev/v1/test.mjs', 25, 'javascript').
+project_file('packages/doctor/proc/doctor/diagnose/taskand.dev/v1/bin.mjs', 126, 'javascript').
+project_file('packages/doctor/proc/doctor/diagnose/taskand.dev/v1/test.mjs', 34, 'javascript').
+project_file('packages/doctor/proc/doctor/prescribe/taskand.dev/v1/bin.mjs', 77, 'javascript').
+project_file('packages/doctor/proc/doctor/prescribe/taskand.dev/v1/test.mjs', 37, 'javascript').
+project_file('packages/doctor/proc/doctor/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/doctor/proc/doctor/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('packages/doctor/proc/hello-world/taskand.dev/v1/bin.mjs', 14, 'javascript').
+project_file('packages/doctor/proc/hello-world/taskand.dev/v1/test.mjs', 12, 'javascript').
+project_file('packages/doctor/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/doctor/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/file-ops/proc/file/ops/taskand.dev/v1/bin.mjs', 48, 'javascript').
+project_file('packages/file-ops/proc/file/ops/taskand.dev/v1/test.mjs', 13, 'javascript').
+project_file('packages/file-ops/proc/file-ops/chat/taskand.dev/v1/bin.mjs', 35, 'javascript').
+project_file('packages/file-ops/proc/file-ops/chat/taskand.dev/v1/test.mjs', 13, 'javascript').
+project_file('packages/file-ops/proc/file-ops/spawn/taskand.dev/v1/bin.mjs', 27, 'javascript').
+project_file('packages/file-ops/proc/file-ops/spawn/taskand.dev/v1/test.mjs', 8, 'javascript').
+project_file('packages/file-ops/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/file-ops/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/hw-monitor/proc/hw/monitor/taskand.dev/v1/bin.mjs', 39, 'javascript').
+project_file('packages/hw-monitor/proc/hw/monitor/taskand.dev/v1/test.mjs', 13, 'javascript').
+project_file('packages/hw-monitor/proc/hw-monitor/chat/taskand.dev/v1/bin.mjs', 36, 'javascript').
+project_file('packages/hw-monitor/proc/hw-monitor/chat/taskand.dev/v1/test.mjs', 13, 'javascript').
+project_file('packages/hw-monitor/proc/hw-monitor/spawn/taskand.dev/v1/bin.mjs', 27, 'javascript').
+project_file('packages/hw-monitor/proc/hw-monitor/spawn/taskand.dev/v1/test.mjs', 8, 'javascript').
+project_file('packages/hw-monitor/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/hw-monitor/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/nginx/proc/nginx/status/taskand.dev/v1/bin.mjs', 34, 'javascript').
+project_file('packages/nginx/proc/nginx/status/taskand.dev/v1/test.mjs', 17, 'javascript').
+project_file('packages/vault/proc/hello-world/taskand.dev/v1/bin.mjs', 14, 'javascript').
+project_file('packages/vault/proc/hello-world/taskand.dev/v1/test.mjs', 12, 'javascript').
+project_file('packages/vault/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/vault/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs', 74, 'javascript').
+project_file('packages/vault/proc/vault/chat/taskand.dev/v1/test.mjs', 25, 'javascript').
+project_file('packages/vault/proc/vault/secrets/taskand.dev/v1/bin.mjs', 148, 'javascript').
+project_file('packages/vault/proc/vault/secrets/taskand.dev/v1/test.mjs', 36, 'javascript').
+project_file('packages/vault/proc/vault/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/vault/proc/vault/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('packages/web/proc/browser/session/taskand.dev/v1/bin.mjs', 121, 'javascript').
+project_file('packages/web/proc/browser/session/taskand.dev/v1/test.mjs', 62, 'javascript').
+project_file('packages/web/proc/flow/login/taskand.dev/v1/bin.mjs', 83, 'javascript').
+project_file('packages/web/proc/flow/login/taskand.dev/v1/test.mjs', 23, 'javascript').
+project_file('packages/web/proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('packages/web/proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('packages/web/proc/web/analyze/taskand.dev/v1/bin.mjs', 31, 'javascript').
+project_file('packages/web/proc/web/analyze/taskand.dev/v1/test.mjs', 23, 'javascript').
+project_file('packages/web/proc/web/navigate/taskand.dev/v1/bin.mjs', 40, 'javascript').
+project_file('packages/web/proc/web/navigate/taskand.dev/v1/test.mjs', 24, 'javascript').
+project_file('packages/web/proc/web/spawn/taskand.dev/v1/bin.mjs', 109, 'javascript').
+project_file('packages/web/proc/web/spawn/taskand.dev/v1/test.mjs', 31, 'javascript').
+project_file('proc/bootstrap/spawn-remote.sh', 36, 'shell').
+project_file('proc/browser/session/taskand.dev/v1/bin.mjs', 52, 'javascript').
+project_file('proc/browser/session/taskand.dev/v1/test.mjs', 34, 'javascript').
+project_file('proc/flow/login/taskand.dev/v1/bin.mjs', 83, 'javascript').
+project_file('proc/flow/login/taskand.dev/v1/test.mjs', 23, 'javascript').
+project_file('proc/registry/serve/taskand.dev/v1/bin.mjs', 134, 'javascript').
+project_file('proc/registry/serve/taskand.dev/v1/test.mjs', 28, 'javascript').
+project_file('proc/web/analyze/taskand.dev/v1/bin.mjs', 31, 'javascript').
+project_file('proc/web/analyze/taskand.dev/v1/test.mjs', 23, 'javascript').
+project_file('proc/web/navigate/taskand.dev/v1/bin.mjs', 40, 'javascript').
+project_file('proc/web/navigate/taskand.dev/v1/test.mjs', 24, 'javascript').
 project_file('project.sh', 59, 'shell').
 project_file('scripts/digital_twin.py', 250, 'python').
 project_file('scripts/dod_validator.py', 80, 'python').
 project_file('scripts/history.py', 310, 'python').
+project_file('scripts/planner.py', 235, 'python').
+project_file('scripts/taskand-new-pkg.sh', 166, 'shell').
+project_file('scripts/taskand-runner.mjs', 55, 'javascript').
+project_file('scripts/verify-conformance.mjs', 200, 'javascript').
 project_file('serve.sh', 22, 'shell').
 project_file('taskand.sh', 60, 'shell').
-project_file('tree.sh', 2, 'shell').
+project_file('templates/adapters/status.template.mjs', 26, 'javascript').
+project_file('verify-catalog.mjs', 72, 'javascript').
 
 % ── Python Functions ─────────────────────────────────────
 python_function('scripts/digital_twin.py', 'load_env', 0, 6, 5).
@@ -27,6 +133,14 @@ python_function('scripts/history.py', 'create_snapshot', 3, 9, 20).
 python_function('scripts/history.py', 'list_history', 0, 21, 16).
 python_function('scripts/history.py', 'show_details', 1, 12, 11).
 python_function('scripts/history.py', 'rollback', 1, 20, 22).
+python_function('scripts/planner.py', 'load_dot_env', 0, 6, 5).
+python_function('scripts/planner.py', 'parse_simple_yaml', 1, 6, 5).
+python_function('scripts/planner.py', 'get_environment', 0, 2, 3).
+python_function('scripts/planner.py', 'get_recent_conversations', 1, 7, 5).
+python_function('scripts/planner.py', 'log_conversation', 5, 1, 8).
+python_function('scripts/planner.py', 'call_llm', 3, 5, 10).
+python_function('scripts/planner.py', 'parse_plan', 3, 11, 4).
+python_function('scripts/planner.py', 'main', 0, 6, 10).
 
 % ── Python Classes ───────────────────────────────────────
 
@@ -35,6 +149,14 @@ python_function('scripts/history.py', 'rollback', 1, 20, 22).
 % ── Makefile Targets ─────────────────────────────────────
 makefile_target('SHELL', '').
 makefile_target('help', '').
+makefile_target('conformance', '').
+makefile_target('test', '').
+makefile_target('packages-test', '').
+makefile_target('pack', '').
+makefile_target('verify', '').
+makefile_target('run', '').
+makefile_target('observe', '').
+makefile_target('extract', '').
 makefile_target('bootstrap', '').
 makefile_target('install-cli', '').
 makefile_target('up', '').
@@ -75,6 +197,35 @@ sumd_declared_file('project/map.toon.yaml', 'analysis').
 sumd_declared_file('project/logic.pl', 'analysis').
 sumd_declared_file('project/calls.toon.yaml', 'analysis').
 sumd_interface('web', '').
+sumd_workflow('conformance', 'manual').
+sumd_workflow_step('conformance', 1, 'node scripts/verify-conformance.mjs').
+sumd_workflow('test', 'manual').
+sumd_workflow_step('test', 1, 'node proc/browser/session/taskand.dev/v1/test.mjs').
+sumd_workflow_step('test', 2, 'node proc/web/navigate/taskand.dev/v1/test.mjs').
+sumd_workflow_step('test', 3, 'node proc/web/analyze/taskand.dev/v1/test.mjs').
+sumd_workflow_step('test', 4, 'node proc/flow/login/taskand.dev/v1/test.mjs').
+sumd_workflow_step('test', 5, 'echo "✓ Wszystkie procesy URI spełniają kontrakt (fail-closed)"').
+sumd_workflow('packages-test', 'manual').
+sumd_workflow_step('packages-test', 1, 'for pkg in packages/*').
+sumd_workflow_step('packages-test', 2, 'if [ -d "$$pkg" ]').
+sumd_workflow_step('packages-test', 3, 'echo "=== Testowanie paczki $$pkg ==="').
+sumd_workflow_step('packages-test', 4, '(cd "$$pkg" && make conformance && make test && make verify && make run) || exit 1').
+sumd_workflow_step('packages-test', 5, 'fi').
+sumd_workflow_step('packages-test', 6, 'done').
+sumd_workflow_step('packages-test', 7, 'echo "✓ Wszystkie wydzielone paczki przeszły pomyślnie testy i konformację!"').
+sumd_workflow('pack', 'manual').
+sumd_workflow_step('pack', 1, 'mkdir -p dist').
+sumd_workflow_step('pack', 2, 'tar -czf dist/taskand-glm53-v1.0.0.tgz proc/ schemas/ capsule.yaml grants.yaml proc-catalog.json').
+sumd_workflow_step('pack', 3, 'tar -tzf dist/taskand-glm53-v1.0.0.tgz >/dev/null && echo "pack ✓ (archiwum dist/taskand-glm53-v1.0.0.tgz gotowe)"').
+sumd_workflow('verify', 'manual').
+sumd_workflow_step('verify', 1, 'node verify-catalog.mjs').
+sumd_workflow_step('verify', 2, 'node scripts/verify-conformance.mjs').
+sumd_workflow('run', 'manual').
+sumd_workflow('observe', 'manual').
+sumd_workflow('extract', 'manual').
+sumd_workflow_step('extract', 1, 'mkdir -p dist/extracted').
+sumd_workflow_step('extract', 2, 'cp -r schemas/ dist/extracted/').
+sumd_workflow_step('extract', 3, 'echo "extract ✓ (wyekstrahowano artefakty do dist/extracted)"').
 sumd_workflow('bootstrap', 'manual').
 sumd_workflow_step('bootstrap', 1, 'sh taskand.sh').
 sumd_workflow('install-cli', 'manual').

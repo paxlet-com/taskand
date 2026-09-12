@@ -1,38 +1,83 @@
 flowchart LR
-%% generated in 0.00s
+%% generated in 0.02s
     subgraph gateway__Dockerfile
         gateway__Dockerfile__print["print"]
     end
+    subgraph packages__developer
+        packages__developer__proc__dev__chat__taskand__dev__v1__bin__out["out"]
+        packages__developer__proc__dev__chat__taskand__dev__v1__bin__getRepoRoot["getRepoRoot"]
+    end
+    subgraph packages__vault
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__logAudit["logAudit"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__envPath["envPath"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__found["found"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__secretName["secretName"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__consumer["consumer"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__allowed["allowed"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__match["match"]
+        packages__vault__proc__vault__secrets__taskand__dev__v1__bin__purpose["purpose"]
+    end
+    subgraph packages__web
+        packages__web__proc__flow__login__taskand__dev__v1__bin__page["page"]
+        packages__web__proc__flow__login__taskand__dev__v1__bin__session["session"]
+        packages__web__proc__flow__login__taskand__dev__v1__bin__analysis["analysis"]
+        packages__web__proc__flow__login__taskand__dev__v1__bin__callUri["callUri"]
+    end
     subgraph scripts__digital_twin
-        scripts__digital_twin__log["log"]
-        scripts__digital_twin__run_twin_verification["run_twin_verification"]
-        scripts__digital_twin__create_twin_environment["create_twin_environment"]
         scripts__digital_twin__ask_llm_for_repair["ask_llm_for_repair"]
+        scripts__digital_twin__run_twin_verification["run_twin_verification"]
+        scripts__digital_twin__log["log"]
         scripts__digital_twin__load_env["load_env"]
+        scripts__digital_twin__create_twin_environment["create_twin_environment"]
         scripts__digital_twin__verify_and_evolve["verify_and_evolve"]
     end
     subgraph scripts__dod_validator
-        scripts__dod_validator__validate_dod["validate_dod"]
         scripts__dod_validator__run_cmd["run_cmd"]
+        scripts__dod_validator__validate_dod["validate_dod"]
     end
     subgraph scripts__history
         scripts__history__ensure_dirs["ensure_dirs"]
-        scripts__history__show_details["show_details"]
-        scripts__history__list_history["list_history"]
         scripts__history__create_snapshot["create_snapshot"]
+        scripts__history__list_history["list_history"]
+        scripts__history__show_details["show_details"]
         scripts__history__rollback["rollback"]
         scripts__history__compute_dir_hash["compute_dir_hash"]
     end
+    subgraph scripts__planner
+        scripts__planner__load_dot_env["load_dot_env"]
+        scripts__planner__get_recent_conversations["get_recent_conversations"]
+        scripts__planner__parse_simple_yaml["parse_simple_yaml"]
+        scripts__planner__log_conversation["log_conversation"]
+        scripts__planner__get_environment["get_environment"]
+        scripts__planner__call_llm["call_llm"]
+        scripts__planner__parse_plan["parse_plan"]
+        scripts__planner__main["main"]
+    end
+    subgraph scripts__verify_conformance
+        scripts__verify_conformance__check["check"]
+        scripts__verify_conformance__cat["cat"]
+        scripts__verify_conformance__hasServe["hasServe"]
+        scripts__verify_conformance__hasInteractive["hasInteractive"]
+    end
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__envPath --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__match
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__found --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__match
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__consumer --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__logAudit
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__purpose --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__logAudit
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__secretName --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__logAudit
+    packages__vault__proc__vault__secrets__taskand__dev__v1__bin__allowed --> packages__vault__proc__vault__secrets__taskand__dev__v1__bin__logAudit
+    packages__developer__proc__dev__chat__taskand__dev__v1__bin__out --> packages__developer__proc__dev__chat__taskand__dev__v1__bin__getRepoRoot
+    packages__web__proc__flow__login__taskand__dev__v1__bin__session --> packages__web__proc__flow__login__taskand__dev__v1__bin__callUri
+    packages__web__proc__flow__login__taskand__dev__v1__bin__page --> packages__web__proc__flow__login__taskand__dev__v1__bin__callUri
+    packages__web__proc__flow__login__taskand__dev__v1__bin__analysis --> packages__web__proc__flow__login__taskand__dev__v1__bin__callUri
     scripts__dod_validator__validate_dod --> scripts__dod_validator__run_cmd
-    scripts__digital_twin__log --> gateway__Dockerfile__print
-    scripts__digital_twin__create_twin_environment --> scripts__digital_twin__log
-    scripts__digital_twin__run_twin_verification --> scripts__digital_twin__log
-    scripts__digital_twin__ask_llm_for_repair --> scripts__digital_twin__load_env
-    scripts__digital_twin__ask_llm_for_repair --> scripts__digital_twin__log
-    scripts__digital_twin__verify_and_evolve --> gateway__Dockerfile__print
-    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__log
-    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__create_twin_environment
-    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__run_twin_verification
+    scripts__planner__get_environment --> scripts__planner__load_dot_env
+    scripts__planner__get_environment --> scripts__planner__parse_simple_yaml
+    scripts__planner__call_llm --> scripts__planner__get_recent_conversations
+    scripts__planner__main --> scripts__planner__get_environment
+    scripts__planner__main --> scripts__planner__call_llm
+    scripts__planner__main --> scripts__planner__parse_plan
+    scripts__planner__main --> scripts__planner__log_conversation
+    scripts__planner__main --> gateway__Dockerfile__print
     scripts__history__create_snapshot --> scripts__history__ensure_dirs
     scripts__history__create_snapshot --> scripts__history__compute_dir_hash
     scripts__history__create_snapshot --> gateway__Dockerfile__print
@@ -43,3 +88,15 @@ flowchart LR
     scripts__history__rollback --> scripts__history__ensure_dirs
     scripts__history__rollback --> gateway__Dockerfile__print
     scripts__history__rollback --> scripts__history__compute_dir_hash
+    scripts__digital_twin__log --> gateway__Dockerfile__print
+    scripts__digital_twin__create_twin_environment --> scripts__digital_twin__log
+    scripts__digital_twin__run_twin_verification --> scripts__digital_twin__log
+    scripts__digital_twin__ask_llm_for_repair --> scripts__digital_twin__load_env
+    scripts__digital_twin__ask_llm_for_repair --> scripts__digital_twin__log
+    scripts__digital_twin__verify_and_evolve --> gateway__Dockerfile__print
+    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__log
+    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__create_twin_environment
+    scripts__digital_twin__verify_and_evolve --> scripts__digital_twin__run_twin_verification
+    scripts__verify_conformance__cat --> scripts__verify_conformance__check
+    scripts__verify_conformance__hasServe --> scripts__verify_conformance__check
+    scripts__verify_conformance__hasInteractive --> scripts__verify_conformance__check

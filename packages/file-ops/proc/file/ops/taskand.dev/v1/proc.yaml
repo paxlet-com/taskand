@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/file/ops/v1
+name: ops
+version: "1.0.0"
+role: worker
+interface:
+  stdin: { action: string, path?: string, content?: string, device?: string }
+  stdout: { ok: boolean, device: string, status?: string }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

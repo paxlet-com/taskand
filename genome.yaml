@@ -1,19 +1,43 @@
 apiVersion: taskand.dev/v1
 kind: Genome
 meta:
-  name: taskand-ecosystem
-  version: "1.5.0"
+  name: taskand-multi-device
+  version: "1.6.0"
   registry: "gitea:3000/taskand/registry.git"
+
+devices:
+  - name: workstation
+    host: 192.168.1.10
+    role: master
+    ssh: taskand@192.168.1.10
+    capabilities: [docker, node, git, gitea]
+
+  - name: rpi5
+    host: 192.168.1.50
+    role: worker
+    ssh: taskand@192.168.1.50
+    os: fedora
+    capabilities: [docker, node, browser, gpio, filesystem]
+    noVNC: "http://rpi5:3000"
+
+  - name: vm-test
+    host: localhost
+    role: test
+    docker: true
+    capabilities: [browser, filesystem, simulate-gpio]
+    noVNC: "http://vm-browser:3000"
 
 organisms:
   - name: nucleus
+    device: workstation
     role: controller
     template: organism-core
     depends: []
-    whoCanSpawn: [bootstrap]
+    whoCanSpawn: [bootstrap, bootstrap-master]
     status: running
 
   - name: supervisor
+    device: workstation
     role: routing
     template: organism-core
     depends: [nucleus]
@@ -21,6 +45,7 @@ organisms:
     status: running
 
   - name: developer
+    device: workstation
     role: evolution
     template: organism-developer
     depends: [nucleus, supervisor]
@@ -28,6 +53,7 @@ organisms:
     status: running
 
   - name: doctor
+    device: workstation
     role: diagnostic
     template: organism-doctor
     depends: [nucleus]
@@ -35,6 +61,7 @@ organisms:
     status: running
 
   - name: vault
+    device: workstation
     role: security
     template: organism-vault
     depends: [nucleus]
@@ -43,6 +70,7 @@ organisms:
     status: running
 
   - name: chat
+    device: workstation
     role: interactive
     template: organism-chat
     depends: [nucleus]
@@ -50,6 +78,7 @@ organisms:
     status: running
 
   - name: web
+    device: workstation
     role: presentation
     template: organism-web
     depends: [nucleus]
@@ -57,23 +86,64 @@ organisms:
     status: running
 
   - name: nginx
+    device: workstation
     role: external-service
     template: organism-adapter
     depends: []
     whoCanSpawn: [developer]
     status: running
 
+  - name: browser
+    device: rpi5
+    role: interface
+    template: organism-browser
+    noVNC: "http://rpi5:3000"
+    whoCanSpawn: [bootstrap-worker, developer]
+    capabilities: [navigate, screenshot, interact]
+    status: active
+
+  - name: file-ops
+    device: rpi5
+    role: worker
+    template: organism-file-ops
+    whoCanSpawn: [bootstrap-worker, developer]
+    capabilities: [read, write, list, search]
+    status: active
+
+  - name: hw-monitor
+    device: rpi5
+    role: worker
+    template: organism-hw-monitor
+    whoCanSpawn: [bootstrap-worker]
+    capabilities: [gpio, cpu-temp, memory, disk]
+    status: active
+
+  - name: browser-test
+    device: vm-test
+    role: interface
+    template: organism-browser
+    noVNC: "http://vm-browser:3000"
+    condition: test-only
+    whoCanSpawn: [bootstrap-test]
+    status: active
+
 templates:
-  organism-core:      { base: core, processes: [nucleus, supervisor] }
-  organism-developer: { base: worker, processes: [codegen, plan, heal, spawn, chat] }
-  organism-doctor:    { base: worker, processes: [diagnose, prescribe, spawn, chat] }
-  organism-vault:     { base: security, processes: [secrets, rotate, audit, spawn, chat] }
-  organism-chat:      { base: interactive, processes: [message, voice, spawn] }
-  organism-web:       { base: presentation, processes: [navigate, analyze, spawn] }
-  organism-adapter:   { base: adapter, processes: [status, spawn] }
+  organism-core:       { base: core, processes: [nucleus, supervisor] }
+  organism-developer:  { base: worker, processes: [codegen, plan, heal, spawn, chat] }
+  organism-doctor:     { base: worker, processes: [diagnose, prescribe, spawn, chat] }
+  organism-vault:      { base: security, processes: [secrets, rotate, audit, spawn, chat] }
+  organism-chat:       { base: interactive, processes: [message, voice, spawn] }
+  organism-web:        { base: presentation, processes: [navigate, analyze, spawn] }
+  organism-adapter:    { base: adapter, processes: [status, spawn] }
+  organism-browser:    { base: interface, processes: [session, screenshot, navigate, spawn] }
+  organism-file-ops:   { base: worker, processes: [read, write, list, search, spawn] }
+  organism-hw-monitor: { base: worker, processes: [gpio, cpu-temp, disk, spawn] }
 
 evolutionRules:
   - "nowy organizm → genome.yaml += entry → git push"
   - "usunięcie → genome.yaml -= entry → docker stop"
   - "spawn wymaga: whoCanSpawn.includes(self)"
   - "genom jest JEDYNYM źródłem prawdy"
+  - "multi-device: bootstrap ↔ bootstrap (mesh, nie hierarchia)"
+  - "digital twin first: testuj na VM zanim wdrożysz na sprzęt"
+  - "cross-device log: historia z wszystkich węzłów z dowolnego punktu"

@@ -1,0 +1,11 @@
+apiVersion: taskand.dev/v1
+kind: Grants
+role: worker
+allowed:
+  read: ["*"]
+  write: ["log/*", "tasks/*"]
+  execute:
+    - "proc://taskand.dev/file/ops/v1"
+    - "proc://taskand.dev/file-ops/chat/v1"
+    - "proc://taskand.dev/file-ops/spawn/v1"
+    - "proc://taskand.dev/registry/serve/v1"
