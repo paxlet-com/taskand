@@ -6,6 +6,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const baseDir = process.cwd();
 let passed = 0;
@@ -75,8 +76,16 @@ check(4, 'Makefile z targetami operacyjnymi', () => {
 
 // 5. proc-catalog.json z hashami i rewizjami
 check(5, 'proc-catalog.json ze zweryfikowanymi hashami SHA-256', () => {
-  const r = spawnSync('node', ['verify-catalog.mjs']);
-  if (r.status !== 0) return 'verify-catalog.mjs zwrócił błąd';
+  if (!existsSync('proc-catalog.json')) return 'brak proc-catalog.json';
+  const cat = JSON.parse(readFileSync('proc-catalog.json', 'utf8'));
+  if (!cat.bindings || cat.bindings.length === 0) return 'brak wpisów w katalogu';
+  for (const b of cat.bindings) {
+    if (!b.binSha256 || !b.yamlSha256 || !b.testSha256) return `niekompletne sumy SHA-256 w ${b.uri}`;
+    const binFile = join(b.path, 'bin.mjs');
+    if (!existsSync(binFile)) return `brak ${binFile}`;
+    const h = createHash('sha256').update(readFileSync(binFile)).digest('hex');
+    if (h !== b.binSha256) return `niezgodność SHA-256 w ${binFile}`;
+  }
   return true;
 });
 

@@ -1,9 +1,12 @@
 SHELL := /bin/sh
 .DEFAULT_GOAL := help
-.PHONY: help test pack verify run observe extract deploy rollback
+.PHONY: help test pack verify run observe extract deploy rollback conformance
 
 help: ## Wyświetla API operacyjne paczki
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-12s %s\n",$$1,$$2}'
+
+conformance: ## Walidacja 9/9 punktów konformacji
+	@node ../../scripts/verify-conformance.mjs .
 
 test: ## Testy kontraktu (fail-closed)
 	@node proc/hello-world/*/v1/test.mjs

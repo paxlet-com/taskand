@@ -1,0 +1,14 @@
+uri: proc://taskand.dev/dev/plan/v1
+name: dev-plan
+version: "1.0.0"
+role: worker
+interface:
+  stdin: any
+  stdout: any
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs
+runtimes:
+  - kind: node
+    bin: bin.mjs
+    engines: ">=20"
+grants: { run: [execute-proc] }

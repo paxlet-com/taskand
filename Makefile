@@ -25,6 +25,15 @@ test: ## Testy kontraktu wszystkich procesów URI (fail-closed)
 	@node proc/flow/login/taskand.dev/v1/test.mjs
 	@echo "✓ Wszystkie procesy URI spełniają kontrakt (fail-closed)"
 
+packages-test: ## Testy i konformacja wszystkich wydzielonych paczek (developer, chat, web, demo)
+	@for pkg in packages/*; do \
+		if [ -d "$$pkg" ]; then \
+			echo "=== Testowanie paczki $$pkg ==="; \
+			(cd "$$pkg" && make conformance && make test && make verify && make run) || exit 1; \
+		fi; \
+	done
+	@echo "✓ Wszystkie wydzielone paczki przeszły pomyślnie testy i konformację!"
+
 pack: ## Tworzy archiwum paczki w dist/ z testem offline
 	@mkdir -p dist
 	@tar -czf dist/taskand-glm53-v1.0.0.tgz proc/ schemas/ capsule.yaml grants.yaml proc-catalog.json

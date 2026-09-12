@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "standard": "taskand-v1.0",
+  "bindings": [
+    {
+      "uri": "proc://taskand.dev/dev/plan/v1",
+      "path": "proc/dev/plan/taskand.dev/v1",
+      "binSha256": "6c9d982511bba6b4639f4713a879489a8af0e41de9fd98804278d0fc66c4e935",
+      "yamlSha256": "20a096b04c19f59489cd37dc311a11ba092c023ffaa8f608760901075a52da04",
+      "testSha256": "db369ba9074f70c81c755b7243d559b2135f8cd86ad9fec44985694ea1b52076"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/heal/v1",
+      "path": "proc/dev/heal/taskand.dev/v1",
+      "binSha256": "688bedb06dd2dd7990be87acadeaafd5c850d99aeca3c4d7804f386a6c036721",
+      "yamlSha256": "1c2ae7f6198dea5ad5496cf20c8d762764d58cdd9fcd2fe5212635800f643f73",
+      "testSha256": "5c20d6dee86770e9b772c0c111b4324b84a47f758935dcf4fdb50630b18e250d"
+    }
+  ]
+}

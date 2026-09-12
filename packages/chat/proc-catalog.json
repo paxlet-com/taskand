@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "standard": "taskand-v1.0",
+  "bindings": [
+    {
+      "uri": "proc://taskand.dev/chat/message/v1",
+      "path": "proc/chat/message/taskand.dev/v1",
+      "binSha256": "cadbff09a560051dcf72cfe487ac2960d39232436990399c1daa2ba55d2ce20f",
+      "yamlSha256": "6c2f82f3e42112a31563551f32fad709a6ff7f394bc31e775641ea5cf4e41f81",
+      "testSha256": "6bf4334d3e14851d4fb71d8e0c3a29af881dddd84c296bda3640bea2ce27a06d"
+    },
+    {
+      "uri": "proc://taskand.dev/chat/voice/v1",
+      "path": "proc/chat/voice/taskand.dev/v1",
+      "binSha256": "c6b8e65bde856054fbd9bd8265fd115a979b27391bea6b53ea1f0e48c107ae9e",
+      "yamlSha256": "5961bd4950df7bd8e20a0377ab15a5fa14deec61409abdddbf0a308a03a41984",
+      "testSha256": "90c79022bce42d0cfe935c45928af2262a5a3e81893f2809491727fa7dcf4453"
+    }
+  ]
+}
