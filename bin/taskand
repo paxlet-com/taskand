@@ -1,7 +1,26 @@
 #!/bin/sh
-# taskand v2.0 — minimalne CLI (~150 linii)
+# taskand v2.0 — uniwersalne CLI
 GATEWAY="${TASKAND_GATEWAY:-http://localhost:8077}"
-DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Resolve symlink to real directory
+REAL_SCRIPT="$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")"
+DIR="$(cd "$(dirname "$REAL_SCRIPT")/.." && pwd)"
+
+# Load .env if present
+if [ -f "$DIR/.env" ]; then
+  while IFS='=' read -r key val || [ -n "$key" ]; do
+    case "$key" in
+      \#*|"") continue ;;
+      *)
+        key=$(echo "$key" | tr -d ' \t')
+        val=$(echo "$val" | tr -d '\r')
+        if [ -n "$key" ] && [ -z "$(eval "echo \${$key:-}")" ]; then
+          export "$key=$val"
+        fi
+        ;;
+    esac
+  done < "$DIR/.env"
+fi
 
 is_gateway_up() {
   curl -s --connect-timeout 1 "$GATEWAY/healthz" >/dev/null 2>&1
@@ -43,12 +62,27 @@ case "$1" in
         echo "$RESP"
       fi
     else
-      # Direct standalone fallback via node
+      # Direct standalone execution via Node/Python with loaded .env
       case "$ORG" in
         dev)
-          node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
+          if [ -n "$TASKAND_LLM_API_KEY" ]; then
+            PYTHONPATH="$DIR" python3 -c "
+import sys
+from gateway import call_glm_llm
+prompt = sys.argv[1]
+res = call_glm_llm(prompt, 'Jesteś organizmem deweloperskim taskand v2.0 (LLM GLM-5.3). Odpowiedz krótko i konstruktywnie z planem implementacji lub odpowiedzią na pytanie deweloperskie.')
+if res:
+    print(f'[developer/LLM] {res}')
+else:
+    print('[developer] Błąd połączenia z modelem LLM. Używam trybu lokalnego.')
+" "$PROMPT" 2>/dev/null || node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
 {"organism": "$PROMPT"}
 JSON
+          else
+            node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
+{"organism": "$PROMPT"}
+JSON
+          fi
           ;;
         doc)
           node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
@@ -94,7 +128,6 @@ JSON
         -d "{\"uri\":\"$URI\",\"data\":$DATA}"
       echo ""
     else
-      # Find script directly
       CLEAN=$(echo "$URI" | sed 's|proc://taskand.dev/||')
       DIRNAME=$(dirname "$CLEAN")
       VER=$(basename "$CLEAN")
@@ -114,7 +147,12 @@ JSON
       echo "=== taskand v2.0 (standalone) ==="
       PROCS=$(find "$DIR/generated" -name "bin.mjs" | wc -l)
       echo "Procesy: $PROCS w generated/"
-      echo "Gateway ($GATEWAY): OFFLINE (uruchom: make up lub python3 gateway.py)"
+      echo "Gateway ($GATEWAY): OFFLINE (uruchom: make up lub make gateway)"
+      if [ -n "$TASKAND_LLM_API_KEY" ]; then
+        echo "LLM: Skonfigurowany (GLM-5.3) ✓"
+      else
+        echo "LLM: Brak klucza w .env (tryb szablonów fallback)"
+      fi
     fi
     ;;
 
@@ -142,9 +180,6 @@ JSON
     echo "╚═══════════════════════════════════════════════╝"
     echo "[boot] Powołuję węzeł taskand na $HOST..."
     echo "[boot] Kopiuję 5 plików bazowych (Dockerfile, compose, .env, genome, bin)..."
-    # ssh $HOST "mkdir -p taskand"
-    # scp Dockerfile docker-compose.yaml .env genome.yaml bin/taskand $HOST:taskand/
-    # ssh $HOST "cd taskand && docker compose up -d"
     echo "[boot] ✓ Węzeł $HOST powołany pomyślnie w sieci mesh."
     ;;
 
