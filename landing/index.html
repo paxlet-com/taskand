@@ -123,6 +123,36 @@ section{margin-top:52px}
 .fplate .v{color:#C9BE8B}
 .fplate .yk{color:var(--pkey)}
 .frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+/* Web Cockpit & Voice */
+.cockpit-box{border:2px solid var(--ink);border-radius:4px;background:var(--paper2);padding:18px 20px;margin-top:14px;box-shadow:3px 3px 0 rgba(0,0,0,.08)}
+.cockpit-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.api-bar{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.api-input{background:var(--paper);border:1px solid var(--line);padding:4px 8px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink);width:190px}
+.badge-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 9px;border-radius:2px;background:#DDF3D5;color:#1E5912;font-weight:600;letter-spacing:.5px}
+.badge-status.offline{background:#FADBD8;color:#922B21}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:#27AE60}
+.badge-status.offline .badge-dot{background:#E74C3C}
+.voice-row{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.voice-in{flex:1;min-width:260px;background:var(--paper);border:1px solid var(--line2);padding:10px 14px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.voice-in:focus{border-color:var(--verm)}
+.mic-btn{display:inline-flex;align-items:center;gap:8px;background:var(--plate);color:#fff;border:none;padding:10px 18px;border-radius:3px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.mic-btn:hover{background:var(--verm)}
+.mic-btn.active{background:#C0392B;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,57,43,.6)}70%{box-shadow:0 0 0 10px rgba(192,57,43,0)}100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}}
+.cpanel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.act-btn{font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:7px 12px;background:var(--ink);color:var(--paper);border:none;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.act-btn:hover{background:var(--verm)}
+.act-btn.alt{background:transparent;border:1px solid var(--line2);color:var(--ink)}
+.act-btn.alt:hover{border-color:var(--ink);background:var(--paper)}
+.grid-cockpit{display:grid;grid-template-columns:1fr 1.3fr;gap:18px}
+@media(max-width:960px){.grid-cockpit{grid-template-columns:1fr}}
+.cockpit-view{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;border-radius:3px;padding:12px 14px;height:340px;overflow-y:auto;box-shadow:0 0 0 1px #14110B}
+.cockpit-view::-webkit-scrollbar{width:6px}
+.cockpit-view::-webkit-scrollbar-thumb{background:#3A3422;border-radius:3px}
+.task-item{border-bottom:1px dashed #3A3422;padding:8px 0;display:flex;flex-direction:column;gap:3px}
+.task-item:last-child{border-bottom:none}
+.task-id{color:var(--pacc);font-weight:600}
+.task-badge{font-size:9.5px;padding:1px 5px;border-radius:2px;background:#2E2818;color:var(--pkey);align-self:flex-start}
 footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
 #toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
 #toast.show{opacity:1;transform:none}
@@ -169,8 +199,68 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
 
 <main>
 
+<section id="cockpit">
+  <div class="shead"><span class="snum">01</span><span class="stitle">web cockpit & sterowanie głosowe (speech api)</span><span class="srule"></span><span class="smeta">100% parzystości z CLI shell · Universal REST API :8077</span></div>
+  <p class="slede">Wszystkie komendy CLI (<code>add</code>, <code>tasks</code>, <code>twin</code>, <code>history</code>, <code>rollback</code>, <code>logs</code>) dostępne na żywo w przeglądarce. Wydawaj polecenia <b>głosem (Web Speech API)</b> po polsku lub wpisuj w pole tekstowe. Panel łączy się z uniwersalną bramką <b>taskand-gateway REST API (:8077)</b> i umożliwia natychmiastowe testy w Digital Twin.</p>
+
+  <div class="cockpit-box">
+    <div class="cockpit-top">
+      <div class="api-bar">
+        <span style="font-weight:600">Bramka REST API:</span>
+        <input class="api-input" id="gwUrl" value="http://localhost:8077" spellcheck="false" title="Adres bazowy taskand-gateway API">
+        <span class="badge-status" id="gwStatus"><span class="badge-dot"></span><span id="gwStatusTxt">sprawdzanie...</span></span>
+        <button class="act-btn alt" id="gwPing" title="Sprawdź połączenie z API"><i data-lucide="refresh-cw"></i> ping</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink2)">
+        <label style="cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+          <input type="checkbox" id="voiceFeedback" checked> 🔊 synteza głosu (TTS)
+        </label>
+        <span id="voiceLangLabel" style="color:var(--verm)">PL (pl-PL)</span>
+      </div>
+    </div>
+
+    <!-- Voice and Text Input -->
+    <div class="voice-row">
+      <button class="mic-btn" id="micBtn" title="Kliknij i wydaj polecenie głosem po polsku">
+        <i data-lucide="mic" id="micIcon"></i> <span id="micLabel">Mów do taskand</span>
+      </button>
+      <input class="voice-in" id="taskPrompt" placeholder="Wpisz lub podyktuj zadanie (np. 'wypchnij zmiany na github', 'zrób digital twin')..." autocomplete="off">
+      <button class="act-btn" id="btnSubmitTask" style="padding:10px 18px;font-size:11.5px">
+        <i data-lucide="send"></i> Wyślij zadanie
+      </button>
+    </div>
+
+    <!-- Quick Action Bar -->
+    <div class="cpanel-actions">
+      <button class="act-btn" id="btnTwinQuick"><i data-lucide="shield-check"></i> ♊ Digital Twin Test</button>
+      <button class="act-btn" id="btnHistoryQuick"><i data-lucide="git-commit"></i> 📚 Historia & Dockerfile</button>
+      <button class="act-btn" id="btnRollbackQuick"><i data-lucide="rotate-ccw"></i> ↺ Rollback Migawki</button>
+      <button class="act-btn alt" id="btnRefreshTasks"><i data-lucide="list-todo"></i> Kolejka zadań</button>
+      <button class="act-btn alt" id="btnRefreshLogs"><i data-lucide="terminal"></i> Logi kontrolera</button>
+      <button class="act-btn alt" id="btnClearTerminal"><i data-lucide="trash-2"></i> Wyczyść widok</button>
+    </div>
+
+    <!-- Two-column live view -->
+    <div class="grid-cockpit">
+      <div>
+        <div class="dph"><i data-lucide="list-todo"></i> Kolejka i wykonane zadania (<span id="taskCounts">0 / 0</span>)</div>
+        <div class="cockpit-view" id="tasksListPanel">
+          <div style="color:var(--pdim);font-style:italic">Ładowanie zadań z :8077/api/tasks...</div>
+        </div>
+      </div>
+      <div>
+        <div class="dph" style="justify-content:space-between">
+          <span><i data-lucide="terminal"></i> Live Output / Logi kontrolera / Digital Twin</span>
+          <span style="font-size:9.5px;color:var(--pacc)" id="liveStatusNote">gotowy</span>
+        </div>
+        <div class="cockpit-view" id="cockpitLogView" style="white-space:pre-wrap;font-size:10.8px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section>
-  <div class="shead"><span class="snum">01</span><span class="stitle">projekt 2 · taskand-landing — strona jako usługa</span><span class="srule"></span><span class="smeta">2 pliki · zero zależności</span></div>
+  <div class="shead"><span class="snum">02</span><span class="stitle">projekt 2 · taskand-landing — strona jako usługa</span><span class="srule"></span><span class="smeta">2 pliki · zero zależności</span></div>
   <p class="slede">Chcesz, żeby strona „żyła” jak aplikacja? Wystarczą dwa pliki obok siebie: <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">index.html</span> (zapisz tę stronę: Ctrl+S / Plik → Zapisz jako) oraz <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">Dockerfile</span> albo <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">serve.sh</span> — oba do pobrania poniżej.</p>
   <div class="cmp">
     <div class="cpath">
@@ -968,9 +1058,328 @@ ${SERVE_SH}
 }
  $('#fBundle').addEventListener('click', () => { dl('taskand-v04.bundle', bundle()); toast('pobrano pakiet v0.4 (7 plików: system + landing)'); });
 
+/* ————— COCKPIT & STEROWANIE GŁOSOWE (WEB SPEECH + REST API) ————— */
+const gwInput = $('#gwUrl');
+const gwStatus = $('#gwStatus');
+const gwStatusTxt = $('#gwStatusTxt');
+const micBtn = $('#micBtn');
+const micLabel = $('#micLabel');
+const micIcon = $('#micIcon');
+const taskPrompt = $('#taskPrompt');
+const btnSubmitTask = $('#btnSubmitTask');
+const cockpitLogView = $('#cockpitLogView');
+const tasksListPanel = $('#tasksListPanel');
+const taskCounts = $('#taskCounts');
+const liveStatusNote = $('#liveStatusNote');
+const voiceFeedbackCheck = $('#voiceFeedback');
+
+function getGwUrl(){
+  return (gwInput.value || 'http://localhost:8077').replace(/\/+$/, '');
+}
+
+function appendCockpitLog(msg, color){
+  const time = new Date().toLocaleTimeString('pl-PL');
+  const div = document.createElement('div');
+  div.style.color = color || 'var(--ptext)';
+  div.innerHTML = `<span style="color:var(--pdim)">[${time}]</span> ${esc(msg)}`;
+  cockpitLogView.appendChild(div);
+  cockpitLogView.scrollTop = cockpitLogView.scrollHeight;
+}
+
+function speakVoice(text){
+  if(!voiceFeedbackCheck.checked || !('speechSynthesis' in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'pl-PL';
+    u.rate = 1.05;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+async function pingGateway(){
+  gwStatusTxt.textContent = 'sprawdzanie...';
+  try {
+    const res = await fetch(getGwUrl() + '/api/health', {cache:'no-store'});
+    if(res.ok){
+      const d = await res.json();
+      gwStatus.className = 'badge-status';
+      gwStatusTxt.textContent = `online (${d.version})`;
+      liveStatusNote.textContent = 'REST API :8077 połączone';
+      return true;
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch(e){
+    gwStatus.className = 'badge-status offline';
+    gwStatusTxt.textContent = 'offline';
+    liveStatusNote.textContent = 'brak połączenia z :8077';
+    return false;
+  }
+}
+
+async function fetchTasks(){
+  try {
+    const res = await fetch(getGwUrl() + '/api/tasks', {cache:'no-store'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    taskCounts.textContent = `${d.total_inbox} w kolejce / ${d.total_done} wykonanych`;
+    
+    let html = '';
+    if(d.inbox && d.inbox.length > 0){
+      html += `<div style="color:var(--pacc);font-weight:600;margin-bottom:6px">Kolejka (inbox.yaml):</div>`;
+      d.inbox.forEach(t => {
+        html += `
+          <div class="task-item">
+            <div style="display:flex;justify-content:space-between">
+              <span class="task-id">[${esc(t.id || 't???')}]</span>
+              <span class="task-badge">${esc(t.typ || 'zadanie')}</span>
+            </div>
+            <div style="color:var(--ptext)">${esc(t.z || t.task || '')}</div>
+          </div>
+        `;
+      });
+    } else {
+      html += `<div style="color:var(--pdim);font-style:italic;margin-bottom:10px">Kolejka inbox pusta (brak oczekujących zadań)</div>`;
+    }
+
+    if(d.done && d.done.length > 0){
+      html += `<div style="color:var(--olive);font-weight:600;margin:12px 0 6px">Ostatnio wykonane (done.yaml):</div>`;
+      const recent = d.done.slice(-6).reverse();
+      recent.forEach(t => {
+        html += `
+          <div class="task-item">
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#C9BE8B">[${esc(t.id || 't???')}]</span>
+              <span class="task-badge">${esc(t.typ || 'sukces')}</span>
+            </div>
+            <div style="font-size:10px;color:var(--pdim)">Zakończono: ${esc(t.date || '')}</div>
+          </div>
+        `;
+      });
+    }
+    tasksListPanel.innerHTML = html;
+  } catch(e){
+    tasksListPanel.innerHTML = `<div style="color:#E74C3C">Błąd pobierania zadań: ${esc(e.message)}</div>`;
+  }
+}
+
+async function fetchLogs(){
+  try {
+    const res = await fetch(getGwUrl() + '/api/logs', {cache:'no-store'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    cockpitLogView.innerHTML = '';
+    if(d.logs && d.logs.length > 0){
+      d.logs.slice(-50).forEach(l => {
+        const div = document.createElement('div');
+        div.textContent = l;
+        cockpitLogView.appendChild(div);
+      });
+      cockpitLogView.scrollTop = cockpitLogView.scrollHeight;
+    } else {
+      appendCockpitLog('Brak wpisów w log/evolution.log', 'var(--pdim)');
+    }
+  } catch(e){
+    appendCockpitLog('Błąd pobierania logów: ' + e.message, '#E74C3C');
+  }
+}
+
+async function submitTask(desc){
+  if(!desc || !desc.trim()){
+    toast('Wpisz lub podyktuj treść zadania');
+    return;
+  }
+  appendCockpitLog(`Wysyłanie zadania: "${desc}"...`, 'var(--pacc)');
+  try {
+    const res = await fetch(getGwUrl() + '/api/tasks', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({z: desc.trim()})
+    });
+    const d = await res.json();
+    if(res.ok && d.ok){
+      appendCockpitLog(`✓ Zadanie [${d.id}] dodane do inbox. Typ: ${d.typ}`, '#27AE60');
+      toast(`Zadanie [${d.id}] w kolejce!`);
+      speakVoice(`Zadanie ${d.id} dodane do realizacji`);
+      taskPrompt.value = '';
+      setTimeout(() => { fetchTasks(); fetchLogs(); }, 1200);
+    } else {
+      throw new Error(d.error || 'Błąd dodawania zadania');
+    }
+  } catch(e){
+    appendCockpitLog(`✗ Błąd wysyłania: ${e.message}`, '#E74C3C');
+    toast('Nie udało się dodać zadania');
+  }
+}
+
+async function runTwinQuick(){
+  const prompt = taskPrompt.value.trim() || 'wypchnij zmiany na github';
+  appendCockpitLog(`[Digital Twin] Uruchamianie piaskownicy testowej dla: "${prompt}"...`, 'var(--pkey)');
+  speakVoice('Uruchamiam cyfrowy bliźniak środowiska');
+  liveStatusNote.textContent = 'Digital Twin w toku...';
+  try {
+    const res = await fetch(getGwUrl() + '/api/twin', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt: prompt})
+    });
+    const d = await res.json();
+    if(d.output){
+      d.output.split('\n').forEach(line => {
+        if(line.trim()) appendCockpitLog(line, d.ok ? '#C9BE8B' : '#E06B37');
+      });
+    }
+    if(d.ok){
+      toast('Digital Twin: test pomyślny!');
+      speakVoice('Cyfrowy bliźniak potwierdził bezpieczeństwo procesu');
+    } else {
+      toast('Digital Twin: proces zgłosił błąd');
+    }
+  } catch(e){
+    appendCockpitLog(`✗ Błąd Digital Twin: ${e.message}`, '#E74C3C');
+  } finally {
+    liveStatusNote.textContent = 'gotowy';
+  }
+}
+
+async function fetchHistoryQuick(){
+  appendCockpitLog('Pobieranie historii zadań i powiązań z Dockerfile...', 'var(--pkey)');
+  try {
+    const res = await fetch(getGwUrl() + '/api/history', {cache:'no-store'});
+    const d = await res.json();
+    if(d.ok && d.output){
+      cockpitLogView.innerHTML = '';
+      d.output.split('\n').forEach(line => {
+        if(line.trim()) appendCockpitLog(line, 'var(--ptext)');
+      });
+      toast('Załadowano historię zadań');
+    }
+  } catch(e){
+    appendCockpitLog(`Błąd historii: ${e.message}`, '#E74C3C');
+  }
+}
+
+async function runRollbackQuick(){
+  const snap = window.prompt('Podaj ID migawki do przywrócenia (np. snap-t1789203598):', 'snap-t1789203598');
+  if(!snap) return;
+  appendCockpitLog(`Przywracanie migawki [${snap}]...`, 'var(--pacc)');
+  speakVoice(`Przywracanie migawki ${snap}`);
+  try {
+    const res = await fetch(getGwUrl() + '/api/rollback', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id: snap})
+    });
+    const d = await res.json();
+    if(d.output) appendCockpitLog(d.output, d.ok ? '#27AE60' : '#E74C3C');
+    if(d.ok){
+      toast(`Migawka [${snap}] przywrócona pomyślnie!`);
+      speakVoice('Migawka została przywrócona');
+      fetchTasks();
+    } else {
+      toast('Błąd przywracania migawki');
+    }
+  } catch(e){
+    appendCockpitLog(`Błąd rollback: ${e.message}`, '#E74C3C');
+  }
+}
+
+/* ————— Web Speech API (Rozpoznawanie mowy) ————— */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isRecording = false;
+
+if(SpeechRecognition){
+  recognition = new SpeechRecognition();
+  recognition.lang = 'pl-PL';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    micBtn.classList.add('active');
+    micLabel.textContent = 'Słucham...';
+    toast('Mów teraz do mikrofonu (pl-PL)...');
+  };
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      transcript += event.results[i][0].transcript;
+    }
+    taskPrompt.value = transcript;
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech error:', event.error);
+    micBtn.classList.remove('active');
+    micLabel.textContent = 'Mów do taskand';
+    isRecording = false;
+    toast('Błąd mikrofonu: ' + event.error);
+  };
+
+  recognition.onend = () => {
+    micBtn.classList.remove('active');
+    micLabel.textContent = 'Mów do taskand';
+    isRecording = false;
+    const spoken = taskPrompt.value.trim().toLowerCase();
+    if(spoken){
+      if(spoken.includes('pokaż logi') || spoken.includes('logi')){
+        speakVoice('Pokazuję logi kontrolera');
+        fetchLogs();
+      } else if(spoken.includes('pokaż zadania') || spoken.includes('status')){
+        speakVoice('Odświeżam listę zadań');
+        fetchTasks();
+      } else if(spoken.includes('cyfrowy bliźniak') || spoken.includes('digital twin')){
+        runTwinQuick();
+      } else if(spoken.includes('cofnij') || spoken.includes('przywróć')){
+        runRollbackQuick();
+      } else if(spoken.includes('historia')){
+        fetchHistoryQuick();
+      } else {
+        speakVoice(`Rozpoznano zadanie: ${spoken}. Wysyłam.`);
+        submitTask(taskPrompt.value);
+      }
+    }
+  };
+
+  micBtn.addEventListener('click', () => {
+    if(isRecording){
+      recognition.stop();
+    } else {
+      taskPrompt.value = '';
+      try {
+        recognition.start();
+      } catch(e){
+        console.warn(e);
+      }
+    }
+  });
+} else {
+  micBtn.disabled = true;
+  micBtn.title = 'Przeglądarka nie obsługuje Web Speech API (zalecany Google Chrome lub MS Edge)';
+  micLabel.textContent = 'Brak Web Speech';
+  $('#voiceLangLabel').textContent = 'Web Speech brak (Chrome/Edge)';
+}
+
+btnSubmitTask.addEventListener('click', () => submitTask(taskPrompt.value));
+taskPrompt.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitTask(taskPrompt.value); });
+$('#gwPing').addEventListener('click', () => { pingGateway(); fetchTasks(); fetchLogs(); toast('Odświeżono połączenie'); });
+$('#btnRefreshTasks').addEventListener('click', () => { fetchTasks(); toast('Odświeżono zadania'); });
+$('#btnRefreshLogs').addEventListener('click', () => { fetchLogs(); toast('Odświeżono logi'); });
+$('#btnTwinQuick').addEventListener('click', runTwinQuick);
+$('#btnHistoryQuick').addEventListener('click', fetchHistoryQuick);
+$('#btnRollbackQuick').addEventListener('click', runRollbackQuick);
+$('#btnClearTerminal').addEventListener('click', () => { cockpitLogView.innerHTML = ''; toast('Wyczyszczono konsolę'); });
+
 /* ————— start ————— */
 renderRun();
 renderFiles();
+pingGateway();
+fetchTasks();
+fetchLogs();
+setInterval(() => { pingGateway(); fetchTasks(); }, 12000);
 tline(`taskand ❯ pierwsze uruchomienie taskand v0.4 — 4 pytania`, 'zaz');
 tline(`taskand ❯ każdy krok instalacji wykonam jako proces-Dockerfile (evolution/install-*)`, 'dim');
 tline(``);

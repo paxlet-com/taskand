@@ -24,9 +24,10 @@ services:
   gateway:
     build: ./gateway
     container_name: taskand-gateway
-    ports: ["8077:8077"]   # przeglądarka → POST /tasks (opcjonalne)
+    ports: ["8077:8077"]   # Uniwersalna bramka REST API dla zadan, logow i Digital Twin
     volumes:
-      - "${TASKAND_HOST_DIR:-.}/tasks:/taskand/tasks"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "${TASKAND_HOST_DIR:-.}:/taskand"
     restart: unless-stopped
 
   landing:
