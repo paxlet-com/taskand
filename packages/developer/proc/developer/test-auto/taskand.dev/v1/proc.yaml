@@ -1,0 +1,14 @@
+uri: proc://taskand.dev/developer/test-auto/v1
+name: test-auto
+version: "v1"
+role: worker
+interface:
+  stdin: any
+  stdout: any
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs
+runtimes:
+  - kind: node
+    bin: bin.mjs
+    engines: ">=20"
+grants: { run: [execute-proc] }

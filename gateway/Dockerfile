@@ -147,6 +147,24 @@ class Gateway(BaseHTTPRequestHandler):
                 with open(cap_file, "r", encoding="utf-8") as f:
                     content = f.read()
             self.send_json(200, {"ok": True, "capsule": content})
+        elif path in ["/federation", "/api/federation"]:
+            registries = {}
+            pkgs_dir = os.path.join(BASE_DIR, "packages")
+            if os.path.exists(pkgs_dir):
+                for pkg in sorted(os.listdir(pkgs_dir)):
+                    cat_p = os.path.join(pkgs_dir, pkg, "proc-catalog.json")
+                    if os.path.exists(cat_p):
+                        try:
+                            with open(cat_p, "r", encoding="utf-8") as f:
+                                registries[pkg] = json.load(f).get("bindings", [])
+                        except Exception:
+                            pass
+            self.send_json(200, {
+                "ok": True,
+                "standard": "taskand-v0.20-federation",
+                "total_registries": len(registries),
+                "registries": registries
+            })
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 

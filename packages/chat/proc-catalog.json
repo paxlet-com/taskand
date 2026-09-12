@@ -15,6 +15,13 @@
       "binSha256": "c6b8e65bde856054fbd9bd8265fd115a979b27391bea6b53ea1f0e48c107ae9e",
       "yamlSha256": "5961bd4950df7bd8e20a0377ab15a5fa14deec61409abdddbf0a308a03a41984",
       "testSha256": "90c79022bce42d0cfe935c45928af2262a5a3e81893f2809491727fa7dcf4453"
+    },
+    {
+      "uri": "proc://taskand.dev/registry/serve/v1",
+      "path": "proc/registry/serve/taskand.dev/v1",
+      "binSha256": "561a019d6789445e7545187233c50dc9ed638b82a54ffc80f6f5262477120199",
+      "yamlSha256": "a7f76d8708a773ce3f6212bc1117ed5544ecfdbf80dbf828ac946da37773535b",
+      "testSha256": "a3058dd899744cbba0a80ca0b07e1534233bed7579ff883d976c5eef2d0aedeb"
     }
   ]
 }

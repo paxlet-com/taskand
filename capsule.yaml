@@ -9,6 +9,9 @@ spec:
   role: application
 
   processes:
+    - uri: proc://taskand.dev/registry/serve/v1
+      role: worker
+      grants: [run]
     - uri: proc://taskand.dev/flow/login/v1
       role: orchestrator
       grants: [execute-proc]

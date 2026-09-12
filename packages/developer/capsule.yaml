@@ -3,7 +3,7 @@ kind: Capsule
 metadata:
   name: taskand-developer
   version: "1.0.0"
-  description: "Kapsuła dewelopera taskand — generator planów, pętla samonaprawy i ewolucji"
+  description: "Kapsuła dewelopera taskand — rejestr, generator planów, pętla samonaprawy i ewolucji"
 
 spec:
   role: agent
@@ -18,6 +18,14 @@ spec:
       grants: [execute-proc]
       calls:
         - proc://taskand.dev/dev/plan/v1
+
+    - uri: proc://taskand.dev/dev/codegen/v1
+      role: worker
+      grants: [execute-proc]
+
+    - uri: proc://taskand.dev/registry/serve/v1
+      role: worker
+      grants: [run]
 
   permissions:
     source: grants.yaml

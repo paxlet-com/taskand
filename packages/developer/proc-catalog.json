@@ -15,6 +15,27 @@
       "binSha256": "688bedb06dd2dd7990be87acadeaafd5c850d99aeca3c4d7804f386a6c036721",
       "yamlSha256": "1c2ae7f6198dea5ad5496cf20c8d762764d58cdd9fcd2fe5212635800f643f73",
       "testSha256": "5c20d6dee86770e9b772c0c111b4324b84a47f758935dcf4fdb50630b18e250d"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/codegen/v1",
+      "path": "proc/dev/codegen/taskand.dev/v1",
+      "binSha256": "07bfd152c70f1fa871fd31aa63e8423e2e1986f8460389908c8bce9a3e3c5008",
+      "yamlSha256": "3417ea29c0ce66288d4383ec949271e16057be5e152552ab6c763f769bd91a89",
+      "testSha256": "858dd06d78ab7a1158c595f0a9310bbe4f1d274c19fff9d774e2b4eabf72d291"
+    },
+    {
+      "uri": "proc://taskand.dev/registry/serve/v1",
+      "path": "proc/registry/serve/taskand.dev/v1",
+      "binSha256": "561a019d6789445e7545187233c50dc9ed638b82a54ffc80f6f5262477120199",
+      "yamlSha256": "a7f76d8708a773ce3f6212bc1117ed5544ecfdbf80dbf828ac946da37773535b",
+      "testSha256": "a3058dd899744cbba0a80ca0b07e1534233bed7579ff883d976c5eef2d0aedeb"
+    },
+    {
+      "uri": "proc://taskand.dev/developer/test-auto/v1",
+      "path": "proc/developer/test-auto/taskand.dev/v1",
+      "binSha256": "324b9eb847882ce90d4f1517ba423ade379be64c6cbaeed98fc1c449b0139566",
+      "yamlSha256": "0a8d8e0b0d004c0ca806b807c1a231c1e21dadfa7765cf0b5743e1849be82839",
+      "testSha256": "876d065d307f567eb6d6fe7665fdf10bd9fda92137da41a6803b67a458b92222"
     }
   ]
 }

@@ -6,6 +6,9 @@ metadata:
 spec:
   role: worker
   processes:
+    - uri: proc://taskand.dev/registry/serve/v1
+      role: worker
+      grants: [run]
     - uri: proc://taskand.dev/hello-world/v1
       role: worker
       grants: [execute-proc]

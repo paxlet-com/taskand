@@ -9,6 +9,9 @@ spec:
   role: agent
 
   processes:
+    - uri: proc://taskand.dev/registry/serve/v1
+      role: worker
+      grants: [run]
     - uri: proc://taskand.dev/chat/message/v1
       role: worker
       grants: [execute-proc]

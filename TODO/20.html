@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>taskand.com v0.20 — federacja rejestrów: każda paczka = registry, wymiana URI, developer+LLM tworzy procesy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDD; --paper2:#EBE4D1; --ink:#221D12; --ink2:#5C543E;
+  --line:#D3C9AD; --line2:#C2B693; --verm:#B03A10; --verm2:#C94E1F; --olive:#71692F;
+  --plate:#1D1911; --ptext:#EBE2CC; --pdim:#8F8567; --pacc:#E06B37; --pkey:#BCB489;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.5;padding:26px clamp(16px,4vw,54px) 44px;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+header,main,footer{position:relative;z-index:1}
+.wrap{max-width:1260px;margin:0 auto}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);position:relative;margin-bottom:6px}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:-5px;border-bottom:1px solid var(--ink)}
+h1{font-size:clamp(34px,4.2vw,52px);font-weight:500;font-style:italic;letter-spacing:-1px;line-height:.95}
+h1 .tld{color:var(--verm);font-size:.62em}
+.tagser{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.mast-r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink2);line-height:1.9}
+.mast-r b{color:var(--verm);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:34px;align-items:start;padding:30px 0 4px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(22px,2.8vw,32px);font-weight:500;font-style:italic;line-height:1.2}
+.hero h2 em{color:var(--verm)}
+.hero-l p{margin-top:12px;font-size:16px;max-width:660px}
+.ansbox{border:1px solid var(--verm2);border-left:4px solid var(--verm2);border-radius:3px;padding:14px 18px;margin-top:16px;background:rgba(176,58,16,.05);font-size:15px}
+.ansbox b{color:var(--verm);font-weight:600}
+section{margin-top:50px}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--verm);letter-spacing:1px}
+.stitle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink2)}
+.srule{flex:1;border-top:1px solid var(--line);min-width:24px}
+.smeta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.slede{font-size:16.5px;max-width:920px;margin-bottom:18px}
+/* arch diagram */
+.arch{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:2.1;padding:16px 18px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B}
+.arch .k{color:var(--pkey)} .arch .v{color:var(--pacc)} .arch .c{color:var(--pdim)} .arch .ok{color:#C9BE8B} .arch .ex{color:var(--pacc)}
+/* symulacja */
+.simgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:920px){.simgrid{grid-template-columns:1fr}}
+.simctl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.simb{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;background:var(--ink);color:var(--paper);border:none;padding:9px 15px;border-radius:2px;cursor:pointer}
+.simb svg{width:12px;height:12px}
+.simb:hover:not(:disabled){background:var(--verm)}
+.simb.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+.simb.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--ink);background:transparent}
+.simb:disabled{opacity:.4;cursor:default}
+.term{background:var(--plate);border-radius:3px;color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;display:flex;flex-direction:column;height:420px;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.termhead{color:var(--pdim);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border-bottom:1px solid #3A3422;padding:9px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.termhead b{color:var(--pacc);font-weight:500}
+.termbody{flex:1;overflow-y:auto;padding:10px 14px}
+.termbody::-webkit-scrollbar{width:7px}
+.termbody::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.tl{white-space:pre-wrap;word-break:break-word;color:var(--ptext)}
+.tl .v{color:var(--pacc)} .tl .dim{color:var(--pdim)} .tl .ok{color:#C9BE8B} .tl .err{color:#E0714A} .tl .cmd{color:var(--pkey)} .tl .ex{color:var(--pacc)}
+.tl.enter{animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0}}
+.flowcard{border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);padding:14px 16px;margin-bottom:12px;display:none}
+.flowcard.show{display:block;animation:fadein .5s ease}
+.flowcard .fh{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;flex-wrap:wrap}
+.flowcard .fn{font-style:italic;font-weight:600;font-size:16px;flex:1;min-width:140px}
+.flowcard .fst{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;padding:2px 8px;border-radius:2px;flex:none}
+.flowcard .fst.ok{background:var(--olive);color:var(--paper)}
+.flowcard .fst.err{background:var(--verm2);color:var(--paper)}
+.flowcard .fst.info{border:1px solid var(--line2);color:var(--ink2)}
+.flowcard .fst.exch{background:var(--verm2);color:var(--paper)}
+.flowcard .fd{font-size:14px;color:var(--ink2);line-height:1.6}
+.flowcard .fd b{color:var(--verm);font-weight:500}
+.flowcard .fd code{font-family:'JetBrains Mono',monospace;font-size:.9em;background:var(--paper2);padding:1px 5px;border-radius:2px}
+.jsonmini{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.65;padding:11px 13px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow-y:auto;box-shadow:0 0 0 1px #14110B;margin-bottom:8px}
+.jsonmini::-webkit-scrollbar{width:7px}
+.jsonmini::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.jsonmini .k{color:var(--pkey)} .jsonmini .v{color:var(--pacc)} .jsonmini .c{color:var(--pdim)}
+/* pliki */
+.ftabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ftab{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:6px 12px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.ftab .fdot{width:6px;height:6px;border-radius:50%;background:var(--olive)}
+.ftab.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.62;padding:16px 18px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.fplate::-webkit-scrollbar{width:8px}
+.fplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.fplate .c{color:#7E755B;font-style:italic}
+.fplate .k{color:var(--pacc);font-weight:600}
+.fplate .yk{color:var(--pkey)}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ibtn{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--line2);border-radius:2px;padding:6px 11px;cursor:pointer;color:var(--ink2)}
+.ibtn:hover{color:var(--ink);border-color:var(--ink)}
+.ibtn svg{width:12px;height:12px}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
+#toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <h1>taskand<span class="tld">.com</span></h1>
+      <p class="tagser">v0.20 · federacja rejestrów · każda paczka = registry · wymiana wersjonowanych URI</p>
+    </div>
+    <div class="mast-r">
+      developer + LLM <b>tworzy procesy</b> → rejestruje w SWOIM registry<br>
+      inne paczki <b>oddkrywają</b> przez katalog → <b>konsumują</b> przez URI
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-l">
+      <h2>Każda paczka taskand może być <em>rejestrem</em> — bo już ma katalog procesów. Wystarczy dodać proces <code>serve</code>.</h2>
+      <p>Skoro każda paczka ma <code>proc-catalog.json</code> i katalog <code>proc/</code>, to wystarczy <b>jeden dodatkowy proces</b> (<code>proc://…/registry/serve/v1</code>) — i paczka staje się <b>rejestrem</b>, który może serwować swoje procesy innym. <b>Developer z dostępem do LLM</b> może tworzyć nowe procesy i rejestrować je w swoim registry — a inne paczki odkrywają je przez <b>federowaną wymianę URI</b> (kopia CloudEvents jako protokół wymiany).</p>
+      <div class="ansbox">
+        <b>Kluczowa zmiana:</b> URI procesu zyskuje <b>prefiks rejestru</b> — <code>proc://taskand.dev/<b>developer</b>/summarize/v1</code> oznacza proces w registry <b>developera</b>. Supervisor routuje: lokalne registry → bezpośrednio; zdalne registry → przez wymianę (envelope). Developer staje się <b>żywą biblioteką procesów</b> tworzonych przez LLM.
+      </div>
+    </div>
+    <div>
+      <div class="arch"><span class="c">// federacja rejestrów — każda paczka = registry</span>
+
+<span class="v">registry://taskand.dev/core</span>           <span class="c">← paczka: taskand-core</span>
+  <span class="k">proc:</span> hello-world, analyze-text, deploy     <span class="c">← procesy w TEJ paczce</span>
+
+<span class="v">registry://taskand.dev/developer</span>       <span class="c">← paczka: taskand-developer</span>
+  <span class="k">proc:</span> evolve-feature, twin-runner           <span class="c">← + NOWE (tworzone przez LLM!)</span>
+  <span class="k">LLM:</span> glm-5.3 (klucz z .env, runtime-only)     <span class="c">← źródło nowych procesów</span>
+
+<span class="v">registry://taskand.dev/web</span>             <span class="c">← paczka: taskand-web</span>
+  <span class="k">proc:</span> chat-serve, evolve-request
+
+<span class="c">// WYMIANA między rejestrami (federacja):</span>
+<span class="ex">web</span> ──discover──→ <span class="v">registry://developer</span>/.well-known/catalog
+<span class="ex">web</span> ──pull──────→ <span class="v">proc://developer/summarize/v1</span> (z hashami ✓)
+<span class="ex">web</span> ──call──────→ <span class="v">printf | node …/bin.mjs</span> (identycznie!)
+
+<span class="c">// procesy z innych rejestru — pełne URI:</span>
+<span class="v">proc://taskand.dev/core/hello/v1</span>         <span class="c">← lokalny</span>
+<span class="v">proc://taskand.dev/developer/summarize/v1</span> <span class="c">← z registry developera</span>
+
+<span class="c">// klucz: wywołujący zawsze widzi to samo (URI + JSON→JSON)</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="shead"><span class="snum">01</span><span class="stitle">symulacja · developer+LLM tworzy proces → federowana wymiana → konsumpcja</span><span class="srule"></span><span class="smeta" id="simMeta">gotowa</span></div>
+  <p class="slede">Pełny cykl: user wysyła zadanie „stwórz proces podsumowujący" → <b>developer+LLM generuje kod</b> → <b>rejestruje w SWOIM registry</b> → <b>taskand-web odkrywa</b> przez federację → <b>konsumuje</b> przez URI. Cała wymiana idzie przez <b>kopertę CloudEvents</b> (wersjonowaną, z grantami).</p>
+  <div class="simctl">
+    <button class="simb" id="fullBtn"><i data-lucide="play"></i> pełny cykl federacji</button>
+    <button class="simb ghost" id="stepBtn"><i data-lucide="redo-2"></i> krok</button>
+    <button class="simb ghost" id="resetBtn"><i data-lucide="rotate-ccw"></i> reset</button>
+  </div>
+  <div class="simgrid">
+    <div id="flowCards"></div>
+    <div>
+      <div class="term">
+        <div class="termhead"><span>federacja · developer + web + registry</span><span id="termStat">idle</span></div>
+        <div class="termbody" id="termBody"></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">registry developera (żywy katalog)</div>
+        <div class="jsonmini" id="devCatalog" style="min-height:120px"><span class="c">// procesy developera pojawią się po utworzeniu</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><span class="stitle">jak optymalnie budować takie organizmy — wzorce federacji</span><span class="srule"></span><span class="smeta">3 wzorce</span></div>
+  <p class="slede">Federacja rejestrów to <b>sieć organizmów</b>. Każdy może być rejestrem, ale nie każdy musi — wybór wzorca zależy od skali i potrzeb.</p>
+  <table class="mtx" style="width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px">
+    <thead><tr><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">wzorzec</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">kiedy</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">struktura</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">wymiana</th></tr></thead>
+    <tbody>
+      <tr>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">pojedynczy</b><br><span style="font-size:10px;color:var(--ink2)">monolityczny</span></td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">mały projekt, 1-5 paczek</td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">1 registry (taskand-core)<br>wszystkie paczki w środku<br>montowane jako wolumen</td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">bez wymiany (wszystko lokalne)<br>polling proc-catalog.json</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">gwiazda</b><br><span style="font-size:10px;color:var(--ink2)">hub-and-spoke</span></td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">typowy projekt, 5-30 paczek<br>developer jako centralne registry</td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">hub = developer (tworzy procesy)<br>spokes = aplikacje (konsumują)<br>spokes odkrywają przez hub</td>
+        <td style="padding:10px 8px;border-bottom:1px solid var(--line)">spoke → hub: discover + pull<br>hub → spoke: notification (nowa wersja)<br>przez kopertę (CloudEvents)</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 8px"><b style="color:var(--verm)">mesh</b><br><span style="font-size:10px;color:var(--ink2)">peer-to-peer</span></td>
+        <td style="padding:10px 8px">duży ekosystem, wielu developerów<br>rozproszone geograficznie</td>
+        <td style="padding:10px 8px">każda paczka = pełny registry<br>każdy może odkryć i konsumować od każdego<br>federacja przez /.well-known/catalog.json</td>
+        <td style="padding:10px 8px">peer → peer: discover + pull + verify<br>każda wymiana = koperta + granty<br>bez centralnego punktu</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><span class="stitle">pliki — standard federacji + registry serve + wymiana</span><span class="srule"></span><span class="smeta">v0.20</span></div>
+  <p class="slede">Realna zawartość: manifest federacji (kto jest rejestrem, co serwuje), proces <code>serve</code> (odkrywanie + katalog + pull), protokół wymiany (koperta + verify + grants) i generator procesów przez LLM.</p>
+  <div class="frow">
+    <div class="ftabs" id="ftabs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ibtn" id="fCopy"><i data-lucide="copy"></i> kopiuj</button>
+      <button class="ibtn" id="fDl"><i data-lucide="download"></i> pobierz plik</button>
+      <button class="ibtn" id="fBundle"><i data-lucide="package"></i> pobierz standard</button>
+    </div>
+  </div>
+  <div class="fplate" id="fplate"></div>
+</section>
+
+</main>
+<footer>
+taskand.com v0.20 · federacja rejestrów: każda paczka = registry (wystarczy proces serve) · URI z prefiksem rejestru (proc://org/registry/capability/version) · wymiana: discover (/.well-known) + pull (verify hashe) + call (identyczne URI) · developer+LLM tworzy procesy w SWOIM registry · wzorce: pojedynczy / gwiazda / mesh<br>
+symulacja liczy się lokalnie; pliki z sekcji 03 realne — serve to szkielet (python http), generator LLM do podpięcia pod .env
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hsh = n => Array.from({length:n}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2800); }
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function dl(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function hlY(t){ return t.split('\n').map(l => { let e = esc(l); if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`; return e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2'); }).join('\n'); }
+function hlJ(o){ return esc(JSON.stringify(o, null, 2)).replace(/"([^"]+)":/g, '"<span class="k">$1</span>":').replace(/: "([^"]*)"/g, ': "<span class="v">$1</span>"'); }
+
+const TB = $('#termBody');
+const DEVCAT = [];
+let SIM = { step: 0, busy: false };
+async function tlog(html, cls){
+  const d = document.createElement('div'); d.className = 'tl ' + (cls || '') + ' enter';
+  d.innerHTML = html;
+  TB.appendChild(d); TB.scrollTop = TB.scrollHeight;
+  await sleep(200);
+}
+function card(title, status, cls, desc){
+  const d = document.createElement('div');
+  d.className = 'flowcard';
+  d.innerHTML = `<div class="fh"><span class="fn">${title}</span><span class="fst ${cls}">${status}</span></div>
+    <div class="fd">${desc}</div>`;
+  $('#flowCards').appendChild(d);
+  requestAnimationFrame(() => d.classList.add('show'));
+  return d;
+}
+function renderDevCat(){
+  $('#devCatalog').innerHTML = DEVCAT.length
+    ? hlJ({ registry: 'taskand.dev/developer', processes: DEVCAT })
+    : '<span class="c">// procesy developera pojawią się po utworzeniu</span>';
+}
+
+const STEPS = [
+  { title:'krok 1 · user → developer: zadanie „stwórz proces"', status:'✓', cls:'ok', log:[
+    ['[web]','user: „stwórz proces podsumowujący tekst — 5 najważniejszych zdań”'],
+    ['[web]','POST developer:8078/tasks (koperta CloudEvents)'],
+    ['[web]','  {taskand: {cel: developer, priorytet: evolution}, data: {typ: evolve-create, opis: "summarize"}}'],
+    ['[dev]','developer: zadanie przyjęte · typ: evolve-create · źródło: user'],
+  ], desc: `User wysyła zadanie <b>typu evolve-create</b> (nowy typ!).<br>Developer dostaje kopertę z opisem: <code>„stwórz proces podsumowujący — 5 zdań"</code>.<br>To nie jest zmiana istniejącego procesu — to <b>utworzenie nowego</b>.` },
+
+  { title:'krok 2 · developer + LLM: generuj kod procesu', status:'✓', cls:'ok', log:[
+    ['[dev]','LLM: glm-5.3 (klucz z .env, runtime-only) — generuj bin.mjs'],
+    ['[llm]','system: „Wygeneruj proces proc://…/summarize/v1 — JSON stdin → JSON stdout, fail-closed”'],
+    ['[llm]','user: „5 najważniejszych zdań z tekstu (odpowiedź: {sentences: [...], count: N})”'],
+    ['[llm]','response: bin.mjs (~30 linii, JSON→JSON, exit 0/1/2) + test.mjs (~10 linii)'],
+    ['[dev]','kod wygenerowany · testy kontraktu: ✓ (fail-closed zachowany)'],
+  ], desc: `Developer wysyła prompt do <b>LLM (glm-5.3 z .env)</b>.<br>LLM generuje: <code>bin.mjs</code> (standardowy wpis: JSON→JSON, fail-closed) + <code>test.mjs</code>.<br>Developer <b>weryfikuje kontrakt</b> (test przechodzi) przed rejestracją.<br><b>To jest miejsce, gdzie LLM staje się źródłem nowych zdolności.</b>` },
+
+  { title:'krok 3 · developer: ZAREJESTRUJ w SWOIM registry', status:'✓', cls:'ok', log:[
+    ['[dev]','mkdir -p proc/summarize/taskand.dev/v1/'],
+    ['[dev]','bin.mjs + test.mjs + proc.yaml (binding: node) zapisane'],
+    ['[dev]','sha256(bin.mjs) = sha256:' + hsh(12) + '…'],
+    ['[dev]','proc-catalog.json: += proc://taskand.dev/developer/summarize/v1'],
+    ['[dev]','git add + commit: "register: summarize v1" + tag dev-registry-v5'],
+    ['[dev]','registry://taskand.dev/developer · procesów: 3 (evolve, twin, summarize)'],
+  ], desc: `Developer rejestruje nowy proces <b>w SWOIM registry</b> (nie w cudzym!).<br><code>proc://taskand.dev/developer/summarize/v1</code> — prefiks <b>developer</b> wskazuje źródło.<br>Commit w git + wpis w <code>proc-catalog.json</code> + hashe.<br><b>Od tej chwili proces istnieje jako zasób URI w registry developera.</b>` },
+
+  { title:'krok 4 · FEDERACJA: web odkrywa proces w registry developera', status:'↔', cls:'exch', log:[
+    ['[web]','GET developer:8078/.well-known/catalog.json (discovery)'],
+    ['[web]','  → {processes: [evolve, twin, summarize(v1, NEW!)]}'],
+    ['[web]','NOWY PROCES wykryty: proc://taskand.dev/developer/summarize/v1'],
+    ['[web]','verify: sha256(bin.mjs) = sha256:' + hsh(12) + '… ✓ (hashe zgodne)'],
+    ['[web]','grants: consume-from-registry:developer ✓ (federacja)'],
+    ['[web]','pull: bin.mjs + proc.yaml (verify: hashe ✓, binding: node ✓)'],
+  ], desc: `taskand-web <b>odkrywa</b> nowy proces przez <b>/.well-known/catalog.json</b> developera.<br>Weryfikuje: <b>hashe ✓</b> (digest z katalogu zgadza się z plikiem) + <b>granty ✓</b> (consume-from-registry).<br>Pull: pobiera pliki procesu z registry developera.<br><b>To jest federacja: paczka web uczy się nowej zdolności bez zmiany własnego kodu.</b>` },
+
+  { title:'krok 5 · web KONSUMUJE proces (przez URI — identycznie jak lokalny)', status:'✓', cls:'ok', log:[
+    ["[web]", 'printf \'%s\' \'{"text":"Taskand unifies everything. Processes are URI-addressed. Each package is a registry. The developer creates new capabilities. Evolution is validated. Standards emerge from practice."}\' | \\'],
+    ["[web]", '  curl -X POST supervisor:8079/run -d \'{"uri":"proc://taskand.dev/developer/summarize/v1"}\''],
+    ['[supervisor]','registry: developer (federated) · verify: hashe ✓'],
+    ['[supervisor]','runtime: node (z bindingu) → execute bin.mjs'],
+    ['[proc]','exit 0 · stdout: {"sentences": ["Taskand unifies everything.", "Processes are URI-addressed.", "Each package is a registry.", "The developer creates new capabilities.", "Evolution is validated."], "count": 5}'],
+    ['[web]','Odpowiedź do usera: 5 najważniejszych zdań ✓'],
+  ], desc: `Wywołanie <b>identyczne jak procesu lokalnego</b>: URI + JSON stdin → JSON stdout.<br>Supervisor routuje do registry developera (federacja).<br>Proces wykonany — wynik wraca do usera.<br><b>Wywołujący nie wie (i nie musi!), że proces przyszedł z innego registry.</b>` },
+];
+
+async function runStep(){
+  if(SIM.busy || SIM.step >= STEPS.length) return;
+  SIM.busy = true;
+  const st = STEPS[SIM.step];
+  const c = card(st.title, st.status, st.cls, st.desc);
+  for(const [who, msg] of st.log){
+    await tlog(`<span class="v">${esc(who)}</span> ${esc(msg)}`);
+  }
+  if(SIM.step === 2){
+    DEVCAT.push({ uri: 'proc://taskand.dev/developer/summarize/v1', hash: 'sha256:' + hsh(12) + '…', runtimes: ['node>=22'] });
+    renderDevCat();
+  }
+  SIM.step++;
+  $('#simMeta').textContent = `krok ${SIM.step}/${STEPS.length}`;
+  SIM.busy = false;
+  if(SIM.step >= STEPS.length){
+    toast('federacja: developer+LLM stworzył proces → web odkrył → skonsumował ✓');
+  }
+}
+async function runFull(){
+  while(SIM.step < STEPS.length){ await runStep(); await sleep(1200); }
+}
+$('#fullBtn').addEventListener('click', runFull);
+$('#stepBtn').addEventListener('click', runStep);
+$('#resetBtn').addEventListener('click', () => {
+  SIM.step = 0; SIM.busy = false;
+  $('#flowCards').innerHTML = ''; TB.innerHTML = '';
+  DEVCAT.length = 0; renderDevCat();
+  $('#simMeta').textContent = 'gotowa';
+  toast('symulacja zresetowana');
+});
+
+/* ————— pliki ————— */
+const FEDERATION_SPEC = `apiVersion: taskand.dev/v1
+kind: FederationSpec
+meta:
+  # standard federacji rejestrów — v0.20
+  # każda paczka MOŻE być rejestrem (wystarczy proces serve)
+  # wymiana: discover + pull + call (przez kopertę CloudEvents)
+rules:
+  registry-identity:
+    # nazwa rejestru = nazwa paczki (z capsule.yaml)
+    # URI procesu zyskuje prefiks rejestru:
+    uriFormat: "proc://<org>/<registry-name>/<capability>/<version>"
+    example: "proc://taskand.dev/developer/summarize/v1"
+    local: "proc://taskand.dev/core/hello/v1"  # z własnego rejestru
+
+  serving:
+    # proces serve wystawia katalog i pliki procesów
+    required-process: "proc://…/registry/serve/v1"
+    endpoints:
+      - { path: "/.well-known/catalog.json", method: GET, desc: "katalog procesów rejestru" }
+      - { path: "/packages/<pkg>/proc/<path>/<file>", method: GET, desc: "plik procesu (bin/proc.yaml)" }
+      - { path: "/proc-catalog.json", method: GET, desc: "pełny katalog z hashami" }
+
+  discovery:
+    # jak inna paczka dowiaduje się o procesach w tym rejestru
+    method: "GET /.well-known/catalog.json"
+    response: { processes: [{uri, hash, version, runtimes}] }
+    polling: "10s (lub push przez kopertę: registry.updated.v1)"
+
+  exchange:
+    # jak proces jest pobierany z innego rejestru
+    steps:
+      - { step: discover, method: "GET /.well-known/catalog.json" }
+      - { step: verify, check: "sha256(pliku) == hash z katalogu" }
+      - { step: grants, check: "consume-from-registry:<name> ✓" }
+      - { step: pull, method: "GET /packages/…/bin.mjs" }
+      - { step: cache, action: "zapisz lokalnie z weryfikacją hashy" }
+    protocol: "kopia CloudEvents (URI, JSON→JSON, fail-closed)"
+
+  grants:
+    register-to-own: "każda paczka ma prawo rejestrować w SWOIM registry"
+    consume-from-other: "wymaga grantu: consume-from-registry:<name>"
+    discover: "publiczne (/.well-known) — bez grantu"
+    verify: "wymagane — sha256 z katalogu == sha256 pliku"
+
+  llm-generated:
+    # developer + LLM tworzy nowe procesy w SWOIM registry
+    source: "LLM (klucz z .env, runtime-only)"
+    process: "generate → test (fail-closed) → register → commit"
+    versioning: "nowy URI (v1) · kolejne wersje: v2, v3…"
+    validation: "kontrakt JSON→JSON + testy przed rejestracją"
+
+  patterns:
+    single: "1 registry, wszystkie paczki w środku (mały projekt)"
+    star: "hub = developer (tworzy), spokes = aplikacje (konsumują)"
+    mesh: "każdy = pełny registry, każdy odkrywa od każdego"
+`;
+const REGISTRY_SERVE = `#!/usr/bin/env node
+// proc://…/registry/serve/v1 — serwuje katalog i pliki procesów
+// TO JEDEN PROCES zamieniający paczkę w REJESTR (federacja v0.20)
+import { createServer } from 'node:http';
+import { readFileSync, existsSync } from 'node:fs';
+import { join, extname } from 'node:path';
+
+const CATALOG = JSON.parse(readFileSync('proc-catalog.json', 'utf8'));
+const MIME = { '.json': 'application/json', '.mjs': 'text/javascript',
+               '.yaml': 'text/yaml', '.md': 'text/markdown' };
+
+const server = createServer((req, res) => {
+  // 1 · DISCOVERY: katalog procesów (publiczny)
+  if (req.url === '/.well-known/catalog.json') {
+    const processes = (CATALOG.bindings || []).map(b => ({
+      uri: b.uri, hash: b.hashes?.['bin.mjs'] || 'unknown',
+      version: b.git?.rev || 'unknown', runtimes: b.runtimes || ['node']
+    }));
+    return json(res, 200, { registry: 'taskand.dev', processes });
+  }
+
+  // 2 · PEŁNY KATALOG (z hashami)
+  if (req.url === '/proc-catalog.json') {
+    return json(res, 200, CATALOG);
+  }
+
+  // 3 · PULL: plik procesu (bin.mjs, proc.yaml, test.mjs)
+  // URI: /packages/<pkg>/proc/<path>/<org>/<ver>/<file>
+  const m = req.url.match(/^\\/packages\\/([^/]+)\\/proc\\/(.+)$/);
+  if (m && req.method === 'GET') {
+    const file = join('packages', m[1], 'proc', m[2]);
+    if (existsSync(file)) {
+      res.writeHead(200, { 'Content-Type': MIME[extname(file)] || 'text/plain' });
+      return res.end(readFileSync(file));
+    }
+    return json(res, 404, { error: 'file not found' });
+  }
+
+  // 4 · HEALTH
+  if (req.url === '/healthz') {
+    return json(res, 200, { status: 'ok', processes: CATALOG.bindings?.length || 0 });
+  }
+
+  return json(res, 404, { error: 'routes: /.well-known/catalog.json · /proc-catalog.json · /packages/…' });
+});
+
+function json(res, code, body) {
+  const b = JSON.stringify(body, null, 2);
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8',
+                        'Content-Length': Buffer.byteLength(b) });
+  res.end(b);
+}
+
+server.listen(8090, () => {
+  console.log('registry-serve: :8090 · processes: ' + (CATALOG.bindings?.length || 0));
+});
+`;
+const EXCHANGE_PROTOCOL = `# protokół wymiany między rejestrami (federacja v0.20)
+# każda wymiana = kopia CloudEvents + verify hashy + grants
+
+# 1 · DISCOVER (polling lub push)
+GET developer:8090/.well-known/catalog.json
+→ { "registry": "taskand.dev/developer", "processes": [
+     { "uri": "proc://…/summarize/v1", "hash": "sha256:ab12…", "runtimes": ["node"] }
+   ] }
+
+# 2 · NOTIFY (push — nowa wersja zarejestrowana)
+# (koperta CloudEvents wysłana do subskrybentów)
+{
+  "type": "org.taskand.registry.updated.v1",
+  "source": "urn:taskand:registry:developer",
+  "taskand": { "cel": "subscribers", "priorytet": "maintenance" },
+  "data": { "newProcess": "proc://…/summarize/v1", "hash": "sha256:…" }
+}
+
+# 3 · PULL (pobierz plik z weryfikacją)
+GET developer:8090/packages/moj/proc/summarize/taskand.dev/v1/bin.mjs
+# (przed zapisem: sha256(pliku) == hash z katalogu)
+
+# 4 · CALL (identyczne jak lokalny — wywołujący nie wie!)
+printf '%s' '{"text":"…"}' | \\
+  curl -X POST supervisor:8079/run \\
+  -d '{"uri":"proc://taskand.dev/developer/summarize/v1"}'
+# supervisor: routuje do registry developera → wykonuje → zwraca JSON
+
+# 5 · GRANTS (kto może konsumować z cudzego rejestru)
+rules:
+  - subject: capsule:taskand-web
+    target: registry:taskand.dev/developer
+    operations: [discover, consume]      # discover = publiczny, consume = grant
+  - subject: capsule:taskand-web
+    target: registry:taskand.dev/developer
+    operations: [register]               # DENY — tylko developer rejestruje w swoim
+`;
+const LLM_GENERATE_SH = `#!/bin/sh
+# developer · LLM generator procesów (szkielet — LLM z .env)
+# cykl: prompt → generate → test → register (w SWOIM registry)
+set -eu
+LLM_KEY=$(sed -n 's/^TASKAND_LLM_API_KEY=//p' .env 2>/dev/null | head -1)
+LLM_MODEL=$(sed -n 's/^TASKAND_LLM_MODEL=//p' .env 2>/dev/null | head -1)
+[ -z "$LLM_KEY" ] && { echo "brak TASKAND_LLM_API_KEY w .env"; exit 1; }
+
+DESC="$1"                     # opis procesu od usera
+URI="proc://taskand.dev/developer/$2/v1"   # URI nowego procesu
+
+# 1 · prompt do LLM
+PROMPT="Wygeneruj proces taskand: $DESC
+Standard: JSON na stdin → JSON na stdout, exit 0 ok / 1 fail-closed / 2 kontrakt.
+Odpowiedź: TYLKO kod Node.js (ESM), bez wyjaśnień."
+
+# 2 · generate (LLM)
+# (tu: wywołanie API — szkielet; w produkcji: adapter z .env)
+echo "generuję przez $LLM_MODEL…"
+
+# 3 · zapisz i przetestuj
+DIR="proc/$2/taskand.dev/v1"
+mkdir -p "$DIR"
+# bin.mjs = odpowiedź LLM (przez adapter)
+# test.mjs = testy kontraktu (fail-closed)
+
+# 4 · test przed rejestracją (bez tego NIE rejestruj!)
+node "$DIR/test.mjs" || { echo "test ✗ — NIE rejestruję"; exit 1; }
+echo "test ✓ — rejestruję"
+
+# 5 · zarejestruj w SWOIM registry
+HASH=$(sha256sum "$DIR/bin.mjs" | cut -c1-16)
+jq --arg uri "$URI" --arg hash "$HASH" '.bindings += [{
+  uri: $uri, dir: "'$DIR'",
+  git: {rev: "pending", immutable: true},
+  hashes: {"bin.mjs": "sha256:" + $hash},
+  runtimes: ["node>=22"]
+}]' proc-catalog.json > proc-catalog.json.tmp && mv proc-catalog.json.tmp proc-catalog.json
+
+git add -A && git commit -qm "register: $2 v1 (LLM-generated)"
+echo "zarejestrowano: $URI (w SWOIM registry — federacja!)"
+`;
+const FILES = [
+  {id:'fed', name:'federation-spec.yaml', get:() => FEDERATION_SPEC, lang:'yaml'},
+  {id:'srv', name:'proc/registry/serve/bin.mjs', get:() => REGISTRY_SERVE, lang:'js'},
+  {id:'ex', name:'exchange-protocol.md', get:() => EXCHANGE_PROTOCOL, lang:'sh'},
+  {id:'llm', name:'developer/llm-generate.sh', get:() => LLM_GENERATE_SH, lang:'sh'}
+];
+let curFile = 'fed';
+function hl(txt, lang){
+  return txt.split('\n').map(line => {
+    let e = esc(line);
+    if(/^\s*#/.test(e) || /^\s*\/\//.test(e)) return `<span class="c">${e}</span>`;
+    if(lang === 'yaml'){
+      e = e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+    }
+    return e;
+  }).join('\n');
+}
+function renderFiles(){
+  const tabs = $('#ftabs'); tabs.innerHTML = '';
+  FILES.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftab' + (f.id === curFile ? ' on' : '');
+    b.innerHTML = `<span class="fdot"></span>${f.name}`;
+    b.onclick = () => { curFile = f.id; renderFiles(); };
+    tabs.appendChild(b);
+  });
+  const f = FILES.find(x => x.id === curFile);
+  $('#fplate').innerHTML = hl(f.get(), f.lang);
+}
+$('#fCopy').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); navigator.clipboard.writeText(f.get()).then(() => toast('skopiowano ' + f.name)); });
+$('#fDl').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); dl(f.name.split('/').pop(), f.get()); toast('pobrano ' + f.name); });
+$('#fBundle').addEventListener('click', () => {
+  dl('taskand-v20-federation.bundle',
+`# taskand v0.20 — standard federacji rejestrów
+# każda paczka = registry · wymiana URI · developer+LLM tworzy procesy
+# start: dodaj proces serve do dowolnej paczki → staje się rejestrem
+
+--- federation-spec.yaml ---
+${FEDERATION_SPEC}
+--- proc/registry/serve/bin.mjs ---
+${REGISTRY_SERVE}
+--- exchange-protocol.md ---
+${EXCHANGE_PROTOCOL}
+--- developer/llm-generate.sh ---
+${LLM_GENERATE_SH}
+`);
+  toast('pobrano standard federacji v0.20 (4 pliki)');
+});
+
+/* ————— start ————— */
+renderDevCat(); renderFiles(); icons();
+tlog(`<span class="dim"># federacja gotowa — developer+LLM tworzy proces w SWOIM registry → web odkrywa → konsumuje</span>`);
+</script>
+</body>
+</html>

@@ -9,3 +9,10 @@ log/
 history/*.tar.gz
 dist/*.tgz
 __pycache__/
+*.pyc
+.code2llm_cache/
+.ruff_cache/
+.pytest_cache/
+venv/
+node_modules/
+.DS_Store
