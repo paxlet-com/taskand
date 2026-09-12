@@ -1,65 +1,63 @@
-# taskand-glm53 v0.4.2 — Autonomiczny Proces w Dockerfile
+# taskand-glm53 v1.0.0 — Standard taskand v1.0 & Autonomiczne Procesy URI
 
-Autonomiczny system zadań sterowany procesami-Dockerfile, pętlą samonaprawy, piaskownicą **Digital Twin Sandbox** oraz weryfikacją **Definition of Done (DoD)**.
+Pełna implementacja **Standardu taskand v1.0**: w którym wszystko jest zasobem URI (`proc://`, `session://`, `artifact:`), procesy wykonują się fail-closed przez stdin/stdout JSON, ewolucja podlega kwalifikacji w piaskownicy **Digital Twin**, a poświadczenia podlegają ścisłym regułom bezpieczeństwa (patrz [docs/SECRETS.md](docs/SECRETS.md)).
 
 Oficjalne repozytorium: **https://github.com/semcod/taskand-glm53**
 
 ---
 
-## ⚡ Szybki start
-
-Najprostszym sposobem zarządzania projektem jest narzędzie **`make`** lub dedykowane CLI **`taskand`**.
+## ⚡ Szybki start (Standard v1.0)
 
 ```bash
-# 1. Pobierz najnowszą wersję repozytorium
-git clone https://github.com/semcod/taskand-glm53.git
-cd taskand-glm53
+# 1. Sprawdź 9/9 punktów konformacji Standardu v1.0
+make conformance
 
-# 2. Sprawdź dostępne polecenia i stan systemu
-make
+# 2. Uruchom testy kontraktów wszystkich procesów URI
+make test
 
-# 3. Zainstaluj globalne CLI w ~/.local/bin/taskand
-make install-cli
+# 3. Zweryfikuj sumy SHA-256 w katalogu procesów
+make verify
 
-# 4. Sprawdź status kontenerów
-make status
+# 4. Uruchom proces URI przez uniwersalny runner
+make run URI=proc://taskand.dev/flow/login/v1 PAYLOAD='{"username":"admin","siteUrl":"https://semcod.com"}'
 
-# 5. Uruchom serwer strony landing page (Nginx w kontenerze na porcie 8090)
+# 5. Spakuj paczkę kapsuły do formatu dystrybucyjnego .tgz
+make pack
+
+# 6. Uruchom Web Cockpit ze sterowaniem głosowym
 make web
 # → http://localhost:8090
-
-# 6. Dodaj zadanie
-taskand add "wypchnij zmiany na github"
 ```
 
 ---
 
-## 🛠️ Polecenia Makefile
+## 🛠️ Polecenia Makefile — Pełne API Standardu v1.0
 
+### Standardowe cele v1.0 (Wymagane specyfikacją):
 | Komenda | Opis |
-|---------|------|
-| `make` / `make help` | Wyświetla listę poleceń oraz aktualny stan kontenerów |
-| `make bootstrap` | Uruchamia interaktywny onboarding i instalację (`sh taskand.sh`) |
-| `make install-cli` | Instaluje / linkuje narzędzie `taskand` do `~/.local/bin/taskand` |
+|---|---|
+| `make test` | Uruchamia testy kontraktu (`test.mjs`) wszystkich procesów w `proc/` (fail-closed) |
+| `make pack` | Buduje archiwum `.tgz` paczki do `dist/` po pomyślnej walidacji konformacji |
+| `make verify` | Sprawdza sumy SHA-256 `bin.mjs` i `proc.yaml` względem `proc-catalog.json` |
+| `make run URI=...` | Uruchamia wskazany proces URI z payloadem JSON przez stdin |
+| `make observe` | Raportuje stan wykonania i historię procesów w formacie JSONL |
+| `make extract` | Wypisuje manifest `capsule.yaml` i `proc-catalog.json` |
+| `make deploy` | Pipeline wdrożenia paczki (testy -> twin qualification -> tag) |
+| `make rollback` | Przywraca stan z wyznaczonej migawki lub tagu git |
+| `make conformance` | Automatyczny audyt 9/9 punktów Listy Sprawdzającej Standardu v1.0 |
+
+### Cele operacyjne i pomocnicze:
+| Komenda | Opis |
+|---|---|
 | `make up` | Uruchamia usługi taskand w tle (`docker compose up -d`) |
 | `make down` | Zatrzymuje kontenery (`docker compose down`) |
 | `make restart` | Restartuje kontenery (`docker compose restart`) |
 | `make status` / `make ps` | Sprawdza status usług (`docker compose ps`) |
-| `make web` | Uruchamia stronę landing page na porcie 8090 |
-| `make logs` | Śledzi logi kontrolera nucleus (planisty) na żywo |
-| `make logs-all` | Śledzi logi wszystkich usług (`nucleus` + `gateway` + `landing`) |
-| `make tasks` | Wyświetla kolejkę zadań (`inbox.yaml`) i historię (`done.yaml`) |
-| `make history` | Wyświetla pełną historię wykonania zadań oraz migawki z sumami SHA-256 |
-| `make twin ID=...` | Testuje proces w cyfrowym bliźniaku (Digital Twin Sandbox) z pętlą samonaprawy |
-| `make rollback [ID=snap-xxx]` | Przywraca pliki z wybranej migawki bezpieczeństwa |
-| `make snapshot TARGET=... DESC=...` | Tworzy nową migawkę wskazanego katalogu lub pliku |
-| `make clean-duplicates` | Uruchamia proces czyszczenia zbędnego podkatalogu `taskand` |
-| `make add TASK="..."` | Dodaje zadanie (automatycznie rozpoznaje typ i śledzi logi na żywo) |
-| `make add-watch TASK="..."`| Dodaje zadanie typu `obserwuj` |
-| `make gateway-health` | Sprawdza stan bramki HTTP (port 8077) |
-| `make web [PORT=8080]` | Uruchamia serwer landing page (domyślnie port 8080) |
-| `make check` | Sprawdza poprawność składniową plików Dockerfile |
-| `make clean` | Zatrzymuje kontenery i czyści wolumeny |
+| `make web` | Uruchamia stronę landing page i Web Cockpit na porcie 8090 |
+| `make logs` | Śledzi logi kontrolera nucleus na żywo |
+| `make add TASK="..."` | Dodaje zadanie do kolejki (automatycznie rozpoznaje typ) |
+| `make twin ID=...` | Testuje proces w cyfrowym bliźniaku (Digital Twin Sandbox) |
+| `make gateway-health` | Sprawdza stan uniwersalnej bramki REST API (port 8077) |
 
 ---
 
@@ -133,28 +131,36 @@ history/
 
 ---
 
-## 📥 Alternatywne sposoby dodawania zadań
+## 🎙️ Web Cockpit & Sterowanie Głosowe (port 8090)
 
-### 1. Bezpośrednio do pliku `tasks/inbox.yaml`
+Interfejs webowy dostępny pod adresem **`http://localhost:8090`** oferuje 100% parzystości z poleceniami CLI:
+* **Sterowanie głosem (Web Speech API)**: rozpoznawanie mowy w języku polskim (`pl-PL`) z przyciskiem `🎙️ Mów do taskand`.
+* **Polecenia głosowe**: rozpoznaje intencje sterujące cockpitem (*„pokaż logi”*, *„pokaż zadania”*, *„cyfrowy bliźniak”*, *„cofnij”*, *„historia”*) oraz dyktowanie dowolnych zadań.
+* **Synteza mowy (TTS)**: potwierdza przyjęcie zadań i status wykonania głosem.
+* **Szybkie akcje**: przyciski dla `Digital Twin Test`, `Rollback`, `Historia & Dockerfile`, `Kolejka zadań` i `Logi kontrolera`.
+
+---
+
+## 🌐 Uniwersalna Bramka REST API (port 8077)
+
+Usługa `taskand-gateway` nasłuchuje na porcie `8077` z nagłówkami CORS (`Access-Control-Allow-Origin: *`):
+
+| Metoda | Endpoint | Opis |
+|---|---|---|
+| `GET` | `/api/health` | Status i wersja usługi bramki |
+| `GET` | `/api/tasks` | Lista zadań: kolejka `inbox` oraz wykonane `done` |
+| `POST` | `/api/tasks` | Dodanie zadania: `{"z": "opis zadania"}` |
+| `GET` | `/api/logs` | Strumień ostatnich wpisów z `log/evolution.log` |
+| `GET` | `/api/history` | Historia zadań, powiązania Dockerfile oraz punkty przywracania |
+| `POST` | `/api/twin` | Uruchomienie testu procesu w Digital Twin Sandbox |
+| `POST` | `/api/rollback` | Przywrócenie plików z migawki: `{"id": "snap-xxx"}` |
+
+### Przykład wysłania zadania przez cURL:
 
 ```bash
-printf -- "- id: t001\n  typ: github-projekt\n  z: stwórz projekt w organizacji semcod z README\n" >> tasks/inbox.yaml
-```
-
-### 2. Przez HTTP Gateway (port 8077)
-
-Bramka HTTP `taskand-gateway` nasłuchuje na porcie `8077` i automatycznie dopisuje zgłoszenia do kolejki:
-
-```bash
-curl -X POST http://localhost:8077/tasks \
+curl -X POST http://localhost:8077/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{"id":"t002","typ":"github-projekt","z":"nowe repozytorium"}'
-```
-
-Sprawdzenie stanu bramki:
-```bash
-curl http://localhost:8077/health
-# Odpowiedź: {"ok": true, "service": "taskand-gateway"}
+  -d '{"z": "wypchnij zmiany na github"}'
 ```
 
 ---
@@ -186,34 +192,50 @@ TASKAND_LLM_MODEL=glm-5.3
 
 ---
 
-## 📂 Struktura katalogów
+## 📂 Struktura katalogów — Standard taskand v1.0
 
-```
+```text
 .
-├── Makefile                # Skróty poleceń administracyjnych
-├── START-HERE.md           # Podręczny przewodnik szybkiego startu
-├── Dockerfile              # Główny obraz bootstrap + controller (nucleus)
-├── bootstrap/
-│   └── Dockerfile          # Kopia obrazu bootstrap (sekcja 04)
-├── docker-compose.yaml     # Definicja usług nucleus i gateway
-├── gateway/
-│   └── Dockerfile          # Bramka HTTP REST (:8077) w Python 3.13 Alpine
-├── landing/
-│   ├── Dockerfile          # Kontener Nginx serwujący stronę projektu
-│   ├── index.html          # Samowystarczalna strona WWW (sekcje 01-04)
-│   └── serve.sh            # Skrypt lokalnego serwowania bez dockera
-├── tasks/
-│   ├── inbox.yaml          # Kolejka zadań wejściowych
-│   └── done.yaml           # Rejestr wykonanych zadań
-├── answers/
-│   └── taskand.answers.yaml # Zapisane odpowiedzi z onboardingu
-├── evolution/              # Dockerfile-y generowane dynamicznie dla zadań
-├── history/                # Rejestr migawek i punktów przywracania z sumami SHA-256
-│   ├── history.yaml        # Metadane i historia zadań
-│   └── snapshots/          # Zarchiwizowane dane wraz z manifest.json
-├── log/                    # Logi ewolucji systemu
+├── capsule.yaml                    # Główny manifest kapsuły v1.0 (role, procesy, ewolucja)
+├── grants.yaml                     # Polityka uprawnień i zakazy (policy-write, git-push)
+├── proc-catalog.json               # Wiązania URI -> ścieżki + SHA-256 (bin.mjs, proc.yaml, test.mjs)
+├── environment.yaml                # Deklaratywny manifest środowiska i infrastruktury
+├── Makefile                        # Standardowe API: test, pack, verify, run, conformance...
+├── proc/                           # Drzewo procesów: proc/<zdolność>/<organizacja>/<wersja>/
+│   ├── flow/login/taskand.dev/v1/          # bin.mjs, proc.yaml, test.mjs (orkiestrator URI)
+│   ├── browser/session/taskand.dev/v1/     # bin.mjs, proc.yaml, test.mjs (sesje przeglądarki)
+│   ├── web/navigate/taskand.dev/v1/        # bin.mjs, proc.yaml, test.mjs (nawigacja i CAS)
+│   └── web/analyze/taskand.dev/v1/         # bin.mjs, proc.yaml, test.mjs (analiza treści)
+├── schemas/                        # Schematy walidacji JSON: envelope, browser, capsule
+├── claims/                         # Roszczenia wiedzy o środowisku (rejestr ze stanami)
+├── twin/                           # Cyfrowy bliźniak: bramki Gate A & Gate B, twin.compose
+├── strategy/                       # Strategie decyzyjne planistów
+├── skills/                         # Deklaracje umiejętności operacyjnych
+├── patches/                        # Wymiana poprawek w standardzie git format-patch
+├── dist/                           # Pakiety dystrybucyjne .tgz budowane przez make pack
+├── docs/
+│   └── SECRETS.md                  # Architektura bezpieczeństwa haseł i sekretów (Vault/Env)
+├── log/
+│   ├── conversations.jsonl         # Dziennik pamięci i interakcji z LLM (wellmanifest/logs@v1)
+│   └── evolution.log               # Logi kontrolera nucleus
 ├── scripts/
-│   └── history.py          # Narzędzie obsługi migawek i procedury rollback
-├── taskand.cli             # Skrypt CLI instalowany w ~/.local/bin/taskand
-└── taskand.sh              # Interaktywny instalator bootstrap
+│   ├── planner.py                  # Wstrzykiwanie pamięci i środowiska do LLM (wellmanifest/llm)
+│   ├── taskand-runner.mjs          # Uniwersalny launcher procesów URI
+│   ├── taskand-new-pkg.sh          # Generator zgodnych paczek 9/9
+│   └── verify-conformance.mjs      # Walidator 9/9 punktów konformacji Standardu
+├── gateway/                        # Bramka HTTP REST (:8077) z CORS
+└── landing/                        # Web Cockpit i Nginx (:8090) z Web Speech API
 ```
+
+---
+
+## 🔒 Bezpieczeństwo i Sekrety (Hasła, Klucze, Vault)
+
+Zgodnie z zasadą nr 7 Standardu v1.0, sekrety **nigdy** nie są zapisywane w Dockerfile, commitach ani plikach obrazów:
+* **Runtime Environment**: przekazywanie przez zmienne środowiskowe wyłącznie w momencie `docker run` / `docker-compose.yaml` (klucze w `.env` ignorowanym przez git).
+* **Vault Agent**: dynamiczne pobieranie tokenów do pamięci RAM (`tmpfs` w `/vault/secrets`).
+* **BuildKit Secret Mount**: montaż poświadczeń podczas budowy (`--mount=type=secret`) bez zapisu w warstwach obrazu.
+* **Read-Only Host Mount**: bezpieczny montaż poświadczeń CLI (np. `~/.config/gh:ro`) z uprawnieniami `0600`.
+
+Pełną dokumentację ze wzorcami wdrożeniowymi znajdziesz w pliku [docs/SECRETS.md](docs/SECRETS.md).
+

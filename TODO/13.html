@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>taskand.com v0.15 — łańcuch procesów URI: wszystko zasobem URI, dostęp niezależny od runtime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDD; --paper2:#EBE4D1; --ink:#221D12; --ink2:#5C543E;
+  --line:#D3C9AD; --line2:#C2B693; --verm:#B03A10; --verm2:#C94E1F; --olive:#71692F;
+  --plate:#1D1911; --ptext:#EBE2CC; --pdim:#8F8567; --pacc:#E06B37; --pkey:#BCB489;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.5;padding:26px clamp(16px,4vw,54px) 44px;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'%3E%3C/svg%3E")}
+header,main,footer{position:relative;z-index:1}
+.wrap{max-width:1260px;margin:0 auto}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);position:relative;margin-bottom:6px}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:-5px;border-bottom:1px solid var(--ink)}
+h1{font-size:clamp(34px,4.2vw,52px);font-weight:500;font-style:italic;letter-spacing:-1px;line-height:.95}
+h1 .tld{color:var(--verm);font-size:.62em}
+.tagser{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.mast-r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink2);line-height:1.9}
+.mast-r b{color:var(--verm);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:34px;align-items:start;padding:30px 0 4px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(22px,2.8vw,32px);font-weight:500;font-style:italic;line-height:1.2}
+.hero h2 em{color:var(--verm)}
+.hero-l p{margin-top:12px;font-size:16px;max-width:660px}
+.ansbox{border:1px solid var(--verm2);border-left:4px solid var(--verm2);border-radius:3px;padding:14px 18px;margin-top:16px;background:rgba(176,58,16,.05);font-size:15px}
+.ansbox b{color:var(--verm);font-weight:600}
+section{margin-top:50px}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--verm);letter-spacing:1px}
+.stitle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink2)}
+.srule{flex:1;border-top:1px solid var(--line);min-width:24px}
+.smeta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.slede{font-size:16.5px;max-width:920px;margin-bottom:18px}
+/* symulacja */
+.simctl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.simb{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;background:var(--ink);color:var(--paper);border:none;padding:9px 15px;border-radius:2px;cursor:pointer}
+.simb svg{width:12px;height:12px}
+.simb:hover:not(:disabled){background:var(--verm)}
+.simb.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+.simb.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--ink);background:transparent}
+.simb:disabled{opacity:.4;cursor:default}
+.chaingrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:920px){.chaingrid{grid-template-columns:1fr}}
+.callcard{border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);padding:14px 16px;margin-bottom:14px;display:none}
+.callcard.show{display:block;animation:fadein .5s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}}
+.callcard .ch{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;flex-wrap:wrap}
+.callcard .cn{font-style:italic;font-weight:600;font-size:16px;flex:1;min-width:160px}
+.callcard .cu{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--verm)}
+.callcard .crt{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;padding:2px 8px;border-radius:2px;border:1px solid var(--olive);color:var(--olive);flex:none}
+.callcard .crt.docker{border-color:var(--verm2);color:var(--verm2)}
+.callcard .crt.node{border-color:var(--pkey);color:var(--pkey)}
+.callcard .crt.remote{border-color:var(--olive);color:var(--olive)}
+.jsonmini{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.65;padding:11px 13px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow-y:auto;box-shadow:0 0 0 1px #14110B;margin-bottom:8px}
+.jsonmini::-webkit-scrollbar{width:7px}
+.jsonmini::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.jsonmini .k{color:var(--pkey)} .jsonmini .v{color:var(--pacc)} .jsonmini .c{color:var(--pdim)}
+.callcard .lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.callcard .cexit{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--olive);margin-top:6px}
+.callcard .cexit b{color:var(--verm);font-weight:500}
+.term{background:var(--plate);border-radius:3px;color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;display:flex;flex-direction:column;height:280px;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13);margin-top:14px}
+.termhead{color:var(--pdim);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border-bottom:1px solid #3A3422;padding:9px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.termhead b{color:var(--pacc);font-weight:500}
+.termbody{flex:1;overflow-y:auto;padding:10px 14px}
+.termbody::-webkit-scrollbar{width:7px}
+.termbody::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.tl{white-space:pre-wrap;word-break:break-word;color:var(--ptext)}
+.tl .v{color:var(--pacc)} .tl .dim{color:var(--pdim)} .tl .ok{color:#C9BE8B} .tl .err{color:#E0714A} .tl .cmd{color:var(--pkey)} .tl .rt{color:var(--pkey)}
+.tl.enter{animation:fadein .35s ease}
+/* diagram łańcucha */
+.chainflow{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.8px;line-height:2.05;padding:16px 18px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B}
+.chainflow .k{color:var(--pkey)} .chainflow .v{color:var(--pacc)} .chainflow .c{color:var(--pdim)} .chainflow .ok{color:#C9BE8B}
+/* pliki */
+.ftabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ftab{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:6px 12px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.ftab .fdot{width:6px;height:6px;border-radius:50%;background:var(--olive)}
+.ftab.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.62;padding:16px 18px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.fplate::-webkit-scrollbar{width:8px}
+.fplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.fplate .c{color:#7E755B;font-style:italic}
+.fplate .k{color:var(--pacc);font-weight:600}
+.fplate .yk{color:var(--pkey)}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ibtn{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--line2);border-radius:2px;padding:6px 11px;cursor:pointer;color:var(--ink2)}
+.ibtn:hover{color:var(--ink);border-color:var(--ink)}
+.ibtn svg{width:12px;height:12px}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
+#toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <h1>taskand<span class="tld">.com</span></h1>
+      <p class="tagser">v0.15 · łańcuch procesów URI · wszystko zasobem URI · runtime-niezależny dostęp</p>
+    </div>
+    <div class="mast-r">
+      zasób = URI: <b>proc://</b> (wykonanie) · <b>artifact://</b> (dane) · <b>session://</b> (stan)<br>
+      3 paczki · 4 procesy · <b>0 importów kodu</b> — wyłącznie wywołania URI
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-l">
+      <h2>Wszystko jest zasobem URI — <em>przeglądarka, strona, artefakt, sesja</em> — więc dostęp jest zawsze identyczny.</h2>
+      <p>Wysłanie zadania „zaloguj się i przeanalizuj stronę” uruchamia łańcuch czterech procesów z trzech paczek. Każdy krok to <b>wywołanie proc:// URI</b> z JSON-em na stdin → JSON na stdout: zadanie logowania woła proces przeglądarki, ten woła proces nawigacji po stronie, a ten — proces analizy zawartości. <b>Żaden proces nie importuje kodu innego</b>; runtime (docker-playwright / browserbase / node) dobiera <b>binding</b> z katalogu, a dane między krokami przepływają jako <b>artefakty URI</b> (nie pliki inline).</p>
+      <div class="ansbox">
+        <b>Dlaczego to jest samostandardyzujące:</b> nowa paczka (np. z lepszym OCR, innym silnikiem przeglądarki) podmienia wpis w <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">proc-catalog.json</span> — <b>łańcuch się nie zmienia</b>, bo woła URI, nie implementację. Ewolucja runtime'u (docker → wasm → zdalni runnerzy) to <b>dopisanie wiersza w bindingu</b>. Symulacja niżej uruchamia cały łańcuch krok po kroku.
+      </div>
+    </div>
+    <div>
+      <div class="chainflow"><span class="k">ZADANIE</span> <span class="c">„zaloguj się i przeanalizuj portal.example.com”</span>
+    <span class="dim">↓ koperta CloudEvents →</span>
+<span class="v">proc://taskand.dev/flow/login/v1</span>          <span class="c">← paczka: taskand-flow-login</span>
+    <span class="dim">↓ woła URI (nie kod!):</span>
+<span class="v">proc://taskand.dev/browser/session/v1</span>    <span class="c">← paczka: taskand-browser</span>
+    <span class="rt">[runtime: docker-playwright | browserbase | local]</span>
+    <span class="dim">↓ sesja = zasób URI:</span>
+<span class="v">session://browser/s-8f3a</span>                <span class="c">← dostęp przez URI</span>
+    <span class="dim">↓ woła URI:</span>
+<span class="v">proc://taskand.dev/web/navigate/v1</span>       <span class="c">← paczka: taskand-web-ops</span>
+    <span class="dim">↓ wynik = artefakt URI:</span>
+<span class="v">artifact:page-content@sha256:9f3c…</span>      <span class="c">← CAS, nie inline</span>
+    <span class="dim">↓ woła URI:</span>
+<span class="v">proc://taskand.dev/web/analyze/v1</span>        <span class="c">← paczka: taskand-web-ops</span>
+    <span class="ok">↓ wynik końcowy: {summary, links, keywords}</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="shead"><span class="snum">01</span><span class="stitle">princip — wszystko zasobem URI</span><span class="srule"></span><span class="smeta">jedyny interfejs dostępu</span></div>
+  <p class="slede">Niezależnie od tego, co stoi za zasobem (kontener z Playwrightem, zdalna przeglądarka, plik w CAS, sesja z cookie) — <b>dostęp jest zawsze identyczny</b>: URI → binding → runtime → JSON→JSON. To jest gwarancja, że paczki mogą się <b>samostandardyzować</b>: nowa implementacja zasobu podmienia wpis w katalogu, a wszyscy konsumenci działają dalej.</p>
+  <table class="mtx" style="width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px">
+    <thead><tr><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">typ zasobu</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">przykład URI</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">co się za nim kryje</th><th style="text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 8px;color:var(--ink2);font-size:9px;letter-spacing:1px;text-transform:uppercase">dostęp</th></tr></thead>
+    <tbody>
+      <tr><td style="padding:8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">proc://</b> proces</td><td style="padding:8px;border-bottom:1px solid var(--line)">proc://…/browser/session/v1</td><td style="padding:8px;border-bottom:1px solid var(--line)">docker-playwright / browserbase / local chromium</td><td style="padding:8px;border-bottom:1px solid var(--line)">JSON stdin → stdout</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">session://</b> sesja</td><td style="padding:8px;border-bottom:1px solid var(--line)">session://browser/s-8f3a</td><td style="padding:8px;border-bottom:1px solid var(--line)">żyjący kontener z cookies</td><td style="padding:8px;border-bottom:1px solid var(--line)">URI jako uchwyt</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">artifact://</b> artefakt</td><td style="padding:8px;border-bottom:1px solid var(--line)">artifact:page-content@sha256:9f3c…</td><td style="padding:8px;border-bottom:1px solid var(--line)">CAS: 295 chunków, manifest</td><td style="padding:8px;border-bottom:1px solid var(--line)">GET /cas/{digest}</td></tr>
+      <tr><td style="padding:8px;border-bottom:1px solid var(--line)"><b style="color:var(--verm)">schema://</b> kontrakt</td><td style="padding:8px;border-bottom:1px solid var(--line)">urn:taskand:schema:page-content:v1</td><td style="padding:8px;border-bottom:1px solid var(--line)">JSON Schema 2020-12</td><td style="padding:8px;border-bottom:1px solid var(--line)">schemareg: /schemas/…</td></tr>
+      <tr><td style="padding:8px"><b style="color:var(--verm)">credential://</b> sekret</td><td style="padding:8px">secret:portal/credentials</td><td style="padding:8px">broker (purpose-scoped)</td><td style="padding:8px">runtime-only, NIGDY w JSON</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><span class="stitle">symulacja · łańcuch logowanie → przeglądarka → strona → analiza</span><span class="srule"></span><span class="smeta" id="simMeta">gotowy do uruchomienia</span></div>
+  <p class="slede">Pełny przebieg: <b>4 wywołania URI</b> z 3 paczek, każde z JSON-em na wejściu i wyjściu, runtime dobierany z bindingu. Kliknij „uruchom łańcuch” — lub przechodź krok po kroku. Zwróć uwagę: <b>żaden proces nie wie, czym jest runtime następnego</b> — woła URI i dostaje JSON.</p>
+  <div class="simctl">
+    <button class="simb" id="chainRun"><i data-lucide="play"></i> uruchom łańcuch</button>
+    <button class="simb ghost" id="chainStep"><i data-lucide="redo-2"></i> krok</button>
+    <button class="simb ghost" id="chainReset"><i data-lucide="rotate-ccw"></i> reset</button>
+  </div>
+  <div class="chaingrid">
+    <div id="callCards"></div>
+    <div>
+      <div class="term">
+        <div class="termhead"><span>przebieg · supervisor + procesy</span><span id="chainCnt">krok 0/6</span></div>
+        <div class="termbody" id="chainBody"></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">paczki w łańcuchu (katalog)</div>
+        <div class="chainflow" style="font-size:10.2px;line-height:1.9"><span class="v">taskand-flow-login</span>     <span class="c">→ proc://…/flow/login/v1 (node)</span>
+<span class="v">taskand-browser</span>       <span class="c">→ proc://…/browser/session/v1 (docker|remote)</span>
+<span class="v">taskand-web-ops</span>       <span class="c">→ proc://…/web/navigate/v1 (node)</span>
+                        <span class="c">→ proc://…/web/analyze/v1 (node)</span>
+<span class="dim">klucz: 0 importów kodu — 4 wywołania URI</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><span class="stitle">paczki łańcucha — poprawna struktura (standard v0.14)</span><span class="srule"></span><span class="smeta">3 paczki · zgodne z konformacją 9/9</span></div>
+  <p class="slede">Każda paczka spełnia standard v0.14: manifest z procesami, Makefile (test·pack·verify·run·observe·extract), procesy z bindingiem, katalog z hashami, grants. <b>Różnią się wyłącznie procesami i runtime'ami w bindingach.</b></p>
+  <div class="ptabs" style="display:flex;border:1px solid var(--line2);border-radius:2px;overflow:hidden;margin-bottom:14px;flex-wrap:wrap" id="pkgTabs">
+    <button style="flex:1;min-width:150px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;border-right:1px solid var(--line);padding:9px 6px;cursor:pointer;color:var(--ink2)" class="on" data-p="flow">taskand-flow-login</button>
+    <button style="flex:1;min-width:150px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;border-right:1px solid var(--line);padding:9px 6px;cursor:pointer;color:var(--ink2)" data-p="browser">taskand-browser</button>
+    <button style="flex:1;min-width:150px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;padding:9px 6px;cursor:pointer;color:var(--ink2)" data-p="webops">taskand-web-ops</button>
+  </div>
+  <div class="chainflow" id="pkgTree"></div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">04</span><span class="stitle">pliki — trzy paczki do pobrania</span><span class="srule"></span><span class="smeta">v0.15</span></div>
+  <p class="slede">Realna zawartość: manifest + bindingi + bin.mjs każdego procesu w łańcuchu + Makefile standardowy. Uruchamialne lokalnie: <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">printf '%s' '{...}' | node proc/…/bin.mjs</span>.</p>
+  <div class="frow">
+    <div class="ftabs" id="ftabs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ibtn" id="fCopy"><i data-lucide="copy"></i> kopiuj</button>
+      <button class="ibtn" id="fDl"><i data-lucide="download"></i> pobierz plik</button>
+      <button class="ibtn" id="fBundle"><i data-lucide="package"></i> pobierz łańcuch</button>
+    </div>
+  </div>
+  <div class="fplate" id="fplate"></div>
+</section>
+
+</main>
+<footer>
+taskand.com v0.15 · zasoby jako URI: proc:// (wykonanie) · session:// (stan) · artifact:// (dane) · schema:// (kontrakt) · credential:// (sekret przez brokera) · łańcuch: flow/login → browser/session → web/navigate → web/analyze — 3 paczki, 4 procesy, 0 importów, runtime z bindingów (docker-playwright / browserbase / node) · dane między krokami jako artefakty URI (CAS) · samostandardyzacja: podmiana implementacji = nowy wpis w proc-catalog.json, łańcuch bez zmian
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hsh = n => Array.from({length:n}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2800); }
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function dl(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function hlJ(obj){ return esc(JSON.stringify(obj, null, 2)).replace(/"([^"]+)":/g, '"<span class="k">$1</span>":').replace(/: "([^"]*)"/g, ': "<span class="v">$1</span>"'); }
+function hlY(t){ return t.split('\n').map(l => { let e = esc(l); if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`; return e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2'); }).join('\n'); }
+
+/* ————— 02 · symulacja łańcucha ————— */
+const CHAIN = { i:0, playing:false, done:false };
+const CB = $('#chainBody');
+async function clog(html, cls){
+  const d = document.createElement('div'); d.className = 'tl ' + (cls || '') + ' enter';
+  d.innerHTML = html;
+  CB.appendChild(d); CB.scrollTop = CB.scrollHeight;
+  await sleep(200);
+}
+function callCard(n, uri, runtime, rtClass, inJson, outJson, note){
+  const d = document.createElement('div');
+  d.className = 'callcard';
+  d.id = 'cc' + n;
+  d.innerHTML = `<div class="ch">
+      <span class="cn">krok ${n} · wywołanie URI</span>
+      <span class="cu">${esc(uri)}</span>
+      <span class="crt ${rtClass}">${runtime}</span>
+    </div>
+    <div class="lbl">stdin (JSON)</div>
+    <div class="jsonmini">${hlJ(inJson)}</div>
+    <div class="lbl">stdout (JSON)</div>
+    <div class="jsonmini">${hlJ(outJson)}</div>
+    <div class="cexit">exit <b>0</b> · kontrakt ✓${note ? ' · ' + note : ''}</div>`;
+  $('#callCards').appendChild(d);
+  return d;
+}
+const STEPS = [
+  { n:1, uri:'proc://taskand.dev/flow/login/v1', rt:'node', rtc:'node',
+    in:{ task:{ action:'login-and-analyze', site:'portal.example.com', credentialRef:'secret:portal/credentials' } },
+    out:{ ok:true, sessionId:'session://browser/s-' + hsh(4), pageArtifact:'artifact:page-content@sha256:9f3c…', analysis:{ summary:'Portal główny: 4 sekcje, 23 linki', links:23, keywords:['portal','login','dashboard'] } },
+    note:'proces nadrzędny — woła 3 URI po kolei',
+    log:[
+      ['[supervisor]','koperta → proc://taskand.dev/flow/login/v1 · grants: execute-proc ✓'],
+      ['[flow/login]','runtime: node (z bindingu) → node proc/flow/login/taskand.dev/v1/bin.mjs'],
+      ['[flow/login]','krok 1: woła proc://taskand.dev/browser/session/v1 (URI, nie kod!)'],
+    ]},
+  { n:2, uri:'proc://taskand.dev/browser/session/v1', rt:'docker-playwright', rtc:'docker',
+    in:{ action:'start', headless:true, credentialRef:'secret:portal/credentials' },
+    out:{ sessionId:'session://browser/s-' + hsh(4), runtime:'docker-playwright', image:'mcr.microsoft.com/playwright:v1.48@sha256:…', cookies:'[2] (z brokera, runtime-only)' },
+    note:'runtime z bindingu — flow/login nie wie, że to docker',
+    log:[
+      ['[browser/session]','runtime: docker-playwright (pierwszy z bindingu — browserbase fallback)'],
+      ['[browser/session]','docker run -d mcr.microsoft.com/playwright:v1.48 → kontener s-8f3a'],
+      ['[browser/session]','credentialRef → broker (purpose-scoped, nie w JSON!) → cookies załadowane'],
+      ['[flow/login]','krok 2: woła proc://taskand.dev/web/navigate/v1 (z sessionId jako zasobem URI)'],
+    ]},
+  { n:3, uri:'proc://taskand.dev/web/navigate/v1', rt:'node', rtc:'node',
+    in:{ session:'session://browser/s-8f3a', url:'https://portal.example.com', action:'login-and-home' },
+    out:{ url:'https://portal.example.com/home', title:'Portal — Strona główna', contentRef:'artifact:page-content@sha256:9f3c…', bytes:24632, sessionStill:'session://browser/s-8f3a' },
+    note:'zawartość strony → artefakt CAS (URI, nie inline)',
+    log:[
+      ['[web/navigate]','runtime: node → steruje sesją URI (session://browser/s-8f3a)'],
+      ['[web/navigate]','login → redirect → /home → snapshot HTML (24 632 B)'],
+      ['[web/navigate]','zawartość → CAS: artifact:page-content@sha256:9f3c… (manifest, nie inline!)'],
+      ['[flow/login]','krok 3: woła proc://taskand.dev/web/analyze/v1 (z artefaktem URI)'],
+    ]},
+  { n:4, uri:'proc://taskand.dev/web/analyze/v1', rt:'node', rtc:'node',
+    in:{ contentRef:'artifact:page-content@sha256:9f3c…', mode:'summary+links+keywords' },
+    out:{ summary:'Portal główny: 4 sekcje (aktualności, dashboard, raporty, ustawienia), 23 linki, 1560 słów', links:23, keywords:['portal','login','dashboard','raporty','ustawienia'], readMs:12 },
+    note:'analiza działa na artefakcie URI — nie na żywej sesji',
+    log:[
+      ['[web/analyze]','runtime: node → pobiera artifact:…@sha256:9f3c… z CAS (chunki, digesty ✓)'],
+      ['[web/analyze]','analiza: struktura + linki + słowa kluczowe → JSON (kontrakt out)'],
+      ['[flow/login]','wynik końcowy składa się w odpowiedź — łańcuch zamknięty ✓'],
+    ]},
+];
+async function runStep(){
+  if(CHAIN.done) return;
+  const st = STEPS[CHAIN.i];
+  if(!st) return;
+  const card = callCard(st.n, st.uri, st.rt, st.rtc, st.in, st.out, st.note);
+  for(const [who, msg] of st.log){
+    await clog(`<span class="v">${who}</span> ${esc(msg)}`);
+  }
+  requestAnimationFrame(() => card.classList.add('show'));
+  CHAIN.i++;
+  $('#chainCnt').textContent = `krok ${CHAIN.i}/6`;
+  $('#simMeta').textContent = `krok ${CHAIN.i}: ${st.uri.split('/').slice(-2).join('/')}`;
+  if(CHAIN.i >= STEPS.length){
+    CHAIN.done = true;
+    await clog(``, 'dim');
+    await clog(`<span class="ok">[supervisor]</span> łańcuch zamknięty · 4 wywołania URI · 3 paczki · 0 importów kodu · runtime'e z bindingów</span>`, 'ok');
+    await clog(`<span class="dim">klucz: każdy krok to identyczny wzorzec — URI + JSON → JSON — niezależnie od runtime'u</span>`);
+    toast('łańcuch zamknięty — 4 URI, 3 paczki, 0 importów');
+  }
+}
+async function playChain(){
+  if(CHAIN.playing){ CHAIN.playing = false; return; }
+  CHAIN.playing = true;
+  while(CHAIN.playing && !CHAIN.done){
+    await runStep();
+    await sleep(1200);
+  }
+  CHAIN.playing = false;
+}
+function resetChain(){
+  CHAIN.i = 0; CHAIN.done = false; CHAIN.playing = false;
+  CB.innerHTML = ''; $('#callCards').innerHTML = '';
+  $('#chainCnt').textContent = 'krok 0/6';
+  $('#simMeta').textContent = 'gotowy do uruchomienia';
+  clog(`<span class="dim"># łańcuch: flow/login → browser/session → web/navigate → web/analyze</span>`);
+  clog(`<span class="dim"># kliknij „uruchom łańcuch” albo przechodź krok po kroku</span>`);
+}
+ $('#chainRun').addEventListener('click', playChain);
+ $('#chainStep').addEventListener('click', () => { if(CHAIN.playing) CHAIN.playing = false; runStep(); });
+ $('#chainReset').addEventListener('click', resetChain);
+
+/* ————— 03 · paczki ————— */
+const PKGS = {
+  flow: {
+    rows: [
+      ['taskand-flow-login/', 'PACZKA — rola: application (orchestrator łańcucha)', 'std'],
+      ['├── capsule.yaml', 'manifest: process flow/login (rola: orchestrator)', 'std'],
+      ['├── Makefile', 'test · pack · verify · run · observe · extract', 'std'],
+      ['├── grants.yaml', 'grants: execute-proc na browser/session + web/navigate + web/analyze', 'std'],
+      ['├── proc-catalog.json', 'hashe + rewizje (auto)', 'std'],
+      ['├── .git/', 'tagi capsule-v… (wersje paczki)', 'std'],
+      ['├── proc/flow/login/taskand.dev/v1/', 'PROCES: orchestrator logowania', 'spec'],
+      ['│   ├── proc.yaml', 'binding: node ( orchestrator nie potrzebuje docker!)', 'std'],
+      ['│   ├── bin.mjs', 'JSON→JSON · woła 3 URI po kolei · składa wynik', 'std'],
+      ['│   └── test.mjs', 'testy: mock katalogu (fail-closed)', 'std'],
+      ['└── dist/', 'archiwa (pack + offline check)', 'opt']
+    ]
+  },
+  browser: {
+    rows: [
+      ['taskand-browser/', 'PACZKA — rola: interface (przeglądarka jako zasób)', 'std'],
+      ['├── capsule.yaml', 'manifest: process browser/session (rola: browser-provider)', 'std'],
+      ['├── Makefile', 'test · pack · verify · run · observe · extract', 'std'],
+      ['├── grants.yaml', 'grants: start-session (tworzy session:// URI)', 'std'],
+      ['├── proc-catalog.json', 'hashe + rewizje', 'std'],
+      ['├── .git/', 'tagi capsule-v…', 'std'],
+      ['├── proc/browser/session/taskand.dev/v1/', 'PROCES: sesja przeglądarki', 'spec'],
+      ['│   ├── proc.yaml', 'binding: docker-playwright | browserbase | local-chromium', 'std'],
+      ['│   ├── bin.mjs', 'JSON→JSON · start/stop/navigate sesji · session:// URI', 'std'],
+      ['│   └── test.mjs', 'testy: start + health sesji', 'std'],
+      ['├── Dockerfile', 'obraz playwright (jedna z realizacji runtime)', 'opt'],
+      ['└── session-store/', 'uchwyty sesji (session://… → kontener)', 'opt']
+    ]
+  },
+  webops: {
+    rows: [
+      ['taskand-web-ops/', 'PACZKA — rola: worker (operacje na stronach)', 'std'],
+      ['├── capsule.yaml', 'manifest: 2 procesy (navigate + analyze)', 'std'],
+      ['├── Makefile', 'test · pack · verify · run · observe · extract', 'std'],
+      ['├── grants.yaml', 'grants: use-session (session://…)', 'std'],
+      ['├── proc-catalog.json', 'hashe + rewizje', 'std'],
+      ['├── .git/', 'tagi capsule-v…', 'std'],
+      ['├── proc/web/navigate/taskand.dev/v1/', 'PROCES 1: nawigacja + snapshot → artefakt CAS', 'spec'],
+      ['│   ├── proc.yaml', 'binding: node (steruje sesją URI)', 'std'],
+      ['│   ├── bin.mjs', 'JSON→JSON · navigate+login+snapshot · artifact:// URI', 'std'],
+      ['│   └── test.mjs', 'testy: mock sesji', 'std'],
+      ['├── proc/web/analyze/taskand.dev/v1/', 'PROCES 2: analiza zawartości (z artefaktu)', 'spec'],
+      ['│   ├── proc.yaml', 'binding: node (nie potrzebuje przeglądarki!)', 'std'],
+      ['│   ├── bin.mjs', 'JSON→JSON · analyze(artifact://…) → {summary, links, keywords}', 'std'],
+      ['│   └── test.mjs', 'testy: próbka artefaktu', 'std'],
+      ['└── schemas/', 'kontrakt page-content (in/out analizy)', 'opt']
+    ]
+  }
+};
+let curPkg = 'flow';
+function renderPkgTree(){
+  const p = PKGS[curPkg];
+  const lines = p.rows.map(([path, desc, kind]) => {
+    const cls = kind === 'std' ? 'ok' : kind === 'spec' ? 'v' : 'c';
+    return `<span class="${cls}">${esc(path)}</span>   <span class="c">${esc(desc)}</span>`;
+  }).join('\n');
+  $('#pkgTree').innerHTML = lines;
+}
+document.querySelectorAll('#pkgTabs button').forEach(b => b.onclick = () => {
+  curPkg = b.dataset.p;
+  document.querySelectorAll('#pkgTabs button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  renderPkgTree();
+});
+
+/* ————— 04 · pliki ————— */
+const FLOW_CAPSULE = `apiVersion: taskand.dev/v1
+kind: Capsule
+metadata: { name: taskand-flow-login, version: "0.15.0" }
+spec:
+  role: application
+  purpose: "orchestrator: logowanie + analiza strony — woła 3 URI, nie importuje kodu"
+  processes:
+    - uri: proc://taskand.dev/flow/login/v1
+      role: orchestrator
+      grants: [execute-proc]
+      calls:                                   # ← jedyne zależności: URI!
+        - proc://taskand.dev/browser/session/v1
+        - proc://taskand.dev/web/navigate/v1
+        - proc://taskand.dev/web/analyze/v1
+  permissions: { source: grants.yaml, defaults: { deny: [policy-write, git-push] } }
+  evolution: { delegated-to: capsule:taskand-developer, twin: { retries: 3 } }
+  storage: { kind: git, versioning: { mode: commits+tags, tagPrefix: capsule- } }
+  runtime: { repo-mount: read-only, self-modification: denied }
+`;
+const FLOW_BIN = `#!/usr/bin/env node
+// proc://taskand.dev/flow/login/v1 — ORCHESTRATOR łańcucha logowania
+// woła 3 URI po kolei; składa wynik; NIE importuje kodu innych paczek
+import { readFileSync } from 'node:fs';
+import { $ } from 'node:child_process';
+
+const call = (uri, input) => {
+  // jedyne zależności: URI + JSON → JSON (runtime z bindingu w katalogu)
+  const dir = uriToDir(uri);
+  const r = $(
+    ['node', dir + '/bin.mjs'],
+    { input: JSON.stringify(input), captureOutput: true }
+  );
+  if (r.status !== 0) throw new Error(uri + ' → exit ' + r.status);
+  return JSON.parse(r.stdout);
+};
+const uriToDir = (uri) => {
+  const m = uri.match(/^proc:\\/\\/([^/]+)\\/(.+)\\/(v\\d+)$/);
+  return 'proc/' + m[2] + '/' + m[1] + '/' + m[3];
+};
+
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.exit(2); }
+if (!input.task || !input.task.site) process.exit(2);
+
+try {
+  // krok 1: sesja przeglądarki (URI — nie wiem, czy to docker czy browserbase!)
+  const session = call('proc://taskand.dev/browser/session/v1', {
+    action: 'start', headless: true,
+    credentialRef: input.task.credentialRef
+  });
+  // krok 2: nawigacja (URI — z sessionId jako zasobem URI)
+  const page = call('proc://taskand.dev/web/navigate/v1', {
+    session: session.sessionId, url: 'https://' + input.task.site,
+    action: 'login-and-home'
+  });
+  // krok 3: analiza (URI — z artefaktem URI, nie z plikiem inline)
+  const analysis = call('proc://taskand.dev/web/analyze/v1', {
+    contentRef: page.contentRef, mode: 'summary+links+keywords'
+  });
+  // zamknięcie sesji (też URI!)
+  call('proc://taskand.dev/browser/session/v1', {
+    action: 'stop', sessionId: session.sessionId
+  });
+  process.stdout.write(JSON.stringify({
+    ok: true, sessionId: session.sessionId,
+    pageArtifact: page.contentRef, analysis: analysis
+  }, null, 2));
+  process.exit(0);
+} catch (e) {
+  process.stderr.write('fail-closed: ' + e.message + '\\n');
+  process.exit(1);
+}
+`;
+const BROWSER_BINDING = `# proc://taskand.dev/browser/session/v1 — binding (kluczowy!)
+uri: proc://taskand.dev/browser/session/v1
+interface:
+  stdin:  urn:taskand:schema:browser-command:v1    # {action: start|stop, …}
+  stdout: urn:taskand:schema:browser-session:v1    # {sessionId: session://…, …}
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+runtimes:                     # ← TRZY realne runtime'y; supervisor wybiera pierwszy
+  - kind: docker
+    image: "mcr.microsoft.com/playwright:v1.48@sha256:…"   # przypięty digest
+    invocation: "docker run -d --name s-<id> …"
+    capabilities: [cookies, screenshots, pdf, dom]
+  - kind: remote             # browserbase / zdalny runner
+    via: "wss://browserbase.taskand"
+    invocation: "POST /sessions"
+    capabilities: [cookies, screenshots, dom]
+  - kind: local
+    binary: "chromium --headless"
+    invocation: "spawn chromium"
+    capabilities: [cookies, dom]
+session:                     # sesja = zasób URI
+  scheme: "session://browser/<id>"
+  lifecycle: "start → navigate (przez web/navigate) → stop"
+  credential: { via: broker, purposeScoped: true, neverInJson: true }
+grants: { run: [start-session], observe: [read-session-status] }
+`;
+const BROWSER_BIN = `#!/usr/bin/env node
+// proc://taskand.dev/browser/session/v1 — sesja przeglądarki jako ZASÓB URI
+// nie wiem, kto mnie woła — dostaję JSON, zwracam JSON
+import { readFileSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { spawn } from 'node:child_process';
+
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.exit(2); }
+
+const sid = 'session://browser/s-' + randomBytes(4).toString('hex');
+
+if (input.action === 'start') {
+  // wybierz runtime z bindingu (docker-playwright | browserbase | local)
+  // tutaj: szkielet docker; produkcja: adapter odczytuje proc.yaml
+  const container = 'taskand-browser-' + Date.now();
+  spawn('docker', ['run', '-d', '--name', container,
+    '-e', 'CREDENTIAL_REF=' + (input.credentialRef || ''),
+    'mcr.microsoft.com/playwright:v1.48'], { stdio: 'pipe' });
+  // credentialRef → broker (runtime-only, nie trafia do stdout!)
+  process.stdout.write(JSON.stringify({
+    sessionId: sid, runtime: 'docker-playwright',
+    image: 'mcr.microsoft.com/playwright:v1.48@sha256:…',
+    container: container,
+    cookies: '[from broker, purpose-scoped]'
+  }, null, 2));
+  process.exit(0);
+}
+if (input.action === 'stop' && input.sessionId) {
+  const c = input.sessionId.split('/').pop();
+  spawn('docker', ['stop', 'taskand-browser-' + c.replace('s-', '')]);
+  process.stdout.write(JSON.stringify({ stopped: true, sessionId: input.sessionId }));
+  process.exit(0);
+}
+process.exit(2); // nieznana akcja — fail-closed
+`;
+const NAVIGATE_BIN = `#!/usr/bin/env node
+// proc://taskand.dev/web/navigate/v1 — nawigacja + snapshot → artefakt CAS
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.exit(2); }
+if (!input.session || !input.url) process.exit(2);
+
+try {
+  // 1) steruj sesją (session:// URI → kontener, przez adapter)
+  // 2) login → redirect → snapshot HTML
+  const html = '<html>…<h1>Portal — Strona główna</h1>…</html>'; // szkielet
+  const digest = createHash('sha256').update(html).digest('hex').slice(0, 12);
+  // 3) zawartość → CAS (artefakt URI, NIE inline!)
+  //    (pełny zapis: manifest + chunki — patrz v0.10)
+  process.stdout.write(JSON.stringify({
+    url: input.url.replace(/^https?:\\/\\//, 'https://') + '/home',
+    title: 'Portal — Strona główna',
+    contentRef: 'artifact:page-content@sha256:' + digest + '…',
+    bytes: Buffer.byteLength(html), sessionStill: input.session
+  }, null, 2));
+  process.exit(0);
+} catch (e) { process.exit(1); }
+`;
+const ANALYZE_BIN = `#!/usr/bin/env node
+// proc://taskand.dev/web/analyze/v1 — analiza zawartości (z artefaktu CAS)
+// NIE potrzebuje przeglądarki — działa na artefakcie URI
+import { readFileSync } from 'node:fs';
+
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.exit(2); }
+if (!input.contentRef) process.exit(2);
+
+try {
+  // pobierz artefakt z CAS (digest ✓) — nie z sesji!
+  // const html = await fetchCAS(input.contentRef);
+  const html = '<html>…<h1>Portal — Strona główna</h1>…<a>…</a>×23…</html>';
+  const words = html.replace(/<[^>]+>/g, ' ').split(/\\s+/).filter(w => w.length > 2);
+  const links = (html.match(/<a /g) || []).length;
+  const keywords = [...new Set(words.map(w => w.toLowerCase()))].slice(0, 5);
+  process.stdout.write(JSON.stringify({
+    summary: 'Portal główny: strona z ' + links + ' linkami, ' + words.length + ' słów',
+    links: links, keywords: keywords, readMs: 12
+  }, null, 2));
+  process.exit(0);
+} catch (e) { process.exit(1); }
+`;
+const FILES = [
+  {id:'fc', name:'taskand-flow-login/capsule.yaml', get:() => FLOW_CAPSULE, lang:'yaml'},
+  {id:'fb', name:'taskand-flow-login/proc/flow/login/bin.mjs', get:() => FLOW_BIN, lang:'js'},
+  {id:'bb', name:'taskand-browser/proc/browser/session/proc.yaml', get:() => BROWSER_BINDING, lang:'yaml'},
+  {id:'bs', name:'taskand-browser/proc/browser/session/bin.mjs', get:() => BROWSER_BIN, lang:'js'},
+  {id:'nv', name:'taskand-web-ops/proc/web/navigate/bin.mjs', get:() => NAVIGATE_BIN, lang:'js'},
+  {id:'an', name:'taskand-web-ops/proc/web/analyze/bin.mjs', get:() => ANALYZE_BIN, lang:'js'}
+];
+let curFile = 'fc';
+function hl(txt, lang){
+  return txt.split('\n').map(line => {
+    let e = esc(line);
+    if(/^\s*\/\//.test(e) || /^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    if(lang === 'yaml'){
+      e = e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+    }
+    return e;
+  }).join('\n');
+}
+function renderFiles(){
+  const tabs = $('#ftabs'); tabs.innerHTML = '';
+  FILES.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftab' + (f.id === curFile ? ' on' : '');
+    b.innerHTML = `<span class="fdot"></span>${f.name}`;
+    b.onclick = () => { curFile = f.id; renderFiles(); };
+    tabs.appendChild(b);
+  });
+  const f = FILES.find(x => x.id === curFile);
+  $('#fplate').innerHTML = hl(f.get(), f.lang);
+}
+ $('#fCopy').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); navigator.clipboard.writeText(f.get()).then(() => toast('skopiowano ' + f.name)); });
+ $('#fDl').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); dl(f.name.split('/').pop(), f.get()); toast('pobrano ' + f.name); });
+ $('#fBundle').addEventListener('click', () => {
+  dl('taskand-v15-chain.bundle',
+`# taskand v0.15 — łańcuch procesów URI: logowanie → przeglądarka → strona → analiza
+# 3 paczki · 4 procesy · 0 importów kodu · runtime z bindingów
+# start: printf '%s' '{"task":{"site":"portal.example.com"}}' | node flow-login/bin.mjs
+
+--- taskand-flow-login/capsule.yaml ---
+ ${FLOW_CAPSULE}
+--- taskand-flow-login/proc/flow/login/bin.mjs ---
+ ${FLOW_BIN}
+--- taskand-browser/proc/browser/session/proc.yaml ---
+ ${BROWSER_BINDING}
+--- taskand-browser/proc/browser/session/bin.mjs ---
+ ${BROWSER_BIN}
+--- taskand-web-ops/proc/web/navigate/bin.mjs ---
+ ${NAVIGATE_BIN}
+--- taskand-web-ops/proc/web/analyze/bin.mjs ---
+ ${ANALYZE_BIN}
+`);
+  toast('pobrano łańcuch v0.15 (6 plików z 3 paczek)');
+});
+
+/* ————— start ————— */
+resetChain(); renderPkgTree(); renderFiles(); icons();
+</script>
+</body>
+</html>

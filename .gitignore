@@ -7,4 +7,5 @@ log/
 
 # Large snapshot archives
 history/*.tar.gz
+dist/*.tgz
 __pycache__/

@@ -1,0 +1,105 @@
+# code2llm | 45f 2706L | yaml:7,shell:5,json:3,python:3 | 2026-09-12
+# generated in 0.01s
+# CC̅=3.5 | critical:3/35 | dups:0 | cycles:0
+
+HEALTH[3]:
+  🟡 CC    validate_dod CC=19 (limit:15)
+  🟡 CC    list_history CC=21 (limit:15)
+  🟡 CC    rollback CC=20 (limit:15)
+
+REFACTOR[1]:
+  1. split 3 high-CC methods  (CC>15)
+
+PIPELINES[6]:
+  [1] Src [validate_dod]: validate_dod → run_cmd
+      PURITY: 100% pure
+  [2] Src [verify_and_evolve]: verify_and_evolve → print
+      PURITY: 100% pure
+  [3] Src [create_snapshot]: create_snapshot → ensure_dirs
+      PURITY: 100% pure
+  [4] Src [list_history]: list_history → ensure_dirs
+      PURITY: 100% pure
+  [5] Src [show_details]: show_details → ensure_dirs
+      PURITY: 100% pure
+  [6] Src [rollback]: rollback → ensure_dirs
+      PURITY: 100% pure
+
+LAYERS:
+  scripts/                        CC̄=8.7    ←in:0  →out:51  !! split
+  │ !! history                    309L  0C    6m  CC=21     ←0
+  │ digital_twin               249L  0C    6m  CC=9      ←0
+  │ !! dod_validator               79L  0C    2m  CC=19     ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ Dockerfile                 369L  0C    2m  CC=0.0    ←0
+  │ Makefile                    99L  0C    0m  CC=0.0    ←0
+  │ taskand.sh                  59L  0C    1m  CC=0.0    ←0
+  │ project.sh                  59L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yaml         43L  0C    0m  CC=0.0    ←0
+  │ serve.sh                    21L  0C    0m  CC=0.0    ←0
+  │ tree.sh                      1L  0C    0m  CC=0.0    ←0
+  │
+  bootstrap/                      CC̄=0.0    ←in:0  →out:0
+  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0
+  │
+  gateway/                        CC̄=0.0    ←in:51  →out:0
+  │ Dockerfile                 199L  1C    8m  CC=0.0    ←2
+  │
+  history/                        CC̄=0.0    ←in:0  →out:0
+  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0
+  │ Dockerfile                  63L  1C    6m  CC=0.0    ←0
+  │ docker-compose.yaml         56L  0C    0m  CC=0.0    ←0
+  │ manifest.json               18L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0
+  │ history.yaml                 9L  0C    0m  CC=0.0    ←0
+  │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0
+  │
+  tasks/                          CC̄=0.0    ←in:0  →out:0
+  │ done.yaml                   14L  0C    0m  CC=0.0    ←0
+  │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0
+  │
+  evolution/                      CC̄=0.0    ←in:0  →out:0
+  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  16L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                  10L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   7L  0C    0m  CC=0.0    ←0
+  │ TWIN_VERIFIED.json           6L  0C    0m  CC=0.0    ←0
+  │ TWIN_VERIFIED.json           6L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   4L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   4L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   3L  0C    0m  CC=0.0    ←0
+  │
+  landing/                        CC̄=0.0    ←in:0  →out:0
+  │ serve.sh                    21L  0C    0m  CC=0.0    ←0
+  │ Dockerfile                   5L  0C    0m  CC=0.0    ←0
+  │
+  answers/                        CC̄=0.0    ←in:0  →out:0
+  │ taskand.answers.yaml         5L  0C    0m  CC=0.0    ←0
+  │
+  ── zero ──
+     history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml  0L
+     tasks/inbox.yaml                          0L
+
+COUPLING:
+           gateway  scripts
+  gateway       ──      ←51  hub
+  scripts       51       ──  !! fan-out
+  CYCLES: none
+  HUB: gateway/ (fan-in=51)
+  SMELL: scripts/ fan-out=51 → split needed
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

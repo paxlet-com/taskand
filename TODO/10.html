@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>taskand.com v0.12 — URI procesów: URN stabilny · URL ulotny · kontrola przez czasowniki i bramki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDD; --paper2:#EBE4D1; --ink:#221D12; --ink2:#5C543E;
+  --line:#D3C9AD; --line2:#C2B693; --verm:#B03A10; --verm2:#C94E1F; --olive:#71692F;
+  --plate:#1D1911; --ptext:#EBE2CC; --pdim:#8F8567; --pacc:#E06B37; --pkey:#BCB489;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.5;padding:26px clamp(16px,4vw,54px) 44px;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'%3E%3C/svg%3E")}
+header,main,footer{position:relative;z-index:1}
+.wrap{max-width:1260px;margin:0 auto}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);position:relative;margin-bottom:6px}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:-5px;border-bottom:1px solid var(--ink)}
+h1{font-size:clamp(34px,4.2vw,52px);font-weight:500;font-style:italic;letter-spacing:-1px;line-height:.95}
+h1 .tld{color:var(--verm);font-size:.62em}
+.tagser{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.mast-r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink2);line-height:1.9}
+.mast-r b{color:var(--verm);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:34px;align-items:start;padding:30px 0 4px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(22px,2.8vw,32px);font-weight:500;font-style:italic;line-height:1.2}
+.hero h2 em{color:var(--verm)}
+.hero-l p{margin-top:12px;font-size:16px;max-width:660px}
+.ansbox{border:1px solid var(--verm2);border-left:4px solid var(--verm2);border-radius:3px;padding:14px 18px;margin-top:16px;background:rgba(176,58,16,.05);font-size:15px}
+.ansbox b{color:var(--verm);font-weight:600}
+.gram{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.8px;line-height:1.95;padding:15px 17px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B}
+.gram .k{color:var(--pkey)} .gram .v{color:var(--pacc)} .gram .c{color:var(--pdim)}
+section{margin-top:50px}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--verm);letter-spacing:1px}
+.stitle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink2)}
+.srule{flex:1;border-top:1px solid var(--line);min-width:24px}
+.smeta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.slede{font-size:16.5px;max-width:920px;margin-bottom:18px}
+.mtx{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px}
+.mtx th{text-align:left;font-weight:500;letter-spacing:1px;text-transform:uppercase;font-size:9px;color:var(--ink2);border-bottom:1.5px solid var(--ink);padding:6px 8px}
+.mtx td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.mtx td b{color:var(--verm);font-weight:500}
+.mtx td .no{color:var(--verm2)}
+/* symulacje */
+.simctl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.simb{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;background:var(--ink);color:var(--paper);border:none;padding:9px 15px;border-radius:2px;cursor:pointer}
+.simb svg{width:12px;height:12px}
+.simb:hover:not(:disabled){background:var(--verm)}
+.simb.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+.simb.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--ink);background:transparent}
+.simb:disabled{opacity:.4;cursor:default}
+select.dinp{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--paper);border:1px solid var(--line2);color:var(--ink);padding:7px 10px;border-radius:2px;max-width:100%}
+.step{display:flex;align-items:baseline;gap:11px;padding:9px 4px;border-bottom:1px dashed var(--line);font-family:'JetBrains Mono',monospace;font-size:11px;flex-wrap:wrap}
+.step .sn{color:var(--verm);flex:none;min-width:118px}
+.step .st{flex:1;min-width:200px}
+.step .ok{color:var(--olive)} .step .err{color:var(--verm2)}
+.step.enter{animation:fadein .5s ease}
+@keyframes fadein{from{opacity:0}}
+.simgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:920px){.simgrid{grid-template-columns:1fr}}
+.jsonplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.68;padding:14px 16px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;box-shadow:0 0 0 1px #14110B;margin-top:12px}
+.jsonplate::-webkit-scrollbar{width:8px}
+.jsonplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.jsonplate .k{color:var(--pkey)} .jsonplate .v{color:var(--pacc)} .jsonplate .c{color:#7E755B;font-style:italic}
+.term{background:var(--plate);border-radius:3px;color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;display:flex;flex-direction:column;height:280px;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13);margin-top:12px}
+.termhead{color:var(--pdim);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border-bottom:1px solid #3A3422;padding:9px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.termhead b{color:var(--pacc);font-weight:500}
+.termbody{flex:1;overflow-y:auto;padding:10px 14px}
+.termbody::-webkit-scrollbar{width:7px}
+.termbody::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.tl{white-space:pre-wrap;word-break:break-word;color:var(--ptext)}
+.tl .v{color:var(--pacc)} .tl .dim{color:var(--pdim)} .tl .ok{color:#C9BE8B} .tl .err{color:#E0714A} .tl .cmd{color:var(--pkey)}
+.tl.enter{animation:fadein .35s ease}
+.curlrow{display:flex;align-items:baseline;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:7px 4px;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.curlrow .cc{flex:1;min-width:220px;word-break:break-all}
+.ibtn{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--line2);border-radius:2px;padding:5px 10px;cursor:pointer;color:var(--ink2);flex:none}
+.ibtn:hover{color:var(--ink);border-color:var(--ink)}
+.ibtn svg{width:11px;height:11px}
+/* pliki */
+.ftabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ftab{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:6px 12px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.ftab .fdot{width:6px;height:6px;border-radius:50%;background:var(--olive)}
+.ftab.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.62;padding:16px 18px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.fplate::-webkit-scrollbar{width:8px}
+.fplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.fplate .c{color:#7E755B;font-style:italic}
+.fplate .k{color:var(--pacc);font-weight:600}
+.fplate .yk{color:var(--pkey)}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
+#toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <h1>taskand<span class="tld">.com</span></h1>
+      <p class="tagser">v0.12 · URI procesów · URN stabilny · URL ulotny · kontrola za bramkami</p>
+    </div>
+    <div class="mast-r">
+      adresowanie: <b>URN</b> (tożsamość logiczna) → <b>/route</b> (supervisor) → <b>URL</b> (compose DNS) → <b>kontener</b> (label)<br>
+      kontrola: czasowniki HTTP — <b>odczyt bezpośrednio</b> · <b>restart/stop tylko przez supervisora</b>
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-l">
+      <h2>Do procesów taskand odnosisz się przez URI — <em>logicznie stabilny, fizycznie ulotny</em> — a sterujesz czasownikami HTTP za bramkami.</h2>
+      <p>Każda rzecz w systemie ma <b>URN</b> (kapsuła, proces, zadanie, zdarzenie, schemat, artefakt, roszczenie) — stabilny identyfikator, który przeżywa wdrożenia. Fizyczny adres (URL: nazwa usługi w sieci compose + port, a za nią kontener) rozwiązuje <b>supervisor na brzegu</b> z tablicy budowanej z <b>etykiet kontenerów</b>. Odczyt (health, journal, wersja) idzie na rozwiążany URL; czasowniki kontrolne (restart, stop, rollback) — <b>wyłącznie przez supervisora</b>, z kontrolą grantów: proces nigdy nie steruje sam sobą.</p>
+      <div class="ansbox">
+        <b>Wypróbuj:</b> sekcja 02 — resolver URN → URL → kontener (kliknij „redeploy”: <em>fizyczny cel się zmienia, URN zostaje ten sam</em>); sekcja 03 — konsola sterowania: wybierz <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">podmiot × czasownik × URI</span> i zobacz ścieżkę przez bramki — włącznie z odmowami (np. web żąda restartu samego siebie → DENY).
+      </div>
+    </div>
+    <div>
+      <div class="gram"><span class="k">urn</span>:taskand:<span class="k">capsule</span>:<span class="v">taskand-web</span>[@<span class="v">v1.1.0</span>]   <span class="c">← paczka (stabilna) · @wersja (tag)</span>
+<span class="k">urn</span>:taskand:<span class="k">process</span>:<span class="v">run-42-p3</span>            <span class="c">← ulotny: ginie z procesem</span>
+<span class="k">urn</span>:taskand:<span class="k">task</span>:<span class="v">t021</span> · <span class="k">journal</span>:<span class="v">run-42#evt-204</span>
+<span class="k">urn</span>:taskand:<span class="k">schema</span>:envelope:<span class="v">v1</span>           <span class="c">← kontrakt (v0.11)</span>
+<span class="k">artifact</span>:<span class="v">rec-42@sha256:9f3c…</span>                <span class="c">← CAS (v0.10)</span>
+<span class="k">urn</span>:taskand:<span class="k">claim</span>:<span class="v">crm.retry_no_duplicate</span>     <span class="c">← wiedza (v0.5)</span>
+<span class="c">rozwiązanie: URN → supervisor /route → URL → kontener (label)</span>
+<span class="c">sterowanie:  odczyt → GET bezpośrednio · kontrola → POST supervisor</span></div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);margin-top:10px;line-height:1.7">invariant: URN nie pływa w ruchu sieciowym wewnętrznym — rozwiązuje się na brzegu; w kopertach (source/subject/artifactref) żyje jako identyfikator, nie jako adres</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="shead"><span class="snum">01</span><span class="stitle">taksonomia URI — co adresujesz i jak stabilne to jest</span><span class="srule"></span><span class="smeta">9 rodzajów</span></div>
+  <p class="slede">Zasada ogólna: <b>tożsamość logiczna jest stabilna, fizyczna ulotna</b>. Wersje i digesty są <b>niewzmienna</b> (nie edytuje się historii); procesy są z definicji krótkotrwałe — ich historię adresujesz przez dziennik, nie przez żyjący kontener.</p>
+  <table class="mtx">
+    <thead><tr><th>URI</th><th>adresuje</th><th>stabilność</th><th>rozwiązanie fizyczne</th></tr></thead>
+    <tbody>
+      <tr><td><b>urn:taskand:capsule:\<nazwa></b></td><td>paczka (logiczna tożsamość)</td><td>przez wdrożenia</td><td>/route → usługa compose → kontener (label)</td></tr>
+      <tr><td><b>…@v1.1.0</b></td><td>konkretna wersja (tag git)</td><td><b>niewzmienna</b></td><td> checkout ref w klonie · digest obrazu</td></tr>
+      <tr><td><b>urn:taskand:process:\<id></b></td><td>żyjący proces (instancja)</td><td><span class="no">ulotna</span> — ginie z kontenerem</td><td>label org.taskand.urn na kontenerze</td></tr>
+      <tr><td><b>urn:taskand:task:\<id></b></td><td>zadanie (kolejka)</td><td>stabilna</td><td>magazyn zadań supervisora</td></tr>
+      <tr><td><b>urn:taskand:journal:\<run>#\<evt></b></td><td>zdarzenie w dzienniku</td><td><b>niewzmienna</b> (append-only)</td><td>events.jsonl + odniesienie do artefaktu</td></tr>
+      <tr><td><b>urn:taskand:schema:…</b></td><td>kontrakt koperty</td><td>wg wersji (major równoległy)</td><td>schemareg: /schemas/envelope/\<v>.json</td></tr>
+      <tr><td><b>artifact:\<nazwa>@sha256:…</b></td><td>artefakt / duży plik</td><td><b>niewzmienna</b> (digest)</td><td>CAS: GET /cas/\<digest> (chunki)</td></tr>
+      <tr><td><b>urn:taskand:claim:\<id></b></td><td>roszczenie wiedzy</td><td>append-only</td><td>claims.yaml (snapshoty)</td></tr>
+      <tr><td><b>channel:taskand.\<nazwa></b></td><td>kanał komunikacji</td><td>stabilna</td><td>AsyncAPI: adres kanału (np. developer:8078/tasks)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><span class="stitle">symulacja · resolver — URN → routing → URL → kontener</span><span class="srule"></span><span class="smeta" id="resMeta">routing: 4 wpisy</span></div>
+  <p class="slede">Wybierz URI i kliknij „rozwiąż”. Przy kapsułce spróbuj <b>redeploy</b> — zobaczysz, że fizyczny cel (kontener, digest obrazu) się zmienia, a URN rozwiązuje dalej: to jest cała pointa pośredniości.</p>
+  <div class="simctl">
+    <select class="dinp" id="resUrn" style="min-width:280px">
+      <option value="capsule">urn:taskand:capsule:taskand-web</option>
+      <option value="version">urn:taskand:capsule:taskand-web@v1.1.0</option>
+      <option value="process">urn:taskand:process:run-42-p3</option>
+      <option value="schema">urn:taskand:schema:envelope:v1</option>
+      <option value="artifact">artifact:rec-42@sha256:9f3c…</option>
+      <option value="task">urn:taskand:task:t021</option>
+      <option value="journal">urn:taskand:journal:run-42#evt-204</option>
+      <option value="claim">urn:taskand:claim:crm.retry_no_duplicate</option>
+    </select>
+    <button class="simb" id="resRun"><i data-lucide="search"></i> rozwiąż URI</button>
+    <button class="simb ghost" id="resDeploy"><i data-lucide="refresh-cw"></i> redeploy (nowy commit)</button>
+  </div>
+  <div class="simgrid">
+    <div>
+      <div id="resSteps"></div>
+      <div class="term"><div class="termhead"><span>warstwa fizyczna · docker (label = odcisk URN)</span><span id="resCnt">—</span></div><div class="termbody" id="resTerm"></div></div>
+    </div>
+    <div>
+      <div class="jsonplate" id="resJson"><span class="c">// odpowiedź GET /route pojawi się po rozwiązaniu</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><span class="stitle">konsola sterowania · podmiot × czasownik × URI → bramki → wykonanie</span><span class="srule"></span><span class="smeta">odczyt: bezpośrednio · kontrola: supervisor</span></div>
+  <p class="slede">Zasady (z v0.8/v0.9, tu widoczne w praktyce): <b>odczyt</b> (healthz, journal, wersja) — GET na rozwiążanym URL, każdemu z grantem read. <b>Kontrola</b> (restart, stop, rollback) — POST na supervisora: user ma prawo, developer tylko <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">request-restart</span>, a proces na samego siebie — <b>DENY</b>. Każde żądanie przechodzi schemat koperty → granty → idempotencję.</p>
+  <div class="simctl">
+    <select class="dinp" id="ctlSubj">
+      <option value="user">podmiot: user</option>
+      <option value="developer">podmiot: capsule:taskand-developer</option>
+      <option value="web">podmiot: capsule:taskand-web</option>
+      <option value="nucleus">podmiot: capsule:taskand-nucleus</option>
+    </select>
+    <select class="dinp" id="ctlVerb">
+      <option value="healthz">czasownik: GET /healthz</option>
+      <option value="journal">czasownik: GET /journal (plast)</option>
+      <option value="restart">czasownik: POST /restart</option>
+      <option value="stop">czasownik: POST /process/stop</option>
+      <option value="rollback">czasownik: POST /rollback</option>
+    </select>
+    <select class="dinp" id="ctlUrn">
+      <option value="urn:taskand:capsule:taskand-web">cel: urn:taskand:capsule:taskand-web</option>
+      <option value="urn:taskand:process:run-42-p3">cel: urn:taskand:process:run-42-p3</option>
+      <option value="urn:taskand:capsule:taskand-developer">cel: urn:taskand:capsule:taskand-developer</option>
+    </select>
+    <button class="simb" id="ctlRun"><i data-lucide="terminal"></i> wykonaj</button>
+  </div>
+  <div class="simgrid">
+    <div>
+      <div id="ctlSteps"></div>
+      <div class="term"><div class="termhead"><span>konsola · wykonanie</span><span id="ctlStat">—</span></div><div class="termbody" id="ctlTerm"></div></div>
+    </div>
+    <div>
+      <div class="jsonplate" id="ctlResp" style="max-height:220px"><span class="c">// odpowiedź pojawi się po wykonaniu</span></div>
+      <div style="margin-top:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">równoważne curl-e (fizycznie)</div>
+        <div id="ctlCurls"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">04</span><span class="stitle">pliki do pobrania — schemat URI, router supervisora, etykiety, ściągawka</span><span class="srule"></span><span class="smeta">v0.12</span></div>
+  <p class="slede">Realna zawartość: gramatyka URI jako walidowalny spec, router supervisora budujący tablicę z etykiet kontenerów (docker.sock), fragment compose z etykietami (odcisk URN na kontenerze) i ściągawka fizycznych komend.</p>
+  <div class="frow">
+    <div class="ftabs" id="ftabs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ibtn" id="fCopy"><i data-lucide="copy"></i> kopiuj</button>
+      <button class="ibtn" id="fDl"><i data-lucide="download"></i> pobierz plik</button>
+      <button class="ibtn" id="fBundle"><i data-lucide="package"></i> pobierz specyfikacje</button>
+    </div>
+  </div>
+  <div class="fplate" id="fplate"></div>
+</section>
+
+</main>
+<footer>
+taskand.com v0.12 · URI: URN (stabilna tożsamość) → supervisor /route (tablica z etykiet kontenerów) → URL (compose DNS) → kontener (label org.taskand.urn) · odczyt GET bezpośrednio · kontrola POST przez supervisora · samosterowanie DENY · URN nie pływa w ruchu wewnętrznym (tylko w kopertach jako identyfikator)<br>
+symulacje liczą się lokalnie (tablica routera i docker ps — ilustracyjne, mechanizm zgodny z opisem); pliki z sekcji 04 realne — router to szkielet z prawdziwym skanowaniem etykiet przez docker.sock
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hsh = n => Array.from({length:n}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function dl(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function hlJson(obj){
+  return esc(JSON.stringify(obj, null, 2))
+    .replace(/"([^"]+)":/g, '"<span class="k">$1</span>":')
+    .replace(/: "([^"]*)"/g, ': "<span class="v">$1</span>"');
+}
+function hlY(txt){
+  return txt.split('\n').map(l => {
+    let e = esc(l);
+    if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    return e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+  }).join('\n');
+}
+
+/* ————— stan fizyczny (router) ————— */
+const PHYS = {
+  web: { container:'taskand-web-1', digest:'sha256:' + hsh(10) + '…', version:'v1.0.0', port:8080, dns:'web.taskand' },
+  dev:  { container:'taskand-developer-1', digest:'sha256:' + hsh(10) + '…', version:'v0.8.0', port:8078, dns:'developer.taskand' },
+  deploys: 0
+};
+async function rlog(html, cls){
+  const d = document.createElement('div'); d.className = 'tl ' + (cls || '') + ' enter';
+  d.innerHTML = html;
+  const b = $('#resTerm'); b.appendChild(d); b.scrollTop = b.scrollHeight;
+  await sleep(160);
+}
+function addStep(n, status, txt){
+  const d = document.createElement('div');
+  d.className = 'step enter';
+  d.innerHTML = `<span class="sn">${n}</span><span class="st"><span class="${status}">${status === 'ok' ? '✓' : status === 'err' ? '✗' : '→'}</span> ${txt}</span>`;
+  $('#resSteps').appendChild(d);
+}
+function routeFor(kind){
+  const w = PHYS.web;
+  switch(kind){
+    case 'capsule': return {
+      urn:'urn:taskand:capsule:taskand-web', kind:'capsule',
+      resolved:{ type:'compose-service', dns:w.digest ? w.dns : '', url:'http://' + w.dns + ':' + w.port,
+        container:w.container, image:'taskand-web@' + w.digest, labels:{ 'org.taskand.urn':'urn:taskand:capsule:taskand-web', 'org.taskand.version':w.version.replace('v','') } },
+      found:'docker ps --filter label=org.taskand.urn=urn:taskand:capsule:taskand-web'
+    };
+    case 'version': return {
+      urn:'urn:taskand:capsule:taskand-web@v1.1.0', kind:'capsule-version',
+      resolved:{ type:'git-ref', ref:'v1.1.0', note:'niewzmienna — checkout w klonie / walidacja historyczna',
+        image:'taskand-web@sha256:' + hsh(10) + '… (z czasu taga)', current: PHYS.web.version === 'v1.1.0' ? 'aktualnie wdrożona' : ' HISTORYCZNA — nie jest fizycznym celem' }
+    };
+    case 'process': return {
+      urn:'urn:taskand:process:run-42-p3', kind:'process',
+      resolved:{ type:'container-instance', container:'taskand-web-1 (worker t001)', pid: 4127,
+        note:'ULOTNY — po restarcie proces znika; historię adresuj przez journal' }
+    };
+    case 'schema': return {
+      urn:'urn:taskand:schema:envelope:v1', kind:'schema',
+      resolved:{ type:'service', url:'http://schemareg.taskand:8095', path:'/schemas/envelope/v1.0.3.json',
+        service:'taskand-schemareg (v0.11)' }
+    };
+    case 'artifact': return {
+      urn:'artifact:rec-42@sha256:9f3c…', kind:'artifact',
+      resolved:{ type:'cas', base:'http://cas.taskand:8090', manifest:'GET /cas/manifest/sha256:9f3c…',
+        note:'niewzmienna (digest) — 295 chunków po 8 MB' }
+    };
+    case 'task': return {
+      urn:'urn:taskand:task:t021', kind:'task',
+      resolved:{ type:'supervisor-store', url:'http://supervisor.taskand:8079', path:'/tasks/t021',
+        state:'done (deploy v1.1.0)', trace:'00-' + hsh(16) }
+    };
+    case 'journal': return {
+      urn:'urn:taskand:journal:run-42#evt-204', kind:'journal-event',
+      resolved:{ type:'file', path:'log/events.jsonl', line:204, immutable:true,
+        note:'append-only — zdarzenie nigdy się nie zmienia' }
+    };
+    case 'claim': return {
+      urn:'urn:taskand:claim:crm.retry_no_duplicate', kind:'claim',
+      resolved:{ type:'file', path:'claims/claims.yaml', status:'zaobserwowana', evidence:'sandbox probe' }
+    };
+  }
+}
+async function resolveUrn(){
+  const kind = $('#resUrn').value;
+  const urn = $('#resUrn').selectedOptions[0].textContent;
+  $('#resSteps').innerHTML = ''; $('#resTerm').innerHTML = '';
+  addStep('parsuj URN', 'ok', urn + ' · rodzaj: ' + kind);
+  await rlog(`<span class="v">‹resolver›</span> parsowanie: urn:taskand:* zgodne z uri-scheme.yaml ✓`);
+  await sleep(300);
+  const route = routeFor(kind);
+  addStep('GET supervisor:8079/route', 'ok', 'tablica routingu (z etykiet kontenerów) → wpis „' + kind + '”');
+  await rlog(`<span class="v">‹resolver›</span> curl "supervisor:8079/route?urn=${esc(urn)}"`);
+  $('#resJson').innerHTML = hlJson(route);
+  await rlog(`<span class="ok">‹supervisor›</span> 200 → ${esc(JSON.stringify(route.resolved).slice(0, 90))}…`);
+  await sleep(400);
+  if(kind === 'capsule' || kind === 'process'){
+    addStep('fizycznie: kontener', 'ok', 'docker ps --filter label=org.taskand.urn=… → ' + PHYS.web.container);
+    await rlog(`<span class="cmd">$ docker ps --filter label=org.taskand.urn=${esc(urn)}</span>`);
+    await rlog(`CONTAINER ID   IMAGE                          PORTS                    LABELS`);
+    await rlog(`${PHYS.web.container === 'taskand-web-1' ? 'a4b8c90e1f2d' : hsh(12)}   taskand-web@${PHYS.web.digest}   0.0.0.0:${PHYS.web.port}->8080   org.taskand.urn=${esc(urn)}, org.taskand.version=${PHYS.web.version}`);
+    await rlog(`<span class="dim"># etykieta kontenera = FIZYCZNY odcisk URN (stawia compose z pliku labels)</span>`);
+  } else if(kind === 'artifact'){
+    addStep('fizycznie: CAS', 'ok', 'manifest + chunki — GET cas.taskand:8090/cas/{digest}');
+    await rlog(`<span class="cmd">$ curl cas.taskand:8090/cas/manifest/sha256:9f3c… | head -5</span>`);
+  } else if(kind === 'journal'){
+    addStep('fizycznie: plik', 'ok', 'events.jsonl · linia 204 (append-only, niewzmienna)');
+    await rlog(`<span class="cmd">$ sed -n '204p' log/events.jsonl | jq .type</span>`);
+    await rlog(`"org.taskand.operation.validated.v1"`);
+  } else {
+    addStep('fizycznie: usługa', 'ok', 'rozwiązane na usługę docelową (patrz JSON →)');
+  }
+  $('#resCnt').textContent = kind;
+  if(kind === 'capsule') $('#resDeploy').disabled = false;
+  toast('URI rozwiązane — URN stabilny, cel fizyczny w JSON');
+}
+ $('#resRun').addEventListener('click', resolveUrn);
+ $('#resDeploy').addEventListener('click', async () => {
+  PHYS.deploys++;
+  const old = PHYS.web.container;
+  PHYS.web = { container:'taskand-web-' + (1 + PHYS.deploys), digest:'sha256:' + hsh(10) + '…', version:'v1.1.0', port:8080, dns:'web.taskand' };
+  $('#resSteps').innerHTML = ''; $('#resTerm').innerHTML = '';
+  addStep('redeploy', 'ok', 'make deploy → compose up -d --build → NOWY kontener, NOWY digest obrazu');
+  await rlog(`<span class="v">‹supervisor›</span> make -C targets/taskand-web deploy → ${PHYS.web.container} (stary: ${old} zakończony)`);
+  await sleep(400);
+  addStep('re-resolve', 'ok', 'ten sam URN → nowy fizyczny cel — tożsamość logiczna NIEZMIENNA');
+  await rlog(`<span class="cmd">$ curl "supervisor:8079/route?urn=urn:taskand:capsule:taskand-web"</span>`);
+  const route = routeFor('capsule');
+  $('#resJson').innerHTML = hlJson(route);
+  await rlog(`<span class="ok">‹supervisor›</span> 200 → ${route.resolved.container} · ${route.resolved.image} · wersja ${PHYS.web.version}`);
+  await rlog(`<span class="dim"># URN bez zmian, kontener i digest inne — dlatego adresuje się URN-em, nie kontenerem</span>`);
+  $('#resCnt').textContent = 'po redeploy';
+  toast('redeploy: fizyczny cel zmieniony — URN rozwiązuje dalej');
+});
+
+/* ————— konsola sterowania ————— */
+const CTL = { busy:false };
+async function clog(html, cls){
+  const d = document.createElement('div'); d.className = 'tl ' + (cls || '') + ' enter';
+  d.innerHTML = html;
+  const b = $('#ctlTerm'); b.appendChild(d); b.scrollTop = b.scrollHeight;
+  await sleep(180);
+}
+function cStep(n, status, txt){
+  const d = document.createElement('div');
+  d.className = 'step enter';
+  d.innerHTML = `<span class="sn">${n}</span><span class="st"><span class="${status}">${status === 'ok' ? '✓' : status === 'err' ? '✗' : '→'}</span> ${txt}</span>`;
+  $('#ctlSteps').appendChild(d);
+}
+function addCurl(txt){
+  const d = document.createElement('div');
+  d.className = 'curlrow';
+  d.innerHTML = `<span class="cc">${esc(txt)}</span><button class="ibtn" data-curl="${esc(txt)}"><i data-lucide="copy"></i></button>`;
+  $('#ctlCurls').appendChild(d);
+  d.querySelector('button').onclick = () => { navigator.clipboard.writeText(txt); toast('skopiowano curl'); };
+  icons();
+}
+async function runCtl(){
+  if(CTL.busy) return;
+  CTL.busy = true;
+  const subj = $('#ctlSubj').value;
+  const subjName = $('#ctlSubj').selectedOptions[0].textContent.replace('podmiot: ', '');
+  const verb = $('#ctlVerb').value;
+  const verbName = $('#ctlVerb').selectedOptions[0].textContent.replace('czasownik: ', '');
+  const cel = $('#ctlUrn').value;
+  $('#ctlSteps').innerHTML = ''; $('#ctlTerm').innerHTML = ''; $('#ctlCurls').innerHTML = '';
+  $('#ctlResp').innerHTML = '<span class="c">// …</span>';
+  /* 1 · rozwiąż */
+  cStep('rozwiąż URI', 'ok', cel + ' → (route) → cel fizyczny');
+  await clog(`<span class="v">‹konsola›</span> ${esc(verbName)} · cel ${esc(cel)}`);
+  await clog(`<span class="dim">‹resolver›</span> /route?urn=${esc(cel)} → ${esc(cel.includes('process') ? 'kontener instancji' : cel.includes('developer') ? 'developer.taskand:8078' : 'web.taskand:8080')}</span>`);
+  await sleep(300);
+  /* 2 · klasyfikacja czasownika */
+  const isControl = ['restart','stop','rollback'].includes(verb);
+  const isRead = ['healthz','journal'].includes(verb);
+  cStep('klasyfikacja', 'ok', isRead ? 'odczyt → GET bezpośrednio na URL' : isControl ? 'kontrola → POST supervisor (egzekutor)' : '?');
+  await sleep(300);
+  /* 3 · granty */
+  let allow = true, reason = '';
+  if(isControl){
+    const self = (subj === 'web' && cel.includes('taskand-web')) || (subj === 'nucleus' && cel.includes('taskand-web') && verb === 'restart');
+    if(subj === 'web' && cel.includes('taskand-web')){
+      allow = false; reason = 'grants: self-restart DENY — proces nie wyrywa sobie podłogi (v0.8)';
+    } else if(subj === 'nucleus' && verb !== 'healthz'){
+      allow = false; reason = 'grants: nucleus nie steruje rodziną — kontrola wyłącznie przez supervisora';
+    } else if(subj === 'developer' && verb === 'stop'){
+      allow = false; reason = 'grants: developer ma request-restart, NIE process-stop — zatrzymanie egzekwuje supervisor';
+    } else if(subj === 'developer' && cel.includes('taskand-developer')){
+      allow = false; reason = 'grants: developer nie restartuje samego siebie (self-restart DENY)';
+    } else {
+      reason = subj === 'developer' ? 'grant: request-restart ✓ (egzekucja przez supervisora)' : 'grant: user → supervisor ✓';
+    }
+  } else {
+    reason = 'grant: read ✓ (odczyt)';
+  }
+  cStep('granty', allow ? 'ok' : 'err', reason);
+  if(!allow){
+    await clog(`<span class="err">‹supervisor›</span> 403 Denied — ${esc(reason)}</span>`, 'err');
+    $('#ctlResp').innerHTML = hlJson({ status:403, error:'denied', grant: reason, hint:'ścieżka kontrolna: user → supervisor (request-restart)' });
+    $('#ctlStat').textContent = '403';
+    toast('DENY — ' + reason.slice(0, 60) + '…');
+    CTL.busy = false;
+    return;
+  }
+  await clog(`<span class="ok">‹grants›</span> ${esc(reason)}</span>`, 'ok');
+  await sleep(300);
+  /* 4 · idempotencja */
+  cStep('idempotencja', 'ok', 'klucz: ' + (verb + ':' + cel).slice(0, 40) + '… — duplikat zostanie pominięty');
+  await sleep(300);
+  /* 5 · wykonanie */
+  const target = cel.includes('developer') ? 'developer.taskand:8078' : 'web.taskand:8080';
+  if(isRead){
+    cStep('wykonanie', 'ok', 'GET http://' + target + (verb === 'journal' ? ' (przez /journal?subject=…&last=200)' : '/healthz'));
+    const cmd = verb === 'healthz'
+      ? `curl http://${target}/healthz`
+      : `curl "supervisor.taskand:8079/journal?subject=${cel}&last=200"`;
+    await clog(`<span class="cmd">$ ${esc(cmd)}</span>`);
+    addCurl(cmd);
+    await sleep(500);
+    $('#ctlResp').innerHTML = hlJson(verb === 'healthz'
+      ? { status:'ok', version: PHYS.web.version.replace('v',''), capsule:'taskand-web', since:new Date().toISOString() }
+      : { subject: cel, events: 200, slice: 'trace-matched', note:'plast dziennika — nie wolumen' });
+    $('#ctlStat').textContent = '200';
+    await clog(`<span class="ok">‹${esc(target)}›</span> 200 OK</span>`, 'ok');
+    toast('odczyt wykonany bezpośrednio (GET, grant read)');
+  } else {
+    cStep('wykonanie', 'ok', 'POST supervisor:8079/' + verb + ' — supervisor egzekwuje (make deploy/rollback lub docker stop)');
+    const cmd = `curl -X POST supervisor.taskand:8079/${verb} -d '{"cel":"${cel}"}'`;
+    await clog(`<span class="cmd">$ ${esc(cmd)}</span>`);
+    addCurl(cmd);
+    if(subj === 'developer') addCurl(`# developer NIE robi tego sam — jego grant to request-restart (supervisor egzekwuje)`);
+    await sleep(500);
+    $('#ctlResp').innerHTML = hlJson({
+      status:202, accepted:true, executor:'supervisor', cel,
+      pipeline: verb === 'rollback' ? 'git revert → tag → make restart' : 'make -C targets/… ' + (verb === 'stop' ? 'docker stop <id>' : 'deploy'),
+      healthAfter:'GET /healthz (fail → auto-rollback)', grant: reason
+    });
+    $('#ctlStat').textContent = '202';
+    await clog(`<span class="ok">‹supervisor›</span> 202 Accepted — egzekucja przez supervisora (health po wdrożeniu)</span>`, 'ok');
+    toast('żądanie kontrolne przyjęte — egzekutor: supervisor');
+  }
+  CTL.busy = false;
+}
+ $('#ctlRun').addEventListener('click', runCtl);
+
+/* ————— pliki ————— */
+const URI_SPEC = `apiVersion: taskand.dev/v1alpha1
+kind: UriScheme
+namespace: "urn:taskand"
+grammar:
+  capsule:  "urn:taskand:capsule:<name>[@<version>]"
+  process:  "urn:taskand:process:<instance-id>"
+  task:     "urn:taskand:task:<id>"
+  journal:  "urn:taskand:journal:<run>#<event-id>"
+  schema:   "urn:taskand:schema:<name>:<major>"
+  claim:    "urn:taskand:claim:<id>"
+  channel:  "channel:taskand.<name>"
+  artifact: "artifact:<name>@sha256:<digest>"
+  grant:    "grants:<subject>→<target>[@<version>]"
+stability:
+  capsule:       "stabilny-przez-wdrożenia (tożsamość logiczna)"
+  capsule@v:     "niewzmienny (tag git + digest obrazu)"
+  process:       "ulotny — ginie z procesem; historię adresuj przez journal"
+  journal-event: "niewzmienny (append-only)"
+  artifact:      "niewzmienny (digest)"
+resolution:
+  chain: "URN → GET supervisor:8079/route → URL (compose DNS) → kontener (label)"
+  edge:  "URN rozwiązuje się NA BRZEGU — nie pływa w ruchu sieci wewnętrznej"
+  physical:
+    dns:    "nazwa usługi w sieci compose (web.taskand)"
+    label:  "org.taskand.urn=… (docker ps --filter label=…)"
+    route:  "tablica supervisora przebudowywana po każdym wdrożeniu"
+control:
+  verbs:
+    odczyt:   { healthz: "GET <url>/healthz", journal: "GET supervisor/journal?subject=<urn>&last=N",
+                version: "GET <url>/.well-known/taskand.json" }
+    kontrola: { restart: "POST supervisor:8079/restart", stop: "POST supervisor:8079/process/<id>/stop",
+                rollback: "POST supervisor:8079/rollback" }
+  zasady:
+    - "czasowniki kontrolne egzekwuje WYŁĄCZNIE supervisor"
+    - "proces nie steruje sam sobą (self-restart DENY)"
+    - "developer: request-restart (grant) — nie zatrzymuje niczego sam"
+    - "każde żądanie: schemat koperty → granty → idempotencja"
+`;
+const ROUTER_DOCKERFILE = `# syntax=docker/dockerfile:1
+# taskand-supervisor · router + egzekutor kontroli (v0.12)
+# tablica routingu budowana z ETYKIET kontenerów (docker.sock) — po każdym
+# wdrożeniu przebudowa: URN bez zmian, fizyczny cel nowy
+FROM python:3.12-alpine
+RUN apk add --no-cache docker-cli make git
+WORKDIR /app
+COPY <<'RT' /app/router.py
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import json, subprocess, urllib.parse
+
+def containers():
+    # skan etykiet = fizyczne odciski URN-ów
+    out = subprocess.check_output([
+        "docker", "ps", "--format",
+        "{{json .Labels}}\\t{{.Names}}\\t{{.Ports}}"], text=True)
+    rows = []
+    for line in out.strip().splitlines():
+        labels, name, ports = (line.split("\\t") + ["", ""])[:3]
+        try: labels = json.loads(labels)
+        except: labels = {}
+        if labels.get("org.taskand.urn"):
+            rows.append({"urn": labels["org.taskand.urn"],
+                         "container": name, "ports": ports,
+                         "version": labels.get("org.taskand.version"),
+                         "dns": labels.get("org.taskand.dns")})
+    return rows
+
+def route(urn):
+    for c in containers():
+        if c["urn"] == urn or c["urn"].split("@")[0] == urn.split("@")[0]:
+            return {"urn": urn, "kind": "capsule", "resolved": {
+                "type": "compose-service", "container": c["container"],
+                "dns": c["dns"], "ports": c["ports"],
+                "image": "taskand-web@sha256:…", "labels": c}}
+    return None
+
+class H(BaseHTTPRequestHandler):
+    def _send(self, code, body):
+        b = json.dumps(body, ensure_ascii=False).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(b)))
+        self.end_headers(); self.wfile.write(b)
+    def do_GET(self):
+        u = urllib.parse.urlparse(self.path)
+        if u.path == "/route":
+            urn = urllib.parse.parse_qs(u.query).get("urn", [""])[0]
+            r = route(urn) or {"error": "nieznany URN", "discovery": "/.well-known"}
+            self._send(200 if "resolved" in r else 404, r)
+        elif u.path == "/healthz":
+            self._send(200, {"status": "ok", "routes": len(containers())})
+    def do_POST(self):
+        n = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(n) or b"{}")
+        # GRANTY przed egzekucją (szkielet): odczyt grants.yaml; DENY: self-restart
+        cel = body.get("cel", "")
+        if self.path in ("/restart", "/rollback", "/process/stop"):
+            if body.get("subject") == cel:                       # self-restart
+                self._send(403, {"error": "self-restart DENY"})
+                return
+            # egzekucja: make deploy/rollback w paczce celu (v0.8/v0.9) — NIE w procesie
+            name = cel.rsplit(":", 1)[-1].split("@")[0]
+            cmd = ["make", "-C", "targets/" + name,
+                   "rollback" if self.path == "/rollback" else "deploy"]
+            subprocess.Popen(cmd)      # asynchronicznie + health po wdrożeniu
+            self._send(202, {"accepted": True, "executor": "supervisor",
+                             "pipeline": " ".join(cmd), "cel": cel})
+
+HTTPServer(("0.0.0.0", 8079), H).serve_forever()
+RT
+EXPOSE 8079
+ENTRYPOINT ["python", "/app/router.py"]
+`;
+const LABELS_COMPOSE = `# fragment docker-compose.yaml — ETYKIETY = fizyczne odciski URN na kontenerach
+# router supervisora skanuje je przez docker.sock i buduje tablicę /route
+services:
+  web:
+    labels:
+      org.taskand.urn: "urn:taskand:capsule:taskand-web"   # ← adres logiczny
+      org.taskand.capsule: taskand-web
+      org.taskand.role: application
+      org.taskand.version: "1.0.0"                          # aktualizowane przy deploy
+      org.taskand.dns: web.taskand                          # nazwa w sieci compose
+
+  developer:
+    labels:
+      org.taskand.urn: "urn:taskand:capsule:taskand-developer"
+      org.taskand.role: developer
+      org.taskand.dns: developer.taskand
+
+# fizyczne odnalezienie procesu po URI:
+#   docker ps --filter label=org.taskand.urn=urn:taskand:capsule:taskand-web
+# po redeploy: nowy kontener + nowy digest obrazu — URN bez zmian (router przebuduje tablicę)
+`;
+const CHEATSHEET = `# taskand · uri-cheatsheet — fizyczne odnoszenie się i kontrola (v0.12)
+
+# 1 · rozwiązanie URN → URL (brzeg: supervisor)
+curl "supervisor.taskand:8079/route?urn=urn:taskand:capsule:taskand-web"
+#   → { "resolved": { "dns": "web.taskand", "ports": "0.0.0.0:8080->8080", … } }
+
+# 2 · fizyczne odnalezienie kontenera (etykieta = odcisk URN)
+docker ps --filter label=org.taskand.urn=urn:taskand:capsule:taskand-web
+docker inspect --format '{{index .Config.Labels "org.taskand.version"}}' taskand-web-1
+
+# 3 · ODCZYT — bezpośrednio na rozwiążanym URL (grant: read)
+curl web.taskand:8080/healthz
+curl "supervisor.taskand:8079/journal?subject=urn:taskand:capsule:taskand-web&last=200"
+curl schemareg.taskand:8095/schemas/envelope/v1.0.3.json
+
+# 4 · KONTROLA — wyłącznie przez supervisora (grants + idempotencja)
+curl -X POST supervisor.taskand:8079/restart \\
+  -H 'Content-Type: application/json' \\
+  -d '{"cel":"urn:taskand:capsule:taskand-web","subject":"urn:taskand:capsule:taskand-developer"}'
+#   developer: request-restart (grant) · web na siebie: 403 self-restart DENY
+
+curl -X POST supervisor.taskand:8079/rollback \\
+  -d '{"cel":"urn:taskand:capsule:taskand-web","subject":"user"}'
+#   pipeline: git revert → tag → make deploy → healthz (fail → auto-rollback)
+
+# 5 · artefakty i zdarzenia (niewzmienna część przestrzeni)
+curl "cas.taskand:8090/cas/manifest/sha256:9f3c…"      # manifest (295 chunków)
+sed -n '204p' log/events.jsonl | jq .type              # zdarzenie journal (append-only)
+
+# invarianty:
+#   URN nie pływa w ruchu wewnętrznym — tylko w kopertach (source/subject/artifactref)
+#   proces nie steruje sam sobą; developer nie zatrzymuje niczego (tylko żąda)
+`;
+const FILES = [
+  {id:'uri', name:'uri-scheme.yaml', get:() => URI_SPEC, lang:'yaml'},
+  {id:'rt', name:'taskand-supervisor/Dockerfile', get:() => ROUTER_DOCKERFILE, lang:'docker'},
+  {id:'lab', name:'docker-compose.labels.yaml', get:() => LABELS_COMPOSE, lang:'yaml'},
+  {id:'cs', name:'uri-cheatsheet.md', get:() => CHEATSHEET, lang:'sh'}
+];
+let curFile = 'uri';
+function hl(txt, lang){
+  return txt.split('\n').map(line => {
+    let e = esc(line);
+    if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    if(lang === 'docker'){
+      e = e.replace(/^(FROM|ARG|WORKDIR|COPY|RUN|ENTRYPOINT|EXPOSE|LABEL|ENV)(\s)/, '<span class="k">$1</span>$2');
+    } else if(lang === 'sh'){
+      e = e.replace(/^(\s*)(curl|docker|make|git|sed|jq)(\b)/, '$1<span class="k">$2</span>$3');
+    } else if(lang === 'yaml'){
+      e = e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+    }
+    return e;
+  }).join('\n');
+}
+function renderFiles(){
+  const tabs = $('#ftabs'); tabs.innerHTML = '';
+  FILES.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftab' + (f.id === curFile ? ' on' : '');
+    b.innerHTML = `<span class="fdot"></span>${f.name}`;
+    b.onclick = () => { curFile = f.id; renderFiles(); };
+    tabs.appendChild(b);
+  });
+  const f = FILES.find(x => x.id === curFile);
+  $('#fplate').innerHTML = hl(f.get(), f.lang);
+}
+ $('#fCopy').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); navigator.clipboard.writeText(f.get()).then(() => toast('skopiowano ' + f.name)); });
+ $('#fDl').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); dl(f.name.split('/').pop(), f.get()); toast('pobrano ' + f.name); });
+ $('#fBundle').addEventListener('click', () => {
+  dl('taskand-v12-uri.bundle',
+`# taskand v0.12 — URI procesów: spec + router + etykiety + ściągawka · ${new Date().toLocaleString('pl-PL')}
+
+--- uri-scheme.yaml ---
+ ${URI_SPEC}
+--- taskand-supervisor/Dockerfile ---
+ ${ROUTER_DOCKERFILE}
+--- docker-compose.labels.yaml ---
+ ${LABELS_COMPOSE}
+--- uri-cheatsheet.md ---
+ ${CHEATSHEET}
+`);
+  toast('pobrano specyfikacje URI v0.12 (4 pliki)');
+});
+
+/* ————— start ————— */
+ $('#resDeploy').disabled = true;
+renderFiles();
+rlog(`<span class="dim"># resolver gotowy — wybierz URI i kliknij „rozwiąż” · przy kapsułce odblokuje się redeploy</span>`);
+clog(`<span class="dim"># konsola gotowa — spróbuj: podmiot web × POST /restart × cel taskand-web → spodziewaj się DENY</span>`);
+icons();
+</script>
+</body>
+</html>

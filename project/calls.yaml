@@ -1,0 +1,220 @@
+project: /home/tom/github/semcod/taskand/glm53
+generated_from: code2llm call graph analysis
+stats:
+  total_nodes: 15
+  total_edges: 20
+  modules_count: 4
+nodes:
+  scripts.digital_twin.log:
+    name: log
+    module: scripts.digital_twin
+    line: 34
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 21
+  scripts.history.ensure_dirs:
+    name: ensure_dirs
+    module: scripts.history
+    line: 16
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 4
+  scripts.history.show_details:
+    name: show_details
+    module: scripts.history
+    line: 162
+    cyclomatic_complexity: 12
+    calls_out: 44
+    calls_in: 0
+  scripts.digital_twin.run_twin_verification:
+    name: run_twin_verification
+    module: scripts.digital_twin
+    line: 68
+    cyclomatic_complexity: 9
+    calls_out: 13
+    calls_in: 1
+  scripts.digital_twin.create_twin_environment:
+    name: create_twin_environment
+    module: scripts.digital_twin
+    line: 37
+    cyclomatic_complexity: 5
+    calls_out: 15
+    calls_in: 1
+  gateway.Dockerfile.print:
+    name: print
+    module: gateway.Dockerfile
+    line: 192
+    cyclomatic_complexity: 0
+    calls_out: 0
+    calls_in: 51
+  scripts.dod_validator.validate_dod:
+    name: validate_dod
+    module: scripts.dod_validator
+    line: 22
+    cyclomatic_complexity: 19
+    calls_out: 10
+    calls_in: 0
+  scripts.dod_validator.run_cmd:
+    name: run_cmd
+    module: scripts.dod_validator
+    line: 18
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 3
+  scripts.digital_twin.ask_llm_for_repair:
+    name: ask_llm_for_repair
+    module: scripts.digital_twin
+    line: 116
+    cyclomatic_complexity: 8
+    calls_out: 20
+    calls_in: 1
+  scripts.digital_twin.load_env:
+    name: load_env
+    module: scripts.digital_twin
+    line: 23
+    cyclomatic_complexity: 6
+    calls_out: 7
+    calls_in: 1
+  scripts.history.list_history:
+    name: list_history
+    module: scripts.history
+    line: 96
+    cyclomatic_complexity: 21
+    calls_out: 52
+    calls_in: 0
+  scripts.history.create_snapshot:
+    name: create_snapshot
+    module: scripts.history
+    line: 36
+    cyclomatic_complexity: 9
+    calls_out: 33
+    calls_in: 0
+  scripts.digital_twin.verify_and_evolve:
+    name: verify_and_evolve
+    module: scripts.digital_twin
+    line: 181
+    cyclomatic_complexity: 6
+    calls_out: 30
+    calls_in: 0
+  scripts.history.rollback:
+    name: rollback
+    module: scripts.history
+    line: 216
+    cyclomatic_complexity: 20
+    calls_out: 59
+    calls_in: 0
+  scripts.history.compute_dir_hash:
+    name: compute_dir_hash
+    module: scripts.history
+    line: 22
+    cyclomatic_complexity: 3
+    calls_out: 12
+    calls_in: 2
+edges:
+- caller: scripts.dod_validator.validate_dod
+  callee: scripts.dod_validator.run_cmd
+  call_type: resolved
+- caller: scripts.digital_twin.log
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.digital_twin.create_twin_environment
+  callee: scripts.digital_twin.log
+  call_type: resolved
+- caller: scripts.digital_twin.run_twin_verification
+  callee: scripts.digital_twin.log
+  call_type: resolved
+- caller: scripts.digital_twin.ask_llm_for_repair
+  callee: scripts.digital_twin.load_env
+  call_type: resolved
+- caller: scripts.digital_twin.ask_llm_for_repair
+  callee: scripts.digital_twin.log
+  call_type: resolved
+- caller: scripts.digital_twin.verify_and_evolve
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.digital_twin.verify_and_evolve
+  callee: scripts.digital_twin.log
+  call_type: resolved
+- caller: scripts.digital_twin.verify_and_evolve
+  callee: scripts.digital_twin.create_twin_environment
+  call_type: resolved
+- caller: scripts.digital_twin.verify_and_evolve
+  callee: scripts.digital_twin.run_twin_verification
+  call_type: resolved
+- caller: scripts.history.create_snapshot
+  callee: scripts.history.ensure_dirs
+  call_type: resolved
+- caller: scripts.history.create_snapshot
+  callee: scripts.history.compute_dir_hash
+  call_type: resolved
+- caller: scripts.history.create_snapshot
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.history.list_history
+  callee: scripts.history.ensure_dirs
+  call_type: resolved
+- caller: scripts.history.list_history
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.history.show_details
+  callee: scripts.history.ensure_dirs
+  call_type: resolved
+- caller: scripts.history.show_details
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.history.rollback
+  callee: scripts.history.ensure_dirs
+  call_type: resolved
+- caller: scripts.history.rollback
+  callee: gateway.Dockerfile.print
+  call_type: resolved
+- caller: scripts.history.rollback
+  callee: scripts.history.compute_dir_hash
+  call_type: resolved
+modules:
+  gateway.Dockerfile:
+  - gateway.Dockerfile.print
+  scripts.digital_twin:
+  - scripts.digital_twin.ask_llm_for_repair
+  - scripts.digital_twin.create_twin_environment
+  - scripts.digital_twin.load_env
+  - scripts.digital_twin.log
+  - scripts.digital_twin.run_twin_verification
+  - scripts.digital_twin.verify_and_evolve
+  scripts.dod_validator:
+  - scripts.dod_validator.run_cmd
+  - scripts.dod_validator.validate_dod
+  scripts.history:
+  - scripts.history.compute_dir_hash
+  - scripts.history.create_snapshot
+  - scripts.history.ensure_dirs
+  - scripts.history.list_history
+  - scripts.history.rollback
+  - scripts.history.show_details
+entry_points:
+- Dockerfile.gh_child
+- Dockerfile.plan
+- bootstrap.Dockerfile.gh_child
+- bootstrap.Dockerfile.plan
+- gateway.Dockerfile.do_GET
+- gateway.Dockerfile.do_OPTIONS
+- gateway.Dockerfile.do_POST
+- gateway.Dockerfile.log_message
+- gateway.Dockerfile.parse_yaml_tasks
+- gateway.Dockerfile.send_cors_headers
+- gateway.Dockerfile.send_json
+- history.snapshots.snap-t1789203598.files.taskand.Dockerfile.gh_child
+- history.snapshots.snap-t1789203598.files.taskand.Dockerfile.plan
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_GET
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_POST
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.log_message
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.print
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.send_json
+- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.yaml_value
+- scripts.digital_twin.verify_and_evolve
+- scripts.dod_validator.validate_dod
+- scripts.history.create_snapshot
+- scripts.history.list_history
+- scripts.history.rollback
+- scripts.history.show_details
+- taskand.safe_curl

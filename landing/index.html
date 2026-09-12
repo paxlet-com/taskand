@@ -164,11 +164,11 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
   <div class="mast">
     <div>
       <h1>taskand<span class="tld">-glm53</span></h1>
-      <p class="tagser">autonomiczny proces w Dockerfile · Digital Twin · Definition of Done · Rollback</p>
+      <p class="tagser">Standard taskand v1.0 · Wszystko jest zasobem URI · Digital Twin · DoD · Rollback</p>
     </div>
     <div class="mast-r">
-      wersja <b>v0.4.2</b> · repozytorium: <a href="https://github.com/semcod/taskand-glm53" target="_blank" style="color:var(--hi,#00d26a);text-decoration:underline;font-weight:700">github.com/semcod/taskand-glm53 ↗</a><br>
-      tryb: <b>shell → daemon</b> · <b>Digital Twin Sandbox</b> · <b>Definition of Done (DoD)</b>
+      wersja <b>v1.0.0 (Standard)</b> · repozytorium: <a href="https://github.com/semcod/taskand-glm53" target="_blank" style="color:var(--hi,#00d26a);text-decoration:underline;font-weight:700">github.com/semcod/taskand-glm53 ↗</a><br>
+      tryb: <b>Zasoby URI (proc://)</b> · <b>Kapsuła & Grants</b> · <b>Digital Twin Sandbox</b> · <b>DoD</b>
     </div>
   </div>
   <div class="hero">
@@ -232,6 +232,8 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
 
     <!-- Quick Action Bar -->
     <div class="cpanel-actions">
+      <button class="act-btn" id="btnCatalogQuick"><i data-lucide="boxes"></i> 📦 Katalog Zasobów URI</button>
+      <button class="act-btn" id="btnCapsuleQuick"><i data-lucide="file-code"></i> 📜 Kapsuła & Grants</button>
       <button class="act-btn" id="btnTwinQuick"><i data-lucide="shield-check"></i> ♊ Digital Twin Test</button>
       <button class="act-btn" id="btnHistoryQuick"><i data-lucide="git-commit"></i> 📚 Historia & Dockerfile</button>
       <button class="act-btn" id="btnRollbackQuick"><i data-lucide="rotate-ccw"></i> ↺ Rollback Migawki</button>
@@ -1260,6 +1262,48 @@ async function fetchHistoryQuick(){
   }
 }
 
+async function fetchCatalogQuick(){
+  appendCockpitLog('Pobieranie katalogu zasobów URI (proc-catalog.json)...', 'var(--pkey)');
+  speakVoice('Ładuję katalog procesów URI');
+  try {
+    const res = await fetch(getGwUrl() + '/api/catalog', {cache:'no-store'});
+    const d = await res.json();
+    if(d.bindings){
+      cockpitLogView.innerHTML = '';
+      appendCockpitLog(`=== STANDARD TASKAND v1.0 — KATALOG ZASOBÓW URI ===`, 'var(--pacc)');
+      appendCockpitLog(`Wersja katalogu: ${d.version} · Standard: ${d.standard}`, 'var(--pdim)');
+      d.bindings.forEach(b => {
+        appendCockpitLog(`\n[URI]: ${b.uri}`, '#27AE60');
+        appendCockpitLog(` Ścieżka: ${b.path}`, 'var(--pkey)');
+        appendCockpitLog(` bin.mjs: sha256:${b.binSha256.slice(0, 16)}...`, 'var(--pdim)');
+      });
+      toast(`Załadowano ${d.bindings.length} procesów URI`);
+    }
+  } catch(e){
+    appendCockpitLog(`Błąd katalogu: ${e.message}`, '#E74C3C');
+  }
+}
+
+async function fetchCapsuleQuick(){
+  appendCockpitLog('Pobieranie manifestu kapsuły (capsule.yaml)...', 'var(--pkey)');
+  speakVoice('Ładuję manifest kapsuły i uprawnienia');
+  try {
+    const res = await fetch(getGwUrl() + '/api/capsule', {cache:'no-store'});
+    const d = await res.json();
+    if(d.ok && d.capsule){
+      cockpitLogView.innerHTML = '';
+      appendCockpitLog(`=== MANIFEST KAPSUŁY (capsule.yaml) ===`, 'var(--pacc)');
+      d.capsule.split('\n').forEach(line => {
+        appendCockpitLog(line, 'var(--ptext)');
+      });
+      toast('Załadowano manifest kapsuły');
+    }
+  } catch(e){
+    appendCockpitLog(`Błąd kapsuły: ${e.message}`, '#E74C3C');
+  }
+}
+
+
 async function runRollbackQuick(){
   const snap = window.prompt('Podaj ID migawki do przywrócenia (np. snap-t1789203598):', 'snap-t1789203598');
   if(!snap) return;
@@ -1337,6 +1381,10 @@ if(SpeechRecognition){
         runRollbackQuick();
       } else if(spoken.includes('historia')){
         fetchHistoryQuick();
+      } else if(spoken.includes('katalog') || spoken.includes('zasoby') || spoken.includes('procesy')){
+        fetchCatalogQuick();
+      } else if(spoken.includes('kapsuła') || spoken.includes('uprawnienia') || spoken.includes('grants')){
+        fetchCapsuleQuick();
       } else {
         speakVoice(`Rozpoznano zadanie: ${spoken}. Wysyłam.`);
         submitTask(taskPrompt.value);
@@ -1368,6 +1416,8 @@ taskPrompt.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitTask
 $('#gwPing').addEventListener('click', () => { pingGateway(); fetchTasks(); fetchLogs(); toast('Odświeżono połączenie'); });
 $('#btnRefreshTasks').addEventListener('click', () => { fetchTasks(); toast('Odświeżono zadania'); });
 $('#btnRefreshLogs').addEventListener('click', () => { fetchLogs(); toast('Odświeżono logi'); });
+$('#btnCatalogQuick').addEventListener('click', fetchCatalogQuick);
+$('#btnCapsuleQuick').addEventListener('click', fetchCapsuleQuick);
 $('#btnTwinQuick').addEventListener('click', runTwinQuick);
 $('#btnHistoryQuick').addEventListener('click', fetchHistoryQuick);
 $('#btnRollbackQuick').addEventListener('click', runRollbackQuick);

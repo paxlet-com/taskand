@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>taskand.com v0.13 — proc:// standard URI-procesów: wykonanie poza HTTP, niezależne od runtime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDD; --paper2:#EBE4D1; --ink:#221D12; --ink2:#5C543E;
+  --line:#D3C9AD; --line2:#C2B693; --verm:#B03A10; --verm2:#C94E1F; --olive:#71692F;
+  --plate:#1D1911; --ptext:#EBE2CC; --pdim:#8F8567; --pacc:#E06B37; --pkey:#BCB489;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.5;padding:26px clamp(16px,4vw,54px) 44px;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3cfeFuncA type='table' tableValues='0 0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+header,main,footer{position:relative;z-index:1}
+.wrap{max-width:1260px;margin:0 auto}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);position:relative;margin-bottom:6px}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:-5px;border-bottom:1px solid var(--ink)}
+h1{font-size:clamp(34px,4.2vw,52px);font-weight:500;font-style:italic;letter-spacing:-1px;line-height:.95}
+h1 .tld{color:var(--verm);font-size:.62em}
+.tagser{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.mast-r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink2);line-height:1.9}
+.mast-r b{color:var(--verm);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:34px;align-items:start;padding:30px 0 4px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(22px,2.8vw,32px);font-weight:500;font-style:italic;line-height:1.2}
+.hero h2 em{color:var(--verm)}
+.hero-l p{margin-top:12px;font-size:16px;max-width:660px}
+.ansbox{border:1px solid var(--verm2);border-left:4px solid var(--verm2);border-radius:3px;padding:14px 18px;margin-top:16px;background:rgba(176,58,16,.05);font-size:15px}
+.ansbox b{color:var(--verm);font-weight:600}
+.gram{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.8px;line-height:1.95;padding:15px 17px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B}
+.gram .k{color:var(--pkey)} .gram .v{color:var(--pacc)} .gram .c{color:var(--pdim)}
+section{margin-top:50px}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--verm);letter-spacing:1px}
+.stitle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink2)}
+.srule{flex:1;border-top:1px solid var(--line);min-width:24px}
+.smeta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.slede{font-size:16.5px;max-width:920px;margin-bottom:18px}
+.mtx{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px}
+.mtx th{text-align:left;font-weight:500;letter-spacing:1px;text-transform:uppercase;font-size:9px;color:var(--ink2);border-bottom:1.5px solid var(--ink);padding:6px 8px}
+.mtx td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.mtx td b{color:var(--verm);font-weight:500}
+/* symulacje */
+.simctl{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.simb{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;background:var(--ink);color:var(--paper);border:none;padding:9px 15px;border-radius:2px;cursor:pointer}
+.simb svg{width:12px;height:12px}
+.simb:hover:not(:disabled){background:var(--verm)}
+.simb.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+.simb.ghost:hover:not(:disabled){color:var(--ink);border-color:var(--ink);background:transparent}
+.simb:disabled{opacity:.4;cursor:default}
+.rtabs{display:flex;border:1px solid var(--line2);border-radius:2px;overflow:hidden;flex-wrap:wrap}
+.rtab{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;border-right:1px solid var(--line);padding:8px 13px;cursor:pointer;color:var(--ink2)}
+.rtab:last-child{border-right:none}
+.rtab.on{background:var(--ink);color:var(--paper)}
+.simgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:920px){.simgrid{grid-template-columns:1fr}}
+.jsonplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.68;padding:14px 16px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;box-shadow:0 0 0 1px #14110B}
+.jsonplate::-webkit-scrollbar{width:8px}
+.jsonplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.jsonplate .k{color:var(--pkey)} .jsonplate .v{color:var(--pacc)} .jsonplate .c{color:#7E755B;font-style:italic}
+textarea.jin{width:100%;min-height:120px;background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;padding:12px 14px;border-radius:3px;border:1px solid #3A3422;resize:vertical}
+textarea.jin:focus{outline:none;border-color:var(--pacc)}
+.cmdplate{background:var(--plate);color:var(--pkey);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.8;padding:12px 14px;border-radius:3px;white-space:pre-wrap;word-break:break-word;box-shadow:0 0 0 1px #14110B;margin-bottom:12px}
+.cmdplate .ps{color:var(--pacc)} .cmdplate b{color:var(--pacc);font-weight:400}
+.exitrow{display:flex;align-items:baseline;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.exitrow .ok{color:var(--olive)} .exitrow .err{color:var(--verm2)}
+.term{background:var(--plate);border-radius:3px;color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;display:flex;flex-direction:column;height:250px;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.termhead{color:var(--pdim);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border-bottom:1px solid #3A3422;padding:9px 14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+.termhead b{color:var(--pacc);font-weight:500}
+.termbody{flex:1;overflow-y:auto;padding:10px 14px}
+.termbody::-webkit-scrollbar{width:7px}
+.termbody::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.tl{white-space:pre-wrap;word-break:break-word;color:var(--ptext)}
+.tl .v{color:var(--pacc)} .tl .dim{color:var(--pdim)} .tl .ok{color:#C9BE8B} .tl .err{color:#E0714A} .tl .cmd{color:var(--pkey)}
+.tl.enter{animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0}}
+/* binding explorer */
+.brow{display:flex;align-items:baseline;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;flex-wrap:wrap}
+.brow:hover{background:var(--paper2)}
+.brow.on{background:var(--paper2);box-shadow:inset 3px 0 0 var(--verm)}
+.brow .bu{flex:1;min-width:220px}
+.brow .bd{color:var(--ink2)}
+.brow .bv{color:var(--olive);flex:none}
+.brow .bim{font-size:9px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line);color:#A79D82;padding:1px 6px;border-radius:2px;flex:none}
+/* pliki */
+.ftabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ftab{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:6px 12px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.ftab .fdot{width:6px;height:6px;border-radius:50%;background:var(--olive)}
+.ftab.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.62;padding:16px 18px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.fplate::-webkit-scrollbar{width:8px}
+.fplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.fplate .c{color:#7E755B;font-style:italic}
+.fplate .k{color:var(--pacc);font-weight:600}
+.fplate .yk{color:var(--pkey)}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ibtn{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--line2);border-radius:2px;padding:6px 11px;cursor:pointer;color:var(--ink2)}
+.ibtn:hover{color:var(--ink);border-color:var(--ink)}
+.ibtn svg{width:12px;height:12px}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
+#toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <h1>taskand<span class="tld">.com</span></h1>
+      <p class="tagser">v0.13 · proc:// — standard URI-procesów · wykonanie poza HTTP · niezależność od runtime</p>
+    </div>
+    <div class="mast-r">
+      URI = tożsamość procesu · binding = <b>jak</b> wykonać (node/docker/make/remote)<br>
+      katalog z hashami · git: <b>obserwacja ≠ wykonanie ≠ publikacja</b> · fail-closed: JSON stdin → JSON stdout
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-l">
+      <h2>Przejmuję z Twojego uriprocess to, czego taskand potrzebował od początku: <em>URI jako tożsamość procesu, nie adres usługi.</em></h2>
+      <p>Nowy schemat <b>proc://&lt;organizacja&gt;/&lt;ścieżka&gt;/&lt;wersja&gt;</b> adresuje <b>wykonywalną zdolność</b>, nie kontener: proces ma standardowy wpis (<span style="font-family:'JetBrains Mono',monospace;font-size:.85em">bin.mjs</span>: JSON na stdin → JSON na stdout, kody wyjścia 0/1/2, fail-closed), a <b>binding</b> deklaruje, jak go uruchomić w dowolnym runtime — node, docker, make, ssh. Katalog z hashami (jak Twój <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">native-catalog.json</span>) trzyma rewizje git i digesty; obserwacja dokładnej rewizji (<span style="font-family:'JetBrains Mono',monospace;font-size:.85em">make observe</span>) jest <b>osobnym uprawnieniem</b> od wykonania (<span style="font-family:'JetBrains Mono',monospace;font-size:.85em">make run</span>) i publikacji.</p>
+      <div class="ansbox">
+        <b>Dlaczego to rozwiązuje ewolucję runtime:</b> dziś taskand wykonuje zdolności przez Dockerfile — jutro może przez WASM, zdalnych runnerów albo natywne pakiety. Z <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">proc://</span> zmiana runtime'u to <b>dopisanie wiersza w bindingu</b>: wywołujący (koperty, router /route z v0.12, supervisor) nie zmienia ani jednej linijki. Spróbuj w sekcji 02: ten sam URI, ten sam JSON — pięć runtime'ów (w tym „przyszły”).
+      </div>
+    </div>
+    <div>
+      <div class="gram"><span class="k">proc</span>://<span class="v">taskand.dev</span>/<span class="k">extract/contacts</span>/<span class="v">v1</span>
+  <span class="c">↑ scheme    ↑ organizacja   ↑ zdolność      ↑ wersja</span>
+  <span class="c">katalog: proc/extract/contacts/taskand.dev/v1/  (URI = ścieżka)</span>
+
+<span class="k">standard wykonania (poza HTTP, każdy runtime):</span>
+  <span class="v">printf '%s' "$JSON" | &lt;runtime&gt; proc/…/bin.mjs</span>
+  <span class="c">stdin: JSON (kontrakt in) → stdout: JSON (kontrakt out)</span>
+  <span class="c">exit 0 ok · 1 fail-closed · 2 naruszenie kontraktu</span>
+
+<span class="k">od uriprocess przejmuję:</span>
+  <span class="c">· URI → katalog (poa://… ↔ proc://…)</span>
+  <span class="c">· native-catalog.json → proc-catalog.json (hashe+rewizje)</span>
+  <span class="c">· make z jawnych argumentów (SRC/BUILDER/OUT)</span>
+  <span class="c">· Guard: obserwacja git bez prawa wykonania</span>
+  <span class="c">· fail-closed + piny rewizji (immutable)</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="shead"><span class="snum">01</span><span class="stitle">od uriprocess do taskand — tabela przejęć</span><span class="srule"></span><span class="smeta">co biorę 1:1 · co adaptuję</span></div>
+  <p class="slede">Twoje pojęcia mapują się na taskand niemal bezpośrednio; tam, gdzie się różnimy, różnimy się celowo (taskand ma granty i twin — one wchodzą do bindingu).</p>
+  <table class="mtx">
+    <thead><tr><th>uriprocess (Twoje)</th><th>taskand v0.13</th><th>uwaga</th></tr></thead>
+    <tbody>
+      <tr><td><b>poa://subactor.com/process/…/v1</b></td><td><b>proc://taskand.dev/…/v1</b></td><td>schemat proc:// = wykonywalna zdolność (URI=tożsamość, nie URL)</td></tr>
+      <tr><td>URI → katalog pakietu</td><td>proc/&lt;ścieżka&gt;/&lt;org&gt;/&lt;wersja&gt;/</td><td>1:1 — URI jest ścieżką na dysku i w repo</td></tr>
+      <tr><td><b>bin.mjs</b> + JSON stdin</td><td>bin.mjs + kody 0/1/2 (fail-closed)</td><td>1:1 — standardowy wpis procesu</td></tr>
+      <tr><td><b>native-catalog.json</b> (hashe, trasy)</td><td><b>proc-catalog.json</b></td><td>1:1 + weryfikacja: <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">make verify</span></td></tr>
+      <tr><td><b>make test-all / pack</b> (jawne SRC/BUILDER/OUT)</td><td>Makefile.standard: test · pack · verify · <b>run · observe · extract</b></td><td>dodaję run/observe — rozdział uprawnień</td></tr>
+      <tr><td><b>Guard</b>: obserwacja dokładnej rewizji git, bez prawa wykonania/publikacji</td><td>grant <b>observe</b> ≠ grant <b>run</b> ≠ grant <b>pack/publish</b></td><td>1:1 — i wprost w grants z v0.5+</td></tr>
+      <tr><td>urirun-connector (natywne pakiety, scope URI)</td><td>binding: runtimes[] — node/docker/make/remote</td><td>adapter wybiera runtime; natywne = kolejny wiersz</td></tr>
+      <tr><td>immutable runtime commit</td><td>git.rev w bindingu + ewolucja = <b>nowy URI (v2)</b></td><td>jak parallel-major z v0.11 — v1 pozostaje</td></tr>
+      <tr><td>offline install check w dist/</td><td>pack → dist/ + weryfikacja archiwum</td><td>1:1</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><span class="stitle">symulacja · jeden URI, dowolny runtime — żywe wykonanie</span><span class="srule"></span><span class="smeta">proces DZIAŁA tutaj (ta sama logika co bin.mjs)</span></div>
+  <p class="slede">Proces <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">proc://taskand.dev/extract/contacts/v1</span> wykonywany naprawdę (w przeglądarce — identyczna logika jak plik bin.mjs do pobrania). Zmień wejście, przełącz runtime: <b>polecenie fizyczne się zmienia, kontrakt wywołania nie</b> — URI + JSON na wejściu, JSON na wyjściu, exit code. Ostatnia zakładka to slot na runtime, którego dziś nie ma.</p>
+  <div class="simgrid">
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">wejście (stdin) — edytowalne</div>
+      <textarea class="jin" id="procIn">{
+  "documents": [
+    { "id": "doc-1", "text": "Jan Kowalski, kontakt: jan.kowalski@firma.pl, tel. 600-100-200" },
+    { "id": "doc-2", "text": "Anna Wiśniewska — a.wisniewska@corp.example.com (sprzedaż)" },
+    { "id": "doc-3", "text": "bez adresu, tylko podpis: Piotr Zając" }
+  ]
+}</textarea>
+      <div class="rtabs" id="rtabs" style="margin-top:12px">
+        <button class="rtab on" data-rt="node">node</button>
+        <button class="rtab" data-rt="docker">docker</button>
+        <button class="rtab" data-rt="make">make</button>
+        <button class="rtab" data-rt="remote">ssh (remote)</button>
+        <button class="rtab" data-rt="wasm">wasm (przyszły)</button>
+      </div>
+      <div class="cmdplate" id="cmdPlate"></div>
+      <div class="simctl">
+        <button class="simb" id="procRun"><i data-lucide="play"></i> wykonaj (stdin → proces → stdout)</button>
+      </div>
+      <div class="exitrow" id="exitRow" hidden></div>
+    </div>
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px">stdout (kontrakt out) — identyczny w KAŻDYM runtime</div>
+      <div class="jsonplate" id="procOut" style="max-height:300px"><span class="c">// wynik pojawi się po wykonaniu</span></div>
+      <div class="jsonplate" id="bindOut" style="max-height:180px;margin-top:12px"><span class="c">// binding (proc-catalog.json) — skąd runtime wie, jak uruchomić</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><span class="stitle">eksplorator bindingów — URI → katalog → manifest → hashe</span><span class="srule"></span><span class="smeta">proc-catalog.json</span></div>
+  <p class="slede">Kliknij wpis: zobacz katalog pakietu (URI = ścieżka), manifest <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">proc.yaml</span> i wpis do katalogu z hashami. Zwróć uwagę na <b>summarize v1/v2</b> — wersje współistnieją, stara pozostaje immutable (jak parallel-major koperty z v0.11).</p>
+  <div class="simgrid">
+    <div id="bindList"></div>
+    <div>
+      <div class="gram" id="bindTree"></div>
+      <div class="jsonplate" id="bindYaml" style="margin-top:12px;max-height:300px"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">04</span><span class="stitle">symulacja · kontrola git — observe ≠ run ≠ pack (rozdział uprawnień)</span><span class="srule"></span><span class="smeta">jak Twój Guard: obserwacja bez prawa wykonania</span></div>
+  <p class="slede">Trzy operacje na tym samym procesie: <b>observe</b> (odczyt dokładnej rewizji z git — zero prawa wykonania), <b>run</b> (wykonanie — osobny grant, fail-closed), <b>pack</b> (archiwum do dist/ + hashe do katalogu — trzecie uprawnienie). To wprost Twoja zasada „grants no execution or publication authority”.</p>
+  <div class="simctl">
+    <button class="simb ghost" id="mkObserve"><i data-lucide="eye"></i> make observe REV=e3f1a9c</button>
+    <button class="simb" id="mkRun"><i data-lucide="play"></i> make run URI=… IN=in.json</button>
+    <button class="simb ghost" id="mkPack"><i data-lucide="package"></i> make pack</button>
+  </div>
+  <div class="term">
+    <div class="termhead"><span>Makefile.standard — trzy uprawnienia, trzy targety</span><span id="mkStat">—</span></div>
+    <div class="termbody" id="mkBody"></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">05</span><span class="stitle">pliki do pobrania — standard proc:// dla taskand</span><span class="srule"></span><span class="smeta">v0.13</span></div>
+  <p class="slede">Realna zawartość: manifest bindingu (gramatyka runtimes), standardowy wpis procesu (bin.mjs — Node ≥22, fail-closed), obowiązkowy Makefile każdej paczki procesu, katalog z hashami i adapter routera v0.12 (URI → binding → wykonanie).</p>
+  <div class="frow">
+    <div class="ftabs" id="ftabs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ibtn" id="fCopy"><i data-lucide="copy"></i> kopiuj</button>
+      <button class="ibtn" id="fDl"><i data-lucide="download"></i> pobierz plik</button>
+      <button class="ibtn" id="fBundle"><i data-lucide="package"></i> pobierz standard</button>
+    </div>
+  </div>
+  <div class="fplate" id="fplate"></div>
+</section>
+
+</main>
+<footer>
+taskand.com v0.13 · proc:// = wykonywalna zdolność: URI (tożsamość) + binding (runtimes: node/docker/make/remote) + katalog z hashami + git (obserwacja ≠ wykonanie ≠ publikacja) + fail-closed (JSON stdin → JSON stdout, exit 0/1/2)<br>
+symulacja w sekcji 02 wykonuje proces naprawdę w przeglądarce (ta sama logika co bin.mjs); runtime wasm to slot demonstracyjny; pliki z sekcji 05 realne — koncepcje przejęte z uriprocess: URI→katalog, catalog.json, jawne argumenty make, Guard-observe, immutable rewizje
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const hsh = n => Array.from({length:n}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function dl(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function hlJson(obj){
+  return esc(typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2))
+    .replace(/"([^"]+)":/g, '"<span class="k">$1</span>":')
+    .replace(/: "([^"]*)"/g, ': "<span class="v">$1</span>"');
+}
+function hlY(txt){
+  return txt.split('\n').map(l => {
+    let e = esc(l);
+    if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    return e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+  }).join('\n');
+}
+
+/* ————— 02 · proces: prawdziwa logika (lustrzana do bin.mjs) ————— */
+const PROC_URI = 'proc://taskand.dev/extract/contacts/v1';
+const PROC_DIR = 'proc/extract/contacts/taskand.dev/v1';
+const BINDING = {
+  uri: PROC_URI, dir: PROC_DIR,
+  interface: { stdin:'urn:taskand:schema:extract-in:v1', stdout:'urn:taskand:schema:contacts:v1' },
+  git: { rev:'e3f1a9c', immutable:true, observation:'read-only (bez prawa wykonania)' },
+  runtimes: [
+    { kind:'node', bin:'bin.mjs', engines:'>=22', pack:{ out:'dist/', offlineCheck:true } },
+    { kind:'docker', file:'Dockerfile', digest:'sha256:' + hsh(12) + '…', invocation:'docker run -i --rm <image>' },
+    { kind:'make', targets:['test','pack','verify','run','observe','extract'] },
+    { kind:'remote', via:'ssh://runner.taskand', sameInterface:true }
+  ],
+  grants: { observe:['read-git'], run:['execute-proc'], pack:['package-proc'] }
+};
+function runExtract(input){
+  // identyczna semantyka jak bin.mjs (fail-closed, kody 0/1/2)
+  if(!input || !Array.isArray(input.documents)) return { exit:2, err:'brak tablicy documents' };
+  const contacts = [];
+  for(const d of input.documents){
+    const text = String(d.text || '');
+    const emails = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/g) || [];
+    const name = (text.match(/([A-ZÀ-Ż][a-zà-ż]+ [A-ZÀ-Ż][a-zà-ż]+)/) || [])[1] || null;
+    emails.forEach(e => contacts.push({ source:d.id, name, email:e }));
+  }
+  return { exit:0, out:{ contacts, count:contacts.length } };
+}
+const RUNTIME_CMD = {
+  node: inJson => `printf '%s' '${inJson.replace(/'/g, "'\\''")}' | node ${PROC_DIR}/bin.mjs`,
+  docker: inJson => `printf '%s' '…' | docker run -i --rm taskand/extract-contacts@${BINDING.runtimes[1].digest}`,
+  make: () => `make run URI=${PROC_URI} IN=in.json OUT=out.json`,
+  remote: () => `ssh runner.taskand 'node ${PROC_DIR}/bin.mjs' < in.json`,
+  wasm: () => `wasmtime run dist/extract-contacts.wasm < in.json   # runtime przyszłości: slot w bindingu`
+};
+let curRt = 'node';
+function renderRt(){
+  document.querySelectorAll('.rtab').forEach(b => b.classList.toggle('on', b.dataset.rt === curRt));
+  let inJson = '';
+  try{ inJson = JSON.stringify(JSON.parse($('#procIn').value)); }catch(e){ inJson = '…'; }
+  const cmd = RUNTIME_CMD[curRt](curRt === 'node' || curRt === 'docker' ? (inJson.length > 40 ? inJson.slice(0, 40) + '…' : inJson) : '');
+  $('#cmdPlate').innerHTML = `<span class="ps">‹host›</span> ${esc(cmd)}\n<span style="color:var(--pdim)"># stdin: JSON → stdout: JSON · exit 0 ok · 1 fail-closed · 2 kontrakt</span>`;
+  $('#bindOut').innerHTML = hlJson({
+    uri: BINDING.uri, dir: BINDING.dir, 'git.rev': BINDING.git.rev,
+    runtimes: BINDING.runtimes.map(r => r.kind), 'wybrany': curRt === 'wasm' ? 'wasm (slot — dopisz w bindingu)' : curRt
+  });
+}
+document.querySelectorAll('.rtab').forEach(b => b.onclick = () => { curRt = b.dataset.rt; renderRt(); });
+ $('#procIn').addEventListener('input', renderRt);
+ $('#procRun').addEventListener('click', () => {
+  let input;
+  try{ input = JSON.parse($('#procIn').value); }
+  catch(e){
+    $('#exitRow').hidden = false;
+    $('#exitRow').innerHTML = `<span>exit</span><span class="err">2 — wejście nie jest JSON (naruszenie kontraktu)</span>`;
+    $('#procOut').innerHTML = '<span class="c">// fail-closed: proces nie ruszył</span>';
+    toast('exit 2 — naruszenie kontraktu wejścia');
+    return;
+  }
+  const r = runExtract(input);
+  const row = $('#exitRow'); row.hidden = false;
+  if(r.exit === 0){
+    row.innerHTML = `<span>exit</span><span class="ok">0 — ok (runtime: ${curRt}${curRt === 'wasm' ? ' — slot' : ''})</span><span style="color:var(--ink2)">· stdout: kontrakt contacts:v1 ✓</span>`;
+    $('#procOut').innerHTML = hlJson(r.out);
+    toast(`wykonano przez ${curRt} — ${r.out.count} kontakt(ów), identyczny wynik jak w każdym runtime`);
+  } else {
+    row.innerHTML = `<span>exit</span><span class="err">${r.exit} — ${esc(r.err)}</span>`;
+    $('#procOut').innerHTML = '<span class="c">// fail-closed</span>';
+  }
+});
+
+/* ————— 03 · eksplorator bindingów ————— */
+const CATALOG = [
+  { uri: PROC_URI, dir: PROC_DIR, rev:'e3f1a9c', v:'v1', imm:true, note:'wyodrębnianie kontaktów z dokumentów' },
+  { uri:'proc://taskand.dev/summarize/hourly/v1', dir:'proc/summarize/hourly/taskand.dev/v1', rev:'c7d2e01', v:'v1', imm:true, note:'streszczenie godzinowe (stara wersja — zastąpiona)' },
+  { uri:'proc://taskand.dev/summarize/hourly/v2', dir:'proc/summarize/hourly/taskand.dev/v2', rev:'9b4f3aa', v:'v2', imm:true, note:'streszczenie godzinowe (UTF-8 + limit — WSPÓŁISTNIEJE z v1)' },
+  { uri:'proc://taskand.dev/git/observe-exact/v1', dir:'proc/git/observe-exact/taskand.dev/v1', rev:'51ac8be', v:'v1', imm:true, note:'obserwacja dokładnej rewizji (Guard — bez prawa wykonania)' },
+  { uri:'proc://taskand.dev/web/deploy/v1', dir:'proc/web/deploy/taskand.dev/v1', rev:'2f90c33', v:'v1', imm:true, note:'wdrożenie paczki web (przez supervisora)' }
+];
+let selBind = 0;
+function renderBindList(){
+  const el = $('#bindList'); el.innerHTML = '';
+  CATALOG.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'brow' + (i === selBind ? ' on' : '');
+    d.innerHTML = `<span class="bu">${esc(b.uri)}</span><span class="bd">${esc(b.dir)}</span>
+      <span class="bv">@${b.rev}</span>${b.v === 'v1' && b.uri.includes('summarize') ? '<span class="bim">immutable</span>' : '<span class="bim">immutable</span>'}`;
+    d.onclick = () => { selBind = i; renderBindList(); renderBindDetail(); };
+    el.appendChild(d);
+  });
+}
+function renderBindDetail(){
+  const b = CATALOG[selBind];
+  const files = ['proc.yaml', 'bin.mjs', 'test.mjs', 'Dockerfile'];
+  $('#bindTree').innerHTML = `<span class="k">${esc(b.dir)}/</span>   <span class="c">← URI = ścieżka (@${b.rev}, immutable)</span>\n` +
+    files.map(f => `├── ${esc(f)}   <span class="c">${f === 'bin.mjs' ? 'standardowy wpis: JSON→JSON' : f === 'proc.yaml' ? 'binding: runtimes' : f === 'test.mjs' ? 'testy kontraktu (upstream)' : 'realizacja docker'}</span>`).join('\n') +
+    `\n└── dist/      <span class="c">(pack: archiwum + offline check)</span>`;
+  const entry = {
+    uri: b.uri, dir: b.dir,
+    git: { rev: b.rev, immutable: true, observation: 'read-only — bez prawa wykonania/publikacji' },
+    hashes: { 'bin.mjs':'sha256:' + hsh(8) + '…', 'proc.yaml':'sha256:' + hsh(8) + '…', 'Dockerfile':'sha256:' + hsh(8) + '…' },
+    runtimes: ['node>=22', 'docker', 'make', 'remote'],
+    interface: { stdin:'urn:taskand:schema:…:v1', stdout:'urn:taskand:schema:…:v1' },
+    grants: { observe:['read-git'], run:['execute-proc'], pack:['package-proc'] }
+  };
+  if(b.uri.includes('v2')){ entry.replaces = b.uri.replace('/v2', '/v1'); entry.coexists = true; }
+  $('#bindYaml').innerHTML = hlJson(entry);
+}
+
+/* ————— 04 · observe ≠ run ≠ pack ————— */
+async function mkLog(html, cls){
+  const d = document.createElement('div'); d.className = 'tl ' + (cls || '') + ' enter';
+  d.innerHTML = html;
+  const b = $('#mkBody'); b.appendChild(d); b.scrollTop = b.scrollHeight;
+  await sleep(200);
+}
+ $('#mkObserve').addEventListener('click', async () => {
+  $('#mkStat').textContent = 'observe';
+  await mkLog(`<span class="v">‹host›</span> make observe URI=${PROC_URI} REV=e3f1a9c`);
+  await mkLog(`<span class="dim"># grant: observe (read-git) — BEZ prawa wykonania ani publikacji (jak Guard)</span>`);
+  await mkLog(`<span class="cmd">$ git show e3f1a9c:${PROC_DIR}/proc.yaml | head -8</span>`);
+  await mkLog(`uri: ${PROC_URI}\ninterface: { stdin: extract-in:v1, stdout: contacts:v1 }\ngit: { rev: e3f1a9c, immutable: true, observation: read-only }\nruntimes: [node, docker, make, remote]`);
+  await mkLog(`<span class="ok">‹observe›</span> obserwowano DOKŁADNĄ rewizję — zero wykonania, zero publikacji</span>`, 'ok');
+  toast('observe ✓ — obserwacja rewizji bez prawa wykonania');
+});
+ $('#mkRun').addEventListener('click', async () => {
+  $('#mkStat').textContent = 'run';
+  await mkLog(`<span class="v">‹host›</span> make run URI=${PROC_URI} IN=in.json OUT=out.json`);
+  await mkLog(`<span class="dim"># grants: execute-proc ✓ (osobny od observe!) · runtime: node (pierwszy z bindingu)</span>`);
+  const input = (() => { try{ return JSON.parse($('#procIn').value); }catch(e){ return null; } })();
+  const r = runExtract(input);
+  if(r.exit !== 0){
+    await mkLog(`<span class="err">‹proc›</span> exit ${r.exit} — ${esc(r.err || 'fail-closed')}</span>`, 'err');
+    return;
+  }
+  await mkLog(`<span class="cmd">$ cat in.json | node ${PROC_DIR}/bin.mjs > out.json; echo $? → 0</span>`);
+  await mkLog(`<span class="ok">‹proc›</span> exit 0 · stdout: ${r.out.count} kontakt(ów) — kontrakt contacts:v1 ✓</span>`, 'ok');
+  toast('run ✓ — wykonanie z grantem execute-proc (fail-closed zachowany)');
+});
+ $('#mkPack').addEventListener('click', async () => {
+  $('#mkStat').textContent = 'pack';
+  await mkLog(`<span class="v">‹host›</span> make pack URI=${PROC_URI}`);
+  await mkLog(`<span class="dim"># grants: package-proc (trzecie uprawnienie — nie execute, nie observe)</span>`);
+  await mkLog(`npm pack ${PROC_DIR} --pack-destination dist/`);
+  await mkLog(`dist/taskand-extract-contacts-v1.tgz   <span class="dim">(offline install check: tar -tzf ✓)</span>`);
+  await mkLog(`<span class="ok">‹pack›</span> hashe dopisane do proc-catalog.json · make verify potwierdzi</span>`, 'ok');
+  toast('pack ✓ — archiwum + offline check + hashe do katalogu');
+});
+
+/* ————— 05 · pliki ————— */
+const PROC_YAML = `apiVersion: taskand.dev/v1alpha1
+kind: ProcBinding
+# standard URI-procesów: URI = tożsamość; binding = jak wykonać w KAŻDYM runtime
+# ewolucja runtime = dopisanie wiersza w runtimes[] — wywołujący się nie zmienia
+uri: proc://taskand.dev/extract/contacts/v1
+dir: proc/extract/contacts/taskand.dev/v1     # URI = ścieżka
+interface:
+  stdin:  urn:taskand:schema:extract-in:v1    # JSON na wejściu (kontrakt)
+  stdout: urn:taskand:schema:contacts:v1      # JSON na wyjściu
+  exit: { 0: ok, 1: fail-closed, 2: naruszenie-kontraktu }
+git:
+  rev: e3f1a9c…                                # dokładna rewizja — IMMUTABLE
+  observation: read-only                       # bez prawa wykonania ani publikacji
+runtimes:                                      # wykonanie POZA http — adapter wybiera
+  - kind: node
+    bin: bin.mjs
+    engines: ">=22"
+    pack: { out: dist/, offlineCheck: true }
+  - kind: docker
+    file: Dockerfile
+    digest: sha256:…                           # przypięty — nigdy :latest
+    invocation: "docker run -i --rm <image>"
+  - kind: make
+    targets: [test, pack, verify, run, observe, extract]
+  - kind: remote
+    via: "ssh://runner.taskand"
+    sameInterface: true                        # ten sam kontrakt stdin→stdout
+evolution:
+  mode: parallel-version                       # zmiana = NOWY URI (v2); v1 immutable
+  catalog: proc-catalog.json                   # hashe+rewizje · weryfikacja: make verify
+grants:                                        # rozdział uprawnień (jak Guard)
+  observe: [read-git]
+  run: [execute-proc]
+  pack: [package-proc]
+`;
+const BIN_MJS = `#!/usr/bin/env node
+// proc://taskand.dev/extract/contacts/v1 — standardowy wpis procesu
+// kontrakt: JSON na stdin → JSON na stdout · exit 0 ok · 1 fail-closed · 2 kontrakt
+import { readFileSync } from 'node:fs';
+
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.stderr.write('wejście nie jest JSON\\n'); process.exit(2); }
+if (!input || !Array.isArray(input.documents)) {
+  process.stderr.write('brak tablicy documents\\n'); process.exit(2);
+}
+try {
+  const contacts = input.documents.flatMap(d => {
+    const text = String(d.text || '');
+    const emails = text.match(/[\\w.+-]+@[\\w-]+\\.[\\w.-]+/g) || [];
+    const name = (text.match(/([A-ZÀ-Ż][a-zà-ż]+ [A-ZÀ-Ż][a-zà-ż]+)/) || [])[1] || null;
+    return emails.map(e => ({ source: d.id, name, email: e }));
+  });
+  process.stdout.write(JSON.stringify({ contacts, count: contacts.length }, null, 2));
+  process.exit(0);
+} catch (e) {
+  process.stderr.write('fail-closed: ' + e.message + '\\n'); process.exit(1);
+}
+`;
+const MAKEFILE_STD = `# taskand · Makefile.standard — OBOWIĄZKOWE targety każdej paczki procesu (proc://)
+# zasady (z uriprocess): jawne argumenty (SRC/BUILDER/OUT) · brak ukrytego stanu · fail-closed
+SHELL := /bin/sh
+URI ?= proc://taskand.dev/extract/contacts/v1
+IN  ?= in.json
+OUT ?= out.json
+DIR  = $(shell echo $(URI) | sed 's|proc://\\([^/]*\\)/\\(.*\\)/\\(v[0-9]*\\)$$|\\2/\\1/\\3|')
+
+.PHONY: test pack verify run observe extract
+
+test: ## testy kontraktu (upstream zachowany) — fail-closed
+    node $(DIR)/test.mjs
+
+pack: ## archiwum → dist/ + sprawdzenie instalacji OFFLINE (grants: package-proc)
+    npm pack $(DIR) --pack-destination dist/ 2>/dev/null \\
+      || tar -czf dist/$(notdir $(DIR)).tgz $(DIR)
+    tar -tzf dist/*.tgz >/dev/null && echo "pack ✓ (offline install check)"
+
+verify: ## hashe plików vs proc-catalog.json
+    @node verify-catalog.mjs && echo "catalog ✓ (hashe zgodne)"
+
+run: ## WYKONAJ (grants: execute-proc) — make run URI=… IN=in.json
+    @cat $(IN) | node $(DIR)/bin.mjs > $(OUT); echo "exit: $$?"
+
+observe: ## obserwacja git DOKŁADNEJ rewizji (grants: read-git — bez wykonania)
+    @git show $(REV):$(DIR)/proc.yaml
+
+extract: ## ekstrakcja z immutable commitu — jawne SRC/BUILDER/OUT
+    @test -n "$(SRC)" -a -n "$(BUILDER)" -a -n "$(OUT)" \\
+      || { echo 'extract wymaga SRC= BUILDER= OUT='; exit 2; }
+    @uripack extract --src $(SRC) --builder $(BUILDER) --out $(OUT) --catalog proc-catalog.json
+`;
+const CATALOG_JSON = `{
+  "version": 1,
+  "generated": "…",
+  "bindings": [
+    {
+      "uri": "proc://taskand.dev/extract/contacts/v1",
+      "dir": "proc/extract/contacts/taskand.dev/v1",
+      "git": { "rev": "e3f1a9c", "immutable": true },
+      "hashes": { "bin.mjs": "sha256:ab12…", "proc.yaml": "sha256:cd34…", "Dockerfile": "sha256:ef56…" },
+      "runtimes": ["node>=22", "docker", "make", "remote"],
+      "interface": { "stdin": "urn:taskand:schema:extract-in:v1", "stdout": "urn:taskand:schema:contacts:v1" },
+      "grants": { "observe": ["read-git"], "run": ["execute-proc"], "pack": ["package-proc"] }
+    },
+    {
+      "uri": "proc://taskand.dev/summarize/hourly/v2",
+      "dir": "proc/summarize/hourly/taskand.dev/v2",
+      "git": { "rev": "9b4f3aa", "immutable": true },
+      "replaces": "proc://taskand.dev/summarize/hourly/v1",
+      "coexists": true,
+      "hashes": { "bin.mjs": "sha256:9a8b…" },
+      "runtimes": ["node>=22", "docker"]
+    }
+  ]
+}
+`;
+const ROUTE_ADAPTER = `# rozszerzenie routera v0.12: proc:// → binding (nie URL!)
+# wywołujący (koperta, supervisor, make) widzi ZAWSZE: URI + JSON → JSON
+import json, subprocess, pathlib
+CATALOG = json.loads(pathlib.Path("proc-catalog.json").read_text())
+BIND = { b["uri"]: b for b in CATALOG["bindings"] }
+
+def route(uri):
+    if uri.startswith("proc://"):
+        b = BIND.get(uri)
+        if not b: return {"error": "nieznany proces", "discovery": "proc-catalog.json"}
+        return {"uri": uri, "kind": "proc", "resolved": b}   # ← binding, nie URL
+    # …pozostałe schematy z v0.12 (urn:taskand:*, artifact:…)
+
+def run(uri, input_path, runtime="auto"):
+    b = route(uri)["resolved"]
+    # GRANTY przed wykonaniem (execute-proc — osobno od observe!)
+    kinds = [r["kind"] for r in b["runtimes"]]
+    rt = runtime if runtime in kinds else kinds[0]     # auto = pierwszy dostępny
+    cmd = {
+        "node":   ["node", b["dir"] + "/bin.mjs"],
+        "docker": ["docker", "run", "-i", "--rm", "taskand/" + uri.split("/")[-2:][0]],
+        "make":   ["make", "run", f"URI={uri}", f"IN={input_path}"],
+    }[rt]
+    out = subprocess.run(cmd, stdin=open(input_path), capture_output=True)
+    return {"uri": uri, "runtime": rt, "exit": out.returncode,
+            "stdout": out.stdout.decode(), "failClosed": out.returncode != 0}
+# zmiana runtime w przyszłości (wasm, zdalni runnerzy, natywne pakiety):
+# dopisz wiersz w bindingu — run() i wywołujący pozostają bez zmian
+`;
+const FILES = [
+  {id:'py', name:'schemas/proc.binding.yaml', get:() => PROC_YAML, lang:'yaml'},
+  {id:'bin', name:'proc/extract/contacts/taskand.dev/v1/bin.mjs', get:() => BIN_MJS, lang:'js'},
+  {id:'mk', name:'Makefile.standard', get:() => MAKEFILE_STD, lang:'make'},
+  {id:'cat', name:'proc-catalog.json', get:() => CATALOG_JSON, lang:'json'},
+  {id:'rt', name:'supervisor/route-proc.py', get:() => ROUTE_ADAPTER, lang:'py'}
+];
+let curFile = 'py';
+function hl(txt, lang){
+  return txt.split('\n').map(line => {
+    let e = esc(line);
+    if(/^\s*#/.test(e) || /^\s*\/\//.test(e)) return `<span class="c">${e}</span>`;
+    if(lang === 'make'){
+      e = e.replace(/^([a-zA-Z_-]+)(:)/, '<span class="k">$1</span>$2');
+    } else if(lang === 'yaml'){
+      e = e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+    } else if(lang === 'json'){
+      e = e.replace(/^(\s*"[^"]+")(\s*:)/, '<span class="yk">$1</span>$2');
+    } else if(lang === 'py' || lang === 'js'){
+      e = e.replace(/^(\s*)(def|return|import|from|if|for|let|const|try|catch|process|class)(\b)/, '$1<span class="k">$2</span>$3');
+    }
+    return e;
+  }).join('\n');
+}
+function renderFiles(){
+  const tabs = $('#ftabs'); tabs.innerHTML = '';
+  FILES.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftab' + (f.id === curFile ? ' on' : '');
+    b.innerHTML = `<span class="fdot"></span>${f.name}`;
+    b.onclick = () => { curFile = f.id; renderFiles(); };
+    tabs.appendChild(b);
+  });
+  const f = FILES.find(x => x.id === curFile);
+  $('#fplate').innerHTML = hl(f.get(), f.lang);
+}
+ $('#fCopy').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); navigator.clipboard.writeText(f.get()).then(() => toast('skopiowano ' + f.name)); });
+ $('#fDl').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); dl(f.name.split('/').pop(), f.get()); toast('pobrano ' + f.name); });
+ $('#fBundle').addEventListener('click', () => {
+  dl('taskand-v13-proc-standard.bundle',
+`# taskand v0.13 — standard proc:// (URI-procesy: wykonanie poza HTTP) · ${new Date().toLocaleString('pl-PL')}
+# koncepcje z uriprocess: URI→katalog · catalog.json z hashami · jawne argumenty make
+#   · obserwacja git bez prawa wykonania (Guard) · fail-closed · immutable rewizje
+# dodane przez taskand: grants w bindingu · runtimes[] jako lista adapterów ·
+#   ewolucja = parallel-version (jak major koperty) · integracja z /route v0.12
+
+--- schemas/proc.binding.yaml ---
+ ${PROC_YAML}
+--- proc/extract/contacts/taskand.dev/v1/bin.mjs ---
+ ${BIN_MJS}
+--- Makefile.standard ---
+ ${MAKEFILE_STD}
+--- proc-catalog.json ---
+ ${CATALOG_JSON}
+--- supervisor/route-proc.py ---
+ ${ROUTE_ADAPTER}
+`);
+  toast('pobrano standard proc:// (5 plików)');
+});
+
+/* ————— start ————— */
+renderRt(); renderBindList(); renderBindDetail(); renderFiles();
+mkLog(`<span class="dim"># trzy uprawnienia, trzy targety — observe (read-git) · run (execute-proc) · pack (package-proc)</span>`);
+icons();
+</script>
+</body>
+</html>

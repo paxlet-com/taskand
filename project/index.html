@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<!-- generated in 0.00s -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>code2llm Analysis Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --border: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --error: #ef4444;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-muted: #64748b;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .search {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            outline: none;
+        }
+
+        .search input:focus {
+            border-color: var(--accent);
+        }
+
+        .search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .file-group {
+            margin-bottom: 1rem;
+        }
+
+        .file-group-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 0.5rem 0.75rem;
+            font-weight: 600;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-bottom: 0.125rem;
+        }
+
+        .file-item:hover {
+            background: var(--surface-hover);
+        }
+
+        .file-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .file-item.active .file-meta {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-title h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface-hover);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--border);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .content-body {
+            flex: 1;
+            overflow: auto;
+            padding: 1.5rem;
+        }
+
+        /* Welcome */
+        .welcome {
+            max-width: 800px;
+        }
+
+        .welcome h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Content Display */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        }
+
+        .markdown-content {
+            line-height: 1.7;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .markdown-content h1 {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content code {
+            background: var(--surface);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+
+        .markdown-content pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+            margin-left: 0;
+            color: var(--text-muted);
+        }
+
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .markdown-content th {
+            background: var(--surface);
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 0.5rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        /* Mermaid */
+        .mermaid-content {
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .mermaid-content pre {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .sidebar.open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+
+            .file-size {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="header">
+                <h1>🔍 code2llm</h1>
+                <p>Analysis Results Browser</p>
+            </div>
+            <div class="search">
+                <input type="text" id="search" placeholder="Search files..." oninput="filterFiles(this.value)">
+            </div>
+            <div class="file-list" id="fileList">
+                <!-- Files will be rendered here -->
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <div class="content-title">
+                    <span id="contentIcon">📁</span>
+                    <h2 id="contentTitle">Welcome</h2>
+                </div>
+                <div class="content-actions" id="contentActions">
+                    <!-- Actions will be rendered here -->
+                </div>
+            </div>
+            <div class="content-body" id="contentBody">
+                <div class="welcome">
+                    <h2>Analysis Results</h2>
+                    <p>Select a file from the sidebar to view its contents. This interface works on GitHub Pages without any server required.</p>  # noqa: E501
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Stats will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+        const files = [{"name": "calls.png", "rel_path": "calls.png", "path": "calls.png", "size": "98.0KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "compact_flow.png", "rel_path": "compact_flow.png", "path": "compact_flow.png", "size": "11.5KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "flow.png", "rel_path": "flow.png", "path": "flow.png", "size": "17.9KB", "icon": "🖼️", "type": "image", "type_name": "Image", "content": "[Binary file]", "is_subdir": false}, {"name": "README.md", "rel_path": "README.md", "path": "README.md", "size": "9.4KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# code2llm - Generated Analysis Files\n<!-- generated in 0.00s -->\n\nThis directory contains the complete analysis of your project generated by `code2llm`. Each file serves a specific purpose for understanding, refactoring, and documenting your codebase.  # noqa: E501\n\n## 📁 Generated Files Overview\n\nWhen you run `code2llm ./ -f all`, the following files are created:\n\n### 🎯 Core Analysis Files\n\n| File | Format | Purpose | Key Insights |\n|------|--------|---------|--------------|\n| `evolution.toon.yaml` | **YAML** | **📋 Refactoring queue** - Prioritized improvements | 0 refactoring actions needed |\n| `map.toon.yaml` | **YAML** | **🗺️ Structural map + project header** - Modules, imports, exports, signatures, stats, alerts, hotspots, trend | Project architecture overview |\n\n### 🤖 LLM-Ready Documentation\n\n| File | Format | Purpose | Use Case |\n|------|--------|---------|----------|\n| `prompt.txt` | **Text** | **📝 Ready-to-send prompt** - Lists all files with instructions | Attach to LLM conversation as context guide |\n| `context.md` | **Markdown** | **📖 LLM narrative** - Architecture summary | Paste into ChatGPT/Claude for code analysis |\n\n### 📊 Visualizations\n\n| File | Format | Purpose | Description |\n|------|--------|---------|-------------|\n| `flow.mmd` | **Mermaid** | **🔄 Control flow diagram** | Function call paths with complexity styling |\n| `calls.mmd` | **Mermaid** | **📞 Call graph** | Function dependencies (edges only) |\n| `compact_flow.mmd` | **Mermaid** | **📦 Module overview** | Aggregated module-level view |\n\n## 🚀 Quick Start Commands\n\n### Basic Analysis\n```bash\n# Quick health check (TOON format only)\ncode2llm ./ -f toon\n\n# Generate all formats (what created these files)\ncode2llm ./ -f all\n\n# LLM-ready context only\ncode2llm ./ -f context\n```\n\n### Performance Options\n```bash\n# Fast analysis for large projects\ncode2llm ./ -f toon --strategy quick\n\n# Memory-limited analysis\ncode2llm ./ -f all --max-memory 500\n\n# Skip PNG generation (faster)\ncode2llm ./ -f all --no-png\n```\n\n### Refactoring Focus\n```bash\n# Get refactoring recommendations\ncode2llm ./ -f evolution\n\n# Focus on specific code smells\ncode2llm ./ -f toon --refactor --smell god_function\n\n# Data flow analysis\ncode2llm ./ -f flow --data-flow\n```\n\n## 📖 Understanding Each File\n\n### `analysis.toon` - Health Diagnostics\n**Purpose**: Quick overview of code health issues\n**Key sections**:\n- **HEALTH**: Critical issues (🔴) and warnings (🟡)\n- **REFACTOR**: Prioritized refactoring actions\n- **COUPLING**: Module dependencies and potential cycles\n- **LAYERS**: Package complexity metrics\n- **FUNCTIONS**: High-complexity functions (CC ≥ 10)\n- **CLASSES**: Complex classes needing attention\n\n**Example usage**:\n```bash\n# View health issues\ncat analysis.toon | head -30\n\n# Check refactoring priorities\ngrep \"REFACTOR\" analysis.toon\n```\n\n### `evolution.toon.yaml` - Refactoring Queue\n**Purpose**: Step-by-step refactoring plan\n**Key sections**:\n- **NEXT**: Immediate actions to take\n- **RISKS**: Potential breaking changes\n- **METRICS-TARGET**: Success criteria\n\n**Example usage**:\n```bash\n# Get refactoring plan\ncat evolution.toon.yaml\n\n# Track progress\ngrep \"NEXT\" evolution.toon.yaml\n```\n\n### `flow.toon` - Legacy Data Flow Analysis\n**Purpose**: Understand data movement through the system (legacy / explicit opt-in)\n**Key sections**:\n- **PIPELINES**: Data processing chains\n- **CONTRACTS**: Function input/output contracts\n- **SIDE_EFFECTS**: Functions with external impacts\n\n**Example usage**:\n```bash\n# Find data pipelines\ngrep \"PIPELINES\" flow.toon\n\n# Identify side effects\ngrep \"SIDE_EFFECTS\" flow.toon\n```\n\n### `map.toon.yaml` - Structural Map + Project Header\n**Purpose**: High-level architecture overview plus compact project header\n**Key sections**:\n- **MODULES**: All modules with basic stats\n- **IMPORTS**: Dependency relationships\n- **EXPORTS**: Public API surface and signatures\n- **HEADER**: Stats, alerts, hotspots, evolution trend\n\n**Example usage**:\n```bash\n# See project structure\ncat map.toon.yaml | head -50\n\n# Find public APIs\ngrep \"SIGNATURES\" map.toon.yaml\n```\n\n### `project.toon.yaml` - Compact Analysis View\n**Purpose**: Compact module view generated from project.yaml data\n**Status**: Legacy view generated on demand from unified project.yaml\n\n**Example usage**:\n```bash\n# View compact project structure\ncat project.toon.yaml | head -30\n\n# Find largest files\ngrep -E \"^  .*[0-9]{3,}$\" project.toon.yaml | sort -t',' -k2 -n -r | head -10\n```\n\n### `prompt.txt` - Ready-to-Send LLM Prompt\n**Purpose**: Pre-formatted prompt listing all generated files for LLM conversation\n**Generation**: Written when `code2llm` runs with a source path and requests `-f all` (including `--no-chunk`) or `code2logic`  # noqa: E501\n**Contents**:\n- **Files section**: Lists all existing generated files with descriptions, including `project.toon.yaml` when generated by `-f all`  # noqa: E501\n- **Source files section**: Highlights important source files such as `cli_exports/orchestrator.py`\n- **Missing section**: Shows which files weren't generated (if any)\n- **Task section**: Refactoring brief with concrete execution instructions, not just analysis\n- **Priority Order section**: State-dependent refactoring priorities, starting with blockers and then architecture cleanup  # noqa: E501\n- **Requirements section**: Guidelines for suggested changes\n\n**Example usage**:\n```bash\n# View the prompt\ncat prompt.txt\n\n# Copy to clipboard and paste into ChatGPT/Claude\ncat prompt.txt | pbcopy  # macOS\ncat prompt.txt | xclip -sel clip  # Linux\n```\n\n### `context.md` - LLM Narrative\n**Purpose**: Ready-to-paste context for AI assistants\n**Key sections**:\n- **Overview**: Project statistics\n- **Architecture**: Module breakdown\n- **Entry Points**: Public interfaces\n- **Patterns**: Design patterns detected\n\n**Example usage**:\n```bash\n# Copy to clipboard for LLM\ncat context.md | pbcopy  # macOS\ncat context.md | xclip -sel clip  # Linux\n\n# Use with Claude/ChatGPT for code analysis\n```\n\n### Visualization Files (`*.mmd`, `*.png`)\n**Purpose**: Visual understanding of code structure\n**Files**:\n- `flow.mmd` - Detailed control flow with complexity colors\n- `calls.mmd` - Simple call graph\n- `compact_flow.mmd` - High-level module view\n- `*.png` - Pre-rendered images\n\n**Example usage**:\n```bash\n# View diagrams\nopen flow.png  # macOS\nxdg-open flow.png  # Linux\n\n# Edit in Mermaid Live Editor\n# Copy content of .mmd files to https://mermaid.live\n```\n\n## 🔍 Common Analysis Patterns\n\n### 1. Code Health Assessment\n```bash\n# Quick health check\ncode2llm ./ -f toon\ncat analysis.toon | grep -E \"(HEALTH|REFACTOR)\"\n```\n\n### 2. Refactoring Planning\n```bash\n# Get refactoring queue\ncode2llm ./ -f evolution\ncat evolution.toon.yaml\n\n# Focus on specific issues\ncode2llm ./ -f toon --refactor --smell god_function\n```\n\n### 3. LLM Assistance\n```bash\n# Generate context for AI\ncode2llm ./ -f context\ncat context.md\n\n# Use with Claude: \"Based on this context, help me refactor the god modules\"\n```\n\n### 4. Team Documentation\n```bash\n# Generate all docs for team\ncode2llm ./ -f all -o ./docs/\n\n# Create visual diagrams\nopen docs/flow.png\n```\n\n## 📊 Interpreting Metrics\n\n### Complexity Metrics (CC)\n- **🔴 Critical (≥5.0)**: Immediate refactoring needed\n- **🟠 High (3.0-4.9)**: Consider refactoring\n- **🟡 Medium (1.5-2.9)**: Monitor complexity\n- **🟢 Low (0.1-1.4)**: Acceptable\n- **⚪ Basic (0.0)**: Simple functions\n\n### Module Health\n- **GOD Module**: Too large (>500 lines, >20 methods)\n- **HUB**: High fan-out (calls many modules)\n- **FAN-IN**: High incoming dependencies\n- **CYCLES**: Circular dependencies\n\n### Data Flow Indicators\n- **PIPELINE**: Sequential data processing\n- **CONTRACT**: Clear input/output specification\n- **SIDE_EFFECT**: External state modification\n\n## 🛠️ Integration Examples\n\n### CI/CD Pipeline\n```bash\n#!/bin/bash\n# Analyze code quality in CI\ncode2llm ./ -f toon -o ./analysis\nif grep -q \"🔴 GOD\" ./analysis/analysis.toon; then\n    echo \"❌ God modules detected\"\n    exit 1\nfi\n```\n\n### Pre-commit Hook\n```bash\n#!/bin/sh\n# .git/hooks/pre-commit\ncode2llm ./ -f toon -o ./temp_analysis\nif grep -q \"🔴\" ./temp_analysis/analysis.toon; then\n    echo \"⚠️  Critical issues found. Review before committing.\"\nfi\nrm -rf ./temp_analysis\n```\n\n### Documentation Generation\n```bash\n# Generate docs for README\ncode2llm ./ -f context -o ./docs/\necho \"## Architecture\" >> README.md\ncat docs/context.md >> README.md\n```\n\n## 📚 Next Steps\n\n1. **Review `analysis.toon`** - Identify critical issues\n2. **Check `evolution.toon.yaml`** - Plan refactoring priorities\n3. **Use `context.md`** - Get LLM assistance for complex changes\n4. **Reference visualizations** - Understand system architecture\n5. **Track progress** - Re-run analysis after changes\n\n## 🔧 Advanced Usage\n\n### Custom Analysis\n```bash\n# Deep analysis with all insights\ncode2llm ./ -m hybrid -f all --max-depth 15 -v\n\n# Performance-optimized\ncode2llm ./ -m static -f toon --strategy quick\n\n# Refactoring-focused\ncode2llm ./ -f toon,evolution --refactor\n```\n\n### Output Customization\n```bash\n# Separate output directories\ncode2llm ./ -f all -o ./analysis-$(date +%Y%m%d)\n\n# Split YAML into multiple files\ncode2llm ./ -f yaml --split-output\n\n# Separate orphaned functions\ncode2llm ./ -f yaml --separate-orphans\n```\n\n---\n\n**Generated by**: `code2llm ./ -f all --readme`  \n**Analysis Date**: 2026-09-12  \n**Total Functions**: 35  \n**Total Classes**: 2  \n**Modules**: 45  \n\nFor more information about code2llm, visit: https://github.com/tom-sapletta/code2llm\n", "is_subdir": false}, {"name": "context.md", "rel_path": "context.md", "path": "context.md", "size": "8.0KB", "icon": "📝", "type": "markdown", "type_name": "Markdown", "content": "# System Architecture Analysis\n<!-- generated in 0.00s -->\n\n## Overview\n\n- **Project**: /home/tom/github/semcod/taskand/glm53\n- **Primary Language**: yaml\n- **Languages**: yaml: 7, shell: 5, json: 3, python: 3\n- **Analysis Mode**: static\n- **Total Functions**: 35\n- **Total Classes**: 2\n- **Modules**: 45\n- **Entry Points**: 26\n\n## Architecture by Module\n\n### gateway.Dockerfile\n- **Functions**: 8\n- **Classes**: 1\n- **File**: `Dockerfile`\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile\n- **Functions**: 6\n- **Classes**: 1\n- **File**: `Dockerfile`\n\n### scripts.digital_twin\n- **Functions**: 6\n- **File**: `digital_twin.py`\n\n### scripts.history\n- **Functions**: 6\n- **File**: `history.py`\n\n### Dockerfile\n- **Functions**: 2\n- **File**: `Dockerfile`\n\n### bootstrap.Dockerfile\n- **Functions**: 2\n- **File**: `Dockerfile`\n\n### history.snapshots.snap-t1789203598.files.taskand.Dockerfile\n- **Functions**: 2\n- **File**: `Dockerfile`\n\n### scripts.dod_validator\n- **Functions**: 2\n- **File**: `dod_validator.py`\n\n### taskand\n- **Functions**: 1\n- **File**: `taskand.sh`\n\n## Key Entry Points\n\nMain execution flows into the system:\n\n### scripts.history.rollback\n- **Calls**: scripts.history.ensure_dirs, os.path.exists, os.path.join, os.path.join, gateway.Dockerfile.print, selected.get, scripts.history.compute_dir_hash, gateway.Dockerfile.print\n\n### scripts.history.list_history\n- **Calls**: scripts.history.ensure_dirs, gateway.Dockerfile.print, os.path.exists, gateway.Dockerfile.print, os.path.exists, sorted, gateway.Dockerfile.print, gateway.Dockerfile.print\n\n### scripts.history.show_details\n- **Calls**: scripts.history.ensure_dirs, os.path.join, gateway.Dockerfile.print, os.path.exists, os.path.exists, os.listdir, meta.get, gateway.Dockerfile.print\n\n### scripts.history.create_snapshot\n- **Calls**: scripts.history.ensure_dirs, os.path.join, os.path.join, os.path.join, os.makedirs, os.path.isdir, scripts.history.compute_dir_hash, gateway.Dockerfile.print\n\n### scripts.digital_twin.verify_and_evolve\n> Główna pętla weryfikacji i ewolucji w Digital Twin.\n- **Calls**: gateway.Dockerfile.print, scripts.digital_twin.log, gateway.Dockerfile.print, range, scripts.digital_twin.log, dockerfile.exists, scripts.digital_twin.log, scripts.digital_twin.log\n\n### scripts.dod_validator.validate_dod\n> Weryfikuje Definition of Done (DoD) na podstawie typu i opisu zadania.\nZwraca (sukces: bool, raport: str).\n- **Calls**: task_desc.lower, any, re.findall, scripts.dod_validator.run_cmd, any, scripts.dod_validator.run_cmd, any, scripts.dod_validator.run_cmd\n\n### taskand.safe_curl\n\n### Dockerfile.plan\n\n### Dockerfile.gh_child\n\n### bootstrap.Dockerfile.plan\n\n### bootstrap.Dockerfile.gh_child\n\n### gateway.Dockerfile.parse_yaml_tasks\n\n### gateway.Dockerfile.send_cors_headers\n\n### gateway.Dockerfile.do_OPTIONS\n\n### gateway.Dockerfile.send_json\n\n### gateway.Dockerfile.do_GET\n\n### gateway.Dockerfile.do_POST\n\n### gateway.Dockerfile.log_message\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.yaml_value\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.send_json\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_GET\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_POST\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.log_message\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.print\n\n### history.snapshots.snap-t1789203598.files.taskand.Dockerfile.plan\n\n### history.snapshots.snap-t1789203598.files.taskand.Dockerfile.gh_child\n\n## Process Flows\n\nKey execution flows identified:\n\n### Flow 1: rollback\n```\nrollback [scripts.history]\n  └─> ensure_dirs\n  └─ →> print\n```\n\n### Flow 2: list_history\n```\nlist_history [scripts.history]\n  └─> ensure_dirs\n  └─ →> print\n  └─ →> print\n```\n\n### Flow 3: show_details\n```\nshow_details [scripts.history]\n  └─> ensure_dirs\n  └─ →> print\n```\n\n### Flow 4: create_snapshot\n```\ncreate_snapshot [scripts.history]\n  └─> ensure_dirs\n```\n\n### Flow 5: verify_and_evolve\n```\nverify_and_evolve [scripts.digital_twin]\n  └─> log\n      └─ →> print\n  └─> log\n      └─ →> print\n  └─ →> print\n```\n\n### Flow 6: validate_dod\n```\nvalidate_dod [scripts.dod_validator]\n  └─> run_cmd\n```\n\n### Flow 7: safe_curl\n```\nsafe_curl [taskand]\n```\n\n### Flow 8: plan\n```\nplan [Dockerfile]\n```\n\n### Flow 9: gh_child\n```\ngh_child [Dockerfile]\n```\n\n### Flow 10: parse_yaml_tasks\n```\nparse_yaml_tasks [gateway.Dockerfile]\n```\n\n## Key Classes\n\n### gateway.Dockerfile.Gateway\n- **Methods**: 0\n\n### history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.Gateway\n- **Methods**: 0\n\n## Data Transformation Functions\n\nKey functions that process and transform data:\n\n### gateway.Dockerfile.parse_yaml_tasks\n\n### scripts.dod_validator.validate_dod\n> Weryfikuje Definition of Done (DoD) na podstawie typu i opisu zadania.\nZwraca (sukces: bool, raport:\n- **Output to**: task_desc.lower, any, re.findall, scripts.dod_validator.run_cmd, any\n\n## Public API Surface\n\nFunctions exposed as public API (no underscore prefix):\n\n- `scripts.history.rollback` - 59 calls\n- `scripts.history.list_history` - 52 calls\n- `scripts.history.show_details` - 44 calls\n- `scripts.history.create_snapshot` - 33 calls\n- `scripts.digital_twin.verify_and_evolve` - 30 calls\n- `scripts.digital_twin.ask_llm_for_repair` - 20 calls\n- `scripts.digital_twin.create_twin_environment` - 15 calls\n- `scripts.digital_twin.run_twin_verification` - 13 calls\n- `scripts.history.compute_dir_hash` - 12 calls\n- `scripts.dod_validator.validate_dod` - 10 calls\n- `scripts.digital_twin.load_env` - 7 calls\n- `scripts.dod_validator.run_cmd` - 4 calls\n- `scripts.history.ensure_dirs` - 4 calls\n- `scripts.digital_twin.log` - 1 calls\n- `taskand.safe_curl` - 0 calls\n- `Dockerfile.plan` - 0 calls\n- `Dockerfile.gh_child` - 0 calls\n- `bootstrap.Dockerfile.plan` - 0 calls\n- `bootstrap.Dockerfile.gh_child` - 0 calls\n- `gateway.Dockerfile.parse_yaml_tasks` - 0 calls\n- `gateway.Dockerfile.send_cors_headers` - 0 calls\n- `gateway.Dockerfile.do_OPTIONS` - 0 calls\n- `gateway.Dockerfile.send_json` - 0 calls\n- `gateway.Dockerfile.do_GET` - 0 calls\n- `gateway.Dockerfile.do_POST` - 0 calls\n- `gateway.Dockerfile.log_message` - 0 calls\n- `gateway.Dockerfile.print` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.yaml_value` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.send_json` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_GET` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_POST` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.log_message` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.print` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.Dockerfile.plan` - 0 calls\n- `history.snapshots.snap-t1789203598.files.taskand.Dockerfile.gh_child` - 0 calls\n\n## System Interactions\n\nHow components interact:\n\n```mermaid\ngraph TD\n    rollback --> ensure_dirs\n    rollback --> exists\n    rollback --> join\n    rollback --> print\n    list_history --> ensure_dirs\n    list_history --> print\n    list_history --> exists\n    show_details --> ensure_dirs\n    show_details --> join\n    show_details --> print\n    show_details --> exists\n    create_snapshot --> ensure_dirs\n    create_snapshot --> join\n    create_snapshot --> makedirs\n    verify_and_evolve --> print\n    verify_and_evolve --> log\n    verify_and_evolve --> range\n    validate_dod --> lower\n    validate_dod --> any\n    validate_dod --> findall\n    validate_dod --> run_cmd\n```\n\n## Reverse Engineering Guidelines\n\n1. **Entry Points**: Start analysis from the entry points listed above\n2. **Core Logic**: Focus on classes with many methods\n3. **Data Flow**: Follow data transformation functions\n4. **Process Flows**: Use the flow diagrams for execution paths\n5. **API Surface**: Public API functions reveal the interface\n\n## Context for LLM\n\nMaintain the identified architectural patterns and public API surface when suggesting changes.", "is_subdir": false}, {"name": "calls.mmd", "rel_path": "calls.mmd", "path": "calls.mmd", "size": "2.5KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart LR\n%% generated in 0.00s\n    subgraph gateway__Dockerfile\n        gateway__Dockerfile__print[&quot;print&quot;]\n    end\n    subgraph scripts__digital_twin\n        scripts__digital_twin__log[&quot;log&quot;]\n        scripts__digital_twin__run_twin_verification[&quot;run_twin_verification&quot;]\n        scripts__digital_twin__create_twin_environment[&quot;create_twin_environment&quot;]\n        scripts__digital_twin__ask_llm_for_repair[&quot;ask_llm_for_repair&quot;]\n        scripts__digital_twin__load_env[&quot;load_env&quot;]\n        scripts__digital_twin__verify_and_evolve[&quot;verify_and_evolve&quot;]\n    end\n    subgraph scripts__dod_validator\n        scripts__dod_validator__validate_dod[&quot;validate_dod&quot;]\n        scripts__dod_validator__run_cmd[&quot;run_cmd&quot;]\n    end\n    subgraph scripts__history\n        scripts__history__ensure_dirs[&quot;ensure_dirs&quot;]\n        scripts__history__show_details[&quot;show_details&quot;]\n        scripts__history__list_history[&quot;list_history&quot;]\n        scripts__history__create_snapshot[&quot;create_snapshot&quot;]\n        scripts__history__rollback[&quot;rollback&quot;]\n        scripts__history__compute_dir_hash[&quot;compute_dir_hash&quot;]\n    end\n    scripts__dod_validator__validate_dod --&gt; scripts__dod_validator__run_cmd\n    scripts__digital_twin__log --&gt; gateway__Dockerfile__print\n    scripts__digital_twin__create_twin_environment --&gt; scripts__digital_twin__log\n    scripts__digital_twin__run_twin_verification --&gt; scripts__digital_twin__log\n    scripts__digital_twin__ask_llm_for_repair --&gt; scripts__digital_twin__load_env\n    scripts__digital_twin__ask_llm_for_repair --&gt; scripts__digital_twin__log\n    scripts__digital_twin__verify_and_evolve --&gt; gateway__Dockerfile__print\n    scripts__digital_twin__verify_and_evolve --&gt; scripts__digital_twin__log\n    scripts__digital_twin__verify_and_evolve --&gt; scripts__digital_twin__create_twin_environment\n    scripts__digital_twin__verify_and_evolve --&gt; scripts__digital_twin__run_twin_verification\n    scripts__history__create_snapshot --&gt; scripts__history__ensure_dirs\n    scripts__history__create_snapshot --&gt; scripts__history__compute_dir_hash\n    scripts__history__create_snapshot --&gt; gateway__Dockerfile__print\n    scripts__history__list_history --&gt; scripts__history__ensure_dirs\n    scripts__history__list_history --&gt; gateway__Dockerfile__print\n    scripts__history__show_details --&gt; scripts__history__ensure_dirs\n    scripts__history__show_details --&gt; gateway__Dockerfile__print\n    scripts__history__rollback --&gt; scripts__history__ensure_dirs\n    scripts__history__rollback --&gt; gateway__Dockerfile__print\n    scripts__history__rollback --&gt; scripts__history__compute_dir_hash\n", "is_subdir": false}, {"name": "compact_flow.mmd", "rel_path": "compact_flow.mmd", "path": "compact_flow.mmd", "size": "309B", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n%% generated in 0.00s\n    gateway__Dockerfile[&quot;gateway.Dockerfile&lt;br/&gt;8 funcs&quot;]\n    scripts__digital_twin[&quot;scripts.digital_twin&lt;br/&gt;6 funcs&quot;]\n    scripts__history[&quot;scripts.history&lt;br/&gt;6 funcs&quot;]\n    scripts__history ==&gt;|48| gateway__Dockerfile\n    scripts__digital_twin --&gt;|3| gateway__Dockerfile\n", "is_subdir": false}, {"name": "flow.mmd", "rel_path": "flow.mmd", "path": "flow.mmd", "size": "1.4KB", "icon": "📈", "type": "mermaid", "type_name": "Mermaid", "content": "flowchart TD\n%% generated in 0.00s\n\n    %% Entry points (blue)\n    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff\n\n    subgraph Core\n        taskand__safe_curl[&quot;safe_curl&quot;]\n        Dockerfile__plan[&quot;plan&quot;]\n        Dockerfile__gh_child[&quot;gh_child&quot;]\n        bootstrap__Dockerfile__plan[&quot;plan&quot;]\n        bootstrap__Dockerfile__gh_child[&quot;gh_child&quot;]\n        gateway__Dockerfile__parse_yaml_tasks[&quot;parse_yaml_tasks&quot;]\n        gateway__Dockerfile__send_cors_headers[&quot;send_cors_headers&quot;]\n        gateway__Dockerfile__do_OPTIONS[&quot;do_OPTIONS&quot;]\n        gateway__Dockerfile__send_json[&quot;send_json&quot;]\n        gateway__Dockerfile__do_GET[&quot;do_GET&quot;]\n        gateway__Dockerfile__do_POST[&quot;do_POST&quot;]\n        gateway__Dockerfile__log_message[&quot;log_message&quot;]\n        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__yaml_value[&quot;yaml_value&quot;]\n        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__send_json[&quot;send_json&quot;]\n        history__snapshots__snap_t1789203598__files__taskand__gateway__Dockerfile__do_GET[&quot;do_GET&quot;]\n        ...[&quot;+5 more&quot;]\n    end\n\n    class taskand__safe_curl,Dockerfile__plan,Dockerfile__gh_child,bootstrap__Dockerfile__plan,bootstrap__Dockerfile__gh_child,gateway__Dockerfile__parse_yaml_tasks,gateway__Dockerfile__send_cors_headers,gateway__Dockerfile__do_OPTIONS,gateway__Dockerfile__send_json,gateway__Dockerfile__do_GET entry\n", "is_subdir": false}, {"name": "prompt.txt", "rel_path": "prompt.txt", "path": "prompt.txt", "size": "2.9KB", "icon": "📄", "type": "text", "type_name": "Text", "content": "You are an AI assistant helping me understand and improve a codebase.\n# generated in 0.00s\nUse the attached/generated files as the authoritative context.\nYour goal is to refactor the project based on these files, not just summarize it.\n\nwe are in project path: glm53\n\nFiles for analysis:\n\nNote: project/validation.toon.yaml and project/duplication.toon.yaml are generated by external tools (vallm and redup)\n- analysis.toon.yaml  (Health diagnostics - complexity metrics, god modules, coupling issues, refactoring priorities) [4KB]\n- map.toon.yaml  (Structural map - files, sizes, imports, exports, signatures, project header) [4KB]\n- evolution.toon.yaml  (Refactoring queue - ranked actions by impact/effort, risks, metrics targets, history) [1KB]\n- project.toon.yaml  (Compact project overview - generated from project.yaml data) [2KB]\n- context.md  (LLM narrative - architecture summary and project context) [8KB]\n\nMissing files (not generated in this run):\n- README.md\n\nTask:\n- Treat this prompt as a refactoring brief: identify the highest-priority changes and prepare concrete edits.\n- Use the file set to decide whether the first pass should focus on correctness, duplication, complexity reduction, or architecture cleanup.\n- If you can safely implement the refactor, do it; otherwise give an exact file-by-file change plan and test plan.\n- Use analysis.toon.yaml to locate high-CC functions and god modules that should be split first.\n- Keep module boundaries intact and update imports/exports according to map.toon.yaml.\n- Use evolution.toon.yaml as the execution backlog and work from the top-ranked items.\n- Keep project.toon.yaml aligned with the refactored architecture.\n\nPriority Order:\nP1 — Split or simplify the highest-CC / god modules identified in analysis.toon.yaml.\nP1 — Preserve module boundaries and update imports/exports according to map.toon.yaml.\nP2 — Keep the compact project overview in project.toon.yaml aligned with the refactor.\nP2 — Execute the highest-impact items from evolution.toon.yaml in order of benefit/risk.\n\nFocus Areas for Analysis:\n1. **Code Health Analysis** - Review complexity metrics, god modules, coupling issues from analysis.toon.yaml\n2. **Structural Map** - Use map.toon.yaml to inspect imports, exports, signatures, and the project header\n3. **Refactoring Priorities** - Examine ranked refactoring actions and risk assessment from evolution.toon.yaml\n4. **Project Overview** - Review the compact project overview from project.toon.yaml\n\nAnalysis Strategy:\n- Start with analysis.toon.yaml for health metrics, then map.toon.yaml for structure and signatures\n- Review evolution.toon.yaml for action priorities and next steps\n- Compare the compact project overview in project.toon.yaml with the main analysis files\n\nConstraints:\n- Prefer minimal, incremental changes.\n- Maintain full backward compatibility.\n- Base recommendations on concrete metrics from the provided files.\n- If uncertain, ask clarifying questions.\n", "is_subdir": false}, {"name": "mermaid.export", "rel_path": "mermaid.export", "path": "mermaid.export", "size": "4.5KB", "icon": "📄", "type": "unknown", "type_name": "EXPORT", "content": "[Binary file]", "is_subdir": false}, {"name": "analysis.toon.yaml", "rel_path": "analysis.toon.yaml", "path": "analysis.toon.yaml", "size": "4.7KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm | 45f 2706L | yaml:7,shell:5,json:3,python:3 | 2026-09-12\n# generated in 0.01s\n# CC̅=3.5 | critical:3/35 | dups:0 | cycles:0\n\nHEALTH[3]:\n  🟡 CC    validate_dod CC=19 (limit:15)\n  🟡 CC    list_history CC=21 (limit:15)\n  🟡 CC    rollback CC=20 (limit:15)\n\nREFACTOR[1]:\n  1. split 3 high-CC methods  (CC&gt;15)\n\nPIPELINES[6]:\n  [1] Src [validate_dod]: validate_dod → run_cmd\n      PURITY: 100% pure\n  [2] Src [verify_and_evolve]: verify_and_evolve → print\n      PURITY: 100% pure\n  [3] Src [create_snapshot]: create_snapshot → ensure_dirs\n      PURITY: 100% pure\n  [4] Src [list_history]: list_history → ensure_dirs\n      PURITY: 100% pure\n  [5] Src [show_details]: show_details → ensure_dirs\n      PURITY: 100% pure\n  [6] Src [rollback]: rollback → ensure_dirs\n      PURITY: 100% pure\n\nLAYERS:\n  scripts/                        CC̄=8.7    ←in:0  →out:51  !! split\n  │ !! history                    309L  0C    6m  CC=21     ←0\n  │ digital_twin               249L  0C    6m  CC=9      ←0\n  │ !! dod_validator               79L  0C    2m  CC=19     ←0\n  │\n  ./                              CC̄=0.0    ←in:0  →out:0\n  │ Dockerfile                 369L  0C    2m  CC=0.0    ←0\n  │ Makefile                    99L  0C    0m  CC=0.0    ←0\n  │ taskand.sh                  59L  0C    1m  CC=0.0    ←0\n  │ project.sh                  59L  0C    0m  CC=0.0    ←0\n  │ docker-compose.yaml         43L  0C    0m  CC=0.0    ←0\n  │ serve.sh                    21L  0C    0m  CC=0.0    ←0\n  │ tree.sh                      1L  0C    0m  CC=0.0    ←0\n  │\n  bootstrap/                      CC̄=0.0    ←in:0  →out:0\n  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0\n  │\n  gateway/                        CC̄=0.0    ←in:51  →out:0\n  │ Dockerfile                 199L  1C    8m  CC=0.0    ←2\n  │\n  history/                        CC̄=0.0    ←in:0  →out:0\n  │ Dockerfile                 286L  0C    2m  CC=0.0    ←0\n  │ Dockerfile                  63L  1C    6m  CC=0.0    ←0\n  │ docker-compose.yaml         56L  0C    0m  CC=0.0    ←0\n  │ manifest.json               18L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0\n  │ history.yaml                 9L  0C    0m  CC=0.0    ←0\n  │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0\n  │\n  tasks/                          CC̄=0.0    ←in:0  →out:0\n  │ done.yaml                   14L  0C    0m  CC=0.0    ←0\n  │ inbox.yaml                   0L  0C    0m  CC=0.0    ←0\n  │\n  evolution/                      CC̄=0.0    ←in:0  →out:0\n  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  43L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  24L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  23L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  17L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  16L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                  10L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   7L  0C    0m  CC=0.0    ←0\n  │ TWIN_VERIFIED.json           6L  0C    0m  CC=0.0    ←0\n  │ TWIN_VERIFIED.json           6L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   4L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   4L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   3L  0C    0m  CC=0.0    ←0\n  │\n  landing/                        CC̄=0.0    ←in:0  →out:0\n  │ serve.sh                    21L  0C    0m  CC=0.0    ←0\n  │ Dockerfile                   5L  0C    0m  CC=0.0    ←0\n  │\n  answers/                        CC̄=0.0    ←in:0  →out:0\n  │ taskand.answers.yaml         5L  0C    0m  CC=0.0    ←0\n  │\n  ── zero ──\n     history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml  0L\n     tasks/inbox.yaml                          0L\n\nCOUPLING:\n           gateway  scripts\n  gateway       ──      ←51  hub\n  scripts       51       ──  !! fan-out\n  CYCLES: none\n  HUB: gateway/ (fan-in=51)\n  SMELL: scripts/ fan-out=51 → split needed\n\nEXTERNAL:\n  validation: run `vallm batch .` → validation.toon\n  duplication: run `redup scan .` → duplication.toon\n", "is_subdir": false}, {"name": "calls.toon.yaml", "rel_path": "calls.toon.yaml", "path": "calls.toon.yaml", "size": "3.1KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm call graph | /home/tom/github/semcod/taskand/glm53\n# generated in 0.01s\n# nodes: 15 | edges: 20 | modules: 4\n# CC̄=3.5\n\nHUBS[20]:\n  scripts.history.rollback\n    CC=20  in:0  out:59  total:59\n  scripts.history.list_history\n    CC=21  in:0  out:52  total:52\n  gateway.Dockerfile.print\n    CC=0  in:51  out:0  total:51\n  scripts.history.show_details\n    CC=12  in:0  out:44  total:44\n  scripts.history.create_snapshot\n    CC=9  in:0  out:33  total:33\n  scripts.digital_twin.verify_and_evolve\n    CC=6  in:0  out:30  total:30\n  scripts.digital_twin.log\n    CC=1  in:21  out:1  total:22\n  scripts.digital_twin.ask_llm_for_repair\n    CC=8  in:1  out:20  total:21\n  scripts.digital_twin.create_twin_environment\n    CC=5  in:1  out:15  total:16\n  scripts.digital_twin.run_twin_verification\n    CC=9  in:1  out:13  total:14\n  scripts.history.compute_dir_hash\n    CC=3  in:2  out:12  total:14\n  scripts.dod_validator.validate_dod\n    CC=19  in:0  out:10  total:10\n  scripts.history.ensure_dirs\n    CC=2  in:4  out:4  total:8\n  scripts.digital_twin.load_env\n    CC=6  in:1  out:7  total:8\n  scripts.dod_validator.run_cmd\n    CC=1  in:3  out:4  total:7\n\nMODULES:\n  gateway.Dockerfile  [1 funcs]\n    print  CC=0  out:0\n  scripts.digital_twin  [6 funcs]\n    ask_llm_for_repair  CC=8  out:20\n    create_twin_environment  CC=5  out:15\n    load_env  CC=6  out:7\n    log  CC=1  out:1\n    run_twin_verification  CC=9  out:13\n    verify_and_evolve  CC=6  out:30\n  scripts.dod_validator  [2 funcs]\n    run_cmd  CC=1  out:4\n    validate_dod  CC=19  out:10\n  scripts.history  [6 funcs]\n    compute_dir_hash  CC=3  out:12\n    create_snapshot  CC=9  out:33\n    ensure_dirs  CC=2  out:4\n    list_history  CC=21  out:52\n    rollback  CC=20  out:59\n    show_details  CC=12  out:44\n\nEDGES:\n  scripts.dod_validator.validate_dod → scripts.dod_validator.run_cmd\n  scripts.digital_twin.log → gateway.Dockerfile.print\n  scripts.digital_twin.create_twin_environment → scripts.digital_twin.log\n  scripts.digital_twin.run_twin_verification → scripts.digital_twin.log\n  scripts.digital_twin.ask_llm_for_repair → scripts.digital_twin.load_env\n  scripts.digital_twin.ask_llm_for_repair → scripts.digital_twin.log\n  scripts.digital_twin.verify_and_evolve → gateway.Dockerfile.print\n  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.log\n  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.create_twin_environment\n  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.run_twin_verification\n  scripts.history.create_snapshot → scripts.history.ensure_dirs\n  scripts.history.create_snapshot → scripts.history.compute_dir_hash\n  scripts.history.create_snapshot → gateway.Dockerfile.print\n  scripts.history.list_history → scripts.history.ensure_dirs\n  scripts.history.list_history → gateway.Dockerfile.print\n  scripts.history.show_details → scripts.history.ensure_dirs\n  scripts.history.show_details → gateway.Dockerfile.print\n  scripts.history.rollback → scripts.history.ensure_dirs\n  scripts.history.rollback → gateway.Dockerfile.print\n  scripts.history.rollback → scripts.history.compute_dir_hash\n", "is_subdir": false}, {"name": "calls.yaml", "rel_path": "calls.yaml", "path": "calls.yaml", "size": "6.4KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "project: /home/tom/github/semcod/taskand/glm53\ngenerated_from: code2llm call graph analysis\nstats:\n  total_nodes: 15\n  total_edges: 20\n  modules_count: 4\nnodes:\n  scripts.digital_twin.log:\n    name: log\n    module: scripts.digital_twin\n    line: 34\n    cyclomatic_complexity: 1\n    calls_out: 1\n    calls_in: 21\n  scripts.history.ensure_dirs:\n    name: ensure_dirs\n    module: scripts.history\n    line: 16\n    cyclomatic_complexity: 2\n    calls_out: 4\n    calls_in: 4\n  scripts.history.show_details:\n    name: show_details\n    module: scripts.history\n    line: 162\n    cyclomatic_complexity: 12\n    calls_out: 44\n    calls_in: 0\n  scripts.digital_twin.run_twin_verification:\n    name: run_twin_verification\n    module: scripts.digital_twin\n    line: 68\n    cyclomatic_complexity: 9\n    calls_out: 13\n    calls_in: 1\n  scripts.digital_twin.create_twin_environment:\n    name: create_twin_environment\n    module: scripts.digital_twin\n    line: 37\n    cyclomatic_complexity: 5\n    calls_out: 15\n    calls_in: 1\n  gateway.Dockerfile.print:\n    name: print\n    module: gateway.Dockerfile\n    line: 192\n    cyclomatic_complexity: 0\n    calls_out: 0\n    calls_in: 51\n  scripts.dod_validator.validate_dod:\n    name: validate_dod\n    module: scripts.dod_validator\n    line: 22\n    cyclomatic_complexity: 19\n    calls_out: 10\n    calls_in: 0\n  scripts.dod_validator.run_cmd:\n    name: run_cmd\n    module: scripts.dod_validator\n    line: 18\n    cyclomatic_complexity: 1\n    calls_out: 4\n    calls_in: 3\n  scripts.digital_twin.ask_llm_for_repair:\n    name: ask_llm_for_repair\n    module: scripts.digital_twin\n    line: 116\n    cyclomatic_complexity: 8\n    calls_out: 20\n    calls_in: 1\n  scripts.digital_twin.load_env:\n    name: load_env\n    module: scripts.digital_twin\n    line: 23\n    cyclomatic_complexity: 6\n    calls_out: 7\n    calls_in: 1\n  scripts.history.list_history:\n    name: list_history\n    module: scripts.history\n    line: 96\n    cyclomatic_complexity: 21\n    calls_out: 52\n    calls_in: 0\n  scripts.history.create_snapshot:\n    name: create_snapshot\n    module: scripts.history\n    line: 36\n    cyclomatic_complexity: 9\n    calls_out: 33\n    calls_in: 0\n  scripts.digital_twin.verify_and_evolve:\n    name: verify_and_evolve\n    module: scripts.digital_twin\n    line: 181\n    cyclomatic_complexity: 6\n    calls_out: 30\n    calls_in: 0\n  scripts.history.rollback:\n    name: rollback\n    module: scripts.history\n    line: 216\n    cyclomatic_complexity: 20\n    calls_out: 59\n    calls_in: 0\n  scripts.history.compute_dir_hash:\n    name: compute_dir_hash\n    module: scripts.history\n    line: 22\n    cyclomatic_complexity: 3\n    calls_out: 12\n    calls_in: 2\nedges:\n- caller: scripts.dod_validator.validate_dod\n  callee: scripts.dod_validator.run_cmd\n  call_type: resolved\n- caller: scripts.digital_twin.log\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.digital_twin.create_twin_environment\n  callee: scripts.digital_twin.log\n  call_type: resolved\n- caller: scripts.digital_twin.run_twin_verification\n  callee: scripts.digital_twin.log\n  call_type: resolved\n- caller: scripts.digital_twin.ask_llm_for_repair\n  callee: scripts.digital_twin.load_env\n  call_type: resolved\n- caller: scripts.digital_twin.ask_llm_for_repair\n  callee: scripts.digital_twin.log\n  call_type: resolved\n- caller: scripts.digital_twin.verify_and_evolve\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.digital_twin.verify_and_evolve\n  callee: scripts.digital_twin.log\n  call_type: resolved\n- caller: scripts.digital_twin.verify_and_evolve\n  callee: scripts.digital_twin.create_twin_environment\n  call_type: resolved\n- caller: scripts.digital_twin.verify_and_evolve\n  callee: scripts.digital_twin.run_twin_verification\n  call_type: resolved\n- caller: scripts.history.create_snapshot\n  callee: scripts.history.ensure_dirs\n  call_type: resolved\n- caller: scripts.history.create_snapshot\n  callee: scripts.history.compute_dir_hash\n  call_type: resolved\n- caller: scripts.history.create_snapshot\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.history.list_history\n  callee: scripts.history.ensure_dirs\n  call_type: resolved\n- caller: scripts.history.list_history\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.history.show_details\n  callee: scripts.history.ensure_dirs\n  call_type: resolved\n- caller: scripts.history.show_details\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.history.rollback\n  callee: scripts.history.ensure_dirs\n  call_type: resolved\n- caller: scripts.history.rollback\n  callee: gateway.Dockerfile.print\n  call_type: resolved\n- caller: scripts.history.rollback\n  callee: scripts.history.compute_dir_hash\n  call_type: resolved\nmodules:\n  gateway.Dockerfile:\n  - gateway.Dockerfile.print\n  scripts.digital_twin:\n  - scripts.digital_twin.ask_llm_for_repair\n  - scripts.digital_twin.create_twin_environment\n  - scripts.digital_twin.load_env\n  - scripts.digital_twin.log\n  - scripts.digital_twin.run_twin_verification\n  - scripts.digital_twin.verify_and_evolve\n  scripts.dod_validator:\n  - scripts.dod_validator.run_cmd\n  - scripts.dod_validator.validate_dod\n  scripts.history:\n  - scripts.history.compute_dir_hash\n  - scripts.history.create_snapshot\n  - scripts.history.ensure_dirs\n  - scripts.history.list_history\n  - scripts.history.rollback\n  - scripts.history.show_details\nentry_points:\n- Dockerfile.gh_child\n- Dockerfile.plan\n- bootstrap.Dockerfile.gh_child\n- bootstrap.Dockerfile.plan\n- gateway.Dockerfile.do_GET\n- gateway.Dockerfile.do_OPTIONS\n- gateway.Dockerfile.do_POST\n- gateway.Dockerfile.log_message\n- gateway.Dockerfile.parse_yaml_tasks\n- gateway.Dockerfile.send_cors_headers\n- gateway.Dockerfile.send_json\n- history.snapshots.snap-t1789203598.files.taskand.Dockerfile.gh_child\n- history.snapshots.snap-t1789203598.files.taskand.Dockerfile.plan\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_GET\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.do_POST\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.log_message\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.print\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.send_json\n- history.snapshots.snap-t1789203598.files.taskand.gateway.Dockerfile.yaml_value\n- scripts.digital_twin.verify_and_evolve\n- scripts.dod_validator.validate_dod\n- scripts.history.create_snapshot\n- scripts.history.list_history\n- scripts.history.rollback\n- scripts.history.show_details\n- taskand.safe_curl\n", "is_subdir": false}, {"name": "evolution.toon.yaml", "rel_path": "evolution.toon.yaml", "path": "evolution.toon.yaml", "size": "1.4KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# code2llm/evolution | 21 func | 6f | 2026-09-12\n# generated in 0.00s\n\nNEXT[0]: no refactoring needed\n\nRISKS[0]: none\n\nMETRICS-TARGET:\n  CC̄:          0.0 → ≤0.0\n  max-CC:      0 → ≤0\n  god-modules: 0 → 0\n  high-CC(≥15): 0 → ≤0\n  hub-types:   0 → ≤0\n\nPATTERNS (language parser shared logic):\n  _extract_declarations() in base.py — unified extraction for:\n    - TypeScript: interfaces, types, classes, functions, arrow funcs\n    - PHP: namespaces, traits, classes, functions, includes\n    - Ruby: modules, classes, methods, requires\n    - C++: classes, structs, functions, #includes\n    - C#: classes, interfaces, methods, usings\n    - Java: classes, interfaces, methods, imports\n    - Go: packages, functions, structs\n    - Rust: modules, functions, traits, use statements\n\n  Shared regex patterns per language:\n    - import: language-specific import/require/using patterns\n    - class: class/struct/trait declarations with inheritance\n    - function: function/method signatures with visibility\n    - brace_tracking: for C-family languages ({ })\n    - end_keyword_tracking: for Ruby (module/class/def...end)\n\n  Benefits:\n    - Consistent extraction logic across all languages\n    - Reduced code duplication (~70% reduction in parser LOC)\n    - Easier maintenance: fix once, apply everywhere\n    - Standardized FunctionInfo/ClassInfo models\n\nHISTORY:\n  (first run — no previous data)\n", "is_subdir": false}, {"name": "map.toon.yaml", "rel_path": "map.toon.yaml", "path": "map.toon.yaml", "size": "4.9KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# glm53 | 45f 2706L | yaml:7,shell:5,json:3,python:3 | 2026-09-12\n# generated in 0.01s\n# producer: code2llm | artifact: map.toon.yaml | schema: 1\n# stats: 35 func | 0 cls | 45 mod | CC̄=3.5 | critical:3 | cycles:0\n# alerts[5]: fan-out rollback=24; fan-out list_history=22; fan-out create_snapshot=20; CC list_history=21; CC rollback=20\n# hotspots[5]: rollback fan=24; list_history fan=22; create_snapshot fan=20; ask_llm_for_repair fan=16; verify_and_evolve fan=14\n# evolution: baseline\n# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods\nM[45]:\n  Dockerfile,369\n  Makefile,99\n  answers/taskand.answers.yaml,5\n  bootstrap/Dockerfile,286\n  docker-compose.yaml,43\n  evolution/install-answers/Dockerfile,16\n  evolution/install-cache/Dockerfile,3\n  evolution/install-ghauth/Dockerfile,4\n  evolution/orchestrator/Dockerfile,10\n  evolution/t1789203055/Dockerfile,4\n  evolution/t1789203289/Dockerfile,7\n  evolution/t1789203378/Dockerfile,23\n  evolution/t1789203531/Dockerfile,23\n  evolution/t1789203598/Dockerfile,17\n  evolution/t1789203624/Dockerfile,17\n  evolution/t1789203850/Dockerfile,17\n  evolution/t1789203850/TWIN_VERIFIED.json,6\n  evolution/t1789204046/Dockerfile,23\n  evolution/t1789204317/Dockerfile,43\n  evolution/t1789204317/TWIN_VERIFIED.json,6\n  evolution/t1789204506/Dockerfile,24\n  evolution/t1789204647/Dockerfile,43\n  evolution/t1789204816/Dockerfile,43\n  evolution/t1789205131/Dockerfile,43\n  evolution/t1789205406/Dockerfile,43\n  evolution/t1789205596/Dockerfile,24\n  gateway/Dockerfile,199\n  history/history.yaml,9\n  history/snapshots/snap-t1789203598/Dockerfile,17\n  history/snapshots/snap-t1789203598/files/taskand/Dockerfile,286\n  history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml,56\n  history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile,63\n  history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml,0\n  history/snapshots/snap-t1789203598/manifest.json,18\n  landing/Dockerfile,5\n  landing/serve.sh,21\n  project.sh,59\n  scripts/digital_twin.py,249\n  scripts/dod_validator.py,79\n  scripts/history.py,309\n  serve.sh,21\n  taskand.sh,59\n  tasks/done.yaml,14\n  tasks/inbox.yaml,0\n  tree.sh,1\nD:\n  scripts/history.py:\n    e: ensure_dirs,compute_dir_hash,create_snapshot,list_history,show_details,rollback\n    ensure_dirs()\n    compute_dir_hash(directory)\n    create_snapshot(target_rel_path;desc;task_id)\n    list_history()\n    show_details(target_id)\n    rollback(target_id_or_hash)\n  scripts/dod_validator.py:\n    e: run_cmd,validate_dod\n    run_cmd(cmd;cwd)\n    validate_dod(task_id;task_type;task_desc)\n  scripts/digital_twin.py:\n    e: load_env,log,create_twin_environment,run_twin_verification,ask_llm_for_repair,verify_and_evolve\n    load_env()\n    log(msg;tag)\n    create_twin_environment(task_id)\n    run_twin_verification(task_id;dockerfile_path;twin_workspace)\n    ask_llm_for_repair(task_id;original_dockerfile;error_logs;task_desc)\n    verify_and_evolve(task_id;task_desc;max_attempts)\n  docker-compose.yaml:\n  serve.sh:\n  tree.sh:\n  project.sh:\n  taskand.sh:\n    e: safe_curl\n    safe_curl()\n  tasks/inbox.yaml:\n  tasks/done.yaml:\n  Dockerfile:\n    e: plan,gh_child\n    plan()\n    gh_child()\n  Makefile:\n  bootstrap/Dockerfile:\n    e: plan,gh_child\n    plan()\n    gh_child()\n  evolution/install-ghauth/Dockerfile:\n  gateway/Dockerfile:\n    e: Gateway,parse_yaml_tasks,send_cors_headers,do_OPTIONS,send_json,do_GET,do_POST,log_message,print\n    Gateway:\n    parse_yaml_tasks()\n    send_cors_headers()\n    do_OPTIONS()\n    send_json()\n    do_GET()\n    do_POST()\n    log_message()\n    print()\n  evolution/t1789203624/Dockerfile:\n  evolution/t1789204317/Dockerfile:\n  evolution/t1789204317/TWIN_VERIFIED.json:\n  evolution/t1789204647/Dockerfile:\n  evolution/t1789203850/TWIN_VERIFIED.json:\n  evolution/t1789203850/Dockerfile:\n  evolution/install-answers/Dockerfile:\n  evolution/t1789204506/Dockerfile:\n  evolution/t1789203378/Dockerfile:\n  evolution/t1789205596/Dockerfile:\n  evolution/t1789204816/Dockerfile:\n  evolution/t1789204046/Dockerfile:\n  evolution/orchestrator/Dockerfile:\n  evolution/t1789205131/Dockerfile:\n  landing/Dockerfile:\n  evolution/t1789203055/Dockerfile:\n  landing/serve.sh:\n  history/snapshots/snap-t1789203598/manifest.json:\n  history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml:\n  evolution/t1789203598/Dockerfile:\n  answers/taskand.answers.yaml:\n  evolution/t1789203289/Dockerfile:\n  evolution/install-cache/Dockerfile:\n  history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml:\n  history/history.yaml:\n  evolution/t1789203531/Dockerfile:\n  evolution/t1789205406/Dockerfile:\n  history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile:\n    e: Gateway,yaml_value,send_json,do_GET,do_POST,log_message,print\n    Gateway:\n    yaml_value()\n    send_json()\n    do_GET()\n    do_POST()\n    log_message()\n    print()\n  history/snapshots/snap-t1789203598/files/taskand/Dockerfile:\n    e: plan,gh_child\n    plan()\n    gh_child()\n  history/snapshots/snap-t1789203598/Dockerfile:\n", "is_subdir": false}, {"name": "planfile-tickets.yaml", "rel_path": "planfile-tickets.yaml", "path": "planfile-tickets.yaml", "size": "5.8KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "source: code2llm\n# generated in 0.01s\nschema: code2llm.planfile_tickets.v1\nproject_root: /home/tom/github/semcod/taskand/glm53\ntickets:\n- signal: code2llm_cc\n  title: 'Reduce cyclomatic complexity: scripts.dod_validator.validate_dod (CC=19)'\n  description: 'code2llm reports `scripts.dod_validator.validate_dod` at `scripts/dod_validator.py:22`\n    with cyclomatic complexity 19 (limit 15).\n\n\n    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run\n    code2llm after the change and keep tests green.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - complexity\n  - refactor\n  files:\n  - scripts/dod_validator.py\n  dedupe_key: code2llm:cc:scripts/dod_validator.py:scripts.dod_validator.validate_dod\n- signal: code2llm_cc\n  title: 'Reduce cyclomatic complexity: scripts.history.list_history (CC=21)'\n  description: 'code2llm reports `scripts.history.list_history` at `scripts/history.py:96`\n    with cyclomatic complexity 21 (limit 15).\n\n\n    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run\n    code2llm after the change and keep tests green.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - complexity\n  - refactor\n  files:\n  - scripts/history.py\n  dedupe_key: code2llm:cc:scripts/history.py:scripts.history.list_history\n- signal: code2llm_cc\n  title: 'Reduce cyclomatic complexity: scripts.history.rollback (CC=20)'\n  description: 'code2llm reports `scripts.history.rollback` at `scripts/history.py:216`\n    with cyclomatic complexity 20 (limit 15).\n\n\n    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run\n    code2llm after the change and keep tests green.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - complexity\n  - refactor\n  files:\n  - scripts/history.py\n  dedupe_key: code2llm:cc:scripts/history.py:scripts.history.rollback\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: ask_llm_for_repair'\n  description: 'code2llm reports `God Function: ask_llm_for_repair` in `scripts/digital_twin.py:116`.\n\n\n    Function ''ask_llm_for_repair'' is oversized: CC=8, fan-out=16, mutations=11.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/digital_twin.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:116:God Function:\n    ask_llm_for_repair'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: compute_dir_hash'\n  description: 'code2llm reports `God Function: compute_dir_hash` in `scripts/history.py:22`.\n\n\n    Function ''compute_dir_hash'' is oversized: CC=3, fan-out=11, mutations=9.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/history.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:22:God Function: compute_dir_hash'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: create_snapshot'\n  description: 'code2llm reports `God Function: create_snapshot` in `scripts/history.py:36`.\n\n\n    Function ''create_snapshot'' is oversized: CC=9, fan-out=20, mutations=15.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/history.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:36:God Function: create_snapshot'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: load_env'\n  description: 'code2llm reports `God Function: load_env` in `scripts/digital_twin.py:23`.\n\n\n    Function ''load_env'' is oversized: CC=6, fan-out=7, mutations=8.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/digital_twin.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:23:God Function:\n    load_env'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: run_twin_verification'\n  description: 'code2llm reports `God Function: run_twin_verification` in `scripts/digital_twin.py:68`.\n\n\n    Function ''run_twin_verification'' is oversized: CC=9, fan-out=9, mutations=12.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/digital_twin.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:68:God Function:\n    run_twin_verification'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: show_details'\n  description: 'code2llm reports `God Function: show_details` in `scripts/history.py:162`.\n\n\n    Function ''show_details'' is oversized: CC=12, fan-out=12, mutations=10.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/history.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:162:God Function: show_details'\n- signal: code2llm_smell_god_function\n  title: 'Address code smell: God Function: verify_and_evolve'\n  description: 'code2llm reports `God Function: verify_and_evolve` in `scripts/digital_twin.py:181`.\n\n\n    Function ''verify_and_evolve'' is oversized: CC=6, fan-out=14, mutations=13.\n\n\n    Make the smallest refactor that removes the smell and run local tests.'\n  priority: normal\n  labels:\n  - llm-ready\n  - code2llm\n  - code-smell\n  - god-function\n  files:\n  - scripts/digital_twin.py\n  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:181:God Function:\n    verify_and_evolve'\napplied: []\nskipped: []\n", "is_subdir": false}, {"name": "project.toon.yaml", "rel_path": "project.toon.yaml", "path": "project.toon.yaml", "size": "2.3KB", "icon": "⚙️", "type": "yaml", "type_name": "YAML", "content": "# glm53 | 35 func | 9f | 2706L | yaml | 2026-09-12\n# generated in 0.00s\n\nHEALTH:\n  CC̄=3.5  critical=4 (limit:10)  dup=1  cycles=0\n\nALERTS[10]:\n  !!! high_fan_out     rollback = 24 (limit:10)\n  !!! high_fan_out     list_history = 22 (limit:10)\n  !!! high_fan_out     create_snapshot = 20 (limit:10)\n  !!  cc_exceeded      list_history = 21 (limit:15)\n  !!  cc_exceeded      rollback = 20 (limit:15)\n  !!  high_fan_out     ask_llm_for_repair = 16 (limit:10)\n  !   cc_exceeded      validate_dod = 19 (limit:15)\n  !   high_fan_out     verify_and_evolve = 14 (limit:10)\n  !   high_fan_out     show_details = 12 (limit:10)\n  !   high_fan_out     compute_dir_hash = 11 (limit:10)\n\nMODULES[45] (top by size):\n  M[Dockerfile] 369L C:0 F:2 CC↑0 D:0 ()\n  M[scripts/history.py] 309L C:0 F:6 CC↑21 D:0 (python)\n  M[bootstrap/Dockerfile] 286L C:0 F:2 CC↑0 D:0 ()\n  M[history/snapshots/snap-t1789203598/files/taskand/Dockerfile] 286L C:0 F:2 CC↑0 D:0 ()\n  M[scripts/digital_twin.py] 249L C:0 F:6 CC↑9 D:0 (python)\n  M[gateway/Dockerfile] 199L C:1 F:8 CC↑0 D:2 ()\n  M[Makefile] 99L C:0 F:0 CC↑0 D:0 ()\n  M[scripts/dod_validator.py] 79L C:0 F:2 CC↑19 D:0 (python)\n  M[history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile] 63L C:1 F:6 CC↑0 D:0 ()\n  M[project.sh] 59L C:0 F:0 CC↑0 D:0 (shell)\n  M[taskand.sh] 59L C:0 F:1 CC↑0 D:0 (shell)\n  M[history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml] 56L C:0 F:0 CC↑0 D:0 (yaml)\n  M[docker-compose.yaml] 43L C:0 F:0 CC↑0 D:0 (yaml)\n  M[evolution/t1789204317/Dockerfile] 43L C:0 F:0 CC↑0 D:0 ()\n  M[evolution/t1789204647/Dockerfile] 43L C:0 F:0 CC↑0 D:0 ()\n  LANGS: other:27/yaml:7/shell:5/python:3/json:3\n\nHOTSPOTS[7]:\n  ★ rollback fan=24  // Orchestrates 24 calls\n  ★ list_history fan=22  // Orchestrates 22 calls\n  ★ create_snapshot fan=20  // Orchestrates 20 calls\n  ★ ask_llm_for_repair fan=16  // Wysyła błąd z Digital Twin do LLM w celu wygenerowania samonaprawionego Dockerfi\n  ★ verify_and_evolve fan=14  // Główna pętla weryfikacji i ewolucji w Digital Twin.\n\nREFACTOR[6]:\n  [1] M/L Split validate_dod (CC=19)\n  [2] M/L Split list_history (CC=21)\n  [3] M/L Split rollback (CC=20)\n  [4] M/M Reduce rollback fan-out (currently 24)\n  [5] M/M Reduce list_history fan-out (currently 22)\n\nEVOLUTION:\n  2026-09-12 CC̄=3.5 crit=4 2706L // Automated analysis\n", "is_subdir": false}];
+        let currentFile = null;
+
+        function renderFileList(filter = '') {
+            const list = document.getElementById('fileList');
+            const filtered = files.filter(f =>
+                f.name.toLowerCase().includes(filter.toLowerCase()) ||
+                f.path.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div class="empty-state">No files found</div>';
+                return;
+            }
+
+            // Group by type
+            const groups = {};
+            for (const file of filtered) {
+                const type = file.type_name;
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(file);
+            }
+
+            let html = '';
+            for (const [typeName, groupFiles] of Object.entries(groups)) {
+                html += `
+                    <div class="file-group">
+                        <div class="file-group-title">${typeName} Files (${groupFiles.length})</div>
+                        ${groupFiles.map(f => `
+                            <div class="file-item ${currentFile?.name === f.name ? 'active' : ''}"
+                                 onclick="selectFile('${f.name}')">
+                                <span class="file-icon">${f.icon}</span>
+                                <div class="file-info">
+                                    <div class="file-name">${f.name}</div>
+                                    <div class="file-meta">${f.path}</div>
+                                </div>
+                                <span class="file-size">${f.size}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            list.innerHTML = html;
+        }
+
+        function selectFile(name) {
+            const file = files.find(f => f.name === name);
+            if (!file) return;
+
+            currentFile = file;
+
+            document.getElementById('contentIcon').textContent = file.icon;
+            document.getElementById('contentTitle').textContent = file.name;
+
+            // Actions
+            const actions = document.getElementById('contentActions');
+            actions.innerHTML = `
+                <a href="${file.rel_path}" download class="btn">⬇ Download</a>
+                <a href="${file.rel_path}" target="_blank" class="btn btn-primary">↗ Open Raw</a>
+            `;
+
+            // Content
+            const body = document.getElementById('contentBody');
+            if (file.type === 'markdown') {
+                // Render markdown as HTML using marked.js
+                body.innerHTML = `<div class="markdown-content">${marked.parse(file.content)}</div>`;
+            } else if (file.type === 'html') {
+                // For HTML files, show in iframe for safety
+                body.innerHTML = `<iframe src="${file.rel_path}" style="width:100%;height:100%;border:none;border-radius:0.5rem;"></iframe>`;  # noqa: E501
+            } else if (file.type === 'image') {
+                // For images, display the actual image
+                body.innerHTML = `<div class="image-preview"><img src="${file.rel_path}" alt="${file.name}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:0.5rem;"></div>`;  # noqa: E501
+            } else if (file.type === 'mermaid') {
+                // Render mermaid diagram
+                const diagramId = 'mermaid-diagram-' + Date.now();
+                body.innerHTML = `<div class="mermaid-content"><pre class="mermaid" id="${diagramId}">${file.content}</pre></div>`;  # noqa: E501
+                // Initialize mermaid on the new element
+                setTimeout(() => {
+                    mermaid.init(undefined, document.getElementById(diagramId));
+                }, 0);
+            } else if (file.type === 'json') {
+                try {
+                    const json = JSON.parse(file.content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));  # noqa: E501
+                    const formatted = JSON.stringify(json, null, 2);
+                    body.innerHTML = `<pre><code class="language-json">${formatted.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;  # noqa: E501
+                    hljs.highlightElement(body.querySelector('code'));
+                } catch {
+                    body.innerHTML = `<pre>${file.content}</pre>`;
+                }
+            } else if (file.type === 'yaml') {
+                // YAML with syntax highlighting
+                body.innerHTML = `<pre><code class="language-yaml">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;  # noqa: E501
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'toon') {
+                // TOON with simple highlighting (use ini as closest match for key: value format)
+                body.innerHTML = `<pre><code class="language-ini">${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;  # noqa: E501
+                hljs.highlightElement(body.querySelector('code'));
+            } else if (file.type === 'code') {
+                // Code files with auto-highlighting
+                body.innerHTML = `<pre><code>${file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;  # noqa: E501
+                hljs.highlightElement(body.querySelector('code'));
+            } else {
+                body.innerHTML = `<pre>${file.content}</pre>`;
+            }
+
+            renderFileList(document.getElementById('search').value);
+        }
+
+        function filterFiles(query) {
+            renderFileList(query);
+        }
+
+        function renderStats() {
+            const stats = {};
+            for (const f of files) {
+                stats[f.type_name] = (stats[f.type_name] || 0) + 1;
+            }
+
+            const grid = document.getElementById('statsGrid');
+            grid.innerHTML = Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => `
+                    <div class="stat-card">
+                        <div class="stat-value">${count}</div>
+                        <div class="stat-label">${type}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Initialize
+        renderStats();
+        renderFileList();
+
+        // Select first file if available
+        if (files.length > 0) {
+            selectFile(files[0].name);
+        }
+    </script>
+</body>
+</html>

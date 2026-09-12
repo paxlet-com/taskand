@@ -1,0 +1,146 @@
+# glm53 | 45f 2706L | yaml:7,shell:5,json:3,python:3 | 2026-09-12
+# generated in 0.01s
+# producer: code2llm | artifact: map.toon.yaml | schema: 1
+# stats: 35 func | 0 cls | 45 mod | CC̄=3.5 | critical:3 | cycles:0
+# alerts[5]: fan-out rollback=24; fan-out list_history=22; fan-out create_snapshot=20; CC list_history=21; CC rollback=20
+# hotspots[5]: rollback fan=24; list_history fan=22; create_snapshot fan=20; ask_llm_for_repair fan=16; verify_and_evolve fan=14
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[45]:
+  Dockerfile,369
+  Makefile,99
+  answers/taskand.answers.yaml,5
+  bootstrap/Dockerfile,286
+  docker-compose.yaml,43
+  evolution/install-answers/Dockerfile,16
+  evolution/install-cache/Dockerfile,3
+  evolution/install-ghauth/Dockerfile,4
+  evolution/orchestrator/Dockerfile,10
+  evolution/t1789203055/Dockerfile,4
+  evolution/t1789203289/Dockerfile,7
+  evolution/t1789203378/Dockerfile,23
+  evolution/t1789203531/Dockerfile,23
+  evolution/t1789203598/Dockerfile,17
+  evolution/t1789203624/Dockerfile,17
+  evolution/t1789203850/Dockerfile,17
+  evolution/t1789203850/TWIN_VERIFIED.json,6
+  evolution/t1789204046/Dockerfile,23
+  evolution/t1789204317/Dockerfile,43
+  evolution/t1789204317/TWIN_VERIFIED.json,6
+  evolution/t1789204506/Dockerfile,24
+  evolution/t1789204647/Dockerfile,43
+  evolution/t1789204816/Dockerfile,43
+  evolution/t1789205131/Dockerfile,43
+  evolution/t1789205406/Dockerfile,43
+  evolution/t1789205596/Dockerfile,24
+  gateway/Dockerfile,199
+  history/history.yaml,9
+  history/snapshots/snap-t1789203598/Dockerfile,17
+  history/snapshots/snap-t1789203598/files/taskand/Dockerfile,286
+  history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml,56
+  history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile,63
+  history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml,0
+  history/snapshots/snap-t1789203598/manifest.json,18
+  landing/Dockerfile,5
+  landing/serve.sh,21
+  project.sh,59
+  scripts/digital_twin.py,249
+  scripts/dod_validator.py,79
+  scripts/history.py,309
+  serve.sh,21
+  taskand.sh,59
+  tasks/done.yaml,14
+  tasks/inbox.yaml,0
+  tree.sh,1
+D:
+  scripts/history.py:
+    e: ensure_dirs,compute_dir_hash,create_snapshot,list_history,show_details,rollback
+    ensure_dirs()
+    compute_dir_hash(directory)
+    create_snapshot(target_rel_path;desc;task_id)
+    list_history()
+    show_details(target_id)
+    rollback(target_id_or_hash)
+  scripts/dod_validator.py:
+    e: run_cmd,validate_dod
+    run_cmd(cmd;cwd)
+    validate_dod(task_id;task_type;task_desc)
+  scripts/digital_twin.py:
+    e: load_env,log,create_twin_environment,run_twin_verification,ask_llm_for_repair,verify_and_evolve
+    load_env()
+    log(msg;tag)
+    create_twin_environment(task_id)
+    run_twin_verification(task_id;dockerfile_path;twin_workspace)
+    ask_llm_for_repair(task_id;original_dockerfile;error_logs;task_desc)
+    verify_and_evolve(task_id;task_desc;max_attempts)
+  docker-compose.yaml:
+  serve.sh:
+  tree.sh:
+  project.sh:
+  taskand.sh:
+    e: safe_curl
+    safe_curl()
+  tasks/inbox.yaml:
+  tasks/done.yaml:
+  Dockerfile:
+    e: plan,gh_child
+    plan()
+    gh_child()
+  Makefile:
+  bootstrap/Dockerfile:
+    e: plan,gh_child
+    plan()
+    gh_child()
+  evolution/install-ghauth/Dockerfile:
+  gateway/Dockerfile:
+    e: Gateway,parse_yaml_tasks,send_cors_headers,do_OPTIONS,send_json,do_GET,do_POST,log_message,print
+    Gateway:
+    parse_yaml_tasks()
+    send_cors_headers()
+    do_OPTIONS()
+    send_json()
+    do_GET()
+    do_POST()
+    log_message()
+    print()
+  evolution/t1789203624/Dockerfile:
+  evolution/t1789204317/Dockerfile:
+  evolution/t1789204317/TWIN_VERIFIED.json:
+  evolution/t1789204647/Dockerfile:
+  evolution/t1789203850/TWIN_VERIFIED.json:
+  evolution/t1789203850/Dockerfile:
+  evolution/install-answers/Dockerfile:
+  evolution/t1789204506/Dockerfile:
+  evolution/t1789203378/Dockerfile:
+  evolution/t1789205596/Dockerfile:
+  evolution/t1789204816/Dockerfile:
+  evolution/t1789204046/Dockerfile:
+  evolution/orchestrator/Dockerfile:
+  evolution/t1789205131/Dockerfile:
+  landing/Dockerfile:
+  evolution/t1789203055/Dockerfile:
+  landing/serve.sh:
+  history/snapshots/snap-t1789203598/manifest.json:
+  history/snapshots/snap-t1789203598/files/taskand/docker-compose.yaml:
+  evolution/t1789203598/Dockerfile:
+  answers/taskand.answers.yaml:
+  evolution/t1789203289/Dockerfile:
+  evolution/install-cache/Dockerfile:
+  history/snapshots/snap-t1789203598/files/taskand/tasks/inbox.yaml:
+  history/history.yaml:
+  evolution/t1789203531/Dockerfile:
+  evolution/t1789205406/Dockerfile:
+  history/snapshots/snap-t1789203598/files/taskand/gateway/Dockerfile:
+    e: Gateway,yaml_value,send_json,do_GET,do_POST,log_message,print
+    Gateway:
+    yaml_value()
+    send_json()
+    do_GET()
+    do_POST()
+    log_message()
+    print()
+  history/snapshots/snap-t1789203598/files/taskand/Dockerfile:
+    e: plan,gh_child
+    plan()
+    gh_child()
+  history/snapshots/snap-t1789203598/Dockerfile:

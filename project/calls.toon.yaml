@@ -1,0 +1,79 @@
+# code2llm call graph | /home/tom/github/semcod/taskand/glm53
+# generated in 0.01s
+# nodes: 15 | edges: 20 | modules: 4
+# CC̄=3.5
+
+HUBS[20]:
+  scripts.history.rollback
+    CC=20  in:0  out:59  total:59
+  scripts.history.list_history
+    CC=21  in:0  out:52  total:52
+  gateway.Dockerfile.print
+    CC=0  in:51  out:0  total:51
+  scripts.history.show_details
+    CC=12  in:0  out:44  total:44
+  scripts.history.create_snapshot
+    CC=9  in:0  out:33  total:33
+  scripts.digital_twin.verify_and_evolve
+    CC=6  in:0  out:30  total:30
+  scripts.digital_twin.log
+    CC=1  in:21  out:1  total:22
+  scripts.digital_twin.ask_llm_for_repair
+    CC=8  in:1  out:20  total:21
+  scripts.digital_twin.create_twin_environment
+    CC=5  in:1  out:15  total:16
+  scripts.digital_twin.run_twin_verification
+    CC=9  in:1  out:13  total:14
+  scripts.history.compute_dir_hash
+    CC=3  in:2  out:12  total:14
+  scripts.dod_validator.validate_dod
+    CC=19  in:0  out:10  total:10
+  scripts.history.ensure_dirs
+    CC=2  in:4  out:4  total:8
+  scripts.digital_twin.load_env
+    CC=6  in:1  out:7  total:8
+  scripts.dod_validator.run_cmd
+    CC=1  in:3  out:4  total:7
+
+MODULES:
+  gateway.Dockerfile  [1 funcs]
+    print  CC=0  out:0
+  scripts.digital_twin  [6 funcs]
+    ask_llm_for_repair  CC=8  out:20
+    create_twin_environment  CC=5  out:15
+    load_env  CC=6  out:7
+    log  CC=1  out:1
+    run_twin_verification  CC=9  out:13
+    verify_and_evolve  CC=6  out:30
+  scripts.dod_validator  [2 funcs]
+    run_cmd  CC=1  out:4
+    validate_dod  CC=19  out:10
+  scripts.history  [6 funcs]
+    compute_dir_hash  CC=3  out:12
+    create_snapshot  CC=9  out:33
+    ensure_dirs  CC=2  out:4
+    list_history  CC=21  out:52
+    rollback  CC=20  out:59
+    show_details  CC=12  out:44
+
+EDGES:
+  scripts.dod_validator.validate_dod → scripts.dod_validator.run_cmd
+  scripts.digital_twin.log → gateway.Dockerfile.print
+  scripts.digital_twin.create_twin_environment → scripts.digital_twin.log
+  scripts.digital_twin.run_twin_verification → scripts.digital_twin.log
+  scripts.digital_twin.ask_llm_for_repair → scripts.digital_twin.load_env
+  scripts.digital_twin.ask_llm_for_repair → scripts.digital_twin.log
+  scripts.digital_twin.verify_and_evolve → gateway.Dockerfile.print
+  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.log
+  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.create_twin_environment
+  scripts.digital_twin.verify_and_evolve → scripts.digital_twin.run_twin_verification
+  scripts.history.create_snapshot → scripts.history.ensure_dirs
+  scripts.history.create_snapshot → scripts.history.compute_dir_hash
+  scripts.history.create_snapshot → gateway.Dockerfile.print
+  scripts.history.list_history → scripts.history.ensure_dirs
+  scripts.history.list_history → gateway.Dockerfile.print
+  scripts.history.show_details → scripts.history.ensure_dirs
+  scripts.history.show_details → gateway.Dockerfile.print
+  scripts.history.rollback → scripts.history.ensure_dirs
+  scripts.history.rollback → gateway.Dockerfile.print
+  scripts.history.rollback → scripts.history.compute_dir_hash

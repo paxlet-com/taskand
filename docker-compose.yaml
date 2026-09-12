@@ -14,11 +14,7 @@ services:
       TASKAND_HOST_DIR: ${TASKAND_HOST_DIR:-.}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${TASKAND_HOST_DIR:-.}/docker-compose.yaml:/taskand/docker-compose.yaml
-      - ${TASKAND_HOST_DIR:-.}/evolution:/taskand/evolution
-      - ${TASKAND_HOST_DIR:-.}/tasks:/taskand/tasks
-      - ${TASKAND_HOST_DIR:-.}/log:/taskand/log
-      - ${TASKAND_HOST_DIR:-.}/answers:/taskand/answers
+      - "${TASKAND_HOST_DIR:-.}:/taskand"
     restart: unless-stopped
 
   gateway:
@@ -34,4 +30,12 @@ services:
     build: ./landing
     container_name: taskand-landing
     ports: ["8090:80"]
+    volumes:
+      - "./landing:/usr/share/nginx/html:ro"
     restart: unless-stopped
+
+  task-t1789216176:
+    build: ./evolution/t1789216176
+    volumes:
+      - /home/tom/.config/gh:/root/.config/gh:ro
+    restart: "no"

@@ -1,17 +1,49 @@
-# taskand v0.4 Makefile
-.PHONY: help bootstrap up down restart ps status logs logs-all tasks add add-watch web gateway-health install-cli check clean history show rollback snapshot clean-duplicates
+# taskand v1.0 Makefile
+.PHONY: help bootstrap up down restart ps status logs logs-all tasks add add-watch web gateway-health install-cli check clean history show rollback snapshot clean-duplicates test pack verify run observe extract deploy conformance
 
 SHELL := /bin/sh
-PORT ?= 8080
+PORT ?= 8090
+URI ?= proc://taskand.dev/flow/login/v1
 
 help: ## Wyświetla pomoc i listę dostępnych celów
-	@echo "taskand v0.4 — System zadań i planista GLM-5.3"
+	@echo "taskand-glm53 v1.0 — Standard Paczki i Procesów URI"
+	@echo "Web Cockpit: http://localhost:8090 · Gateway REST API: http://localhost:8077"
 	@echo ""
 	@echo "Dostępne komendy:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Aktualny stan usług:"
 	@docker compose ps 2>/dev/null || true
+
+conformance: ## Sprawdza 9/9 punktów listy konformacji Standardu v1.0
+	@node scripts/verify-conformance.mjs
+
+test: ## Testy kontraktu wszystkich procesów URI (fail-closed)
+	@node proc/browser/session/taskand.dev/v1/test.mjs
+	@node proc/web/navigate/taskand.dev/v1/test.mjs
+	@node proc/web/analyze/taskand.dev/v1/test.mjs
+	@node proc/flow/login/taskand.dev/v1/test.mjs
+	@echo "✓ Wszystkie procesy URI spełniają kontrakt (fail-closed)"
+
+pack: ## Tworzy archiwum paczki w dist/ z testem offline
+	@mkdir -p dist
+	@tar -czf dist/taskand-glm53-v1.0.0.tgz proc/ schemas/ capsule.yaml grants.yaml proc-catalog.json
+	@tar -tzf dist/taskand-glm53-v1.0.0.tgz >/dev/null && echo "pack ✓ (archiwum dist/taskand-glm53-v1.0.0.tgz gotowe)"
+
+verify: ## Weryfikuje sumy SHA-256 w proc-catalog.json i konformację
+	@node verify-catalog.mjs
+	@node scripts/verify-conformance.mjs
+
+run: ## Wykonuje proces URI przez uniwersalny launcher: make run [URI=proc://...]
+	@printf '%s' '{"task":{"site":"semcod.com"}}' | node scripts/taskand-runner.mjs $(URI)
+
+observe: ## Podgląd definicji procesu (proc.yaml): make observe [URI=proc://...]
+	@node --input-type=module -e 'import {readFileSync} from "node:fs"; const m = "$(URI)".match(/^proc:\/\/([^/]+)\/(.+)\/(v\d+)$$/); if(m) console.log(readFileSync("proc/"+m[2]+"/"+m[1]+"/"+m[3]+"/proc.yaml","utf8"));'
+
+extract: ## Ekstrakcja artefaktów z niemodyfikowalnej rewizji
+	@mkdir -p dist/extracted
+	@cp -r schemas/ dist/extracted/
+	@echo "extract ✓ (wyekstrahowano artefakty do dist/extracted)"
 
 bootstrap: ## Uruchamia interaktywny onboarding i instalację (taskand.sh)
 	@sh taskand.sh
@@ -65,10 +97,10 @@ add-watch: ## Dodaje zadanie typu obserwuj: make add-watch TASK="opis"
 	@./taskand.cli add -t obserwuj "$(TASK)"
 
 gateway-health: ## Sprawdza stan bramki HTTP (port 8077)
-	@curl -s http://localhost:8077/health | grep -q '"ok": true' && echo "✓ Gateway HTTP działa (port 8077)" || echo "✗ Gateway nie odpowiada"
+	@curl -s http://localhost:8077/api/health | grep -q '"ok": true' && echo "✓ Gateway REST API działa (port 8077)" || echo "✗ Gateway nie odpowiada"
 
-web: ## Uruchamia stronę landing page (Nginx w kontenerze na porcie 8090 lub lokalnie): make web
-	@docker compose up -d landing && echo "✓ Strona działa pod adresem: http://localhost:8090" || sh serve.sh 8090
+web: ## Uruchamia stronę landing page i Web Cockpit na porcie 8090: make web
+	@docker compose up -d landing && echo "✓ Web Cockpit działa pod adresem: http://localhost:8090" || sh landing/serve.sh $(PORT)
 
 check: ## Weryfikuje składnię wszystkich plików Dockerfile
 	@docker build --check .

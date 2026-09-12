@@ -1,0 +1,474 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-ad03e472
+    name: Fix ast-unused-imports issues
+    description: Resolve 3 ast-unused-imports issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ast-unused-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-abdbe278
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-a3549701
+    name: Fix ast-print-statements issues
+    description: Resolve 4 ast-print-statements issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ast-print-statements
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3f1f6469
+    name: Fix ast-missing-return-type issues
+    description: Resolve 4 ast-missing-return-type issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ast-missing-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b060d632
+    name: Fix ruff-unused-imports issues
+    description: Resolve 1 ruff-unused-imports issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ruff-unused-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3c3c054e
+    name: Fix ruff-print-statements issues
+    description: Resolve 4 ruff-print-statements issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ruff-print-statements
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4833e083
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-369cc4c8
+    name: Fix smart-return-type issues
+    description: Resolve 4 smart-return-type issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: smart-return-type
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d531a0ab
+    name: Fix string-concat-fstring issues
+    description: Resolve 4 string-concat-fstring issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: string-concat-fstring
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1d6d0f79
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-af47034f
+    name: Fix magic-numbers issues
+    description: Resolve 6 magic-numbers issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/digital_twin.py
+    rule_id: magic-numbers
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-74213210
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-42e3f6f1
+    name: Fix string-formatting issues
+    description: Resolve 1 string-formatting issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: string-formatting
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-08b9ba6a
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in scripts/digital_twin.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/digital_twin.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-76cdf7e0
+    name: Fix ast-unused-imports issues
+    description: Resolve 6 ast-unused-imports issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ast-unused-imports
+    count: 6
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8ad94b01
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2b6d9c1f
+    name: Fix ast-print-statements issues
+    description: Resolve 5 ast-print-statements issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ast-print-statements
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-84b70e88
+    name: Fix ast-missing-return-type issues
+    description: Resolve 1 ast-missing-return-type issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ast-missing-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3cc0adcf
+    name: Fix ruff-unused-imports issues
+    description: Resolve 2 ruff-unused-imports issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ruff-unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-29168810
+    name: Fix ruff-print-statements issues
+    description: Resolve 5 ruff-print-statements issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ruff-print-statements
+    count: 5
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d75edfae
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-df42fc51
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-71c477e0
+    name: Fix unused-imports issues
+    description: Resolve 4 unused-imports issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - scripts/dod_validator.py
+    rule_id: unused-imports
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-32a5e2b7
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ab986e9d
+    name: Fix import-optimization issues
+    description: Resolve 3 import-optimization issues in scripts/dod_validator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/dod_validator.py
+    rule_id: import-optimization
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-14cec7c3
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2320710d
+    name: Fix ast-print-statements issues
+    description: Resolve 49 ast-print-statements issues in scripts/history.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - scripts/history.py
+    rule_id: ast-print-statements
+    count: 49
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-57cf4307
+    name: Fix ast-missing-return-type issues
+    description: Resolve 0 ast-missing-return-type issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: ast-missing-return-type
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1881375f
+    name: Fix ruff-print-statements issues
+    description: Resolve 0 ruff-print-statements issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: ruff-print-statements
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9046e409
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 0 ruff-sorted-imports issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: ruff-sorted-imports
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ba78be79
+    name: Fix smart-return-type issues
+    description: Resolve 0 smart-return-type issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: smart-return-type
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-25841ecf
+    name: Fix string-concat-fstring issues
+    description: Resolve 0 string-concat-fstring issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: string-concat-fstring
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-ed3e8517
+    name: Fix magic-numbers issues
+    description: Resolve 0 magic-numbers issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: magic-numbers
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-413b7f97
+    name: Fix ai-boilerplate issues
+    description: Resolve 0 ai-boilerplate issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: ai-boilerplate
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7412219b
+    name: Fix string-formatting issues
+    description: Resolve 0 string-formatting issues in scripts/history.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - scripts/history.py
+    rule_id: string-formatting
+    count: 0
+    model_hints:
+      planning: balanced
+      implementation: balanced

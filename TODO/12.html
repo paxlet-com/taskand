@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>taskand.com v0.14 — finalny standard paczki: 1 paczka = N procesów · wspólny szkielet dla każdej roli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2ECDD; --paper2:#EBE4D1; --ink:#221D12; --ink2:#5C543E;
+  --line:#D3C9AD; --line2:#C2B693; --verm:#B03A10; --verm2:#C94E1F; --olive:#71692F;
+  --plate:#1D1911; --ptext:#EBE2CC; --pdim:#8F8567; --pacc:#E06B37; --pkey:#BCB489;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Newsreader',Georgia,serif;font-size:16px;line-height:1.5;padding:26px clamp(16px,4vw,54px) 44px;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/feFilter%3E%3C/svg%3E")}
+header,main,footer{position:relative;z-index:1}
+.wrap{max-width:1260px;margin:0 auto}
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding-bottom:16px;border-bottom:2px solid var(--ink);position:relative;margin-bottom:6px}
+.mast::after{content:'';position:absolute;left:0;right:0;bottom:-5px;border-bottom:1px solid var(--ink)}
+h1{font-size:clamp(34px,4.2vw,52px);font-weight:500;font-style:italic;letter-spacing:-1px;line-height:.95}
+h1 .tld{color:var(--verm);font-size:.62em}
+.tagser{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--ink2);margin-top:9px}
+.mast-r{text-align:right;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink2);line-height:1.9}
+.mast-r b{color:var(--verm);font-weight:500}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:34px;align-items:start;padding:30px 0 4px}
+@media(max-width:980px){.hero{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(22px,2.8vw,32px);font-weight:500;font-style:italic;line-height:1.2}
+.hero h2 em{color:var(--verm)}
+.hero-l p{margin-top:12px;font-size:16px;max-width:660px}
+.ansbox{border:1px solid var(--verm2);border-left:4px solid var(--verm2);border-radius:3px;padding:14px 18px;margin-top:16px;background:rgba(176,58,16,.05);font-size:15px}
+.ansbox b{color:var(--verm);font-weight:600}
+section{margin-top:50px}
+.shead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.snum{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--verm);letter-spacing:1px}
+.stitle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink2)}
+.srule{flex:1;border-top:1px solid var(--line);min-width:24px}
+.smeta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.slede{font-size:16.5px;max-width:920px;margin-bottom:18px}
+.mtx{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px}
+.mtx th{text-align:left;font-weight:500;letter-spacing:1px;text-transform:uppercase;font-size:9px;color:var(--ink2);border-bottom:1.5px solid var(--ink);padding:6px 8px}
+.mtx td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.mtx td b{color:var(--verm);font-weight:500}
+.mtx td .ok{color:var(--olive)}
+/* inspektor */
+.ptabs{display:flex;border:1px solid var(--line2);border-radius:2px;overflow:hidden;margin-bottom:14px;flex-wrap:wrap}
+.ptab{flex:1;min-width:140px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;border-right:1px solid var(--line);padding:9px 6px;cursor:pointer;color:var(--ink2)}
+.ptab:last-child{border-right:none}
+.ptab.on{background:var(--ink);color:var(--paper)}
+.tglrow{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2)}
+.tgl{border:1px solid var(--line2);border-radius:999px;padding:5px 12px;cursor:pointer;background:transparent;color:var(--ink2);font-family:'JetBrains Mono',monospace;font-size:10px}
+.tgl.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tree{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.6px;line-height:1.85;padding:16px 18px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B;min-height:340px}
+.tree .c{color:#7E755B;font-style:italic}
+.tree .v{color:var(--pacc)}
+.tree .k{color:var(--pkey)}
+.tree .std{color:#C9BE8B}
+.tree .hide{display:none}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink2);margin:10px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+/* pliki */
+.ftabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.ftab{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);background:transparent;color:var(--ink2);padding:6px 12px;border-radius:2px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.ftab .fdot{width:6px;height:6px;border-radius:50%;background:var(--olive)}
+.ftab.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fplate{background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.62;padding:16px 18px;border-radius:3px;white-space:pre-wrap;word-break:break-word;max-height:560px;overflow:auto;box-shadow:0 0 0 1px #14110B,0 0 0 2px rgba(0,0,0,.13)}
+.fplate::-webkit-scrollbar{width:8px}
+.fplate::-webkit-scrollbar-thumb{background:#3A3422;border-radius:4px}
+.fplate .c{color:#7E755B;font-style:italic}
+.fplate .k{color:var(--pacc);font-weight:600}
+.fplate .yk{color:var(--pkey)}
+.frow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ibtn{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:transparent;border:1px solid var(--line2);border-radius:2px;padding:6px 11px;cursor:pointer;color:var(--ink2)}
+.ibtn:hover{color:var(--ink);border-color:var(--ink)}
+.ibtn svg{width:12px;height:12px}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink2);line-height:1.8}
+#toast{position:fixed;left:24px;bottom:22px;background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:11px;padding:10px 16px;border-radius:2px;opacity:0;transform:translateY(8px);transition:all .28s;pointer-events:none;z-index:50;max-width:70vw}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <h1>taskand<span class="tld">.com</span></h1>
+      <p class="tagser">v0.14 · finalny standard paczki · 1 paczka = N procesów · wspólny szkielet</p>
+    </div>
+    <div class="mast-r">
+      <b>proces</b> = jednostka WYKONANIA (proc://, kontrakt JSON→JSON)<br>
+      <b>paczka</b> = jednostka WERSJONOWANIA (git, tag, ewolucja, granty, twin)
+    </div>
+  </div>
+  <div class="hero">
+    <div class="hero-l">
+      <h2>Jedna paczka zawiera <em>wiele procesów</em> — bo proces i paczka odpowiadają za różne rzeczy.</h2>
+      <p>Proces (<span style="font-family:'JetBrains Mono',monospace;font-size:.85em">proc://taskand.dev/…/v1</span>) wykonuje jedno zadanie z kontraktem: JSON na wejściu → JSON na wyjściu, fail-closed, własna wersja v1/v2. Paczka (kapsuła = repozytorium git z tagiem <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">capsule-v…</span>) wersjonuje, ewoluuje i broni (granty, twin, deploy) całą <b>rodzinę procesów + wspólne artefakty</b>. Między paczkami procesy wołają się <b>wyłącznie przez URI</b> — nigdy przez import kodu: paczka jest granicą kodu, URI granicą wołania.</p>
+      <div class="ansbox">
+        <b>Podwójne wersjonowanie (celowe):</b> ewolucja <em>procesu</em> = nowy URI (v1 → v2, stare immutable — jak parallel-major koperty); ewolucja <em>paczki</em> = nowy tag git (może zmienić <b>atomowo</b> wiele procesów, grants, schematy). Minimalna paczka = 1 proces; duża = dziesiątki. Standard nie wymusza granularności — wymusza <b>szkielet</b>.
+      </div>
+    </div>
+    <div>
+      <div style="background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.6px;line-height:1.95;padding:15px 17px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B">taskand-web/                  <span style="color:var(--pdim)">← PACZKA (wersja: tag git)</span>
+├── proc/chat/serve/…/v1      <span style="color:var(--pacc)">← PROCES 1</span>
+├── proc/chat/evolve-req/…/v1 <span style="color:var(--pacc)">← PROCES 2</span>
+├── proc/summarize/…/v2       <span style="color:var(--pacc)">← PROCES 3 (v2 obok v1)</span>
+├── schemas/ grants/ claims/  <span style="color:var(--pdim)">← wspólne artefakty paczki</span>
+└── capsule.yaml              <span style="color:var(--pdim)">← manifest: który proces gra którą rolę</span>
+
+<span style="color:var(--pdim)">wołanie Z INNEJ PACZKI (nigdy import):</span>
+  envelope → proc://taskand.dev/chat/serve/v1
+           → katalog: binding (node/docker/make) → JSON→JSON</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="shead"><span class="snum">01</span><span class="stitle">podział odpowiedzialności — proces kontra paczka</span><span class="srule"></span><span class="smeta">dwie jednostki, zero nakładania ról</span></div>
+  <p class="slede">Zasada spójna z całą historią taskand: to, co wykonuje, nie wersjonuje się samo; to, co się wersjonuje, nie wykonuje się samo.</p>
+  <table class="mtx">
+    <thead><tr><th>odpowiedzialność</th><th>proces (proc://)</th><th>paczka (kapsuła)</th></tr></thead>
+    <tbody>
+      <tr><td><b>wykonanie</b></td><td>tak — kontrakt JSON→JSON, fail-closed, exit 0/1/2</td><td>nie — paczka nie „uruchamia się”, uruchamiają się jej procesy</td></tr>
+      <tr><td><b>wersjonowanie</b></td><td>własna wersja w URI (v1/v2, immutable)</td><td>tag git capsule-v… (atomowo: procesy + artefakty + grants)</td></tr>
+      <tr><td><b>ewolucja</b></td><td>nowy URI — stary zostaje</td><td>developer → twin → 3 próby → deploy albo raport (v0.9)</td></tr>
+      <tr><td><b>uprawnienia</b></td><td>deklaruje wymagane granty w bindingu</td><td>grants.yaml: co wolno procesom i komu w ogóle</td></tr>
+      <tr><td><b>granica wołania</b></td><td>URI — jedyny sposób wywołania</td><td>granica kodu: procesy innych paczek = tylko przez URI</td></tr>
+      <tr><td><b>liczność</b></td><td>1 zadanie</td><td><b>N procesów</b> (minimum 1 — paczka jednoprocesowa jest poprawna)</td></tr>
+      <tr><td><b>runtime</b></td><td>binding: node/docker/make/remote (v0.13)</td><td>nie narzuca runtime'u — compose/docker to opcja</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><span class="stitle">inspektor standardu — trzy realne paczki, jeden szkielet</span><span class="srule"></span><span class="smeta">developer · web-chat · schemareg</span></div>
+  <p class="slede">Przełącz paczkę; włącz <b>„tylko wspólne”</b> — zobaczysz rdzeń standardu, identyczny dla każdej roli (żółte wpisy). Wspólny szkielet to <b>obowiązkowe minimum konformacji</b>; reszta to dodatki zależne od roli.</p>
+  <div class="ptabs" id="ptabs">
+    <button class="ptab on" data-p="dev">taskand-developer</button>
+    <button class="ptab" data-p="web">taskand-web (czat)</button>
+    <button class="ptab" data-p="reg">taskand-schemareg</button>
+  </div>
+  <div class="tglrow">
+    <button class="tgl" id="onlyStd">pokaż tylko wspólne (rdzeń standardu)</button>
+    <span id="pkgMeta">—</span>
+  </div>
+  <div class="legend">
+    <span><i style="background:#C9BE8B"></i>wspólne (STD — wymagane)</span>
+    <span><i style="background:#E06B37"></i>specyficzne dla roli</span>
+    <span><i style="background:#7E755B"></i>opcjonalne (zależnie od roli)</span>
+  </div>
+  <div class="tree" id="pkgTree"></div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><span class="stitle">wołania między procesami i podwójne wersjonowanie</span><span class="srule"></span><span class="smeta">URI granicą · tag granicą atomowości</span></div>
+  <p class="slede">Procesy <b>within</b> paczki też wołają się przez URI (nie przez import) — dzięki temu refaktor wewnętrzny nie zmienia zachowania na zewnątrz, a testy kontraktu łapią każdy przełom.</p>
+  <div style="background:var(--plate);color:var(--ptext);font-family:'JetBrains Mono',monospace;font-size:10.8px;line-height:1.95;padding:16px 18px;border-radius:3px;white-space:pre-wrap;box-shadow:0 0 0 1px #14110B"><span style="color:var(--pdim)"># ewolucja PROCESU — nowy URI, stary zostaje (immutable):</span>
+proc/summarize/hourly/taskand.dev/v1   <span style="color:var(--pdim)">← działa dalej (konsumenci na v1)</span>
+proc/summarize/hourly/taskand.dev/v2   <span style="color:var(--pacc)">← UTF-8 + limit — WSPÓŁISTNIEJE</span>
+
+<span style="color:var(--pdim)"># ewolucja PACZKI — jeden tag zmienia atomowo wiele rzeczy:</span>
+git tag capsule-taskand-web-v1.2.0
+  <span style="color:var(--pdim)">├── proc/chat/serve/v1 → v2 (nowy URI w manifeście)</span>
+  <span style="color:var(--pdim)">├── grants.yaml: +publish (za zgodą usera)</span>
+  <span style="color:var(--pdim)">└── schemas/chat-message: pole opcjonalne (minor)</span>
+
+<span style="color:var(--pdim)"># wołanie między paczkami (nigdy import kodu):</span>
+koperta { target: <span style="color:var(--pacc)">proc://taskand.dev/evolve/feature/v1</span>, data: {cel, opis} }
+  → supervisor: katalog (hashy ✓) → binding → node bin.mjs (JSON→JSON)</div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">04</span><span class="stitle">lista konformacji — co każda paczka MUSI mieć</span><span class="srule"></span><span class="smeta">9 wymagań standardu v1</span></div>
+  <p class="slede">Tabela konformacji trzech paczek (i miejsca na Twoją następną — generator z sekcji 05 tworzy szkielet spełniający całość od pierwszego commita).</p>
+  <table class="mtx" id="confTable">
+    <thead><tr><th>wymaganie (STD)</th><th>developer</th><th>web-chat</th><th>schemareg</th></tr></thead>
+    <tbody>
+      <tr><td><b>capsule.yaml</b> — manifest z procesami i rolami</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>≥1 proces proc://</b> — bin.mjs (JSON→JSON, fail-closed) + binding</td><td class="ok">✓ (evolve)</td><td class="ok">✓ (serve, evolve-request)</td><td class="ok">✓ (registry-serve)</td></tr>
+      <tr><td><b>URI = ścieżka</b> — proc/&lt;ścieżka&gt;/&lt;org&gt;/&lt;wersja&gt;/</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>Makefile</b> — targety: test · pack · verify · run · observe · extract</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>proc-catalog.json</b> — hashe + rewizje (make verify)</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>grants.yaml</b> — uprawnienia (git, proc://, restart)</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>testy kontraktu</b> — upstream zachowany, fail-closed</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓ (corpus replay)</td></tr>
+      <tr><td><b>git</b> — kręgosłup: tagi capsule-v…, historia immutable</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+      <tr><td><b>ewolucja</b> — delegated-to developer · twin-first · 3 próby · raport</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">05</span><span class="stitle">pliki — szablon standardu i generator nowej paczki</span><span class="srule"></span><span class="smeta">v0.14 · start nowej paczki w 1 komendę</span></div>
+  <p class="slede">Szablon manifestu (wypełniasz procesy i rolę), spec konformacji jako dane, finalny Makefile paczki i <span style="font-family:'JetBrains Mono',monospace;font-size:.85em">taskand-new-pkg.sh</span> — generator szkieletu zgodnego z całą listą konformacji od pierwszego commita.</p>
+  <div class="frow">
+    <div class="ftabs" id="ftabs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ibtn" id="fCopy"><i data-lucide="copy"></i> kopiuj</button>
+      <button class="ibtn" id="fDl"><i data-lucide="download"></i> pobierz plik</button>
+      <button class="ibtn" id="fBundle"><i data-lucide="package"></i> pobierz standard</button>
+    </div>
+  </div>
+  <div class="fplate" id="fplate"></div>
+</section>
+
+</main>
+<footer>
+taskand.com v0.14 · standard paczki: 1 paczka (git, tag, ewolucja, granty, twin) = N procesów (proc://, kontrakt JSON→JSON, fail-closed) + wspólne artefakty · szkielet wspólny dla każdej roli: manifest · Makefile (test/pack/verify/run/observe/extract) · ≥1 proc:// · katalog z hashami · grants · testy kontraktu · ewolucja przez developera<br>
+wołania między procesami wyłącznie przez URI (nigdy import) · podwójne wersjonowanie: proces (URI v1/v2) i paczka (tag, atomowo) · generator tworzy szkielet zgodny z listą konformacji
+</footer>
+</div>
+<div id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+function icons(){ if(window.lucide) lucide.createIcons(); }
+function dl(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function hlY(txt){
+  return txt.split('\n').map(l => {
+    let e = esc(l);
+    if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    return e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+  }).join('\n');
+}
+
+/* ————— 02 · inspektor ————— */
+/* kind: std (wspólne, żółte) | spec (verm) | opt (szare) */
+const PKGS = {
+  dev: {
+    name: 'taskand-developer', role: 'developer',
+    rows: [
+      ['taskand-developer/', 'PACZKA — rola: developer (wersja: tag git)', 'std'],
+      ['├── capsule.yaml', 'manifest: procesy tej paczki + rola + ewolucja', 'std'],
+      ['├── Makefile', 'API: test · pack · verify · run · observe · extract', 'std'],
+      ['├── grants.yaml', 'uprawnienia: git rw na celach · request-restart', 'std'],
+      ['├── proc-catalog.json', 'katalog procesów: hashe + rewizje (auto)', 'std'],
+      ['├── .git/', 'kręgosłup: tagi capsule-v… · historia immutable', 'std'],
+      ['├── proc/', 'PROCESY paczki (URI = ścieżka):', 'std'],
+      ['│   └── evolve/feature/taskand.dev/v1/', 'proces: ewolucja przez git (fetch→branch→merge)', 'spec'],
+      ['│       ├── proc.yaml', 'binding: node/docker/make + granty run', 'std'],
+      ['│       ├── bin.mjs', 'JSON→JSON · fail-closed · exit 0/1/2', 'std'],
+      ['│       └── test.mjs', 'testy kontraktu (upstream zachowany)', 'std'],
+      ['├── twin-runner', 'pętla prób: 3 próby → deploy albo raport', 'opt'],
+      ['├── targets/', 'klony repozytoriów-celów (grants: read+write)', 'spec'],
+      ['├── tasks/evolution-inbox.yaml', 'zadania ewolucji (typy evolve-*)', 'opt'],
+      ['├── dist/', 'archiwa po make pack (+ offline check)', 'opt'],
+      ['└── patches/', 'wyeksportowane ewolucje (git format-patch)', 'opt']
+    ]
+  },
+  web: {
+    name: 'taskand-web', role: 'application (czat)',
+    rows: [
+      ['taskand-web/', 'PACZKA — rola: application (wersja: tag git)', 'std'],
+      ['├── capsule.yaml', 'manifest: procesy czatu + polityka deploy', 'std'],
+      ['├── Makefile', 'API: test · pack · verify · run · observe · extract (+deploy)', 'std'],
+      ['├── grants.yaml', 'uprawnienia: submit task · NIE self-restart', 'std'],
+      ['├── proc-catalog.json', 'katalog procesów: hashe + rewizje (auto)', 'std'],
+      ['├── .git/', 'kręgosłup: tagi capsule-v… · historia immutable', 'std'],
+      ['├── proc/', 'PROCESY paczki (URI = ścieżka):', 'std'],
+      ['│   ├── chat/serve/taskand.dev/v1/', 'proces: serwer czatu (healthz, /chat)', 'spec'],
+      ['│   │   ├── proc.yaml', 'binding: node/docker/make + granty run', 'std'],
+      ['│   │   ├── bin.mjs', 'JSON→JSON · fail-closed · exit 0/1/2', 'std'],
+      ['│   │   └── test.mjs', 'testy kontraktu wiadomości', 'std'],
+      ['│   └── chat/evolve-request/taskand.dev/v1/', 'proces: zgłoszenie zmiany do developera', 'spec'],
+      ['├── Dockerfile', 'realizacja runtime: docker (jedna z możliwych!)', 'opt'],
+      ['├── docker-compose.yaml', 'usługi z etykietami URN (org.taskand.*)', 'opt'],
+      ['├── twin.compose.yaml', 'bliźniak kandydata (:8180) — twin-first', 'opt'],
+      ['├── schemas/', 'kontrakty wiadomości (versioned-validated)', 'opt'],
+      ['├── .env.example', 'konfiguracja LLM (runtime-only, poza git)', 'opt'],
+      ['└── app/', 'front czatu (statyczny, serwowany przez serve)', 'spec']
+    ]
+  },
+  reg: {
+    name: 'taskand-schemareg', role: 'schema-registry (koperta)',
+    rows: [
+      ['taskand-schemareg/', 'PACZKA — rola: schema-registry (wersja: tag git)', 'std'],
+      ['├── capsule.yaml', 'manifest: proces rejestru + artefakt koperty', 'std'],
+      ['├── Makefile', 'API: test · pack · verify · run · observe · extract', 'std'],
+      ['├── grants.yaml', 'uprawnienia: validate (publiczne) · NIE edycja wersji', 'std'],
+      ['├── proc-catalog.json', 'katalog procesów: hashe + rewizje (auto)', 'std'],
+      ['├── .git/', 'kręgosłup: tagi capsule-v… · historia immutable', 'std'],
+      ['├── proc/', 'PROCESY paczki (URI = ścieżka):', 'std'],
+      ['│   └── registry/serve/taskand.dev/v1/', 'proces: /schemas · /validate · discovery', 'spec'],
+      ['│       ├── proc.yaml', 'binding: node/docker/make + granty run', 'std'],
+      ['│       ├── bin.mjs', 'JSON→JSON · fail-closed · exit 0/1/2', 'std'],
+      ['│       └── test.mjs', 'testy walidacji (próbki kopert)', 'std'],
+      ['├── schemas/envelope/', 'KOPERTA jako artefakt: v1.0.3.json, v2.0.0.json…', 'spec'],
+      ['├── tests/compat/run.sh', 'twin: replay nagrań z dziennika (corpus)', 'opt'],
+      ['├── versioning-policy.yaml', 'zasady bumpów (additive→minor, breaking→major)', 'opt'],
+      ['└── dist/', 'archiwa po make pack (+ offline check)', 'opt']
+    ]
+  }
+};
+let curPkg = 'dev', onlyStd = false;
+function renderTree(){
+  const p = PKGS[curPkg];
+  let nStd = 0;
+  const lines = p.rows.filter(r => !onlyStd || r[2] === 'std').map(([path, desc, kind]) => {
+    if(kind === 'std') nStd++;
+    const cls = kind === 'std' ? 'std' : (kind === 'spec' ? 'v' : 'c');
+    return `<span class="${onlyStd && kind === 'std' ? 'std' : cls}">${esc(path)}</span>   <span class="c">${esc(desc)}</span>`;
+  }).join('\n');
+  $('#pkgTree').innerHTML = lines;
+  $('#pkgMeta').textContent = `${p.name} · rola: ${p.role} · ${p.rows.length} wpisów${onlyStd ? ` · rdzeń standardu: ${nStd}` : ''}`;
+}
+document.querySelectorAll('.ptab').forEach(b => b.onclick = () => {
+  curPkg = b.dataset.p;
+  document.querySelectorAll('.ptab').forEach(x => x.classList.toggle('on', x === b));
+  renderTree();
+});
+ $('#onlyStd').addEventListener('click', () => {
+  onlyStd = !onlyStd;
+  $('#onlyStd').classList.toggle('on', onlyStd);
+  $('#onlyStd').textContent = onlyStd ? 'pokaż wszystko' : 'pokaż tylko wspólne (rdzeń standardu)';
+  renderTree();
+  toast(onlyStd ? 'rdzeń standardu — identyczny w każdej paczce' : 'pełny widok paczki');
+});
+
+/* ————— 05 · pliki ————— */
+const CAPSULE_TEMPLATE = `apiVersion: taskand.dev/v1
+kind: Capsule                       # STANDARD PACZKI v1 (v0.14)
+metadata:
+  name: taskand-<nazwa>             # małe litery, myślniki
+  version: "1.0.0"                  # wersja PACZKI = tag git (capsule-v…)
+
+spec:
+  role: <developer|application|interface|schema-registry|…>
+
+  processes:                        # ← N procesów w JEDNEJ paczce
+    - uri: proc://<org>/<zdolność>/v1
+      role: <worker|serve|…>        # rola procesu w paczce
+      grants: [execute-proc]
+    - uri: proc://<org>/<zdolność-2>/v1
+      role: worker
+  # binding każdego procesu: proc/<ścieżka>/<org>/<wersja>/proc.yaml
+  # standardowy wpis: bin.mjs (JSON→JSON, fail-closed, exit 0/1/2)
+
+  interfaces: []                    # http/web tylko jeśli rola tego wymaga
+  permissions:
+    source: grants.yaml             # uprawnienia: git · proc:// · restart
+    defaults: { deny: [policy-write, claims-delete, git-push] }
+
+  artifacts: []                     # klasy: process|schema|skill|knowledge|twin
+                                    # tryby: versioned|versioned-validated|reviewed|append-only|requalified
+
+  evolution:
+    delegated-to: capsule:taskand-developer   # paczka NIE ewoluuje się sama
+    twin: { corpus: journal, retries: 3 }     # twin-first, 3 próby, potem raport
+
+  deploy:
+    policy: twin-first
+    health: { after: deploy, on-fail: auto-rollback }
+    on-exhausted: keep-previous + report
+
+  storage:                          # kręgosłup (od v0.7)
+    kind: git
+    versioning: { mode: commits+tags, tagPrefix: capsule- }
+    evolution: { branches: evo/<id>, merge: no-ff }
+    exchange: { patches: patches/, import: git-am-reviewed }
+    prohibited: [force-push, history-rewrite]
+
+  runtime:                          # nie narzuca runtime'u!
+    repo-mount: read-only           # samomodyfikacja DENY
+    self-modification: denied
+  # realization (docker-compose, ssh, natywnie) — deklaruje BINDING procesu,
+  # nie paczka: ewolucja runtime'u nie zmienia ani jednej paczki-wywołującego
+`;
+const STANDARD_SPEC = `apiVersion: taskand.dev/v1
+kind: PackageStandard              # spec konformacji (sekcja 04 = ta lista)
+rules:
+  required:                         # rdzeń — każda paczka
+    - capsule.yaml                  # manifest z processes[] i rolą
+    - Makefile                      # targety: test pack verify run observe extract
+    - proc/                         # ≥1 proces: URI=ścieżka, bin.mjs, proc.yaml, test
+    - proc-catalog.json             # hashe+rewizje · weryfikacja: make verify
+    - grants.yaml                   # uprawnienia (git, proc://, restart)
+    - .git                          # kręgosłup: tagi capsule-v…, immutable
+  conventions:
+    - "proces wołany WYŁĄCZNIE przez URI (nigdy import kodu)"
+    - "bin.mjs: JSON stdin → JSON stdout · exit 0 ok / 1 fail-closed / 2 kontrakt"
+    - "wersja procesu w URI (v1/v2) ≠ wersja paczki (tag) — obie żyją"
+    - "paczka nie ewoluuje sama: delegated-to developer (twin-first)"
+    - "runtime deklaruje binding procesu, nie manifest paczki"
+  optional-by-role:                 # włączasz, gdy rola potrzebuje
+    - Dockerfile / docker-compose.yaml   # realizacja docker (+ etykiety URN)
+    - twin.compose.yaml             # bliźniak kandydata
+    - schemas/ strategy/ skills/ claims/ twin/
+    - .env.example                  # konfiguracja (runtime-only)
+    - patches/ deps/ tasks/ dist/
+  prohibited:
+    - "proces modyfikujący własną paczkę w runtime (DENY)"
+    - "wołanie kodu innej paczki z pominięciem proc://"
+    - "edycja opublikowanej wersji procesu/schematu (immutable)"
+`;
+const PKG_MAKEFILE = `# taskand · Makefile paczki — FINAL standard v0.14
+# wymagane targety (konformacja): test · pack · verify · run · observe · extract
+SHELL := /bin/sh
+URI ?= $(shell jq -r '.spec.processes[0].uri' capsule.yaml)
+IN  ?= in.json
+OUT ?= out.json
+DIR  = $(shell echo $(URI) | sed 's|proc://\\([^/]*\\)/\\(.*\\)/\\(v[0-9]*\\)$$|\\2/\\1/\\3|')
+
+.DEFAULT_GOAL := help
+.PHONY: help test pack verify run observe extract deploy rollback
+
+help: ## API paczki
+    @grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-10s %s\\n",$$1,$$2}'
+
+test: ## testy kontraktu (fail-closed)
+    node $(DIR)/test.mjs
+
+pack: ## archiwum → dist/ + offline install check
+    npm pack $(DIR) --pack-destination dist/ 2>/dev/null || tar -czf dist/pkg.tgz $(DIR)
+    tar -tzf dist/*.tgz >/dev/null && echo "pack ✓ (offline check)"
+
+verify: ## hashe vs proc-catalog.json
+    @node verify-catalog.mjs && echo "catalog ✓"
+
+run: ## wykonaj proces (grants: execute-proc)
+    @cat $(IN) | node $(DIR)/bin.mjs > $(OUT); echo "exit: $$?"
+
+observe: ## obserwacja dokładnej rewizji (grants: read-git — bez wykonania)
+    @git show $(REV):$(DIR)/proc.yaml
+
+extract: ## ekstrakcja z immutable commit — jawne SRC/BUILDER/OUT
+    @test -n "$(SRC)" -a -n "$(BUILDER)" -a -n "$(OUT)" || { echo 'SRC= BUILDER= OUT='; exit 2; }
+    @uripack extract --src $(SRC) --builder $(BUILDER) --out $(OUT) --catalog proc-catalog.json
+
+deploy: ## wdróż paczkę (supervisor — po twin+walidacji)
+    @git fetch --tags -q || true
+    @docker compose up -d --build 2>/dev/null || echo "deploy: runtime z bindingu procesu"
+    @curl -sf localhost:8080/healthz 2>/dev/null || $(MAKE) rollback
+
+rollback: ## git revert + tag + restart (historia naprzód)
+    @git revert --no-edit HEAD
+    @NEW=$$(git describe --tags --abbrev=0 | awk -F. '{printf "%s.%d",$$1"."$$2,$$3+1}'); git tag "$$NEW"
+    @$(MAKE) deploy
+`;
+const NEW_PKG_SH = `#!/bin/sh
+# taskand-new-pkg.sh — generator szkieletu paczki zgodnej ze standardem v1 (v0.14)
+# użycie: sh taskand-new-pkg.sh <nazwa> [rola] [org]
+set -eu
+NAME="\${1:?użycie: taskand-new-pkg.sh <nazwa> [rola] [org]}"
+ROLE="\${2:-application}"
+ORG="\${3:-taskand.dev}"
+PROCS="proc/hello-world/\$ORG/v1"
+
+mkdir -p "\$NAME"/{proc,schemas,strategy,skills,claims,twin,patches,deps,tasks,dist} "\$NAME/\$PROCS"
+
+cat > "\$NAME/capsule.yaml" <<EOF
+apiVersion: taskand.dev/v1
+kind: Capsule
+metadata: { name: taskand-\$NAME, version: "0.1.0" }
+spec:
+  role: \$ROLE
+  processes:
+    - uri: proc://\$ORG/hello-world/v1
+      role: worker
+      grants: [execute-proc]
+  permissions: { source: grants.yaml, defaults: { deny: [policy-write, git-push] } }
+  evolution: { delegated-to: capsule:taskand-developer, twin: { retries: 3 } }
+  deploy: { policy: twin-first, health: { on-fail: auto-rollback } }
+  storage: { kind: git, versioning: { mode: commits+tags, tagPrefix: capsule- } }
+  runtime: { repo-mount: read-only, self-modification: denied }
+EOF
+
+cat > "\$NAME/grants.yaml" <<EOF
+apiVersion: taskand.dev/v1
+kind: GrantPolicy
+rules:
+  - { subject: role:controller, target: proc:*, operations: [run] }
+EOF
+
+cat > "\$NAME/\$PROCS/proc.yaml" <<EOF
+uri: proc://\$ORG/hello-world/v1
+interface: { stdin: any, stdout: any, exit: { 0: ok, 1: fail-closed, 2: kontrakt } }
+runtimes:
+  - { kind: node, bin: bin.mjs, engines: ">=22" }
+grants: { run: [execute-proc] }
+EOF
+
+cat > "\$NAME/\$PROCS/bin.mjs" <<'EOF'
+#!/usr/bin/env node
+// standardowy wpis procesu: JSON stdin → JSON stdout, fail-closed
+import { readFileSync } from 'node:fs';
+let input;
+try { input = JSON.parse(readFileSync(0, 'utf8')); }
+catch { process.exit(2); }
+process.stdout.write(JSON.stringify({ ok: true, echo: input }, null, 2));
+EOF
+
+cat > "\$NAME/\$PROCS/test.mjs" <<'EOF'
+import { spawnSync } from 'node:child_process';
+const r = spawnSync('node', ['bin.mjs'], { input: '{"ping":1}' });
+if (r.status !== 0 || !JSON.parse(r.stdout).ok) { console.error('kontrakt ✗'); process.exit(1); }
+console.log('kontrakt ✓ (fail-closed zachowany)');
+EOF
+
+printf '{ "version": 1, "bindings": [] }\\n' > "\$NAME/proc-catalog.json"
+cat > "\$NAME/Makefile" <<'EOF'
+include Makefile.package   # standard v0.14 (test pack verify run observe extract)
+EOF
+
+cd "\$NAME" && git init -q && git add -A && git commit -qm "init: taskand-\$NAME (szkielet standardu v1)" \\
+  && git tag capsule-v0.1.0
+echo "gotowe: taskand-\$NAME — spełnia konformację (9/9) od pierwszego commita"
+echo "  cd taskand-\$NAME && make test && printf '%s' '{\\"x\\":1}' | node \$PROCS/bin.mjs"
+`;
+const FILES = [
+  {id:'cap', name:'capsule.yaml (szablon v1)', get:() => CAPSULE_TEMPLATE, lang:'yaml'},
+  {id:'std', name:'package-standard.yaml', get:() => STANDARD_SPEC, lang:'yaml'},
+  {id:'mk', name:'Makefile.package', get:() => PKG_MAKEFILE, lang:'make'},
+  {id:'gen', name:'taskand-new-pkg.sh', get:() => NEW_PKG_SH, lang:'sh'}
+];
+let curFile = 'cap';
+function hl(txt, lang){
+  return txt.split('\n').map(line => {
+    let e = esc(line);
+    if(/^\s*#/.test(e)) return `<span class="c">${e}</span>`;
+    if(lang === 'make'){
+      e = e.replace(/^([a-zA-Z_-]+)(:)/, '<span class="k">$1</span>$2');
+    } else if(lang === 'yaml'){
+      e = e.replace(/^(\s*-?\s*[\w.-]+)(:)/, '<span class="yk">$1</span>$2');
+    } else if(lang === 'sh'){
+      e = e.replace(/^(\s*)(set|test|mkdir|cat|cd|git|echo|printf|sh)(\b)/, '$1<span class="k">$2</span>$3');
+    }
+    return e;
+  }).join('\n');
+}
+function renderFiles(){
+  const tabs = $('#ftabs'); tabs.innerHTML = '';
+  FILES.forEach(f => {
+    const b = document.createElement('button');
+    b.className = 'ftab' + (f.id === curFile ? ' on' : '');
+    b.innerHTML = `<span class="fdot"></span>${f.name}`;
+    b.onclick = () => { curFile = f.id; renderFiles(); };
+    tabs.appendChild(b);
+  });
+  const f = FILES.find(x => x.id === curFile);
+  $('#fplate').innerHTML = hl(f.get(), f.lang);
+}
+ $('#fCopy').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); navigator.clipboard.writeText(f.get()).then(() => toast('skopiowano ' + f.name)); });
+ $('#fDl').addEventListener('click', () => { const f = FILES.find(x => x.id === curFile); dl(f.name.replace(/[ ()]/g, '_'), f.get()); toast('pobrano ' + f.name); });
+ $('#fBundle').addEventListener('click', () => {
+  dl('taskand-v14-package-standard.bundle',
+`# taskand v0.14 — finalny standard paczki (1 paczka = N procesów) · ${new Date().toLocaleString('pl-PL')}
+# start nowej paczki: sh taskand-new-pkg.sh <nazwa> [rola] — szkielet zgodny z konformacją 9/9
+
+--- capsule.yaml (szablon v1) ---
+ ${CAPSULE_TEMPLATE}
+--- package-standard.yaml ---
+ ${STANDARD_SPEC}
+--- Makefile.package ---
+ ${PKG_MAKEFILE}
+--- taskand-new-pkg.sh ---
+ ${NEW_PKG_SH}
+`);
+  toast('pobrano standard paczki v0.14 (4 pliki)');
+});
+
+/* ————— start ————— */
+renderTree(); renderFiles(); icons();
+</script>
+</body>
+</html>

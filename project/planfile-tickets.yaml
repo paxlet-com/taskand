@@ -1,0 +1,188 @@
+source: code2llm
+# generated in 0.01s
+schema: code2llm.planfile_tickets.v1
+project_root: /home/tom/github/semcod/taskand/glm53
+tickets:
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: scripts.dod_validator.validate_dod (CC=19)'
+  description: 'code2llm reports `scripts.dod_validator.validate_dod` at `scripts/dod_validator.py:22`
+    with cyclomatic complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - scripts/dod_validator.py
+  dedupe_key: code2llm:cc:scripts/dod_validator.py:scripts.dod_validator.validate_dod
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: scripts.history.list_history (CC=21)'
+  description: 'code2llm reports `scripts.history.list_history` at `scripts/history.py:96`
+    with cyclomatic complexity 21 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - scripts/history.py
+  dedupe_key: code2llm:cc:scripts/history.py:scripts.history.list_history
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: scripts.history.rollback (CC=20)'
+  description: 'code2llm reports `scripts.history.rollback` at `scripts/history.py:216`
+    with cyclomatic complexity 20 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - scripts/history.py
+  dedupe_key: code2llm:cc:scripts/history.py:scripts.history.rollback
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: ask_llm_for_repair'
+  description: 'code2llm reports `God Function: ask_llm_for_repair` in `scripts/digital_twin.py:116`.
+
+
+    Function ''ask_llm_for_repair'' is oversized: CC=8, fan-out=16, mutations=11.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/digital_twin.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:116:God Function:
+    ask_llm_for_repair'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: compute_dir_hash'
+  description: 'code2llm reports `God Function: compute_dir_hash` in `scripts/history.py:22`.
+
+
+    Function ''compute_dir_hash'' is oversized: CC=3, fan-out=11, mutations=9.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/history.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:22:God Function: compute_dir_hash'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: create_snapshot'
+  description: 'code2llm reports `God Function: create_snapshot` in `scripts/history.py:36`.
+
+
+    Function ''create_snapshot'' is oversized: CC=9, fan-out=20, mutations=15.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/history.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:36:God Function: create_snapshot'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: load_env'
+  description: 'code2llm reports `God Function: load_env` in `scripts/digital_twin.py:23`.
+
+
+    Function ''load_env'' is oversized: CC=6, fan-out=7, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/digital_twin.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:23:God Function:
+    load_env'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: run_twin_verification'
+  description: 'code2llm reports `God Function: run_twin_verification` in `scripts/digital_twin.py:68`.
+
+
+    Function ''run_twin_verification'' is oversized: CC=9, fan-out=9, mutations=12.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/digital_twin.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:68:God Function:
+    run_twin_verification'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: show_details'
+  description: 'code2llm reports `God Function: show_details` in `scripts/history.py:162`.
+
+
+    Function ''show_details'' is oversized: CC=12, fan-out=12, mutations=10.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/history.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/history.py:162:God Function: show_details'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: verify_and_evolve'
+  description: 'code2llm reports `God Function: verify_and_evolve` in `scripts/digital_twin.py:181`.
+
+
+    Function ''verify_and_evolve'' is oversized: CC=6, fan-out=14, mutations=13.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - scripts/digital_twin.py
+  dedupe_key: 'code2llm:smell:god_function:scripts/digital_twin.py:181:God Function:
+    verify_and_evolve'
+applied: []
+skipped: []

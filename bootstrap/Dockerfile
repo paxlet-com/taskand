@@ -7,6 +7,8 @@
 
 FROM docker:27-cli
 
+RUN apk add --no-cache python3 py3-pip
+
 LABEL org.taskand.role="bootstrap+controller" \
       org.taskand.version="0.4.0"
 
@@ -143,17 +145,20 @@ log "gotowy · zadania: tasks/inbox.yaml (shell) albo POST :8077/tasks · org=$O
 if [ -n "$TASKAND_LLM_API_KEY" ]; then log "planista: $MODEL (klucz z .env — runtime)"; else log "planista: plan lokalny (brak klucza w .env)"; fi
 
 plan(){
+  if [ -f "$TD/scripts/planner.py" ]; then
+    python3 "$TD/scripts/planner.py" "$1" "$TID" 2>> "$LOG" && return 0
+  fi
   if [ -z "$TASKAND_LLM_API_KEY" ]; then
-    printf 'REPO: taskand\nORG: %s\nREADME_START\n# taskand\n\nproces, który sam się rozrasta.\nREADME_END\n' "$ORG"
+    printf 'REPO: taskand-glm53\nORG: %s\nREADME_START\n# taskand-glm53\n\nproces w Dockerfile.\nREADME_END\n' "$ORG"
     return 0
   fi
   ZJ=$(printf '%s' "$1" | sed 's/"/\\"/g')
-  BODY=$(printf '{"model":"%s","messages":[{"role":"system","content":"Planista taskand. Odpowiedz DOKŁADNIE:\\nREPO: nazwa\\nORG: organizacja albo -\\nREADME_START\\n<markdown README: co to, filozofia, szybki start, bezpieczeństwo>\\nREADME_END"},{"role":"user","content":"%s"}],"temperature":0.3,"max_tokens":1200}' "$MODEL" "$ZJ")
+  BODY=$(printf '{"model":"%s","messages":[{"role":"system","content":"Planista taskand-glm53 (repo: taskand-glm53). Odpowiedz DOKŁADNIE:\\nREPO: taskand-glm53\\nORG: organizacja albo -\\nREADME_START\\n<markdown README: co to, filozofia, szybki start, bezpieczeństwo>\\nREADME_END"},{"role":"user","content":"%s"}],"temperature":0.3,"max_tokens":1200}' "$MODEL" "$ZJ")
   wget -qO- --header="Content-Type: application/json" \
        --header="Authorization: Bearer $TASKAND_LLM_API_KEY" \
        --post-data="$BODY" "$ENDPOINT" 2>> "$LOG" \
     | sed 's/\\n/\n/g' > /tmp/plan.raw || true
-  [ -s /tmp/plan.raw ] || printf 'REPO: taskand\nORG: %s\nREADME_START\n# taskand\nREADME_END\n' "$ORG"
+  [ -s /tmp/plan.raw ] || printf 'REPO: taskand-glm53\nORG: %s\nREADME_START\n# taskand-glm53\nREADME_END\n' "$ORG"
 }
 
 gh_child(){
@@ -172,6 +177,7 @@ ORG="$TASKAND_ORG"; REPO="$TASKAND_REPO"
 if [ -n "$ORG" ] && [ "$ORG" != "-" ]; then FULL="$ORG/$REPO"; else FULL="$REPO"; fi
 git config --global user.name "taskand"
 git config --global user.email "taskand@local"
+gh auth setup-git 2>/dev/null || true
 git init -q -b main . && git add README.md
 git commit -qm "taskand: README od planisty"
 gh repo create "$FULL" --public 2>/dev/null || echo "repo istnieje — push"
@@ -204,16 +210,98 @@ while :; do
   fi
   if [ "$TTYP" = "github-projekt" ]; then
     plan "$TZ" > /tmp/plan.txt
-    PREPO=$(sed -n 's/^REPO: *//p' /tmp/plan.txt | head -1); [ -n "$PREPO" ] || PREPO=taskand
+    PREPO=$(sed -n 's/^REPO: *//p' /tmp/plan.txt | head -1); [ -n "$PREPO" ] || PREPO=taskand-glm53
     PORG=$(sed -n 's/^ORG: *//p' /tmp/plan.txt | head -1);   [ -n "$PORG" ] || PORG="$ORG"
     log "zadanie $TID: plan ($MODEL): repo=$PREPO org=$PORG"
     awk '/^README_START/{f=1;next} /^README_END/{f=0} f' /tmp/plan.txt > "$D/README.md"
-    [ -s "$D/README.md" ] || printf '# taskand\n\nproces w Dockerfile.\n' > "$D/README.md"
+    [ -s "$D/README.md" ] || printf '# taskand-glm53\n\nproces w Dockerfile.\n' > "$D/README.md"
     gh_child "$TID" "$PORG" "$PREPO" > "$D/Dockerfile"
     printf '\n  task-%s:\n    build: ./evolution/%s\n    volumes:\n      - %s:/root/.config/gh:ro\n    restart: "no"\n' "$TID" "$TID" "$GHCONF" >> "$COMPOSE"
     docker compose -f "$COMPOSE" up -d --build "task-$TID"
     log "zadanie $TID: compose: task-$TID up · gh tworzy $PORG/$PREPO"
     echo "- id: $TID · typ: $TTYP · $(date '+%F %T')" >> "$TD/tasks/done.yaml"
+  elif [ "$TTYP" = "git-push" ] || [ "$TTYP" = "git-sync" ]; then
+    log "zadanie $TID: rozpoczęto proces synchronizacji Git ($TZ)"
+    cat > "$D/Dockerfile" <<'DOCKER_SPEC'
+# taskand · task-@ID@ · proces-Dockerfile synchronizacji repozytorium z GitHub
+FROM alpine:3.20
+RUN apk add --no-cache git github-cli
+WORKDIR /project
+COPY <<'TSK' /entry.sh
+#!/bin/sh
+set -eu
+ORG="@ORG@"; REPO="@REPO@"
+[ -n "$REPO" ] || REPO="taskand-glm53"
+if [ -n "$ORG" ] && [ "$ORG" != "-" ]; then FULL="$ORG/$REPO"; else FULL="$REPO"; fi
+
+echo "[task-@ID@] konfiguracja poświadczeń git i katalogu..."
+git config --global user.name "taskand"
+git config --global user.email "taskand@local"
+git config --global --add safe.directory /project
+gh auth setup-git 2>/dev/null || true
+
+cd /project
+if [ ! -d ".git" ]; then
+  echo "[task-@ID@] inicjalizacja repozytorium git w projekcie..."
+  git init -b main
+fi
+
+if ! git remote get-url origin >/dev/null 2>&1; then
+  echo "[task-@ID@] dodawanie remote origin: https://github.com/$FULL.git"
+  git remote add origin "https://github.com/$FULL.git"
+fi
+
+echo "[task-@ID@] sprawdzanie zmian i commit..."
+git add -A
+if git diff --cached --quiet; then
+  echo "[task-@ID@] brak nowych zmian do zatwierdzenia."
+else
+  git commit -m "taskand: synchronizacja projektu [task-@ID@]"
+  echo "[task-@ID@] utworzono commit."
+fi
+
+echo "[task-@ID@] wypychanie zmian do GitHub ($FULL)..."
+git push -u origin main || git push origin main --force
+echo "[task-@ID@] synchronizacja git zakończona sukcesem ✓: https://github.com/$FULL"
+TSK
+RUN chmod +x /entry.sh
+ENTRYPOINT ["/entry.sh"]
+DOCKER_SPEC
+    sed -i -e "s/@ID@/$TID/g" -e "s/@ORG@/$ORG/g" -e "s/@REPO@/taskand/g" "$D/Dockerfile"
+    docker build -q -t "taskand/task-$TID" "$D" >/dev/null
+    docker run --rm \
+      -v "$HOSTDIR":/project \
+      -v "$GHCONF":/root/.config/gh:ro \
+      "taskand/task-$TID" 2>&1 | tee -a "$LOG"
+    echo "- id: $TID · typ: $TTYP · $(date '+%F %T')" >> "$TD/tasks/done.yaml"
+    log "zadanie $TID: synchronizacja git zakończona sukcesem ✓"
+  elif [ "$TTYP" = "github-rename" ]; then
+    log "zadanie $TID: rozpoczęto proces zmiany nazwy repozytorium ($TZ)"
+    cat > "$D/Dockerfile" <<'DOCKER_SPEC'
+# taskand · task-@ID@ · proces-Dockerfile zmiany nazwy repozytorium GitHub
+FROM alpine:3.20
+RUN apk add --no-cache git github-cli
+WORKDIR /work
+COPY <<'TSK' /entry.sh
+#!/bin/sh
+set -eu
+ORG="@ORG@"; OLD_REPO="@OLD_REPO@"; NEW_REPO="@NEW_REPO@"
+if [ -n "$ORG" ] && [ "$ORG" != "-" ]; then FULL_OLD="$ORG/$OLD_REPO"; FULL_NEW="$ORG/$NEW_REPO"; else FULL_OLD="$OLD_REPO"; FULL_NEW="$NEW_REPO"; fi
+
+echo "[task-@ID@] zmiana nazwy repozytorium GitHub: $FULL_OLD -> $FULL_NEW..."
+gh repo rename "$NEW_REPO" --yes -R "$FULL_OLD" || echo "Uwaga: zmiana nazwy zgłoszona lub repo już istnieje"
+echo "[task-@ID@] ✓ nazwa repozytorium zmieniona pomyślnie na: $FULL_NEW"
+TSK
+RUN chmod +x /entry.sh
+ENTRYPOINT ["/entry.sh"]
+DOCKER_SPEC
+    NEW_R=$(printf '%s' "$TZ" | awk '{print $NF}')
+    [ -n "$NEW_R" ] || NEW_R="taskand-glm53"
+    sed -i -e "s/@ID@/$TID/g" -e "s/@ORG@/$ORG/g" -e "s/@OLD_REPO@/taskand/g" -e "s/@NEW_REPO@/$NEW_R/g" "$D/Dockerfile"
+    docker build -q -t "taskand/task-$TID" "$D" >/dev/null
+    docker run --rm -v "$GHCONF":/root/.config/gh:ro "taskand/task-$TID" 2>&1 | tee -a "$LOG"
+    echo "- id: $TID · typ: $TTYP · $(date '+%F %T')" >> "$TD/tasks/done.yaml"
+    log "zadanie $TID: zmiana nazwy repozytorium zakończona sukcesem ✓"
   elif [ "$TTYP" = "czyszczenie" ] || [ "$TTYP" = "cleanup" ]; then
     log "zadanie $TID: rozpoczęto proces czyszczenia ($TZ)"
     cat > "$D/Dockerfile" <<'DOCKER_SPEC'

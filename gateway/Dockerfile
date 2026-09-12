@@ -114,6 +114,39 @@ class Gateway(BaseHTTPRequestHandler):
                 "output": res.stdout,
                 "done_tasks": parse_yaml_tasks(DONE_FILE)
             })
+        elif path in ["/environment", "/api/environment"]:
+            env_file = os.path.join(BASE_DIR, "environment.yaml")
+            content = ""
+            if os.path.exists(env_file):
+                with open(env_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+            self.send_json(200, {"ok": True, "environment": content})
+        elif path in ["/conversations", "/api/conversations"]:
+            conv_file = os.path.join(BASE_DIR, "log", "conversations.jsonl")
+            convs = []
+            if os.path.exists(conv_file):
+                with open(conv_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.strip():
+                            try:
+                                convs.append(json.loads(line.strip()))
+                            except Exception:
+                                pass
+            self.send_json(200, {"ok": True, "conversations": convs[-50:]})
+        elif path in ["/catalog", "/api/catalog"]:
+            cat_file = os.path.join(BASE_DIR, "proc-catalog.json")
+            if os.path.exists(cat_file):
+                with open(cat_file, "r", encoding="utf-8") as f:
+                    self.send_json(200, json.load(f))
+            else:
+                self.send_json(404, {"ok": False, "error": "Catalog not found"})
+        elif path in ["/capsule", "/api/capsule"]:
+            cap_file = os.path.join(BASE_DIR, "capsule.yaml")
+            content = ""
+            if os.path.exists(cap_file):
+                with open(cap_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+            self.send_json(200, {"ok": True, "capsule": content})
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 
