@@ -26,18 +26,23 @@ else
     # 2. Tryb instalatora zdalnego (curl ... | sh)
     safe_curl(){
       url="$1"; out="$2"
-      if [ ! -s "$out" ] || grep -q "maintenance" "$out" 2>/dev/null; then
-        if curl -fsSL "$url" -o "$out.tmp" 2>/dev/null && [ -s "$out.tmp" ] && ! grep -q "maintenance" "$out.tmp"; then
+      dir="$(dirname "$out")"
+      [ -d "$dir" ] || mkdir -p "$dir"
+      if [ ! -s "$out" ] || grep -q "maintenance\|503" "$out" 2>/dev/null; then
+        if curl -fsSL "$url" -o "$out.tmp" 2>/dev/null && [ -s "$out.tmp" ] && ! grep -q "maintenance\|503" "$out.tmp"; then
           mv "$out.tmp" "$out"
         else
           rm -f "$out.tmp"
         fi
       fi
     }
-    safe_curl taskand.com/Dockerfile           Dockerfile
-    safe_curl taskand.com/docker-compose.yaml  docker-compose.yaml
-    safe_curl taskand.com/gateway.Dockerfile   gateway/Dockerfile
-    safe_curl taskand.com/.env.example         .env.example
+    GH_RAW="https://raw.githubusercontent.com/semcod/taskand-glm53/main"
+    safe_curl "$GH_RAW/Dockerfile"           Dockerfile
+    safe_curl "$GH_RAW/docker-compose.yaml"  docker-compose.yaml
+    safe_curl "$GH_RAW/gateway/Dockerfile"   gateway/Dockerfile
+    safe_curl "$GH_RAW/.env.example"         .env.example
+    safe_curl "$GH_RAW/taskand.cli"          taskand.cli
+    [ -f taskand.cli ] && chmod +x taskand.cli
   fi
 
   [ -f .env ] || { [ -f .env.example ] && cp .env.example .env; }

@@ -22,11 +22,15 @@ taskand history
 # 5. Przywrócenie stanu z migawki (Rollback)
 taskand rollback snap-t1789203598
 
-# 6. Śledzenie logów planisty i orkiestratora na żywo
+# 6. Test w cyfrowym bliźniaku (Digital Twin Sandbox) z samonaprawą
+taskand twin t1789204317 "wypchnij zmiany na github"
+
+# 7. Śledzenie logów planisty i orkiestratora na żywo
 taskand logs
 
-# 7. Uruchomienie lokalnej strony landing (sekcja 04, symulator)
-taskand web 8080
+# 8. Uruchomienie lokalnej strony landing (Nginx w kontenerze)
+make web
+# → http://localhost:8090
 ```
 
 ## Alternatywne sposoby dodawania zadań

@@ -67,8 +67,8 @@ add-watch: ## Dodaje zadanie typu obserwuj: make add-watch TASK="opis"
 gateway-health: ## Sprawdza stan bramki HTTP (port 8077)
 	@curl -s http://localhost:8077/health | grep -q '"ok": true' && echo "✓ Gateway HTTP działa (port 8077)" || echo "✗ Gateway nie odpowiada"
 
-web: ## Uruchamia serwer landing page (domyślnie port 8080): make web PORT=8080
-	@sh serve.sh $(PORT)
+web: ## Uruchamia stronę landing page (Nginx w kontenerze na porcie 8090 lub lokalnie): make web
+	@docker compose up -d landing && echo "✓ Strona działa pod adresem: http://localhost:8090" || sh serve.sh 8090
 
 check: ## Weryfikuje składnię wszystkich plików Dockerfile
 	@docker build --check .

@@ -1,6 +1,8 @@
-# taskand v0.4 — Bootstrap + Landing + Planista GLM-5.3
+# taskand-glm53 v0.4.2 — Autonomiczny Proces w Dockerfile
 
-Autonomiczny system zadań sterowany procesami-Dockerfile i docker-compose. Każdy krok instalacji i każde zadanie jest izolowanym procesem w kontenerze Docker.
+Autonomiczny system zadań sterowany procesami-Dockerfile, pętlą samonaprawy, piaskownicą **Digital Twin Sandbox** oraz weryfikacją **Definition of Done (DoD)**.
+
+Oficjalne repozytorium: **https://github.com/semcod/taskand-glm53**
 
 ---
 
@@ -9,20 +11,25 @@ Autonomiczny system zadań sterowany procesami-Dockerfile i docker-compose. Każ
 Najprostszym sposobem zarządzania projektem jest narzędzie **`make`** lub dedykowane CLI **`taskand`**.
 
 ```bash
-# 1. Sprawdź dostępne polecenia i stan systemu
+# 1. Pobierz najnowszą wersję repozytorium
+git clone https://github.com/semcod/taskand-glm53.git
+cd taskand-glm53
+
+# 2. Sprawdź dostępne polecenia i stan systemu
 make
 
-# 2. Zainstaluj globalne CLI w ~/.local/bin/taskand (jeśli jeszcze nie zainstalowano)
+# 3. Zainstaluj globalne CLI w ~/.local/bin/taskand
 make install-cli
 
-# 3. Sprawdź status kontenerów
+# 4. Sprawdź status kontenerów
 make status
 
-# 4. Dodaj pierwsze zadanie
-make add TASK="stwórz projekt w organizacji semcod z README"
+# 5. Uruchom serwer strony landing page (Nginx w kontenerze na porcie 8090)
+make web
+# → http://localhost:8090
 
-# 5. Podgląd logów planisty GLM-5.3
-make logs
+# 6. Dodaj zadanie
+taskand add "wypchnij zmiany na github"
 ```
 
 ---
@@ -38,10 +45,12 @@ make logs
 | `make down` | Zatrzymuje kontenery (`docker compose down`) |
 | `make restart` | Restartuje kontenery (`docker compose restart`) |
 | `make status` / `make ps` | Sprawdza status usług (`docker compose ps`) |
+| `make web` | Uruchamia stronę landing page na porcie 8090 |
 | `make logs` | Śledzi logi kontrolera nucleus (planisty) na żywo |
-| `make logs-all` | Śledzi logi wszystkich usług (`nucleus` + `gateway`) |
+| `make logs-all` | Śledzi logi wszystkich usług (`nucleus` + `gateway` + `landing`) |
 | `make tasks` | Wyświetla kolejkę zadań (`inbox.yaml`) i historię (`done.yaml`) |
 | `make history` | Wyświetla pełną historię wykonania zadań oraz migawki z sumami SHA-256 |
+| `make twin ID=...` | Testuje proces w cyfrowym bliźniaku (Digital Twin Sandbox) z pętlą samonaprawy |
 | `make rollback [ID=snap-xxx]` | Przywraca pliki z wybranej migawki bezpieczeństwa |
 | `make snapshot TARGET=... DESC=...` | Tworzy nową migawkę wskazanego katalogu lub pliku |
 | `make clean-duplicates` | Uruchamia proces czyszczenia zbędnego podkatalogu `taskand` |
