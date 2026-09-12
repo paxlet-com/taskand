@@ -223,6 +223,14 @@ class Gateway(BaseHTTPRequestHandler):
         elif path in ["/doctor", "/api/doctor"]:
             diag = execute_proc("proc://taskand.dev/doctor/diagnose/v1", {})
             self.send_json(200 if diag.get("ok") else 500, diag)
+        elif path in ["/organisms", "/api/organisms"]:
+            organisms = [
+                {"name": "developer", "alias": "dev", "role": "creator", "proc": "proc://taskand.dev/dev/chat/v1", "description": "Generowanie kodu, dozbrajanie usług, ewolucja"},
+                {"name": "doctor", "alias": "doc", "role": "diagnostic", "proc": "proc://taskand.dev/doctor/chat/v1", "description": "Diagnostyka, samonaprawa, monitorowanie zdrowia"},
+                {"name": "vault", "alias": "sec", "role": "security", "proc": "proc://taskand.dev/vault/chat/v1", "description": "Zarządzanie sekretami, migracja tokenów LLM, audyt"},
+                {"name": "chat", "alias": "c", "role": "interactive", "proc": "proc://taskand.dev/chat/message/v1", "description": "Rozmowa z systemem, kolejkowanie zadań"}
+            ]
+            self.send_json(200, {"ok": True, "organisms": organisms})
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 
@@ -389,6 +397,39 @@ class Gateway(BaseHTTPRequestHandler):
                 "healthCheck": "PASS" if health_ok else "FAIL",
                 "error": error_detail if not health_ok else None,
                 "message": f"Kontener {container} zrestartowany pomyślnie i zweryfikowany przez taskand-doctor" if health_ok else error_detail
+            })
+        elif path.startswith("/api/organism/") and path.endswith("/chat"):
+            parts = path.strip("/").split("/")
+            org = parts[2].lower() if len(parts) >= 4 else "chat"
+            msg = payload.get("message") or payload.get("prompt") or payload.get("text") or ""
+            if not msg:
+                self.send_json(400, {"ok": False, "error": "Brak wiadomości ('message')"})
+                return
+
+            proc_map = {
+                "dev": "proc://taskand.dev/dev/chat/v1",
+                "developer": "proc://taskand.dev/dev/chat/v1",
+                "doc": "proc://taskand.dev/doctor/chat/v1",
+                "doctor": "proc://taskand.dev/doctor/chat/v1",
+                "sec": "proc://taskand.dev/vault/chat/v1",
+                "vault": "proc://taskand.dev/vault/chat/v1",
+                "chat": "proc://taskand.dev/chat/message/v1",
+                "c": "proc://taskand.dev/chat/message/v1"
+            }
+            target_proc = proc_map.get(org)
+            if not target_proc:
+                self.send_json(404, {"ok": False, "error": f"Nieznany organizm: {org}. Dostępne: dev, doc, sec, chat"})
+                return
+
+            res = execute_proc(target_proc, {"message": msg, "prompt": msg})
+            status_code = 200 if res.get("ok") else (422 if res.get("exit_code") == 2 else 500)
+            self.send_json(status_code, {
+                "ok": res.get("ok", False),
+                "organism": org,
+                "proc": target_proc,
+                "reply": (res.get("output", {}).get("reply") if isinstance(res.get("output"), dict) else res.get("output")) or res.get("error"),
+                "output": res.get("output"),
+                "raw": res
             })
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})

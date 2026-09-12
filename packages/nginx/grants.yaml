@@ -1,0 +1,10 @@
+rules:
+  - principal: capsule:taskand-nginx
+    allow: [execute-proc]
+    deny: [policy-write, claims-delete, git-push, self-restart]
+
+prohibited:
+  - policy-write
+  - claims-delete
+  - git-push
+  - self-restart

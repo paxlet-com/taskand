@@ -18,6 +18,13 @@
       "testSha256": "50548c4af896928c309219e2eb0f68809b191059d9e389e28e264535056838c0"
     },
     {
+      "uri": "proc://taskand.dev/doctor/chat/v1",
+      "path": "proc/doctor/chat/taskand.dev/v1",
+      "binSha256": "6b53b630dd8a23a7f2139d85fcf9688458f6cb2547c1ba707530a3a26208192e",
+      "yamlSha256": "90089bb602f10fc66398b64390efe42cee4dd8692aed940a93bb87eeb9b9f52d",
+      "testSha256": "a8797a96bca7ef121858b47d30b523cb4f6cab8870d5f1f74a511bba1cdb614f"
+    },
+    {
       "uri": "proc://taskand.dev/registry/serve/v1",
       "path": "proc/registry/serve/taskand.dev/v1",
       "binSha256": "561a019d6789445e7545187233c50dc9ed638b82a54ffc80f6f5262477120199",

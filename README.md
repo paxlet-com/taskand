@@ -1,26 +1,51 @@
-# taskand-glm53 v1.1 — Standard taskand v1.1, Federacja Rejestrów & Ekosystem Organizmów
+# taskand-glm53 v1.4 — Standard taskand v1.4: Konwersacyjny Interfejs CLI/Web, Ekosystem Organizmów & Security Vault
 
-Kompletna implementacja **Standardu taskand v1.1**: federacyjny ekosystem, w którym wszystko jest zasobem URI (`proc://`, `session://`, `artifact:`), każda paczka jest **autonomicznym organizmem** i rejestrem procesów, ewolucja podlega kwalifikacji w piaskownicy **Digital Twin**, a poświadczenia podlegają ścisłym regułom bezpieczeństwa.
+Kompletna implementacja **Standardu taskand v1.4**: federacyjny ekosystem, w którym wszystko jest zasobem URI (`proc://`, `session://`, `artifact:`), a użytkownik komunikuje się **bezpośrednio z każdym autonomicznym organizmem** przez CLI (`taskand <organizm> "prompt"`) lub Web Cockpit. Poświadczenia i tokeny LLM są chronione przez dedykowany sejf **`taskand-vault`** w oparciu o uprawnienia purpose-scoped (`developer:codegen`, `doctor:diagnosis`).
 
 * Oficjalne repozytorium: **https://github.com/semcod/taskand-glm53**
-* Kompletna specyfikacja standardu: [docs/standard-v1.1.md](docs/standard-v1.1.md) oraz [STANDARD-v1.1.md](STANDARD-v1.1.md)
+* Kompletna specyfikacja Standardu v1.4: [docs/standard-v1.4.md](docs/standard-v1.4.md) oraz [STANDARD-v1.4.md](STANDARD-v1.4.md)
 * Architektura federacji, LLM i rollbacków: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-* Standard zarządzania sekretami i tokenami: [docs/SECRETS.md](docs/SECRETS.md)
+* Standard zarządzania sekretami i sejfem Vault: [docs/SECRETS.md](docs/SECRETS.md)
 
 ---
 
 ## 🧬 Ekosystem Organizmów (Pakiety jako Autonomiczne Kapsuły)
 
-W systemie taskand każda paczka w `packages/` stanowi niezależny organizm z własnym manifestem `capsule.yaml`, uprawnieniami `grants.yaml`, procesami `proc://` oraz serwerem rejestru federacji `proc://.../registry/serve/v1`:
+W systemie taskand każda paczka w `packages/` stanowi niezależny organizm z własnym manifestem `capsule.yaml`, uprawnieniami `grants.yaml`, procesami `proc://` oraz interfejsem konwersacyjnym:
 
-| Organizm (Paczka) | Rola w ekosystemie | Kluczowe procesy URI | Dostęp do LLM (GLM-5.3) |
-|---|---|---|---|
-| **`taskand-bootstrap`** | **Narodziny i rozruch**: weryfikacja środowiska, onboarding i przekazanie kontroli | `bootstrap/onboarding`, `bootstrap/handover` | Nie (deterministyczny start) |
-| **`taskand-core`** | **Układ nerwowy**: demon nucleus, supervisor zadań i bramka REST API (:8077) | `controller`, `supervisor`, `gateway` | Tak (planista zadań przez `.env`) |
-| **`taskand-chat` & `taskand-web`** | **Zmysły i mowa**: dialog z użytkownikiem, Web Speech API (PL), synteza głosu TTS | `chat/message`, `chat/voice`, `browser/session`, `web/navigate`, `web/analyze` | Kontekstowy przez proces czatu |
-| **`taskand-developer`** | **Regeneracja i ewolucja**: generowanie procesów przez LLM, autotesty, Digital Twin | `dev/codegen`, `dev/plan`, `dev/heal`, `developer/test-auto` | **Tak (runtime API key do kodowania)** |
-| **`taskand-doctor`** | **Strażnik zdrowia (SRE)**: ciągła diagnostyka WWW (:8090) i API (:8077), autoleczenie | `doctor/diagnose`, `doctor/prescribe` | **Nie (deleguje naprawę do developera)** |
-| **`taskand-demo`** | **Przykłady i szablony**: referencyjne procesy testowe | `hello-world/v1` | Nie |
+| Organizm (Paczka) | Alias CLI | Rola w ekosystemie | Kluczowe procesy URI | Zarządzanie Tokenem LLM (GLM-5.3) |
+|---|---|---|---|---|
+| **`taskand-developer`** | `taskand dev` | **Regeneracja i ewolucja**: generowanie procesów przez LLM, autotesty, Digital Twin, dozbrajanie usług | `dev/chat`, `dev/codegen`, `dev/plan`, `dev/heal`, `developer/test-auto` | **Izolowany w Vault (`purpose=codegen`)** |
+| **`taskand-doctor`** | `taskand doc` | **Strażnik zdrowia (SRE)**: ciągła diagnostyka WWW (:8090) i API (:8077), autoleczenie, trendy | `doctor/chat`, `doctor/diagnose`, `doctor/prescribe` | **Dostęp brokerski w Vault (`purpose=diagnosis`)** |
+| **`taskand-vault`** | `taskand sec` | **Sejf poświadczeń**: szyfrowanie AES-256-GCM, migracja z `.env`, audyt dostępu, purpose grants | `vault/chat`, `vault/secrets` | **Główny dysponent i broker poświadczeń** |
+| **`taskand-chat` & `web`**| `taskand chat`| **Zmysły i mowa**: dialog z użytkownikiem, Web Speech API (PL), synteza TTS, analiza stron | `chat/message`, `chat/voice`, `browser/session`, `flow/login` | Kontekstowy przez proces czatu |
+| **`taskand-nginx`** | `taskand arm` | **Dozbrojona usługa zewnętrzna**: bezprzerwowy adapter HTTP (:8090) jako kapsuła | `nginx/status` | Nie wymaga tokenu |
+| **`taskand-bootstrap`**| `bootstrap` | **Narodziny i rozruch**: onboarding, weryfikacja środowiska i przekazanie kontroli | `bootstrap/onboarding`, `bootstrap/handover` | Deterministyczny start |
+| **`taskand-demo`** | `demo` | **Przykłady i szablony**: referencyjne procesy testowe | `hello-world/v1` | Nie |
+
+---
+
+## 💬 Interfejs Konwersacyjny CLI (Standard v1.4)
+
+```bash
+# Rozmawiaj bezpośrednio z developerem (dozbrajanie usług, tworzenie procesów)
+taskand dev "dozbrój nginx na :8090"
+taskand dev "stwórz nowy proces proc://taskand.dev/auth/v1"
+
+# Rozmawiaj ze strażnikiem zdrowia doctor (diagnoza, autoleczenie, trendy SRE)
+taskand doc "sprawdź stan całego systemu"
+taskand doc "coś nie działa ze stroną WWW"
+
+# Rozmawiaj z sejfem Vault (migracja tokenów LLM, audyt dostępu)
+taskand sec "migruj token llm do vaulta"
+taskand sec "pokaż audyt uprawnień"
+
+# Rozmowa z asystentem czatu i kolejkowanie zadań
+taskand chat "jaki jest aktualny status środowiska?"
+
+# Szybkie dozbrojenie dowolnej działającej usługi w trybie zero-downtime:
+taskand arm nginx 8090
+```
 
 ---
 

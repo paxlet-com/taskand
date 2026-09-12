@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/nginx/status/v1
+name: status
+version: "1.0.0"
+role: worker
+interface:
+  stdin: any
+  stdout: any
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

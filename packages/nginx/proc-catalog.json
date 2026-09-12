@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "standard": "taskand-v1.0",
+  "generatedAt": "2026-09-12T14:43:08.826Z",
+  "bindings": [
+    {
+      "uri": "proc://taskand.dev/nginx/status/v1",
+      "path": "proc/nginx/status/taskand.dev/v1",
+      "binSha256": "61309699b8ef0c2123158251145bb9ad13d26607b7b65ff414417ae347be9257",
+      "yamlSha256": "85ad40348946a0e1d019a87d04548b082a27a588993e20b9baa675c85426f227",
+      "testSha256": "a24c3ad294eb2d4c8aff1eca4cf02fa57201870bbf6f5297baf3531670f51240"
+    }
+  ]
+}

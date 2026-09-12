@@ -219,12 +219,22 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
       </div>
     </div>
 
+    <!-- Organism selector pills (Standard v1.4) -->
+    <div class="organism-pills" id="orgPills" style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:0.05em">Organizm:</span>
+      <button class="act-btn org-pill active" data-org="auto" style="padding:4px 10px;font-size:11px"><i data-lucide="cpu"></i> Auto / Kolejka</button>
+      <button class="act-btn org-pill alt" data-org="developer" style="padding:4px 10px;font-size:11px;border-color:#2980B9;color:#85C1E9"><i data-lucide="code-2"></i> Developer (dev)</button>
+      <button class="act-btn org-pill alt" data-org="doctor" style="padding:4px 10px;font-size:11px;border-color:#27AE60;color:#A9DFBF"><i data-lucide="stethoscope"></i> Doctor (doc)</button>
+      <button class="act-btn org-pill alt" data-org="vault" style="padding:4px 10px;font-size:11px;border-color:#D35400;color:#F5B041"><i data-lucide="shield-alert"></i> Vault (sec)</button>
+      <button class="act-btn org-pill alt" data-org="chat" style="padding:4px 10px;font-size:11px;border-color:#8E44AD;color:#D7BDE2"><i data-lucide="message-square"></i> Chat (c)</button>
+    </div>
+
     <!-- Voice and Text Input -->
     <div class="voice-row">
       <button class="mic-btn" id="micBtn" title="Kliknij i wydaj polecenie głosem po polsku">
         <i data-lucide="mic" id="micIcon"></i> <span id="micLabel">Mów do taskand</span>
       </button>
-      <input class="voice-in" id="taskPrompt" placeholder="Wpisz lub podyktuj zadanie (np. 'wypchnij zmiany na github', 'zrób digital twin')..." autocomplete="off">
+      <input class="voice-in" id="taskPrompt" placeholder="Wpisz polecenie dla organizmu (np. 'dozbrój nginx na :8090', 'migruj token llm')..." autocomplete="off">
       <button class="act-btn" id="btnSubmitTask" style="padding:10px 18px;font-size:11.5px">
         <i data-lucide="send"></i> Wyślij zadanie
       </button>
@@ -233,6 +243,8 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
     <!-- Quick Action Bar -->
     <div class="cpanel-actions">
       <button class="act-btn" id="btnDoctorQuick" style="background:#1B3B36;border-color:#27AE60;color:#A9DFBF"><i data-lucide="stethoscope"></i> 🩺 taskand-doctor</button>
+      <button class="act-btn" id="btnDevArmQuick" style="background:#1A252F;border-color:#2980B9;color:#85C1E9"><i data-lucide="wrench"></i> 💻 Dozbrój :8090</button>
+      <button class="act-btn" id="btnVaultQuick" style="background:#2D2013;border-color:#D35400;color:#F5B041"><i data-lucide="key"></i> 🔒 Migruj Token LLM</button>
       <button class="act-btn" id="btnRestartQuick" style="background:#2C3E50"><i data-lucide="refresh-cw"></i> 🔄 Restart WWW (:8090)</button>
       <button class="act-btn" id="btnFederationQuick"><i data-lucide="network"></i> 🌐 Federacja Rejestrów (v0.20)</button>
       <button class="act-btn" id="btnCatalogQuick"><i data-lucide="boxes"></i> 📦 Katalog Zasobów URI</button>
@@ -1190,7 +1202,9 @@ async function fetchLogs(){
   }
 }
 
-async function submitTask(desc){
+let selectedOrganism = 'auto';
+
+async function submitTask(desc, forcedOrg){
   if(!desc || !desc.trim()){
     toast('Wpisz lub podyktuj treść zadania');
     return;
@@ -1198,7 +1212,38 @@ async function submitTask(desc){
   const clean = desc.trim();
   appendCockpitLog(`[USER]: "${clean}"`, 'var(--pacc)');
   
-  // 1. Bezpośrednie wywołanie procesu organizmu czatu: proc://taskand.dev/chat/message/v1
+  let targetOrg = forcedOrg || selectedOrganism;
+  if(targetOrg === 'auto'){
+    const low = clean.toLowerCase();
+    if(low.startsWith('dev ') || low.startsWith('developer ') || low.includes('dozbrój') || low.includes('nowy proces')) targetOrg = 'developer';
+    else if(low.startsWith('doc ') || low.startsWith('doctor ') || low.includes('diagno') || low.includes('trendy')) targetOrg = 'doctor';
+    else if(low.startsWith('sec ') || low.startsWith('vault ') || low.includes('token') || low.includes('sejf')) targetOrg = 'vault';
+    else if(low.startsWith('chat ') || low.startsWith('c ')) targetOrg = 'chat';
+  }
+
+  // Bezpośrednia konwersacja z organizmem (Standard v1.4)
+  if(targetOrg && targetOrg !== 'auto'){
+    try {
+      appendCockpitLog(`[routing] Kierowanie do organizmu: [${targetOrg}]...`, 'var(--pdim)');
+      const res = await fetch(getGwUrl() + `/api/organism/${targetOrg}/chat`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: clean})
+      });
+      const data = await res.json();
+      if(data.ok && data.reply){
+        const color = targetOrg === 'doctor' ? '#A9DFBF' : (targetOrg === 'developer' ? '#85C1E9' : (targetOrg === 'vault' ? '#F5B041' : '#D7BDE2'));
+        appendCockpitLog(`[${data.organism || targetOrg}]: ${data.reply}`, color);
+        speakVoice(data.reply);
+        taskPrompt.value = '';
+        return;
+      }
+    } catch(err){
+      console.warn(`Błąd wywołania organizmu ${targetOrg}:`, err);
+    }
+  }
+
+  // Tryb ogólny czat + kolejka
   try {
     const chatRes = await fetch(getGwUrl() + '/api/chat', {
       method: 'POST',
@@ -1214,7 +1259,7 @@ async function submitTask(desc){
     console.warn('Chat proc fallback:', err);
   }
 
-  // 2. Dodanie zadania wykonawczego do kolejki kontrolera
+  // Dodanie zadania wykonawczego do kolejki kontrolera
   try {
     const res = await fetch(getGwUrl() + '/api/tasks', {
       method: 'POST',
@@ -1528,6 +1573,38 @@ if(SpeechRecognition){
   micLabel.textContent = 'Brak Web Speech';
   $('#voiceLangLabel').textContent = 'Web Speech brak (Chrome/Edge)';
 }
+
+// Obsługa przełączania organizmów (Standard v1.4)
+document.querySelectorAll('.org-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.org-pill').forEach(p => {
+      p.classList.remove('active');
+      p.classList.add('alt');
+    });
+    pill.classList.add('active');
+    pill.classList.remove('alt');
+    selectedOrganism = pill.getAttribute('data-org') || 'auto';
+    const placeholders = {
+      auto: "Wpisz polecenie dla organizmu (np. 'dozbrój nginx na :8090', 'migruj token llm')...",
+      developer: "Prompt dla developera (np. 'dozbrój nginx na :8090', 'stwórz nowy proces')...",
+      doctor: "Zapytanie dla doktora (np. 'sprawdź stan systemu', 'analiza trendów')...",
+      vault: "Polecenie dla sejfu (np. 'migruj token llm do vaulta', 'audyt uprawnień')...",
+      chat: "Wiadomość do asystenta chat..."
+    };
+    taskPrompt.placeholder = placeholders[selectedOrganism] || placeholders.auto;
+    toast(`Wybrano organizm: ${selectedOrganism}`);
+  });
+});
+
+$('#btnDevArmQuick').addEventListener('click', () => {
+  taskPrompt.value = 'dozbrój nginx na :8090';
+  submitTask('dozbrój nginx na :8090', 'developer');
+});
+
+$('#btnVaultQuick').addEventListener('click', () => {
+  taskPrompt.value = 'migruj token llm do vaulta';
+  submitTask('migruj token llm do vaulta', 'vault');
+});
 
 btnSubmitTask.addEventListener('click', () => submitTask(taskPrompt.value));
 taskPrompt.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitTask(taskPrompt.value); });
