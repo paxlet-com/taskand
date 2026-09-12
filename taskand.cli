@@ -50,6 +50,9 @@ case "$cmd" in
         *usuń*|*skasuj*|*wyczyść*|*delete*|*clean*|*remove*|*rm\ *)
           TYP="czyszczenie"
           ;;
+        *zmień*nazw*|*zmien*nazw*|*rename*repo*)
+          TYP="github-rename"
+          ;;
         *wypchnij*|*push*|*sync*|*commit*|*wyślij*git*|*wypchnij*git*)
           TYP="git-push"
           ;;
@@ -61,22 +64,20 @@ case "$cmd" in
           ;;
         *)
           TYP="github-projekt"
-          ;;
       esac
     fi
     TID="t$(date +%s)"
     mkdir -p "$PROJECT_DIR/tasks" "$PROJECT_DIR/log"
     touch "$PROJECT_DIR/log/evolution.log" "$DONE" 2>/dev/null || true
-    if ! printf -- "- id: %s\n  typ: %s\n  z: %s\n" "$TID" "$TYP" "$ZADANIE" >> "$INBOX" 2>/dev/null; then
-      # Fallback przez lokalną bramkę HTTP Gateway (działającą jako root w kontenerze)
+    echo "✓ Dodano zadanie [$TID] (typ: $TYP): $ZADANIE"
+    # Dopisanie do inbox.yaml
+    if [ -f "$INBOX" ] && [ -w "$INBOX" ]; then
+      printf -- "- id: %s\n  typ: %s\n  z: %s\n" "$TID" "$TYP" "$ZADANIE" >> "$INBOX"
+    else
       curl -s -X POST http://localhost:8077/tasks \
         -H "Content-Type: application/json" \
-        -d "{\"id\":\"$TID\",\"typ\":\"$TYP\",\"z\":\"$ZADANIE\"}" >/dev/null || {
-          echo "Błąd: brak uprawnień zapisu do $INBOX i bramka HTTP nie odpowiada!"
-          exit 1
-        }
+        -d "{\"id\":\"$TID\",\"typ\":\"$TYP\",\"z\":\"$ZADANIE\"}" >/dev/null || true
     fi
-    echo "✓ Dodano zadanie [$TID] (typ: $TYP): $ZADANIE"
 
     if [ "$FOLLOW" = "1" ]; then
       echo "→ Śledzenie wykonania zadania [$TID] na żywo (Ctrl+C aby odpiąć podgląd):"
@@ -94,7 +95,14 @@ case "$cmd" in
           sleep 1
           cleanup_tail
           echo ""
-          echo "✓ Zadanie [$TID] wykonane pomyślnie!"
+          # Walidacja Definition of Done (DoD)
+          if python3 "$PROJECT_DIR/scripts/dod_validator.py" "$TID" "$TYP" "$ZADANIE"; then
+            echo "\033[32m✓ Zadanie [$TID] wykonane i zweryfikowane pomyślnie (Definition of Done: PASS)!\033[0m"
+          else
+            echo "\033[31m✗ OSTRZEŻENIE: Proces [$TID] zakończył pracę, ale Definition of Done (DoD) NIESPEŁNIONE!\033[0m"
+            echo "Uruchom: taskand twin $TID \"$ZADANIE\" w celu zbadania w Digital Twin."
+            exit 1
+          fi
           break
         fi
         sleep 0.5

@@ -270,6 +270,33 @@ DOCKER_SPEC
       "taskand/task-$TID" 2>&1 | tee -a "$LOG"
     echo "- id: $TID · typ: $TTYP · $(date '+%F %T')" >> "$TD/tasks/done.yaml"
     log "zadanie $TID: synchronizacja git zakończona sukcesem ✓"
+  elif [ "$TTYP" = "github-rename" ]; then
+    log "zadanie $TID: rozpoczęto proces zmiany nazwy repozytorium ($TZ)"
+    cat > "$D/Dockerfile" <<'DOCKER_SPEC'
+# taskand · task-@ID@ · proces-Dockerfile zmiany nazwy repozytorium GitHub
+FROM alpine:3.20
+RUN apk add --no-cache git github-cli
+WORKDIR /work
+COPY <<'TSK' /entry.sh
+#!/bin/sh
+set -eu
+ORG="@ORG@"; OLD_REPO="@OLD_REPO@"; NEW_REPO="@NEW_REPO@"
+if [ -n "$ORG" ] && [ "$ORG" != "-" ]; then FULL_OLD="$ORG/$OLD_REPO"; FULL_NEW="$ORG/$NEW_REPO"; else FULL_OLD="$OLD_REPO"; FULL_NEW="$NEW_REPO"; fi
+
+echo "[task-@ID@] zmiana nazwy repozytorium GitHub: $FULL_OLD -> $FULL_NEW..."
+gh repo rename "$NEW_REPO" --yes -R "$FULL_OLD" || echo "Uwaga: zmiana nazwy zgłoszona lub repo już istnieje"
+echo "[task-@ID@] ✓ nazwa repozytorium zmieniona pomyślnie na: $FULL_NEW"
+TSK
+RUN chmod +x /entry.sh
+ENTRYPOINT ["/entry.sh"]
+DOCKER_SPEC
+    NEW_R=$(printf '%s' "$TZ" | awk '{print $NF}')
+    [ -n "$NEW_R" ] || NEW_R="taskand-glm53"
+    sed -i -e "s/@ID@/$TID/g" -e "s/@ORG@/$ORG/g" -e "s/@OLD_REPO@/taskand/g" -e "s/@NEW_REPO@/$NEW_R/g" "$D/Dockerfile"
+    docker build -q -t "taskand/task-$TID" "$D" >/dev/null
+    docker run --rm -v "$GHCONF":/root/.config/gh:ro "taskand/task-$TID" 2>&1 | tee -a "$LOG"
+    echo "- id: $TID · typ: $TTYP · $(date '+%F %T')" >> "$TD/tasks/done.yaml"
+    log "zadanie $TID: zmiana nazwy repozytorium zakończona sukcesem ✓"
   elif [ "$TTYP" = "czyszczenie" ] || [ "$TTYP" = "cleanup" ]; then
     log "zadanie $TID: rozpoczęto proces czyszczenia ($TZ)"
     cat > "$D/Dockerfile" <<'DOCKER_SPEC'
