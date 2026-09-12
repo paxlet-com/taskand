@@ -27,9 +27,9 @@
     {
       "uri": "proc://taskand.dev/dev/chat/v1",
       "path": "proc/dev/chat/taskand.dev/v1",
-      "binSha256": "b5a94f970d48531d82cb50ada032708ad2649e56339b09ba55cdd2674996b155",
+      "binSha256": "c25bbf9e35ecbb43406c9a119491c8774c14fc550a2b6bf41b926d6e6f1be308",
       "yamlSha256": "6f08b40f0a7d621f28fb59d2c422e2127544cfd33a2f760a47b921b4d115d197",
-      "testSha256": "3b7b27c42ca8b9c11b6833353d5bc3861532dedbad2bc60c7480e2548c95bf2f"
+      "testSha256": "aca696ed8cdc19dca92d82e92da86bf99555bba2456d2d2f7df11ce0df887900"
     },
     {
       "uri": "proc://taskand.dev/registry/serve/v1",

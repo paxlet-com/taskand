@@ -24,6 +24,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - "${TASKAND_HOST_DIR:-.}:/taskand"
+      - "${HOME:-/home/tom}:${HOME:-/home/tom}"
     restart: unless-stopped
 
   landing:

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // proc://taskand.dev/dev/chat/v1 — Konwersacyjny interfejs developera
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, chownSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -25,6 +25,7 @@ if (!prompt) {
 }
 
 const low = prompt.toLowerCase();
+const norm = low.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 let reply = "";
 let intent = "general-dev";
 
@@ -39,7 +40,7 @@ function getRepoRoot() {
   return cur || process.cwd();
 }
 
-if (low.includes("dozbrój") || low.includes("arm") || low.includes("opakuj") || low.includes("adapter")) {
+if (norm.includes("dozbroj") || norm.includes("arm") || norm.includes("opakuj") || norm.includes("adapter")) {
   intent = "arm-service";
   // Wykryj nazwę usługi i port
   const service = low.includes("nginx") ? "nginx" : "external-service";
@@ -133,18 +134,57 @@ spec:
           `Usługa ${service} (${url}) działa bez przerw w trybie zerowego przestoju.\n` +
           `taskand-doctor może teraz monitorować tę usługę przez adapter URI.`;
 
-} else if (low.includes("stwórz") || low.includes("nowy proces") || low.includes("codegen")) {
+} else if (norm.includes("stworz plik") || norm.includes("utworz plik") || norm.includes("zapisz plik") || (norm.includes("plik") && (norm.includes("tresci") || norm.includes("zawartosc") || norm.includes("folderze") || norm.includes("katalogu")))) {
+  intent = "file-create";
+
+  const folderMatch = prompt.match(/(?:folderze|katalogu|sciezce|path|dir)\s+([^\s]+)/i);
+  const fileMatch = prompt.match(/(?:plik[u]?|file)\s+([^\s]+)/i);
+  const contentMatch = prompt.match(/(?:tresci|zawartosci|content|text)\s+["']?([^"']+)["']?$/i) ||
+                      prompt.match(/(?:tresci|zawartosci|content|text)\s+([^\n\r]+)/i);
+
+  const targetDir = folderMatch ? folderMatch[1].replace(/['",]/g, '') : "";
+  let fileName = fileMatch ? fileMatch[1].replace(/['",]/g, '') : "";
+  const content = contentMatch ? contentMatch[1].replace(/^["']|["']$/g, '').trim() : "";
+
+  let fullPath = fileName;
+  if (targetDir) {
+    fullPath = targetDir.endsWith('/') ? targetDir + fileName : targetDir + '/' + fileName;
+  }
+  if (!fullPath) {
+    fullPath = "output.txt";
+  }
+
+  try {
+    const parentDir = dirname(fullPath);
+    if (parentDir && !existsSync(parentDir)) {
+      mkdirSync(parentDir, { recursive: true });
+    }
+    writeFileSync(fullPath, (content ? content : "") + "\n", "utf8");
+    try {
+      if (process.getuid && process.getuid() === 0) {
+        chownSync(fullPath, 1000, 1000);
+      }
+    } catch(e) {}
+    reply = `[developer] Pomyślnie utworzono plik: ${fullPath}\n` +
+            `[dev/filesystem] Zapisana treść (${content.length} znaków):\n${content}\n` +
+            `Zadanie wykonane poprawnie ✓`;
+  } catch (err) {
+    reply = `[developer] Błąd podczas tworzenia pliku ${fullPath}: ${err.message}`;
+  }
+
+} else if (norm.includes("stworz") || norm.includes("nowy proces") || norm.includes("codegen")) {
   intent = "evolve-create";
   reply = `[developer] Przyjąłem zadanie utworzenia nowego procesu.\n` +
           `[dev/codegen] Kod procesu wygenerowany i zakwalifikowany w testach kontraktu.\n` +
           `Zarejestrowano nowy proces w katalogu proc-catalog.json.`;
-} else if (low.includes("popraw") || low.includes("napraw") || low.includes("heal")) {
+} else if (norm.includes("popraw") || norm.includes("napraw") || norm.includes("heal")) {
   intent = "evolve-fix";
   reply = `[developer] Diagnozuję problem i przygotowuję łatkę naprawczą (dev/heal).\n` +
           `Testy kwalifikacji w Digital Twin potwierdziły stabilność poprawki.`;
 } else {
   reply = `[developer] Cześć! Jestem organizmem deweloperskim taskand.\n` +
           `Możesz mi zlecić:\n` +
+          `  • "stworz plik [nazwa] w folderze [sciezka] o tresci [zawartosc]" — tworzenie plików\n` +
           `  • "dozbrój nginx na :8090" — tworzy adapter dla działającej usługi bez restartu\n` +
           `  • "stwórz proces [opis]" — autonomiczne generowanie nowego procesu\n` +
           `  • "popraw proces [nazwa]" — ewolucja i autoleczenie z testami w Digital Twin.`;

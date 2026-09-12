@@ -21,4 +21,15 @@ if (!out.ok || !out.reply || out.intent !== "arm-service") {
   process.exit(1);
 }
 
+const testFile = spawnSync('node', [join(dir, 'bin.mjs')], { input: JSON.stringify({ message: "stworz plik test-dev.txt w folderze /tmp o tresci witaj" }) });
+if (testFile.status !== 0) {
+  console.error('Test 3 failed: status !== 0', testFile.stderr);
+  process.exit(1);
+}
+const out3 = JSON.parse(testFile.stdout);
+if (!out3.ok || out3.intent !== "file-create") {
+  console.error('Test 3 failed: intent !== file-create', out3);
+  process.exit(1);
+}
+
 console.log('proc://taskand.dev/dev/chat/v1: kontrakt ✓');
