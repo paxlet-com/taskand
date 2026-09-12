@@ -134,8 +134,25 @@ case "$cmd" in
     python3 "$PROJECT_DIR/scripts/history.py" list
     ;;
   rollback|revert)
-    shift || true
-    python3 "$PROJECT_DIR/scripts/history.py" rollback "${1:-}"
+    shift
+    ID="${1:-}"
+    if [ -z "$ID" ]; then
+      echo "Błąd: podaj ID migawki do przywrócenia, np.: taskand rollback snap-t1789203598"
+      exit 1
+    fi
+    python3 "$PROJECT_DIR/scripts/history.py" rollback "$ID"
+    ;;
+  twin|test-twin)
+    shift
+    ID="${1:-}"
+    if [ -z "$ID" ]; then
+      echo "Użycie: taskand twin <ID_ZADANIA> [opis]"
+      echo "Przykład: taskand twin t1789204317 \"wypchnij zmiany na github\""
+      exit 1
+    fi
+    shift
+    DESC="${*:-zadanie}"
+    python3 "$PROJECT_DIR/scripts/digital_twin.py" "$ID" "$DESC"
     ;;
   snapshot|backup)
     shift || true
@@ -159,9 +176,10 @@ case "$cmd" in
     echo "  taskand add -d \"opis\"              Dodaj zadanie w tle (async)"
     echo "  taskand add -t <typ> \"opis\"        Dodaj zadanie wybranego typu (github-projekt, czyszczenie, obserwuj)"
     echo "  taskand clean                        Uruchom zadanie czyszczenia zbędnego podkatalogu taskand"
-    echo "  taskand tasks                        Pokaż kolejkę zadań (inbox) i historię (done)"
-    echo "  taskand history                      Wyświetl historię zadań i dostępnych migawek z hashami"
-    echo "  taskand rollback [snap_id_lub_hash]  Przywróć stan plików z wybranej migawki"
+    echo "  taskand history                 - wyświetla historię zadań, powiązane procesy Dockerfile i migawki"
+    echo "  taskand show <id>               - wyświetla szczegóły i kod Dockerfile danego zadania lub migawki"
+    echo "  taskand twin <id> [opis]        - testuje proces w cyfrowym bliźniaku (Digital Twin Sandbox) z samonaprawą LLM"
+    echo "  taskand rollback <snap-id>      - przywraca stan plików z wybranej migawki"
     echo "  taskand snapshot [ścieżka] [opis]    Utwórz ręczną migawkę stanu plików (SHA-256)"
     echo "  taskand logs [nucleus|gateway]       Śledź logi na żywo"
     echo "  taskand status                       Status kontenerów (docker compose ps)"

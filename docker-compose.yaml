@@ -60,3 +60,9 @@ services:
     volumes:
       - /home/tom/.config/gh:/root/.config/gh:ro
     restart: "no"
+
+  task-t1789204506:
+    build: ./evolution/t1789204506
+    volumes:
+      - /home/tom/.config/gh:/root/.config/gh:ro
+    restart: "no"

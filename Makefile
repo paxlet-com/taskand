@@ -81,6 +81,9 @@ history: ## Wyświetla historię zadań i listę migawek z sumami SHA-256
 show: ## Wyświetla szczegóły i kod Dockerfile procesu: make show ID=t123_lub_snap_xxx
 	@./taskand.cli show $(ID)
 
+twin: ## Testuje proces w cyfrowym bliźniaku (Digital Twin Sandbox): make twin ID=t123 [DESC="opis"]
+	@./taskand.cli twin $(ID) "$(DESC)"
+
 rollback: ## Przywraca stan z wybranej migawki: make rollback ID=snap-xxx
 	@./taskand.cli rollback $(ID)
 

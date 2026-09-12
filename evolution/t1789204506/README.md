@@ -1,0 +1,3 @@
+# taskand
+
+proces w Dockerfile.

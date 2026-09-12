@@ -7,3 +7,4 @@ log/
 
 # Large snapshot archives
 history/*.tar.gz
+__pycache__/
