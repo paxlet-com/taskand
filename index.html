@@ -233,6 +233,7 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
     <!-- Quick Action Bar -->
     <div class="cpanel-actions">
       <button class="act-btn" id="btnDoctorQuick" style="background:#1B3B36;border-color:#27AE60;color:#A9DFBF"><i data-lucide="stethoscope"></i> 🩺 taskand-doctor</button>
+      <button class="act-btn" id="btnRestartQuick" style="background:#2C3E50"><i data-lucide="refresh-cw"></i> 🔄 Restart WWW (:8090)</button>
       <button class="act-btn" id="btnFederationQuick"><i data-lucide="network"></i> 🌐 Federacja Rejestrów (v0.20)</button>
       <button class="act-btn" id="btnCatalogQuick"><i data-lucide="boxes"></i> 📦 Katalog Zasobów URI</button>
       <button class="act-btn" id="btnCapsuleQuick"><i data-lucide="file-code"></i> 📜 Kapsuła & Grants</button>
@@ -1321,6 +1322,27 @@ async function runDoctorQuick(){
   } catch(e){
     appendCockpitLog(`Błąd diagnostyki: ${e.message}`, '#E74C3C');
   }
+async function restartWebServiceQuick(){
+  appendCockpitLog('Wysyłanie żądania restartu usługi WWW (:8090) przez bramkę API...', 'var(--pkey)');
+  speakVoice('Restartuję usługę strony WWW');
+  try {
+    const res = await fetch(getGwUrl() + '/api/restart', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({service: 'landing'})
+    });
+    const d = await res.json();
+    if(d.ok){
+      appendCockpitLog(`✓ ${d.message} (Weryfikacja: ${d.healthCheck})`, '#27AE60');
+      toast('Usługa WWW zrestartowana i zweryfikowana!');
+      speakVoice('Usługa WWW została zrestartowana i zweryfikowana pomyślnie');
+    } else {
+      appendCockpitLog(`✗ Błąd restartu: ${d.error || 'Usługa nie wstała'}`, '#E74C3C');
+      toast('Błąd restartu usługi WWW!');
+    }
+  } catch(e){
+    appendCockpitLog(`Błąd komunikacji: ${e.message}`, '#E74C3C');
+  }
 }
 
 async function fetchFederationQuick(){
@@ -1513,6 +1535,7 @@ $('#gwPing').addEventListener('click', () => { pingGateway(); fetchTasks(); fetc
 $('#btnRefreshTasks').addEventListener('click', () => { fetchTasks(); toast('Odświeżono zadania'); });
 $('#btnRefreshLogs').addEventListener('click', () => { fetchLogs(); toast('Odświeżono logi'); });
 $('#btnDoctorQuick').addEventListener('click', runDoctorQuick);
+$('#btnRestartQuick').addEventListener('click', restartWebServiceQuick);
 $('#btnFederationQuick').addEventListener('click', fetchFederationQuick);
 $('#btnCatalogQuick').addEventListener('click', fetchCatalogQuick);
 $('#btnCapsuleQuick').addEventListener('click', fetchCapsuleQuick);

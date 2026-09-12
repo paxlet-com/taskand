@@ -346,11 +346,49 @@ class Gateway(BaseHTTPRequestHandler):
                     "issues": issues,
                     "autoSubmit": auto_submit
                 })
-            self.send_json(200 if diag.get("ok") else 500, {
-                "ok": diag.get("ok"),
-                "diagnosis": diag.get("output"),
-                "prescription": presc.get("output") if presc else None,
-                "autoHealTriggered": presc is not None
+        elif path in ["/restart", "/api/restart", "/service/restart", "/api/service/restart"]:
+            target = payload.get("service") or payload.get("target") or "landing"
+            container_map = {
+                "landing": "taskand-landing",
+                "web": "taskand-landing",
+                "taskand-landing": "taskand-landing",
+                "8090": "taskand-landing",
+                "gateway": "taskand-gateway",
+                "nucleus": "taskand-nucleus"
+            }
+            container = container_map.get(str(target).lower(), target)
+            allowed_containers = ["taskand-landing", "taskand-gateway", "taskand-nucleus"]
+            if container not in allowed_containers:
+                self.send_json(403, {"ok": False, "error": f"Usługa '{container}' niedozwolona do restartu przez API (dozwolone: {allowed_containers})"})
+                return
+
+            print(f"[gateway] Żądanie restartu kontenera: {container}...", flush=True)
+            res = subprocess.run(["docker", "restart", container], capture_output=True, text=True, timeout=20)
+            if res.returncode != 0:
+                self.send_json(500, {"ok": False, "error": f"Błąd restartu: {res.stderr.strip()}"})
+                return
+
+            time.sleep(1)
+            health_ok = True
+            error_detail = ""
+            if container == "taskand-landing":
+                diag = execute_proc("proc://taskand.dev/doctor/diagnose/v1", {"timeoutMs": 3000})
+                web_check = next((c for c in diag.get("output", {}).get("checks", []) if c.get("target") == "web-landing"), None)
+                if not web_check or not web_check.get("ok"):
+                    health_ok = False
+                    error_detail = "Usługa WWW nie odpowiada po restarcie!"
+                    rollback_id = payload.get("rollbackSnapId")
+                    if rollback_id:
+                        subprocess.run(["python3", "/taskand/scripts/history.py", "rollback", rollback_id], capture_output=True, text=True)
+                        error_detail += f" Wykonano automatyczny rollback do {rollback_id}."
+
+            self.send_json(200 if health_ok else 502, {
+                "ok": health_ok,
+                "container": container,
+                "restarted": True,
+                "healthCheck": "PASS" if health_ok else "FAIL",
+                "error": error_detail if not health_ok else None,
+                "message": f"Kontener {container} zrestartowany pomyślnie i zweryfikowany przez taskand-doctor" if health_ok else error_detail
             })
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
