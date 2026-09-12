@@ -1,0 +1,9 @@
+uri: proc://taskand.dev/doctor/prescribe/v1
+name: prescribe
+version: "1.0.0"
+role: worker
+interface:
+  stdin: { type: object }
+  stdout: { type: object, required: [ok, uri, prescriptions] }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+entrypoint: bin.mjs

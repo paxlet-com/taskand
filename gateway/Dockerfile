@@ -220,6 +220,9 @@ class Gateway(BaseHTTPRequestHandler):
                 "total_registries": len(registries),
                 "registries": registries
             })
+        elif path in ["/doctor", "/api/doctor"]:
+            diag = execute_proc("proc://taskand.dev/doctor/diagnose/v1", {})
+            self.send_json(200 if diag.get("ok") else 500, diag)
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 
@@ -332,6 +335,23 @@ class Gateway(BaseHTTPRequestHandler):
             voice_input = {"transcript": transcript}
             result = execute_proc("proc://taskand.dev/chat/voice/v1", voice_input)
             self.send_json(200 if result.get("ok") else 500, result)
+        elif path in ["/doctor", "/api/doctor"]:
+            diag_in = payload.get("diagnose", {})
+            auto_submit = payload.get("autoSubmit", True)
+            diag = execute_proc("proc://taskand.dev/doctor/diagnose/v1", diag_in)
+            presc = None
+            if diag.get("ok") and not diag.get("output", {}).get("healthy", True):
+                issues = diag.get("output", {}).get("issues", [])
+                presc = execute_proc("proc://taskand.dev/doctor/prescribe/v1", {
+                    "issues": issues,
+                    "autoSubmit": auto_submit
+                })
+            self.send_json(200 if diag.get("ok") else 500, {
+                "ok": diag.get("ok"),
+                "diagnosis": diag.get("output"),
+                "prescription": presc.get("output") if presc else None,
+                "autoHealTriggered": presc is not None
+            })
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 

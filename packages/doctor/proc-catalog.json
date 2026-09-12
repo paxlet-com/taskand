@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "standard": "taskand-v1.0",
+  "package": "taskand-doctor",
+  "bindings": [
+    {
+      "uri": "proc://taskand.dev/doctor/diagnose/v1",
+      "path": "proc/doctor/diagnose/taskand.dev/v1",
+      "binSha256": "bec11cbafb7126731484f0361c45b0c3bdd8a573fa5abc4a1df40dac7fe3941a",
+      "yamlSha256": "782408e387c8cca1d77280b80cde9fc31d6b5bc766f81487593173c58c136757",
+      "testSha256": "aa30d8ececa7d14341663de6e477892528cf15ccca70e0aaee38af562acbb49f"
+    },
+    {
+      "uri": "proc://taskand.dev/doctor/prescribe/v1",
+      "path": "proc/doctor/prescribe/taskand.dev/v1",
+      "binSha256": "3b9c9a754c9da05c545f706f105d418236e36b4af7e474f9eb7746b3cfffab23",
+      "yamlSha256": "a03ae2af4cf0036f16893e794b21455a31944646d5ffced9b989927aeeb08208",
+      "testSha256": "50548c4af896928c309219e2eb0f68809b191059d9e389e28e264535056838c0"
+    },
+    {
+      "uri": "proc://taskand.dev/registry/serve/v1",
+      "path": "proc/registry/serve/taskand.dev/v1",
+      "binSha256": "561a019d6789445e7545187233c50dc9ed638b82a54ffc80f6f5262477120199",
+      "yamlSha256": "a7f76d8708a773ce3f6212bc1117ed5544ecfdbf80dbf828ac946da37773535b",
+      "testSha256": "a3058dd899744cbba0a80ca0b07e1534233bed7579ff883d976c5eef2d0aedeb"
+    }
+  ]
+}

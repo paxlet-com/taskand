@@ -232,6 +232,7 @@ footer{margin-top:54px;border-top:1px solid var(--line);padding-top:16px;font-fa
 
     <!-- Quick Action Bar -->
     <div class="cpanel-actions">
+      <button class="act-btn" id="btnDoctorQuick" style="background:#1B3B36;border-color:#27AE60;color:#A9DFBF"><i data-lucide="stethoscope"></i> 🩺 taskand-doctor</button>
       <button class="act-btn" id="btnFederationQuick"><i data-lucide="network"></i> 🌐 Federacja Rejestrów (v0.20)</button>
       <button class="act-btn" id="btnCatalogQuick"><i data-lucide="boxes"></i> 📦 Katalog Zasobów URI</button>
       <button class="act-btn" id="btnCapsuleQuick"><i data-lucide="file-code"></i> 📜 Kapsuła & Grants</button>
@@ -1276,9 +1277,52 @@ async function fetchHistoryQuick(){
       });
       toast('Załadowano historię zadań');
     }
+async function runDoctorQuick(){
+  appendCockpitLog('Uruchamianie diagnostyki systemu przez taskand-doctor...', 'var(--pkey)');
+  speakVoice('taskand-doctor rozpoczyna diagnostykę');
+  try {
+    const res = await fetch(getGwUrl() + '/api/doctor', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({autoSubmit: true})
+    });
+    const d = await res.json();
+    cockpitLogView.innerHTML = '';
+    appendCockpitLog(`=== RAPORT DIAGNOSTYCZNY: taskand-doctor ===`, 'var(--pacc)');
+    const diag = d.diagnosis || {};
+    if(diag.healthy){
+      appendCockpitLog(`✓ Stan systemu: ZDROWY (${diag.checksPassed}/${diag.checksTotal} testów zdanych)`, '#27AE60');
+      speakVoice('Wszystkie usługi działają prawidłowo. System jest zdrowy.');
+      toast('System zdrowy — brak wykrytych usterek');
+    } else {
+      appendCockpitLog(`✗ Wykryto ${diag.issues ? diag.issues.length : 1} problemów!`, '#E74C3C');
+      if(diag.issues){
+        diag.issues.forEach(i => {
+          appendCockpitLog(`  [AWARIA]: ${i.target} (${i.status}) — ${i.error}`, '#E06B37');
+        });
+      }
+      if(d.autoHealTriggered && d.prescription){
+        appendCockpitLog(`\n[RECEPTA DLA DEVELOPERA]:`, 'var(--pkey)');
+        d.prescription.prescriptions.forEach(p => {
+          appendCockpitLog(`  → Zlecono zadanie do ${p.delegateTo} (priorytet: ${p.priority})`, '#27AE60');
+          appendCockpitLog(`    Treść: ${p.task}`, 'var(--ptext)');
+        });
+        speakVoice(`Wykryto usterki. taskand-doctor zlecił automatyczną naprawę do dewelopera.`);
+        toast('Wykryto usterkę — zlecono naprawę deweloperowi!');
+        setTimeout(() => { fetchTasks(); fetchLogs(); }, 1200);
+      }
+    }
+    if(diag.checks){
+      appendCockpitLog(`\nSzczegóły sprawdzeń:`, 'var(--pdim)');
+      diag.checks.forEach(c => {
+        appendCockpitLog(`  • ${c.target} (${c.url || ''}): ${c.ok ? 'OK' : 'BŁĄD (' + c.error + ')'}`, c.ok ? '#27AE60' : '#E74C3C');
+      });
+    }
   } catch(e){
-    appendCockpitLog(`Błąd historii: ${e.message}`, '#E74C3C');
+    appendCockpitLog(`Błąd diagnostyki: ${e.message}`, '#E74C3C');
   }
+}
+
 async function fetchFederationQuick(){
   appendCockpitLog('Pobieranie stanu federacji rejestrów z /api/federation...', 'var(--pkey)');
   speakVoice('Ładuję federację rejestrów');
@@ -1430,7 +1474,8 @@ if(SpeechRecognition){
           else if(act === 'rollback') runRollbackQuick();
           else {
             const low = spoken.toLowerCase();
-            if(low.includes('federacj') || low.includes('rejestr')) fetchFederationQuick();
+            if(low.includes('doktor') || low.includes('zdrowie') || low.includes('diagnoz') || low.includes('lecz')) runDoctorQuick();
+            else if(low.includes('federacj') || low.includes('rejestr')) fetchFederationQuick();
             else if(low.includes('katalog') || low.includes('zasoby')) fetchCatalogQuick();
             else if(low.includes('kapsuła') || low.includes('grants')) fetchCapsuleQuick();
             else if(low.includes('historia')) fetchHistoryQuick();
@@ -1467,6 +1512,7 @@ taskPrompt.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitTask
 $('#gwPing').addEventListener('click', () => { pingGateway(); fetchTasks(); fetchLogs(); toast('Odświeżono połączenie'); });
 $('#btnRefreshTasks').addEventListener('click', () => { fetchTasks(); toast('Odświeżono zadania'); });
 $('#btnRefreshLogs').addEventListener('click', () => { fetchLogs(); toast('Odświeżono logi'); });
+$('#btnDoctorQuick').addEventListener('click', runDoctorQuick);
 $('#btnFederationQuick').addEventListener('click', fetchFederationQuick);
 $('#btnCatalogQuick').addEventListener('click', fetchCatalogQuick);
 $('#btnCapsuleQuick').addEventListener('click', fetchCapsuleQuick);
