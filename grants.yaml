@@ -1,0 +1,31 @@
+# taskand v2.2 — Grants & Security Access Control
+version: "1.0"
+
+users:
+  admin:
+    token: "taskand-admin-key"
+    role: "administrator"
+    allowed_uris:
+      - "proc://taskand.dev/*"
+    allowed_actions:
+      - "*"
+
+  operator:
+    token: "taskand-operator-key"
+    role: "operator"
+    allowed_uris:
+      - "proc://taskand.dev/chat/*"
+      - "proc://taskand.dev/doctor/*"
+      - "proc://taskand.dev/monitor/*"
+      - "proc://taskand.dev/hw/*"
+    allowed_actions:
+      - "call"
+      - "read"
+
+  guest:
+    token: "taskand-guest-key"
+    role: "guest"
+    allowed_uris:
+      - "proc://taskand.dev/chat/message/v1"
+    allowed_actions:
+      - "call"

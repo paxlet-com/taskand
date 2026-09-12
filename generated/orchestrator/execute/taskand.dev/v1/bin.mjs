@@ -43,6 +43,21 @@ const state = {
   summary: []
 };
 
+// Resume logic: jeśli stan dla runId już istnieje na dysku, wczytaj go
+let isResume = false;
+if (existsSync(stateFile)) {
+  try {
+    const prev = JSON.parse(readFileSync(stateFile, "utf8"));
+    if (prev && prev.steps) {
+      isResume = true;
+      Object.assign(state.steps, prev.steps);
+      state.startedAt = prev.startedAt || state.startedAt;
+      state.resumedAt = new Date().toISOString();
+      if (Array.isArray(prev.summary)) state.summary = [...prev.summary];
+    }
+  } catch {}
+}
+
 function saveState() {
   state.updatedAt = new Date().toISOString();
   try {
@@ -56,6 +71,12 @@ saveState();
 
 // Pętla wykonania kroków
 for (const step of plan.steps) {
+  // Resume check: jeśli krok już zakończył się sukcesem, NIE powtarzaj go!
+  const prevStep = state.steps[step.name];
+  if (prevStep && (prevStep.status === "SUCCEEDED" || prevStep.status === "SKIPPED")) {
+    continue;
+  }
+
   const stepRecord = {
     id: step.id,
     name: step.name,
@@ -81,10 +102,11 @@ for (const step of plan.steps) {
 
   if (!canExecute) {
     stepRecord.status = "BLOCKED";
+    stepRecord.errorType = "DEPENDENCY_BLOCKED";
     stepRecord.reason = `Poprzednik "${blockingDep}" nie powiódł się lub nie istnieje`;
     stepRecord.finishedAt = new Date().toISOString();
     state.steps[step.name] = stepRecord;
-    state.summary.push({ step: step.name, status: "BLOCKED", reason: stepRecord.reason });
+    state.summary.push({ step: step.name, status: "BLOCKED", errorType: "DEPENDENCY_BLOCKED", reason: stepRecord.reason });
     saveState();
     continue;
   }
@@ -136,6 +158,7 @@ for (const step of plan.steps) {
     const binPath = step.resolvedPath ? join(ROOT, step.resolvedPath) : null;
     if (!binPath || !existsSync(binPath)) {
       stepRecord.status = "FAILED";
+      stepRecord.errorType = "FATAL";
       stepRecord.error = `Nie znaleziono pliku wykonywalnego: ${step.resolvedPath || step.process}`;
     } else {
       try {
@@ -149,13 +172,22 @@ for (const step of plan.steps) {
         stepRecord.exit = r.status;
         if (r.status !== 0) {
           stepRecord.status = "FAILED";
-          stepRecord.error = r.stderr?.trim() || `Proces zakończył się kodem ${r.status}`;
+          const errText = r.stderr?.trim() || `Proces zakończył się kodem ${r.status}`;
+          stepRecord.error = errText;
+          if (errText.includes("timed out") || errText.includes("ETIMEDOUT") || r.status === 124) {
+            stepRecord.errorType = "RETRYABLE";
+          } else if (errText.includes("EACCES") || errText.includes("Permission denied") || errText.includes("Forbidden")) {
+            stepRecord.errorType = "DENIED";
+          } else {
+            stepRecord.errorType = "EXEC_ERROR";
+          }
         } else {
           // BUG 5 & 6 FIX: Bezpieczne parsowanie pełnego JSON i check {"ok":false}
           try {
             const parsed = JSON.parse(r.stdout.trim());
             if (parsed.ok === false || parsed.status === "error" || parsed.status === "fail") {
               stepRecord.status = "FAILED";
+              stepRecord.errorType = "VALIDATION_FAILED";
               stepRecord.error = parsed.error || "Proces zwrócił błąd w kontrakcie (ok: false)";
               stepRecord.output = parsed;
             } else {
@@ -170,6 +202,7 @@ for (const step of plan.steps) {
       } catch (execErr) {
         stepRecord.status = "FAILED";
         stepRecord.error = execErr.message;
+        stepRecord.errorType = execErr.message?.includes("timed out") ? "RETRYABLE" : "EXEC_ERROR";
       }
     }
   }
@@ -179,6 +212,7 @@ for (const step of plan.steps) {
   state.summary.push({
     step: step.name,
     status: stepRecord.status,
+    errorType: stepRecord.errorType,
     error: stepRecord.error
   });
   saveState();

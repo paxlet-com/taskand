@@ -54,11 +54,12 @@ ZASADY:
    - description: 1 zdanie
    - deps: lista NAZW kroków poprzedzających (np. ["monitor_cpu"])
    - params: parametry konfiguracyjne
-2. W parametrach dla sekretów UŻYWAJ WYŁĄCZNIE credentialRef: "vault://...", NIGDY plaintext tokenów!
+2. KRYTYCZNE DLA BEZPIECZEŃSTWA: NIGDY nie umieszczaj kluczy takich jak "bot_token", "api_key", "token", "secret" bezpośrednio w params!
+   Dla poświadczeń UŻYWAJ WYŁĄCZNIE parametru: "credentialRef": "vault://service/token". Wszelkie jawne sekrety w parametrach zostaną natychmiast odrzucone przez walidator!
 3. Jeśli zadanie to "monitoring z alertami na Telegram i dashboardem", zaplanuj:
    - krok monitor (proc://taskand.dev/monitor/cpu/v1)
-   - krok alert (proc://taskand.dev/alert/telegram/v1, deps: [monitor])
-   - krok dashboard (proc://taskand.dev/web/serve/v1, deps: [monitor])
+   - krok alert (proc://taskand.dev/alert/telegram/v1, deps: ["monitor_cpu"], params: { "threshold": 80, "credentialRef": "vault://telegram/token" })
+   - krok dashboard (proc://taskand.dev/web/serve/v1, deps: ["monitor_cpu"], params: { "port": 8090 })
 
 Zwróć WYŁĄCZNIE poprawny JSON o strukturze:
 {
@@ -89,6 +90,26 @@ if (KEY) {
     }
   } catch (err) {
     // Network or LLM error
+  }
+}
+
+// Sanitization: obrona w głąb przed przypadkowymi jawnymi kluczami w wyjściu LLM
+if (plan && plan.blueprint && Array.isArray(plan.blueprint.steps)) {
+  for (const step of plan.blueprint.steps) {
+    if (step.params && typeof step.params === "object") {
+      for (const k of Object.keys(step.params)) {
+        const kLower = k.toLowerCase();
+        if (kLower.includes("token") || kLower.includes("secret") || kLower.includes("password") || kLower.includes("key")) {
+          const val = String(step.params[k]);
+          if (!val.startsWith("vault://")) {
+            delete step.params[k];
+            if (!step.params.credentialRef) {
+              step.params.credentialRef = `vault://${step.name || "service"}/${k}`;
+            }
+          }
+        }
+      }
+    }
   }
 }
 

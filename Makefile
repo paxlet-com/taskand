@@ -13,8 +13,10 @@ status:
 	docker compose ps
 	@./bin/taskand status
 
-test:
-	@echo "=== Weryfikacja kontraktów procesów taskand v2.0 (fail-closed) ==="
+test: test-contracts test-negative
+
+test-contracts:
+	@echo "=== Weryfikacja kontraktów procesów taskand v2.2 (fail-closed) ==="
 	@passed=0; total=0; \
 	for bin in $$(find generated -name "bin.mjs" | sort); do \
 		total=$$((total + 1)); \
@@ -23,10 +25,13 @@ test:
 			passed=$$((passed + 1)); \
 		else \
 			echo "  $$bin: FAIL ✗"; \
-		fi \
+			fi \
 	done; \
-	echo "Wynik testów: $$passed/$$total PASS ✓"; \
+	echo "Wynik kontraktów: $$passed/$$total PASS ✓"; \
 	[ "$$passed" -eq "$$total" ]
+
+test-negative:
+	@node tests/negative_tests.mjs
 
 bootstrap:
 	docker compose run --rm bootstrap

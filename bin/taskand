@@ -54,6 +54,7 @@ case "$1" in
     if is_gateway_up; then
       RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
         -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
       REPLY=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
       if [ -n "$REPLY" ]; then
@@ -118,6 +119,7 @@ JSON
     if is_gateway_up; then
       curl -s -X POST "$GATEWAY/api/proc/call" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
         -d "{\"uri\":\"$URI\",\"data\":$DATA}"
       echo ""
     else

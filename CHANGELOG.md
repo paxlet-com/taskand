@@ -10,6 +10,12 @@
 - Persistent orchestration state tracking in `log/orchestrations/`
 - Reference processes: `monitor/cpu/v1` and `alert/telegram/v1` with credential protection
 - End-to-end composite execution in `dev/chat`: `taskand dev "zbuduj system monitoringu z alertami na Telegram i dashboardem"`
+- Modular Gateway (`gateway/` package with router, auth, cors, logging middleware and isolated handlers)
+- RBAC security access control and authentication via `grants.yaml` (HTTP 401 on unauthenticated, HTTP 403 on denied grants)
+- Orchestrator crash resume capability: non-idempotent SUCCEEDED steps preserved across restarts
+- Error taxonomy: `DEPENDENCY_BLOCKED`, `RETRYABLE`, `DENIED`, `VALIDATION_FAILED`, `FATAL`, `EXEC_ERROR`
+- Release pinning and SHA-256 `bindingHash` integrity verification in `proc-catalog.json` and validator
+- Automated negative test suite (`tests/negative_tests.mjs` running 10 edge case scenarios)
 
 ## [Unreleased] - 2026-09-12
 

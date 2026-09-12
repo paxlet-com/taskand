@@ -164,7 +164,7 @@ Przebieg:
 ## 10 · Instrukcja testowania i weryfikacji
 
 ```bash
-# 1. Wszystkie testy kontraktu (17 procesów fail-closed)
+# 1. Wszystkie testy kontraktu (17 procesów) i testy negatywne (10 testów)
 make test
 
 # 2. Test prosty (odczyt istnienia pliku)
@@ -180,3 +180,98 @@ taskand dev "zbuduj system monitoringu z alertami na Telegram i dashboardem"
 ls -la log/orchestrations/
 cat log/orchestrations/*.json
 ```
+
+---
+
+<a id="11-gateway"></a>
+## 11 · Architektura Modularna Gateway (`gateway/`)
+
+Monolityczny plik `gateway.py` został zastąpiony pakietem modularnym z pojedynczą odpowiedzialnością (SRP):
+
+```
+gateway/
+├── __init__.py          ← start serwera HTTPServer i obsługa cyklu życia
+├── router.py            ← cienki dyspozytor URI → handler (<30 linii)
+├── auth.py              ← check_auth (Bearer/API key) i check_grant (grants.yaml)
+├── utils.py             ← rozwiązywanie URI i konfiguracja środowiska
+├── middleware/
+│   ├── cors.py          ← nagłówki CORS dla aplikacji Web/Cockpit
+│   └── logging.py       ← append-only log zdarzeń (log/events.jsonl)
+└── handlers/
+    ├── health.py        ← GET /healthz
+    ├── federation.py    ← GET /api/federation
+    ├── proc.py          ← POST /api/proc/call (kontrola grantów i wykonanie)
+    ├── chat.py          ← POST /api/chat (routing organizmów)
+    ├── doctor.py        ← POST /api/doctor
+    ├── planner.py       ← POST /api/planner
+    └── orchestrator.py  ← POST /api/orchestrator
+```
+
+Plik `gateway.py` w katalogu głównym pozostaje minimalistycznym punktem wejścia (wrapperem), zachowując 100% kompatybilności wstecznej dla `python3 gateway.py` oraz `docker compose`.
+
+---
+
+<a id="12-grants"></a>
+## 12 · Kontrola Dostępu i Autentykacja (`grants.yaml`)
+
+Wszystkie bezpośrednie wywołania procedur (`/api/proc/call`) oraz silnika orkiestracji podlegają ścisłej autoryzacji:
+
+1. **Autentykacja**:
+   * Każde żądanie musi zawierać nagłówek `Authorization: Bearer <token>` lub `X-Taskand-Key: <token>`.
+   * Brak poświadczeń skutkuje natychmiastowym kodem **HTTP 401 Unauthorized**.
+2. **Autoryzacja (Granty)**:
+   * Uprawnienia użytkownika są sprawdzane w `grants.yaml`.
+   * Użytkownik o ograniczonej roli (np. `guest`) próbujący uzyskać dostęp do zasobów administracyjnych/plikowych otrzymuje kod **HTTP 403 Forbidden**.
+   * Role:
+     - `admin`: pełen dostęp do `proc://taskand.dev/*` (akcje `*`).
+     - `operator`: dostęp do `chat/*`, `doctor/*`, `monitor/*`, `hw/*` (akcje `call`, `read`).
+     - `guest`: dostęp wyłącznie do `proc://taskand.dev/chat/message/v1` (akcja `call`).
+
+---
+
+<a id="13-resume"></a>
+## 13 · Wznowienie po Awarii (Orchestrator Crash Resume) i Taksonomia Błędów
+
+### Wznowienie po awarii (Crash Resume)
+Orkiestrator (`orchestrator/execute/v1`) ładuje stan z `log/orchestrations/<runId>.json`:
+* Kroki ze statusem `SUCCEEDED` lub `SKIPPED` **nigdy nie są wykonywane ponownie** (ochrona przed powtórnymi efektami ubocznymi).
+* Wykonanie wznawiane jest deterministycznie od pierwszego nieukończonego kroku.
+
+### Taksonomia błędów (Error Taxonomy)
+Każdy krok w stanie `FAILED` lub `BLOCKED` otrzymuje jednoznaczny typ błędu `errorType`:
+* `DEPENDENCY_BLOCKED`: Awaria lub brak kroku nadrzędnego w grafie DAG.
+* `RETRYABLE`: Przekroczenie limitu czasu (timeout) lub przejściowy błąd sieciowy.
+* `DENIED`: Brak uprawnień do zasobu lub odmowa dostępu w systemie plików (EACCES).
+* `VALIDATION_FAILED`: Naruszenie kontraktu wyjścia procesu (np. zwrócenie `{"ok": false}`).
+* `FATAL`: Brak pliku wykonywalnego na dysku lub błąd krytyczny.
+* `EXEC_ERROR`: Standardowy błąd wykonania z kodem wyjścia różnym od zera.
+
+---
+
+<a id="14-wersjonowanie"></a>
+## 14 · Wersjonowanie Wydań i Integralność (`bindingHash`)
+
+W `proc-catalog.json` każdy proces posiada:
+* `release`: Wersję wydania (np. `"1.0.0"`).
+* `bindingHash`: Sumę kontrolną SHA-256 pliku wykonywalnego (`sha256:<hash>`).
+* `created`: Sygnaturę czasową publikacji.
+
+Walidator (`validator/resolve/v1`) weryfikuje sumę kontrolną pliku wykonywalnego przed zatwierdzeniem planu — jakakolwiek nieautoryzowana modyfikacja kodu na dysku skutkuje odrzuceniem planu z błędem naruszenia integralności.
+
+---
+
+<a id="15-negatywne"></a>
+## 15 · Zestaw Testów Negatywnych (Negative Test Suite)
+
+Automatyczny pakiet testów weryfikuje odporność systemu na błędy brzegowe (`make test-negative`):
+1. **Detekcja cyklu (A → B → A)**: Walidator wykrywa cykl 3-kolorowym DFS i odrzuca plan.
+2. **Zduplikowane ID kroków**: Odrzucenie planu z listą powielonych identyfikatorów.
+3. **Jawne tokeny w parametrach**: Odrzucenie planu przy braku prefiksu `vault://`.
+4. **Path traversal / nieznany proces URI**: Odrzucenie prób odwołania do plików spoza katalogu.
+5. **Blokowanie kroków zależnych**: Awaria poprzednika ustawia status `BLOCKED` na krokach potomnych.
+6. **Weryfikacja błędu w kontrakcie**: `{"ok": false}` przy kodzie 0 traktowane jako `FAILED`.
+7. **Crash resume**: Pomijanie ponownego wykonania zakończonych pomyślnie kroków.
+8. **Brak autentykacji na gateway**: HTTP 401 Unauthorized.
+9. **Brak grantu na gateway**: HTTP 403 Forbidden dla roli o ograniczonych uprawnieniach.
+10. **Poprawny token administratora**: HTTP 200 OK.
+

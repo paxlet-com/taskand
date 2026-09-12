@@ -24,9 +24,11 @@ services:
     volumes:
       - ./generated:/taskand/generated
       - ./proc-catalog.json:/taskand/proc-catalog.json
+      - ./grants.yaml:/taskand/grants.yaml:ro
       - ./web-root:/taskand/web-root
       - ./index.html:/taskand/index.html
       - ./gateway.py:/app/server.py:ro
+      - ./gateway:/app/gateway:ro
       - ./log:/taskand/log
     ports: ["8077:8077"]
     restart: unless-stopped
