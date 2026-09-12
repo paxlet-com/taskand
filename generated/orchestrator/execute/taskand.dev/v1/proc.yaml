@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/orchestrator/execute/v1
+interface:
+  stdin: { approvedPlan: object, runId?: string }
+  stdout: { runId: string, status: string, succeeded: number, failed: number, steps: object }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+runtimes: [{ kind: node, bin: bin.mjs }]

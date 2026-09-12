@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.2.0] - 2026-09-12
+
+### Added
+- Standard taskand v2.2: complex task planning, validation and execution pipeline (`planner/plan/v1`, `validator/resolve/v1`, `orchestrator/execute/v1`)
+- Dynamic capability context introspection from `proc-catalog.json`
+- 3-color DFS cycle detection and DAG validation in validator
+- Child process environment isolation (`TASKAND_LLM_API_KEY` masked)
+- Persistent orchestration state tracking in `log/orchestrations/`
+- Reference processes: `monitor/cpu/v1` and `alert/telegram/v1` with credential protection
+- End-to-end composite execution in `dev/chat`: `taskand dev "zbuduj system monitoringu z alertami na Telegram i dashboardem"`
+
+## [Unreleased] - 2026-09-12
+
+### Fixed
+- Fix ast-duplicate-imports issues (ticket-1b0c6508)
+- Fix ast-sorted-imports issues (ticket-c88d6e99)
+- Fix ast-string-concat issues (ticket-ace36772)
+- Fix ast-print-statements issues (ticket-59513206)
+- Fix ast-missing-return-type issues (ticket-94b3ac97)
+- Fix ruff-print-statements issues (ticket-995cf87a)
+- Fix ruff-sorted-imports issues (ticket-fbbe0c7d)
+- Fix smart-return-type issues (ticket-367fadf1)
+- Fix string-concat-fstring issues (ticket-b93f8379)
+- Fix importchecker-duplicate-imports issues (ticket-f129ddaa)
+- Fix magic-numbers issues (ticket-46566321)
+- Fix ai-boilerplate issues (ticket-7e73e316)
+- Fix string-formatting issues (ticket-065cc1f4)
+- Fix import-optimization issues (ticket-4d088f66)
+
 ## [Unreleased] - 2026-09-12
 
 ### Fixed

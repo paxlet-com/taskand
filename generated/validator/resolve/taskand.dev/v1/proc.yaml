@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/validator/resolve/v1
+interface:
+  stdin: { blueprint: object }
+  stdout: { valid: boolean, status: string, approvedPlan?: object, errors?: string[] }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+runtimes: [{ kind: node, bin: bin.mjs }]

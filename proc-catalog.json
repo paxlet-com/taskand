@@ -1,46 +1,125 @@
 {
-  "version": "2.0.0",
-  "updated": "2026-09-12T17:40:00Z",
+  "version": "2.2.0",
+  "updated": "2026-09-12T17:50:00Z",
   "processes": [
     {
       "uri": "proc://taskand.dev/browser/session/v1",
-      "status": "active"
+      "path": "generated/browser/session/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Zarz\u0105dzanie sesjami przegl\u0105darki noVNC i zrzutami ekranu"
     },
     {
       "uri": "proc://taskand.dev/chat/message/v1",
-      "status": "active"
+      "path": "generated/chat/message/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Obs\u0142uga wiadomo\u015bci i dialogu konwersacyjnego"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/chat/v1",
+      "path": "generated/dev/chat/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Interfejs konwersacyjny developera taskand (WYKONUJE, nie wyja\u015bnia)"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/execute/v1",
+      "path": "generated/dev/execute/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Silnik bezpo\u015bredniego wykonywania intencji deweloperskich"
     },
     {
       "uri": "proc://taskand.dev/dev/codegen/v1",
-      "status": "active"
+      "path": "generated/dev/codegen/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Generowanie kodu procesu na podstawie specyfikacji"
     },
     {
       "uri": "proc://taskand.dev/developer/spawn/v1",
-      "status": "active"
+      "path": "generated/developer/spawn/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Powo\u0142ywanie nowych organizm\u00f3w z testami w sandboxie"
     },
     {
       "uri": "proc://taskand.dev/doctor/diagnose/v1",
-      "status": "active"
+      "path": "generated/doctor/diagnose/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Diagnostyka zdrowia us\u0142ug i proces\u00f3w w ekosystemie"
     },
     {
       "uri": "proc://taskand.dev/doctor/prescribe/v1",
-      "status": "active"
+      "path": "generated/doctor/prescribe/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Rekomendacje SRE i recepty naprawcze"
     },
     {
       "uri": "proc://taskand.dev/file/ops/v1",
-      "status": "active"
+      "path": "generated/file/ops/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Operacje na systemie plik\u00f3w w\u0119z\u0142a (odczyt, zapis, lista)"
     },
     {
       "uri": "proc://taskand.dev/hw/monitor/v1",
-      "status": "active"
+      "path": "generated/hw/monitor/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Telemetria sprz\u0119towa: CPU, pami\u0119\u0107, temperatura, GPIO"
     },
     {
       "uri": "proc://taskand.dev/vault/secrets/v1",
-      "status": "active"
+      "path": "generated/vault/secrets/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Zarz\u0105dzanie po\u015bwiadczeniami i sekretami (AES-256-GCM)"
     },
     {
       "uri": "proc://taskand.dev/web/serve/v1",
-      "status": "active"
+      "path": "generated/web/serve/taskand.dev/v1/bin.mjs",
+      "kind": "service",
+      "status": "active",
+      "desc": "Serwowanie interfejsu Web Cockpit na :8090"
+    },
+    {
+      "uri": "proc://taskand.dev/planner/plan/v1",
+      "path": "generated/planner/plan/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Dekompozycja z\u0142o\u017conych zada\u0144 na Blueprint (kandydat planu)"
+    },
+    {
+      "uri": "proc://taskand.dev/validator/resolve/v1",
+      "path": "generated/validator/resolve/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Deterministyczna walidacja grafu, uprawnie\u0144 i rozwi\u0105zywanie URI"
+    },
+    {
+      "uri": "proc://taskand.dev/orchestrator/execute/v1",
+      "path": "generated/orchestrator/execute/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Trwa\u0142a, asynchroniczna orkiestracja zatwierdzonego planu z izolacj\u0105"
+    },
+    {
+      "uri": "proc://taskand.dev/monitor/cpu/v1",
+      "path": "generated/monitor/cpu/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Precyzyjny monitor obci\u0105\u017cenia CPU z pomiarem i histori\u0105"
+    },
+    {
+      "uri": "proc://taskand.dev/alert/telegram/v1",
+      "path": "generated/alert/telegram/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Adapter alert\u00f3w Telegram z kontrol\u0105 prog\u00f3w i ochron\u0105 sekret\u00f3w"
     }
   ]
 }

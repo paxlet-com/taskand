@@ -1,12 +1,12 @@
 ![img.png](img.png)
 
-# taskand v2.0 — Minimalny, auto-mnożący się ekosystem (Standard v2.0)
+# taskand v2.2 — Planowanie złożonych zadań + generowanie organizmów na żądanie (Standard v2.2)
 
-> **taskand v2.0** redukuje złożoność systemu do zaledwie **5 kluczowych plików**. Likwiduje 5 zbędnych warstw pośredniczących i setki zduplikowanych plików z wersji legacy. Bootstrap (zygota) czyta genom, sprawdza dostępność klucza LLM (`TASKAND_LLM_API_KEY` z modelem **GLM-5.3**): jeśli klucz jest obecny — AI autonomicznie generuje kod procesów w locie; jeśli nie — system korzysta ze sprawdzonych, wbudowanych szablonów.
+> **taskand v2.2** wprowadza deterministyczną dekompozycję złożonych celów biznesowych na grafy zależności (DAG Blueprint), trójkolorową walidację cykli i uprawnień oraz izolowany silnik orkiestracji. System zachowuje minimalistyczną architekturę v2.0, wzbogacając ją o trójwarstwowy pipeline: **Planner → Validator → Orchestrator**, wspierany przez model **GLM-5.3** oraz odporne kontrakty procesów (fail-closed JSON).
 
 * **Oficjalne repozytorium**: https://github.com/semcod/taskand-glm53
-* **Pełna specyfikacja Standardu v2.0**: [STANDARD-v2.0.md](STANDARD-v2.0.md) oraz [docs/standard-v2.0.md](docs/standard-v2.0.md)
-* **Wcześniejsze wersje standardu**: [v1.6](docs/standard-v1.6.md) | [v1.5](docs/standard-v1.5.md) | [v1.4](docs/standard-v1.4.md) | [v1.1](docs/standard-v1.1.md)
+* **Pełna specyfikacja Standardu v2.2**: [STANDARD-v2.2.md](STANDARD-v2.2.md) oraz [docs/standard-v2.2.md](docs/standard-v2.2.md)
+* **Wcześniejsze wersje standardu**: [v2.0](docs/standard-v2.0.md) | [v1.6](docs/standard-v1.6.md) | [v1.5](docs/standard-v1.5.md) | [v1.4](docs/standard-v1.4.md) | [v1.1](docs/standard-v1.1.md)
 
 ---
 
@@ -38,9 +38,12 @@ taskand/
 
 ---
 
-## 💬 Interfejs Konwersacyjny CLI v2.0
+## 💬 Interfejs Konwersacyjny CLI v2.2
 
 ```bash
+# Złożone zadania wieloetapowe (dekompozycja, walidacja DAG i orkiestracja)
+taskand dev "zbuduj system monitoringu z alertami na Telegram i dashboardem"
+
 # Rozmawiaj bezpośrednio z developerem (podłączony na żywo do GLM-5.3)
 taskand dev "cześć, co potrafisz?"
 taskand dev "stwórz proces liczący słowa"
@@ -51,17 +54,17 @@ taskand doc "sprawdź czy wszystko działa"
 # Zarządzanie sejfem i poświadczeniami (vault AES-256-GCM)
 taskand sec "status"
 
-# Sterowanie zdalną sesją przeglądarki noVNC
+# Sterowanie zdalną sesją przeglądarki noVNC w środowisku Digital Twin
 taskand browser "otwórz https://example.com"
 
 # Operacje na plikach na węźle mesh
 taskand file "pokaż pliki"
 
-# Telemetria sprzętu i GPIO
+# Telemetria sprzętu i monitor obciążenia CPU
 taskand hw "stan"
 
 # Bezpośrednie wywołanie procesu proc://
-taskand proc "proc://taskand.dev/chat/message/v1" '{"message": "hej"}'
+taskand proc "proc://taskand.dev/monitor/cpu/v1" '{}'
 
 # Inspekcja federacji i stanu
 taskand status

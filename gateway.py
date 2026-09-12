@@ -188,53 +188,8 @@ class H(BaseHTTPRequestHandler):
 
             log_event("chat.message", {"message": msg, "organism": org})
 
-            # 1. Routing to doctor
-            if org in ["doc", "doctor"] or "sprawdź" in msg or "sprawdz" in msg:
-                binpath = GENERATED / "doctor" / "diagnose" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({}), capture_output=True, text=True)
-                diag = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[doctor] Diagnoza systemu taskand v2.0: zdrowy={diag.get('healthy')}. Kontrole: {', '.join(diag.get('details', []))}"
-                self._send(200, {"ok": True, "organism": "doctor", "reply": reply})
-                return
-
-            # 2. Routing to vault
-            if org in ["sec", "vault"] or "sejf" in msg or "token" in msg or "klucz" in msg:
-                binpath = GENERATED / "vault" / "secrets" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({"action": "status"}), capture_output=True, text=True)
-                v = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[vault] Stan sejfu: {v.get('status')} ({v.get('cipher')}). Liczba zarządzanych poświadczeń: {v.get('secrets_count')}."
-                self._send(200, {"ok": True, "organism": "vault", "reply": reply})
-                return
-
-            # 3. Routing to browser
-            if org in ["browser"] or "otwórz" in msg or "przeglądark" in msg:
-                binpath = GENERATED / "browser" / "session" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({"action": "open", "url": msg}), capture_output=True, text=True)
-                b = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[browser] Sesja noVNC: {b.get('novnc_url')}. Akcja: {b.get('action')} -> {b.get('session')}"
-                self._send(200, {"ok": True, "organism": "browser", "reply": reply})
-                return
-
-            # 4. Routing to file-ops
-            if org in ["file", "file-ops"] or "plik" in msg or "katalog" in msg:
-                binpath = GENERATED / "file" / "ops" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({"op": "list"}), capture_output=True, text=True)
-                f_res = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[file-ops] Pliki na węźle {f_res.get('device')}: {', '.join(f_res.get('files', []))}"
-                self._send(200, {"ok": True, "organism": "file-ops", "reply": reply})
-                return
-
-            # 5. Routing to hw-monitor
-            if org in ["hw", "hw-monitor"] or "sprzęt" in msg or "temperatura" in msg:
-                binpath = GENERATED / "hw" / "monitor" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({}), capture_output=True, text=True)
-                h_res = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[hw-monitor] CPU: {h_res.get('cpu_usage_pct')}% ({h_res.get('cpu_temp')}°C), Dysk wolny: {h_res.get('disk_free_gb')}GB, GPIO: {h_res.get('gpio_pins')}"
-                self._send(200, {"ok": True, "organism": "hw-monitor", "reply": reply})
-                return
-
-            # 6. Routing to developer (WYKONUJE, nie wyjaśnia)
-            if org in ["dev", "developer"] or "stwórz" in msg or "stworz" in msg:
+            # 1. Explicit organism routing
+            if org in ["dev", "developer"]:
                 binpath = GENERATED / "dev" / "chat" / "taskand.dev" / "v1" / "bin.mjs"
                 if not binpath.exists():
                     binpath = GENERATED / "developer" / "spawn" / "taskand.dev" / "v1" / "bin.mjs"
@@ -247,9 +202,73 @@ class H(BaseHTTPRequestHandler):
                     input=json.dumps({"message": msg}),
                     capture_output=True,
                     text=True,
-                    timeout=30,
+                    timeout=60,
                     env=env
                 )
+                try:
+                    res = json.loads(r.stdout)
+                    reply = res.get("reply", r.stdout)
+                except Exception:
+                    reply = r.stdout
+                self._send(200, {"ok": r.returncode == 0, "organism": "developer", "reply": reply})
+                return
+
+            if org in ["doc", "doctor"]:
+                binpath = GENERATED / "doctor" / "diagnose" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({}), capture_output=True, text=True)
+                diag = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[doctor] Diagnoza systemu taskand v2.2: zdrowy={diag.get('healthy')}. Kontrole: {', '.join(diag.get('details', []))}"
+                self._send(200, {"ok": True, "organism": "doctor", "reply": reply})
+                return
+
+            if org in ["sec", "vault"]:
+                binpath = GENERATED / "vault" / "secrets" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({"action": "status"}), capture_output=True, text=True)
+                v = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[vault] Stan sejfu: {v.get('status')} ({v.get('cipher')}). Liczba zarządzanych poświadczeń: {v.get('secrets_count')}."
+                self._send(200, {"ok": True, "organism": "vault", "reply": reply})
+                return
+
+            if org in ["file", "file-ops"]:
+                binpath = GENERATED / "file" / "ops" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({"op": "list"}), capture_output=True, text=True)
+                f_res = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[file-ops] Pliki na węźle {f_res.get('device')}: {', '.join(f_res.get('files', []))}"
+                self._send(200, {"ok": True, "organism": "file-ops", "reply": reply})
+                return
+
+            if org in ["hw", "hw-monitor"]:
+                binpath = GENERATED / "hw" / "monitor" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({}), capture_output=True, text=True)
+                h_res = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[hw-monitor] CPU: {h_res.get('cpu_usage_pct')}% ({h_res.get('cpu_temp')}°C), Dysk wolny: {h_res.get('disk_free_gb')}GB, GPIO: {h_res.get('gpio_pins')}"
+                self._send(200, {"ok": True, "organism": "hw-monitor", "reply": reply})
+                return
+
+            if org in ["browser"]:
+                binpath = GENERATED / "browser" / "session" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({"action": "open", "url": msg}), capture_output=True, text=True)
+                b = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[browser] Sesja noVNC: {b.get('novnc_url')}. Akcja: {b.get('action')} -> {b.get('session')}"
+                self._send(200, {"ok": True, "organism": "browser", "reply": reply})
+                return
+
+            # 2. Generic chat keyword matching (when org not specified)
+            if "sprawdź" in msg or "sprawdz" in msg:
+                binpath = GENERATED / "doctor" / "diagnose" / "taskand.dev" / "v1" / "bin.mjs"
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({}), capture_output=True, text=True)
+                diag = json.loads(r.stdout) if r.returncode == 0 else {}
+                reply = f"[doctor] Diagnoza systemu taskand v2.2: zdrowy={diag.get('healthy')}."
+                self._send(200, {"ok": True, "organism": "doctor", "reply": reply})
+                return
+
+            if "zbuduj" in msg or "monitoring" in msg or "stwórz" in msg or "stworz" in msg:
+                binpath = GENERATED / "dev" / "chat" / "taskand.dev" / "v1" / "bin.mjs"
+                env = os.environ.copy()
+                if LLM_KEY:
+                    env["TASKAND_LLM_API_KEY"] = LLM_KEY
+                    env["TASKAND_LLM_MODEL"] = LLM_MODEL
+                r = subprocess.run(["node", str(binpath)], input=json.dumps({"message": msg}), capture_output=True, text=True, timeout=60, env=env)
                 try:
                     res = json.loads(r.stdout)
                     reply = res.get("reply", r.stdout)

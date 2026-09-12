@@ -2,7 +2,6 @@ organisms:
   - name: chat
     processes:
       - { uri: proc://taskand.dev/chat/message/v1, desc: "odpowiada na wiadomości" }
-      - { uri: proc://taskand.dev/chat/voice/v1, desc: "zamienia mowę na akcję" }
 
   - name: doctor
     processes:
@@ -14,7 +13,27 @@ organisms:
       - { uri: proc://taskand.dev/dev/chat/v1, desc: "interfejs konwersacyjny developera (WYKONUJE, nie wyjaśnia)" }
       - { uri: proc://taskand.dev/dev/execute/v1, desc: "silnik bezpośredniego wykonywania intencji i zadań" }
       - { uri: proc://taskand.dev/dev/codegen/v1, desc: "generuje kod przez LLM" }
-      - { uri: proc://taskand.dev/dev/spawn/v1, desc: "powołuje nowe organizmy" }
+      - { uri: proc://taskand.dev/developer/spawn/v1, desc: "powołuje nowe organizmy" }
+
+  - name: planner
+    processes:
+      - { uri: proc://taskand.dev/planner/plan/v1, desc: "dekomponuje złożone zadania na Blueprint" }
+
+  - name: validator
+    processes:
+      - { uri: proc://taskand.dev/validator/resolve/v1, desc: "waliduje graf, cykle i rozwiązuje URI z katalogu" }
+
+  - name: orchestrator
+    processes:
+      - { uri: proc://taskand.dev/orchestrator/execute/v1, desc: "trwały silnik asynchronicznej orkiestracji" }
+
+  - name: monitor
+    processes:
+      - { uri: proc://taskand.dev/monitor/cpu/v1, desc: "monitor obciążenia procesora CPU" }
+
+  - name: alert
+    processes:
+      - { uri: proc://taskand.dev/alert/telegram/v1, desc: "adapter powiadomień Telegram z ochroną sekretów" }
 
   - name: web
     processes:
