@@ -1,0 +1,183 @@
+flowchart LR
+%% generated in 0.00s
+    subgraph gateway
+        gateway__main["main"]
+    end
+    subgraph gateway__GatewayHTTPHandler
+        gateway__GatewayHTTPHandler__do_GET["do_GET"]
+        gateway__GatewayHTTPHandler__do_POST["do_POST"]
+        gateway__GatewayHTTPHandler__do_OPTIONS["do_OPTIONS"]
+        gateway__GatewayHTTPHandler___send["_send"]
+    end
+    subgraph gateway__auth
+        gateway__auth__check_auth["check_auth"]
+        gateway__auth__check_grant["check_grant"]
+        gateway__auth___parse_simple_yaml["_parse_simple_yaml"]
+        gateway__auth__load_grants["load_grants"]
+    end
+    subgraph gateway__handlers
+        gateway__handlers__health__handle_healthz["handle_healthz"]
+        gateway__handlers__chat__handle_chat["handle_chat"]
+        gateway__handlers__orchestrator__handle_orchestrator["handle_orchestrator"]
+        gateway__handlers__federation__handle_federation["handle_federation"]
+        gateway__handlers__proc__handle_proc_call["handle_proc_call"]
+    end
+    subgraph gateway__middleware
+        gateway__middleware__cors__add_cors_headers["add_cors_headers"]
+        gateway__middleware__logging__log_event["log_event"]
+    end
+    subgraph gateway__router
+        gateway__router__dispatch["dispatch"]
+    end
+    subgraph gateway__utils
+        gateway__utils__proc_hash["proc_hash"]
+        gateway__utils__find_proc_bin["find_proc_bin"]
+    end
+    subgraph generated___lib
+        generated___lib__proc__walk["walk"]
+        generated___lib__catalog__rehashAll["rehashAll"]
+        generated___lib__catalog__procHash["procHash"]
+        generated___lib__catalog__saveCatalog["saveCatalog"]
+        generated___lib__catalog__addToGenome["addToGenome"]
+        generated___lib__catalog__cat["cat"]
+        generated___lib__catalog__loadCatalog["loadCatalog"]
+        generated___lib__catalog__resolveUri["resolveUri"]
+        generated___lib__proc__callProc["callProc"]
+        generated___lib__proc__adoptOwnership["adoptOwnership"]
+        generated___lib__catalog__register["register"]
+        generated___lib__proc__uriToPath["uriToPath"]
+    end
+    subgraph generated__admin
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__vendorFromMac["vendorFromMac"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__selfIps["selfIps"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__out["out"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__hostname["hostname"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__readName["readName"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__rdlen["rdlen"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__errOut["errOut"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__an["an"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsProbe["mdnsProbe"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__run["run"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__fin["fin"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__off["off"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__readArp["readArp"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget["probeBudget"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__type["type"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__r["r"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__qd["qd"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe["tcpProbe"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__len["len"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__loadOui["loadOui"]
+    end
+    subgraph generated__dev
+        generated__dev__chat__taskand__dev__v1__dispatch__telemetry["telemetry"]
+        generated__dev__chat__taskand__dev__v1__intent__hasAny["hasAny"]
+        generated__dev__llm__taskand__dev__v1__context__capabilities["capabilities"]
+        generated__dev__composite__taskand__dev__v1__bin__done["done"]
+        generated__dev__composite__taskand__dev__v1__bin__val["val"]
+        generated__dev__chat__taskand__dev__v1__intent__parseIntent["parseIntent"]
+        generated__dev__chat__taskand__dev__v1__dispatch__diagnose["diagnose"]
+        generated__dev__chat__taskand__dev__v1__dispatch__webStatus["webStatus"]
+        generated__dev__chat__taskand__dev__v1__dispatch__bin["bin"]
+        generated__dev__llm__taskand__dev__v1__context__capabilityContext["capabilityContext"]
+        generated__dev__chat__taskand__dev__v1__dispatch__uri["uri"]
+        generated__dev__chat__taskand__dev__v1__intent__matches["matches"]
+        generated__dev__composite__taskand__dev__v1__bin__say["say"]
+        generated__dev__chat__taskand__dev__v1__dispatch__P["P"]
+        generated__dev__act__taskand__dev__v1__bin__run["run"]
+        generated__dev__chat__taskand__dev__v1__dispatch__organismTemplate["organismTemplate"]
+        generated__dev__act__taskand__dev__v1__bin__evolve["evolve"]
+        generated__dev__act__taskand__dev__v1__bin__format["format"]
+        generated__dev__chat__taskand__dev__v1__intent__match["match"]
+        generated__dev__act__taskand__dev__v1__bin__decision["decision"]
+        generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism["spawnOrganism"]
+        generated__dev__chat__taskand__dev__v1__intent__low["low"]
+        generated__dev__composite__taskand__dev__v1__bin__validate["validate"]
+    end
+    subgraph generated__doctor
+        generated__doctor__diagnose__taskand__dev__v1__bin__probe["probe"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__checkService["checkService"]
+    end
+    subgraph generated__hw
+        generated__hw__monitor__taskand__dev__v1__bin__cpuTimes["cpuTimes"]
+        generated__hw__monitor__taskand__dev__v1__bin__cpuUsagePct["cpuUsagePct"]
+    end
+    subgraph generated__monitor
+        generated__monitor__cpu__taskand__dev__v1__bin__cpus["cpus"]
+        generated__monitor__cpu__taskand__dev__v1__bin__cpuPct["cpuPct"]
+    end
+    subgraph generated__validator
+        generated__validator__resolve__taskand__dev__v1__bin__dfs["dfs"]
+        generated__validator__resolve__taskand__dev__v1__bin__currentStep["currentStep"]
+        generated__validator__resolve__taskand__dev__v1__bin__hasCycle["hasCycle"]
+    end
+    generated__monitor__cpu__taskand__dev__v1__bin__cpuPct --> generated__monitor__cpu__taskand__dev__v1__bin__cpus
+    gateway__auth__load_grants --> gateway__auth___parse_simple_yaml
+    gateway__auth__check_auth --> gateway__auth__load_grants
+    gateway__handlers__health__handle_healthz --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__handlers__federation__handle_federation --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__auth__check_auth
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__middleware__logging__log_event
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__auth__check_grant
+    gateway__handlers__proc__handle_proc_call --> gateway__auth__check_auth
+    gateway__handlers__proc__handle_proc_call --> gateway__utils__find_proc_bin
+    gateway__handlers__proc__handle_proc_call --> gateway__auth__check_grant
+    generated__validator__resolve__taskand__dev__v1__bin__hasCycle --> generated__validator__resolve__taskand__dev__v1__bin__dfs
+    generated__validator__resolve__taskand__dev__v1__bin__currentStep --> generated__validator__resolve__taskand__dev__v1__bin__dfs
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__errOut --> generated__admin__network_device_discovery__taskand__dev__v1__bin__out
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__vendorFromMac --> generated__admin__network_device_discovery__taskand__dev__v1__bin__loadOui
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__readArp --> generated__admin__network_device_discovery__taskand__dev__v1__bin__run
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe --> generated__admin__network_device_discovery__taskand__dev__v1__bin__fin
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsProbe --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__hostname --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__off --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__qd --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__an --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__r --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__rdlen --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__type --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget --> generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget --> generated__admin__network_device_discovery__taskand__dev__v1__bin__r
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__selfIps --> generated__admin__network_device_discovery__taskand__dev__v1__bin__out
+    generated__hw__monitor__taskand__dev__v1__bin__cpuUsagePct --> generated__hw__monitor__taskand__dev__v1__bin__cpuTimes
+    generated__doctor__diagnose__taskand__dev__v1__bin__checkService --> generated__doctor__diagnose__taskand__dev__v1__bin__probe
+    generated___lib__proc__adoptOwnership --> generated___lib__proc__walk
+    generated___lib__proc__callProc --> generated___lib__proc__uriToPath
+    generated___lib__catalog__resolveUri --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__resolveUri --> generated___lib__catalog__procHash
+    generated___lib__catalog__register --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__register --> generated___lib__catalog__procHash
+    generated___lib__catalog__register --> generated___lib__catalog__saveCatalog
+    generated___lib__catalog__register --> generated___lib__catalog__addToGenome
+    generated___lib__catalog__cat --> generated___lib__catalog__procHash
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__procHash
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__saveCatalog
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__say
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__done
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__validate
+    generated__dev__composite__taskand__dev__v1__bin__validate --> generated__dev__composite__taskand__dev__v1__bin__say
+    generated__dev__llm__taskand__dev__v1__context__capabilityContext --> generated__dev__llm__taskand__dev__v1__context__capabilities
+    generated__dev__act__taskand__dev__v1__bin__decision --> generated__dev__act__taskand__dev__v1__bin__run
+    generated__dev__act__taskand__dev__v1__bin__run --> generated__dev__act__taskand__dev__v1__bin__format
+    generated__dev__act__taskand__dev__v1__bin__evolve --> generated__dev__act__taskand__dev__v1__bin__run
+    generated__dev__chat__taskand__dev__v1__intent__hasAny --> generated__dev__chat__taskand__dev__v1__intent__match
+    generated__dev__chat__taskand__dev__v1__intent__matches --> generated__dev__chat__taskand__dev__v1__intent__match
+    generated__dev__chat__taskand__dev__v1__intent__matches --> generated__dev__chat__taskand__dev__v1__intent__hasAny
+    generated__dev__chat__taskand__dev__v1__intent__parseIntent --> generated__dev__chat__taskand__dev__v1__intent__matches
+    generated__dev__chat__taskand__dev__v1__intent__low --> generated__dev__chat__taskand__dev__v1__intent__matches
+    generated__dev__chat__taskand__dev__v1__dispatch__telemetry --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__diagnose --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__webStatus --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism --> generated__dev__chat__taskand__dev__v1__dispatch__organismTemplate
+    generated__dev__chat__taskand__dev__v1__dispatch__uri --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__bin --> generated__dev__chat__taskand__dev__v1__dispatch__organismTemplate
+    gateway__GatewayHTTPHandler___send --> gateway__middleware__cors__add_cors_headers
+    gateway__GatewayHTTPHandler___send --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__GatewayHTTPHandler__do_OPTIONS --> gateway__middleware__cors__add_cors_headers
+    gateway__GatewayHTTPHandler__do_GET --> gateway__router__dispatch
+    gateway__GatewayHTTPHandler__do_POST --> gateway__router__dispatch
+    gateway__main --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__utils__find_proc_bin --> gateway__utils__proc_hash
+    gateway__handlers__chat__handle_chat --> gateway__middleware__logging__log_event

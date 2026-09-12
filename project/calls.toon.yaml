@@ -1,0 +1,196 @@
+# code2llm call graph | /home/tom/github/semcod/taskand/glm53
+# generated in 0.05s
+# nodes: 83 | edges: 70 | modules: 23
+# CC̄=3.1
+
+HUBS[20]:
+  gateway.handlers.chat.handle_chat
+    CC=29  in:0  out:83  total:83
+  gateway.handlers.proc.handle_proc_call
+    CC=9  in:0  out:26  total:26
+  gateway.auth._parse_simple_yaml
+    CC=14  in:1  out:19  total:20
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
+    CC=15  in:0  out:18  total:18
+  gateway.auth.check_auth
+    CC=8  in:2  out:15  total:17
+  gateway.handlers.orchestrator.handle_orchestrator
+    CC=6  in:0  out:17  total:17
+  gateway.handlers.federation.handle_federation
+    CC=8  in:0  out:15  total:15
+  generated._lib.catalog.procHash
+    CC=3  in:4  out:10  total:14
+  generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
+    CC=4  in:0  out:13  total:13
+  gateway.utils.find_proc_bin
+    CC=9  in:3  out:9  total:12
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
+    CC=20  in:0  out:12  total:12
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+    CC=5  in:8  out:3  total:11
+  generated._lib.catalog.addToGenome
+    CC=5  in:1  out:10  total:11
+  generated._lib.catalog.register
+    CC=4  in:0  out:11  total:11
+  gateway.auth.load_grants
+    CC=7  in:1  out:10  total:11
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
+    CC=11  in:1  out:10  total:11
+  gateway.utils.proc_hash
+    CC=5  in:1  out:9  total:10
+  gateway.GatewayHTTPHandler._send
+    CC=1  in:0  out:10  total:10
+  gateway.middleware.logging.log_event
+    CC=2  in:3  out:7  total:10
+  gateway.main
+    CC=2  in:0  out:9  total:9
+
+MODULES:
+  gateway  [5 funcs]
+    _send  CC=1  out:10
+    do_GET  CC=1  out:1
+    do_OPTIONS  CC=1  out:3
+    do_POST  CC=4  out:6
+    main  CC=2  out:9
+  gateway.auth  [4 funcs]
+    _parse_simple_yaml  CC=14  out:19
+    check_auth  CC=8  out:15
+    check_grant  CC=7  out:3
+    load_grants  CC=7  out:10
+  gateway.handlers.chat  [1 funcs]
+    handle_chat  CC=29  out:83
+  gateway.handlers.federation  [1 funcs]
+    handle_federation  CC=8  out:15
+  gateway.handlers.health  [1 funcs]
+    handle_healthz  CC=2  out:5
+  gateway.handlers.orchestrator  [1 funcs]
+    handle_orchestrator  CC=6  out:17
+  gateway.handlers.proc  [1 funcs]
+    handle_proc_call  CC=9  out:26
+  gateway.middleware.cors  [1 funcs]
+    add_cors_headers  CC=1  out:3
+  gateway.middleware.logging  [1 funcs]
+    log_event  CC=2  out:7
+  gateway.router  [1 funcs]
+    dispatch  CC=3  out:4
+  gateway.utils  [2 funcs]
+    find_proc_bin  CC=9  out:9
+    proc_hash  CC=5  out:9
+  generated._lib.catalog  [8 funcs]
+    addToGenome  CC=5  out:10
+    cat  CC=5  out:4
+    loadCatalog  CC=2  out:2
+    procHash  CC=3  out:10
+    register  CC=4  out:11
+    rehashAll  CC=5  out:6
+    resolveUri  CC=6  out:5
+    saveCatalog  CC=1  out:4
+  generated._lib.proc  [4 funcs]
+    adoptOwnership  CC=4  out:9
+    callProc  CC=8  out:6
+    uriToPath  CC=4  out:7
+    walk  CC=2  out:6
+  generated.admin.network-device-discovery.taskand.dev.v1.bin  [20 funcs]
+    an  CC=5  out:2
+    errOut  CC=1  out:1
+    fin  CC=2  out:2
+    hostname  CC=11  out:6
+    len  CC=2  out:0
+    loadOui  CC=11  out:10
+    mdnsProbe  CC=15  out:18
+    off  CC=5  out:4
+    out  CC=1  out:3
+    probeBudget  CC=3  out:8
+  generated.dev.act.taskand.dev.v1.bin  [4 funcs]
+    decision  CC=1  out:1
+    evolve  CC=7  out:5
+    format  CC=8  out:2
+    run  CC=3  out:3
+  generated.dev.chat.taskand.dev.v1.dispatch  [8 funcs]
+    P  CC=1  out:0
+    bin  CC=2  out:6
+    diagnose  CC=5  out:4
+    organismTemplate  CC=6  out:4
+    spawnOrganism  CC=4  out:13
+    telemetry  CC=8  out:7
+    uri  CC=1  out:1
+    webStatus  CC=2  out:6
+  generated.dev.chat.taskand.dev.v1.intent  [5 funcs]
+    hasAny  CC=5  out:2
+    low  CC=3  out:1
+    match  CC=2  out:0
+    matches  CC=5  out:3
+    parseIntent  CC=3  out:2
+  generated.dev.composite.taskand.dev.v1.bin  [4 funcs]
+    done  CC=1  out:2
+    say  CC=1  out:2
+    val  CC=7  out:6
+    validate  CC=5  out:3
+  generated.dev.llm.taskand.dev.v1.context  [2 funcs]
+    capabilities  CC=4  out:4
+    capabilityContext  CC=2  out:3
+  generated.doctor.diagnose.taskand.dev.v1.bin  [2 funcs]
+    checkService  CC=3  out:1
+    probe  CC=2  out:2
+  generated.hw.monitor.taskand.dev.v1.bin  [2 funcs]
+    cpuTimes  CC=1  out:2
+    cpuUsagePct  CC=2  out:4
+  generated.monitor.cpu.taskand.dev.v1.bin  [2 funcs]
+    cpuPct  CC=5  out:3
+    cpus  CC=4  out:2
+  generated.validator.resolve.taskand.dev.v1.bin  [3 funcs]
+    currentStep  CC=7  out:3
+    dfs  CC=7  out:3
+    hasCycle  CC=7  out:4
+
+EDGES:
+  generated.monitor.cpu.taskand.dev.v1.bin.cpuPct → generated.monitor.cpu.taskand.dev.v1.bin.cpus
+  gateway.auth.load_grants → gateway.auth._parse_simple_yaml
+  gateway.auth.check_auth → gateway.auth.load_grants
+  gateway.handlers.health.handle_healthz → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  gateway.handlers.federation.handle_federation → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_auth
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.middleware.logging.log_event
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_grant
+  gateway.handlers.proc.handle_proc_call → gateway.auth.check_auth
+  gateway.handlers.proc.handle_proc_call → gateway.utils.find_proc_bin
+  gateway.handlers.proc.handle_proc_call → gateway.auth.check_grant
+  generated.validator.resolve.taskand.dev.v1.bin.hasCycle → generated.validator.resolve.taskand.dev.v1.bin.dfs
+  generated.validator.resolve.taskand.dev.v1.bin.currentStep → generated.validator.resolve.taskand.dev.v1.bin.dfs
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac → generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp → generated.admin.network-device-discovery.taskand.dev.v1.bin.run
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe → generated.admin.network-device-discovery.taskand.dev.v1.bin.fin
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.off → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.qd → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.an → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.r → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.type → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.r
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
+  generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct → generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
+  generated.doctor.diagnose.taskand.dev.v1.bin.checkService → generated.doctor.diagnose.taskand.dev.v1.bin.probe
+  generated._lib.proc.adoptOwnership → generated._lib.proc.walk
+  generated._lib.proc.callProc → generated._lib.proc.uriToPath
+  generated._lib.catalog.resolveUri → generated._lib.catalog.loadCatalog
+  generated._lib.catalog.resolveUri → generated._lib.catalog.procHash
+  generated._lib.catalog.register → generated._lib.catalog.loadCatalog
+  generated._lib.catalog.register → generated._lib.catalog.procHash
+  generated._lib.catalog.register → generated._lib.catalog.saveCatalog
+  generated._lib.catalog.register → generated._lib.catalog.addToGenome
+  generated._lib.catalog.cat → generated._lib.catalog.procHash
+  generated._lib.catalog.rehashAll → generated._lib.catalog.loadCatalog
+  generated._lib.catalog.rehashAll → generated._lib.catalog.procHash
+  generated._lib.catalog.rehashAll → generated._lib.catalog.saveCatalog
+  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.say
+  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.done
+  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.validate
+  generated.dev.composite.taskand.dev.v1.bin.validate → generated.dev.composite.taskand.dev.v1.bin.say
+  generated.dev.llm.taskand.dev.v1.context.capabilityContext → generated.dev.llm.taskand.dev.v1.context.capabilities
+  generated.dev.act.taskand.dev.v1.bin.decision → generated.dev.act.taskand.dev.v1.bin.run
+  generated.dev.act.taskand.dev.v1.bin.run → generated.dev.act.taskand.dev.v1.bin.format
+  generated.dev.act.taskand.dev.v1.bin.evolve → generated.dev.act.taskand.dev.v1.bin.run

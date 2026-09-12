@@ -1,0 +1,15 @@
+# redup/duplication | 0 groups | 50f 3433L | 2026-09-12
+
+SUMMARY:
+  files_scanned: 50
+  total_lines:   3433
+  dup_groups:    0
+  actionable:    0
+  review:        0
+  generated:     0
+  actionable_L:  0
+  review_L:      0
+  generated_L:   0
+  dup_fragments: 0
+  saved_lines:   0
+  scan_ms:       199

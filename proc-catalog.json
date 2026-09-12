@@ -1,6 +1,6 @@
 {
   "version": "2.2.0",
-  "updated": "2026-09-12T18:02:09.589Z",
+  "updated": "2026-09-12T18:39:50.643Z",
   "processes": [
     {
       "uri": "proc://taskand.dev/browser/session/v1",
@@ -10,7 +10,7 @@
       "desc": "Zarządzanie sesjami przeglądarki noVNC i zrzutami ekranu",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:36764e8c4c25ed7430b42b1f586f541eeca51ef61da822e658f0002e36dfcb37"
+      "bindingHash": "sha256:97ebc2193f0615f26d9348c1935dacb7c942e11d8aa23189dd791f56dbb79de0"
     },
     {
       "uri": "proc://taskand.dev/chat/message/v1",
@@ -20,7 +20,7 @@
       "desc": "Obsługa wiadomości i dialogu konwersacyjnego",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:ee5f83aeb32d0df9fe87485a28fbfd1b94ec10ff0924b9e79de02773b6b4f5a4"
+      "bindingHash": "sha256:4d68183a65150e6b3b8c22886618c4cf1e92641db4531012b98e1fe71206d797"
     },
     {
       "uri": "proc://taskand.dev/dev/chat/v1",
@@ -30,7 +30,7 @@
       "desc": "Interfejs konwersacyjny developera taskand (WYKONUJE, nie wyjaśnia)",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:06b158665d13a8ff75f83c74b9ebde82febfdd466e053dccb0d2be01656ac489"
+      "bindingHash": "sha256:2ab44693bd29d3c214e03f4f98bff672690c953d076601df5a64b1c2d3183fb9"
     },
     {
       "uri": "proc://taskand.dev/dev/execute/v1",
@@ -40,7 +40,7 @@
       "desc": "Silnik bezpośredniego wykonywania intencji deweloperskich",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:4b68f93fe71461a183f72cc254a83eb1f2003a43cb15f574b0d91ebdbad70044"
+      "bindingHash": "sha256:eb817f50df8cc9788179c74155bac931fd505e5f081a00536c41368943149621"
     },
     {
       "uri": "proc://taskand.dev/dev/codegen/v1",
@@ -50,7 +50,7 @@
       "desc": "Generowanie kodu procesu na podstawie specyfikacji",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:a609046943b82f728b02297add7f36f35710ae1c9b90c0c118945c9ac7fdae58"
+      "bindingHash": "sha256:3f7349449a9aa67c75f369f0348fa79d80f531c5ed96b7188d696bd7a2a5202c"
     },
     {
       "uri": "proc://taskand.dev/developer/spawn/v1",
@@ -60,7 +60,7 @@
       "desc": "Powoływanie nowych organizmów z testami w sandboxie",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:a08cad30cd52c108b6af4722d58e2af17a2a6781a56a02a06cb374b10e77920e"
+      "bindingHash": "sha256:970e55ac0243c72dcc894802d1bc804e2e643f11c743b97623a8cc2a9ae01224"
     },
     {
       "uri": "proc://taskand.dev/doctor/diagnose/v1",
@@ -70,7 +70,7 @@
       "desc": "Diagnostyka zdrowia usług i procesów w ekosystemie",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:9f1f21be4d45fdf17c5cfe26b8af8a9ca14e5a19041c363aa7aff553eab1c989"
+      "bindingHash": "sha256:5928ae5f76875c6ce8accf823563d8383d47b8d398fa0adf64de0c49c3941b97"
     },
     {
       "uri": "proc://taskand.dev/doctor/prescribe/v1",
@@ -80,7 +80,7 @@
       "desc": "Rekomendacje SRE i recepty naprawcze",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:4c6cd7a3393fb76bbf1615689d2ff3437768c74f096b2fe6ebef29d7ce468855"
+      "bindingHash": "sha256:9b295b6b5cfd4aff84653afc982ee6cc4ff7ea3bcb5a07bd6124b4fa9c9c52d1"
     },
     {
       "uri": "proc://taskand.dev/file/ops/v1",
@@ -90,7 +90,7 @@
       "desc": "Operacje na systemie plików węzła (odczyt, zapis, lista)",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:2bee613589b1005addd33a4353fc823b08aea35355f9445e352c997ce21bdf82"
+      "bindingHash": "sha256:475a65c3025d8f18aa769fd190cb7cdda51cdf9ba0d15a3c20cbfbb0a21e38e3"
     },
     {
       "uri": "proc://taskand.dev/hw/monitor/v1",
@@ -100,7 +100,7 @@
       "desc": "Telemetria sprzętowa: CPU, pamięć, temperatura, GPIO",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:738afa3cdd4e3e5ad99a8e09d100d715363147a436ce97cf8db017082599d720"
+      "bindingHash": "sha256:5e21346e4da61a8702c4101671c9dd15eba50ada322226221dc31271bb6f1781"
     },
     {
       "uri": "proc://taskand.dev/vault/secrets/v1",
@@ -110,7 +110,7 @@
       "desc": "Zarządzanie poświadczeniami i sekretami (AES-256-GCM)",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:969cc5d3aedd12117dd597f96987a1b8b8bb4e8753c027fccfee82f6ac837db9"
+      "bindingHash": "sha256:f205446a5c9041151405ef8ac5c51bd7d104648adc56b354ee00334404119591"
     },
     {
       "uri": "proc://taskand.dev/web/serve/v1",
@@ -120,7 +120,7 @@
       "desc": "Serwowanie interfejsu Web Cockpit na :8090",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:172fa811c301a5ad34b529a920d1717943d441f525fe800416a12b08d0df61e6"
+      "bindingHash": "sha256:8ec6825638786042930e1450ac4c21213ad6fc8f2b508daf8e8090e4eab35698"
     },
     {
       "uri": "proc://taskand.dev/planner/plan/v1",
@@ -130,7 +130,7 @@
       "desc": "Dekompozycja złożonych zadań na Blueprint (kandydat planu)",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:9b34b9806b4046b2d27d3f9edaadeb0293edb82eb3d6bcc779ffa136ce31881b"
+      "bindingHash": "sha256:5349ad007a8ac1d6be386e93e87d07f3b34ea53f6a9968c6a9ecdd9965d674c1"
     },
     {
       "uri": "proc://taskand.dev/validator/resolve/v1",
@@ -140,7 +140,7 @@
       "desc": "Deterministyczna walidacja grafu, uprawnień i rozwiązywanie URI",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:272aca8f69cc79521a43361745941555fbd1c930fccb5797ea9a83b0b2e3bbf7"
+      "bindingHash": "sha256:0bf22769dd2b9162f1d29345f68fafef0ff3ad3de4b8041c13fdc304879c46f6"
     },
     {
       "uri": "proc://taskand.dev/orchestrator/execute/v1",
@@ -150,7 +150,7 @@
       "desc": "Trwała, asynchroniczna orkiestracja zatwierdzonego planu z izolacją",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:de0213167c081a7523f6aff1df75398ebb106b1332b4ef54660f9f8fd14dbbb5"
+      "bindingHash": "sha256:78b654148ade6ca6ee4a9270172da4d58a43c866c98e472f2034cfea9195cb6f"
     },
     {
       "uri": "proc://taskand.dev/monitor/cpu/v1",
@@ -160,7 +160,7 @@
       "desc": "Precyzyjny monitor obciążenia CPU z pomiarem i historią",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:ccd39e39ee594e07899e24c24aacf9076c7994476a7411ca0fa4340c4ad0455f"
+      "bindingHash": "sha256:82e2b290543914142efe1a46f142f199c7411b156eaaa9938a9d2f5b95e1d5cb"
     },
     {
       "uri": "proc://taskand.dev/alert/telegram/v1",
@@ -170,7 +170,7 @@
       "desc": "Adapter alertów Telegram z kontrolą progów i ochroną sekretów",
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
-      "bindingHash": "sha256:c784f635674724ad14639965e9610aee303f26c7f8a43a68de090b0be9ebfb0d"
+      "bindingHash": "sha256:6334246c4bed67445cf29fecacff3ce24aaffa4775f530feedb967aaddca6d73"
     },
     {
       "uri": "proc://taskand.dev/admin/chat/v1",
@@ -179,8 +179,69 @@
       "status": "active",
       "desc": "Interfejs i telemetria organizmu admin",
       "release": "1.0.0",
-      "bindingHash": "sha256:518e804714a0aba06964fb8140031edfbdf6e7d1b215d0f6b254f15829b95fd7",
+      "bindingHash": "sha256:c8bccd174ebf4b41a1e4c59258b85e85b985d8e988d8ec258f2c614fe478e8b0",
       "created": "2026-09-12T18:15:41.050Z"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/llm/v1",
+      "path": "generated/dev/llm/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Jedyny klient LLM (Z.ai/OpenAI-compatible), tryb tekst/JSON",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:29:40.146Z",
+      "bindingHash": "sha256:577714fffde13104b968fe48354dcd52a6d236ba1f4999ba491b704801554253"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/act/v1",
+      "path": "generated/dev/act/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Wykonuje zadanie usera: wybiera proces z katalogu lub ewoluuje nowy",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:29:40.148Z",
+      "bindingHash": "sha256:f0e27788b1334eeec3f679dbfeb3127620dd443fc2558a2f840088d021049c2c"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/evolve/v1",
+      "path": "generated/dev/evolve/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Ewolucja: LLM generuje proces, guard, test kontraktu, rejestracja",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:29:40.149Z",
+      "bindingHash": "sha256:a910b2986e0cab36dc7a2ba1f3f5ebc4f9e298378f791f665d685e1800cd5a88"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/composite/v1",
+      "path": "generated/dev/composite/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Zadania złożone: planner → validator → evolve → orchestrator",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:29:40.150Z",
+      "bindingHash": "sha256:78d0bbdaba6a2cbac02454e78ff6ac2e72d68e063b59d07599508ac998305548"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/file-router/v1",
+      "path": "generated/dev/file-router/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Pytania o pliki: istnienie i rozmiar ścieżki z promptu",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:29:40.151Z",
+      "bindingHash": "sha256:d8aa064ff9234468986c1c995dfd7fdfbad6cb2caa9e531c9990415f8f990c10"
+    },
+    {
+      "uri": "proc://taskand.dev/admin/network-device-discovery/v1",
+      "path": "generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI.",
+      "release": "1.0.0",
+      "created": "2026-09-12T18:37:14.008Z",
+      "bindingHash": "sha256:c39124a5efa5d50a3ecd4651a299707a6e4acdc1ca33c18835aa07a306cfa6aa",
+      "origin": "evolved"
     }
   ]
 }

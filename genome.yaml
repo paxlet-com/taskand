@@ -14,6 +14,11 @@ organisms:
       - { uri: proc://taskand.dev/dev/execute/v1, desc: "silnik bezpośredniego wykonywania intencji i zadań" }
       - { uri: proc://taskand.dev/dev/codegen/v1, desc: "generuje kod przez LLM" }
       - { uri: proc://taskand.dev/developer/spawn/v1, desc: "powołuje nowe organizmy" }
+      - { uri: proc://taskand.dev/dev/llm/v1, desc: "Jedyny klient LLM (Z.ai/OpenAI-compatible), tryb tekst/JSON" }
+      - { uri: proc://taskand.dev/dev/act/v1, desc: "Wykonuje zadanie usera: wybiera proces z katalogu lub ewoluuje nowy" }
+      - { uri: proc://taskand.dev/dev/evolve/v1, desc: "Ewolucja: LLM generuje proces, guard, test kontraktu, rejestracja" }
+      - { uri: proc://taskand.dev/dev/composite/v1, desc: "Zadania złożone: planner → validator → evolve → orchestrator" }
+      - { uri: proc://taskand.dev/dev/file-router/v1, desc: "Pytania o pliki: istnienie i rozmiar ścieżki z promptu" }
 
   - name: planner
     processes:

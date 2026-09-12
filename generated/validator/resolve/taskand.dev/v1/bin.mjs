@@ -3,7 +3,7 @@
 // Deterministyczny walidator grafu, uprawnień i resolver URI z proc-catalog.json
 
 import { readFileSync, existsSync } from "node:fs";
-import { createHash } from "node:crypto";
+import { procHash } from "../../../../_lib/catalog.mjs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 
@@ -162,17 +162,9 @@ for (const s of steps) {
         stepCopy.release = entry.release || "1.0.0";
         stepCopy.bindingHash = entry.bindingHash || null;
 
-        // Weryfikacja integralności bindingHash (jeśli zdefiniowany)
-        if (entry.bindingHash && entry.bindingHash.startsWith("sha256:")) {
-          try {
-            const expected = entry.bindingHash.replace("sha256:", "");
-            const actual = createHash("sha256").update(readFileSync(fullPath)).digest("hex");
-            if (expected !== actual) {
-              errors.push(`Krok "${s.name}": Naruszenie integralności bindingHash dla ${entry.path} (oczekiwano ${expected.slice(0, 8)}..., otrzymano ${actual.slice(0, 8)}...)`);
-            }
-          } catch (hashErr) {
-            errors.push(`Krok "${s.name}": Błąd obliczania sumy kontrolnej: ${hashErr.message}`);
-          }
+        // Weryfikacja integralności bindingHash (wszystkie moduły procesu, patrz _lib/catalog.mjs)
+        if (entry.bindingHash && procHash(fullPath) !== entry.bindingHash) {
+          errors.push(`Krok "${s.name}": Naruszenie integralności bindingHash dla ${entry.path}`);
         }
       }
     }

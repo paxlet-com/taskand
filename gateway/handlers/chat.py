@@ -1,8 +1,15 @@
 import os
 import json
 import subprocess
-from gateway.utils import GENERATED, LLM_KEY, LLM_MODEL
+from gateway.utils import GENERATED, LLM_KEY, LLM_MODEL, LLM_ENDPOINT, find_proc_bin
 from gateway.middleware.logging import log_event
+
+def llm_env() -> dict:
+    env = os.environ.copy()
+    if LLM_KEY:
+        env.update(TASKAND_LLM_API_KEY=LLM_KEY, TASKAND_LLM_MODEL=LLM_MODEL, TASKAND_LLM_ENDPOINT=LLM_ENDPOINT)
+    return env
+
 
 def handle_chat(request_handler, body: dict) -> None:
     msg = body.get("message", "").strip()
@@ -24,7 +31,7 @@ def handle_chat(request_handler, body: dict) -> None:
             input=json.dumps({"message": msg}),
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=900,
             env=env
         )
         try:
@@ -75,27 +82,20 @@ def handle_chat(request_handler, body: dict) -> None:
         request_handler._send(200, {"ok": True, "organism": "browser", "reply": reply})
         return
 
-    # 2. Dynamic organism lookup for spawned organisms (e.g. admin, auditor, etc.)
+    # 2. Organizmy dynamiczne (np. admin): interfejs <org>/chat, a bez niego dev/act z kontekstem organizmu
     if org:
-        org_dir = GENERATED / org
-        if org_dir.exists():
-            candidates = list(org_dir.rglob("bin.mjs"))
-            if candidates:
-                binpath = candidates[0]
-                r = subprocess.run(
-                    ["node", str(binpath)],
-                    input=json.dumps({"message": msg, "prompt": msg}),
-                    capture_output=True,
-                    text=True,
-                    timeout=30
-                )
-                try:
-                    res = json.loads(r.stdout)
-                    reply = res.get("reply", r.stdout)
-                except Exception:
-                    reply = r.stdout
-                request_handler._send(200, {"ok": r.returncode == 0, "organism": org, "reply": reply})
-                return
+        binpath = find_proc_bin(f"proc://taskand.dev/{org}/chat/v1")
+        payload = {"message": msg, "prompt": msg}
+        if not binpath:
+            binpath = find_proc_bin("proc://taskand.dev/dev/act/v1")
+            payload = {"message": msg, "organism": org}
+        r = subprocess.run(["node", str(binpath)], input=json.dumps(payload), capture_output=True, text=True, timeout=600, env=llm_env())
+        try:
+            reply = json.loads(r.stdout).get("reply", r.stdout)
+        except ValueError:
+            reply = r.stdout or r.stderr
+        request_handler._send(200, {"ok": r.returncode == 0, "organism": org, "reply": reply})
+        return
 
     # 2. Generic chat keyword matching (when org not specified)
     if "sprawdź" in msg or "sprawdz" in msg:
@@ -112,7 +112,7 @@ def handle_chat(request_handler, body: dict) -> None:
         if LLM_KEY:
             env["TASKAND_LLM_API_KEY"] = LLM_KEY
             env["TASKAND_LLM_MODEL"] = LLM_MODEL
-        r = subprocess.run(["node", str(binpath)], input=json.dumps({"message": msg}), capture_output=True, text=True, timeout=60, env=env)
+        r = subprocess.run(["node", str(binpath)], input=json.dumps({"message": msg}), capture_output=True, text=True, timeout=900, env=env)
         try:
             res = json.loads(r.stdout)
             reply = res.get("reply", r.stdout)

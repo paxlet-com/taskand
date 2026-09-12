@@ -1,0 +1,52 @@
+# glm53 | 373 func | 52f | 3490L | javascript | 2026-09-12
+# generated in 0.00s
+
+HEALTH:
+  CC̄=3.1  critical=9 (limit:10)  dup=0  cycles=0
+
+ALERTS[20]:
+  !!! cc_exceeded      handle_chat = 29 (limit:15)
+  !!! high_fan_out     handle_chat = 22 (limit:10)
+  !!  cc_exceeded      binPath = 21 (limit:15)
+  !!  cc_exceeded      readArp = 20 (limit:15)
+  !!  high_fan_out     mdnsProbe = 18 (limit:10)
+  !!  high_fan_out     ssdpProbe = 15 (limit:10)
+  !   cc_exceeded      mdnsProbe = 15 (limit:15)
+  !   high_fan_out     handle_proc_call = 14 (limit:10)
+  !   high_fan_out     MAX_ATTEMPTS = 14 (limit:10)
+  !   high_fan_out     spawnOrganism = 13 (limit:10)
+
+MODULES[72] (top by size):
+  M[generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs] 292L C:0 F:61 CC↑20 D:3 (javascript)
+  M[proc-catalog.json] 247L C:0 F:0 CC↑0 D:0 (json)
+  M[generated/orchestrator/execute/taskand.dev/v1/bin.mjs] 242L C:0 F:22 CC↑21 D:0 (javascript)
+  M[generated/validator/resolve/taskand.dev/v1/bin.mjs] 212L C:0 F:22 CC↑8 D:0 (javascript)
+  M[generated/planner/plan/taskand.dev/v1/bin.mjs] 157L C:0 F:12 CC↑8 D:0 (javascript)
+  M[gateway/handlers/chat.py] 138L C:0 F:2 CC↑29 D:0 (python)
+  M[gateway/auth.py] 124L C:0 F:4 CC↑14 D:2 (python)
+  M[generated/hw/monitor/taskand.dev/v1/bin.mjs] 112L C:0 F:24 CC↑4 D:0 (javascript)
+  M[generated/_lib/catalog.mjs] 109L C:0 F:21 CC↑6 D:0 (javascript)
+  M[generated/dev/composite/taskand.dev/v1/bin.mjs] 82L C:0 F:16 CC↑9 D:0 (javascript)
+  M[generated/dev/chat/taskand.dev/v1/dispatch.mjs] 82L C:0 F:17 CC↑8 D:0 (javascript)
+  M[generated/dev/act/taskand.dev/v1/bin.mjs] 79L C:0 F:18 CC↑8 D:0 (javascript)
+  M[generated/dev/evolve/taskand.dev/v1/bin.mjs] 76L C:0 F:14 CC↑9 D:0 (javascript)
+  M[Dockerfile] 68L C:0 F:0 CC↑0 D:0 ()
+  M[gateway/handlers/proc.py] 65L C:0 F:1 CC↑9 D:0 (python)
+  LANGS: javascript:39/yaml:15/python:13/other:3/json:1/shell:1
+
+HOTSPOTS[10]:
+  ★ handle_chat fan=22  // Orchestrates 22 calls
+  ★ mdnsProbe fan=18  // Orchestrates 18 calls
+  ★ ssdpProbe fan=15  // Orchestrates 15 calls
+  ★ handle_proc_call fan=14  // Orchestrates 14 calls
+  ★ MAX_ATTEMPTS fan=14  // Orchestrates 14 calls
+
+REFACTOR[7]:
+  [1] H/L Split handle_chat (CC=29)
+  [2] M/L Split binPath (CC=21)
+  [3] M/L Split readArp (CC=20)
+  [4] M/L Split mdnsProbe (CC=15)
+  [5] M/M Reduce handle_chat fan-out (currently 22)
+
+EVOLUTION:
+  2026-09-12 CC̄=3.1 crit=9 3490L // Automated analysis

@@ -1,0 +1,441 @@
+flowchart TD
+%% generated in 0.00s
+    subgraph gateway
+        gateway__main["main"]
+    end
+    subgraph gateway__GatewayHTTPHandler
+        gateway__GatewayHTTPHandler___send["_send"]
+        gateway__GatewayHTTPHandler__do_OPTIONS["do_OPTIONS"]
+        gateway__GatewayHTTPHandler__do_GET["do_GET"]
+        gateway__GatewayHTTPHandler__do_POST["do_POST"]
+        gateway__GatewayHTTPHandler__log_message["log_message"]
+    end
+    subgraph gateway__auth
+        gateway__auth___parse_simple_yaml("_parse_simple_yaml CC=14")
+        gateway__auth__load_grants["load_grants"]
+        gateway__auth__check_auth("check_auth CC=8")
+        gateway__auth__check_grant["check_grant"]
+    end
+    subgraph gateway__handlers
+        gateway__handlers__doctor__handle_doctor["handle_doctor"]
+        gateway__handlers__planner__handle_planner["handle_planner"]
+        gateway__handlers__health__handle_healthz["handle_healthz"]
+        gateway__handlers__federation__handle_federation("handle_federation CC=8")
+        gateway__handlers__orchestrator__handle_orchestrator["handle_orchestrator"]
+        gateway__handlers__proc__handle_proc_call("handle_proc_call CC=9")
+        gateway__handlers__chat__llm_env["llm_env"]
+        gateway__handlers__chat__handle_chat{{handle_chat CC=29}}
+    end
+    subgraph gateway__middleware
+        gateway__middleware__cors__add_cors_headers["add_cors_headers"]
+        gateway__middleware__logging__log_event["log_event"]
+    end
+    subgraph gateway__router
+        gateway__router__dispatch["dispatch"]
+    end
+    subgraph gateway__utils
+        gateway__utils__proc_hash["proc_hash"]
+        gateway__utils__find_proc_bin("find_proc_bin CC=9")
+    end
+    subgraph generated___lib
+        generated___lib__proc__here["here"]
+        generated___lib__proc__ROOT["ROOT"]
+        generated___lib__proc__GEN["GEN"]
+        generated___lib__proc__readInput["readInput"]
+        generated___lib__proc__raw["raw"]
+        generated___lib__proc__emit["emit"]
+        generated___lib__proc__adoptOwnership["adoptOwnership"]
+        generated___lib__proc__walk["walk"]
+        generated___lib__proc__uriToPath["uriToPath"]
+        generated___lib__proc__parts["parts"]
+        generated___lib__proc__ver["ver"]
+        generated___lib__proc__callProc("callProc CC=8")
+        generated___lib__proc__bin["bin"]
+        generated___lib__proc__r["r"]
+        generated___lib__proc__out["out"]
+        generated___lib__catalog__CATALOG_PATH["CATALOG_PATH"]
+        generated___lib__catalog__GENOME_PATH["GENOME_PATH"]
+        generated___lib__catalog__loadCatalog["loadCatalog"]
+        generated___lib__catalog__saveCatalog["saveCatalog"]
+        generated___lib__catalog__procHash["procHash"]
+        generated___lib__catalog__dir["dir"]
+        generated___lib__catalog__h["h"]
+        generated___lib__catalog__modules["modules"]
+        generated___lib__catalog__resolveUri["resolveUri"]
+        generated___lib__catalog__entry["entry"]
+        generated___lib__catalog__bin["bin"]
+        generated___lib__catalog__register["register"]
+        generated___lib__catalog__cat["cat"]
+        generated___lib__catalog__addToGenome["addToGenome"]
+        generated___lib__catalog__text["text"]
+        generated___lib__catalog__idx["idx"]
+        generated___lib__catalog__rest["rest"]
+        generated___lib__catalog__blockEnd["blockEnd"]
+        generated___lib__catalog__at["at"]
+        generated___lib__catalog__rehashAll["rehashAll"]
+        generated___lib__catalog__changed["changed"]
+    end
+    subgraph generated__admin
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__run["run"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__TIMEOUT_MS["TIMEOUT_MS"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__deadline["deadline"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__out["out"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__errOut["errOut"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__raw["raw"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__timeLeft["timeLeft"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ouiMap("ouiMap CC=11")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__loadOui("loadOui CC=11")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__lines["lines"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__parts["parts"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__hex["hex"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__vendorFromMac["vendorFromMac"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__parseArpText["parseArpText"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__m["m"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__readArp{{readArp CC=20}}
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__t["t"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__p["p"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__mip["mip"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__mmac["mmac"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__localSubnets("localSubnets CC=8")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ifaces("ifaces CC=8")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ipParts["ipParts"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__maskParts["maskParts"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__maskBits["maskBits"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__netParts["netParts"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe["tcpProbe"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__s["s"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__done["done"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__fin["fin"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsProbe{{mdnsProbe CC=15}}
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__sock["sock"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__timer["timer"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ip["ip"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__hostname("hostname CC=11")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__off["off"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__readName["readName"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__len["len"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ptr["ptr"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__sub["sub"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__qd["qd"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__an["an"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__r["r"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__rdlen["rdlen"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__type["type"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__rd["rd"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__q["q"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ssdpProbe("ssdpProbe CC=9")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__existing["existing"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__st["st"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__nets["nets"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__netsInfo["netsInfo"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsMs("mdnsMs CC=9")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__ssdpMs("ssdpMs CC=9")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__byIp("byIp CC=9")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__add("add CC=9")
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__cur["cur"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget["probeBudget"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__alive["alive"]
+        generated__admin__network_device_discovery__taskand__dev__v1__bin__names["names"]
+    end
+    subgraph generated__alert
+        generated__alert__telegram__taskand__dev__v1__bin__raw["raw"]
+        generated__alert__telegram__taskand__dev__v1__bin__cpuVal["cpuVal"]
+        generated__alert__telegram__taskand__dev__v1__bin__depData["depData"]
+        generated__alert__telegram__taskand__dev__v1__bin__threshold["threshold"]
+        generated__alert__telegram__taskand__dev__v1__bin__chatId["chatId"]
+        generated__alert__telegram__taskand__dev__v1__bin__credRef["credRef"]
+        generated__alert__telegram__taskand__dev__v1__bin__isOver["isOver"]
+        generated__alert__telegram__taskand__dev__v1__bin__alertMsg["alertMsg"]
+        generated__alert__telegram__taskand__dev__v1__test____dirname["__dirname"]
+        generated__alert__telegram__taskand__dev__v1__test__r["r"]
+        generated__alert__telegram__taskand__dev__v1__test__out["out"]
+    end
+    subgraph generated__browser
+        generated__browser__session__taskand__dev__v1__bin__raw["raw"]
+        generated__browser__session__taskand__dev__v1__bin__act["act"]
+        generated__browser__session__taskand__dev__v1__bin__url["url"]
+        generated__browser__session__taskand__dev__v1__bin__dev["dev"]
+    end
+    subgraph generated__chat
+        generated__chat__message__taskand__dev__v1__bin__raw["raw"]
+        generated__chat__message__taskand__dev__v1__bin__msg("msg CC=12")
+    end
+    subgraph generated__dev
+        generated__dev__codegen__taskand__dev__v1__bin__raw["raw"]
+        generated__dev__codegen__taskand__dev__v1__bin__desc["desc"]
+        generated__dev__chat__taskand__dev__v1__test__r["r"]
+        generated__dev__chat__taskand__dev__v1__test__out["out"]
+        generated__dev__execute__taskand__dev__v1__bin____filename["__filename"]
+        generated__dev__execute__taskand__dev__v1__bin____dirname["__dirname"]
+        generated__dev__execute__taskand__dev__v1__bin__raw["raw"]
+        generated__dev__execute__taskand__dev__v1__bin__intent["intent"]
+        generated__dev__execute__taskand__dev__v1__bin__desc["desc"]
+        generated__dev__execute__taskand__dev__v1__bin__devChatBin["devChatBin"]
+        generated__dev__execute__taskand__dev__v1__bin__r["r"]
+        generated__dev__execute__taskand__dev__v1__bin__out["out"]
+        generated__dev__execute__taskand__dev__v1__test__r["r"]
+        generated__dev__execute__taskand__dev__v1__test__out["out"]
+        generated__dev__composite__taskand__dev__v1__bin__input["input"]
+        generated__dev__composite__taskand__dev__v1__bin__task["task"]
+        generated__dev__composite__taskand__dev__v1__bin__organism["organism"]
+        generated__dev__composite__taskand__dev__v1__bin__say["say"]
+        generated__dev__composite__taskand__dev__v1__bin__done["done"]
+        generated__dev__composite__taskand__dev__v1__bin__plan["plan"]
+        generated__dev__composite__taskand__dev__v1__bin__deps["deps"]
+        generated__dev__composite__taskand__dev__v1__bin__val["val"]
+        generated__dev__composite__taskand__dev__v1__bin__step["step"]
+        generated__dev__composite__taskand__dev__v1__bin__ev["ev"]
+        generated__dev__composite__taskand__dev__v1__bin__orch["orch"]
+        generated__dev__composite__taskand__dev__v1__bin__validate["validate"]
+        generated__dev__composite__taskand__dev__v1__bin__r["r"]
+        generated__dev__composite__taskand__dev__v1__bin__stepLine("stepLine CC=9")
+        generated__dev__composite__taskand__dev__v1__bin__o["o"]
+        generated__dev__composite__taskand__dev__v1__bin__detail["detail"]
+        generated__dev__llm__taskand__dev__v1__bin__input["input"]
+        generated__dev__llm__taskand__dev__v1__bin__KEY["KEY"]
+        generated__dev__llm__taskand__dev__v1__bin__MODEL["MODEL"]
+        generated__dev__llm__taskand__dev__v1__bin__URL["URL"]
+        generated__dev__llm__taskand__dev__v1__bin__messages["messages"]
+        generated__dev__llm__taskand__dev__v1__bin__extractJson["extractJson"]
+        generated__dev__llm__taskand__dev__v1__bin__fenced["fenced"]
+        generated__dev__llm__taskand__dev__v1__bin__candidate["candidate"]
+        generated__dev__llm__taskand__dev__v1__bin__start["start"]
+        generated__dev__llm__taskand__dev__v1__bin__end["end"]
+        generated__dev__llm__taskand__dev__v1__bin__resp["resp"]
+        generated__dev__llm__taskand__dev__v1__bin__data["data"]
+        generated__dev__llm__taskand__dev__v1__bin__choice["choice"]
+        generated__dev__llm__taskand__dev__v1__bin__content["content"]
+        generated__dev__llm__taskand__dev__v1__bin__json["json"]
+        generated__dev__llm__taskand__dev__v1__context__capabilities["capabilities"]
+        generated__dev__llm__taskand__dev__v1__context__procs["procs"]
+        generated__dev__llm__taskand__dev__v1__context__capabilityContext["capabilityContext"]
+        generated__dev__act__taskand__dev__v1__bin__input["input"]
+        generated__dev__act__taskand__dev__v1__bin__message["message"]
+        generated__dev__act__taskand__dev__v1__bin__organism["organism"]
+        generated__dev__act__taskand__dev__v1__bin__decision["decision"]
+        generated__dev__act__taskand__dev__v1__bin__decide["decide"]
+        generated__dev__act__taskand__dev__v1__bin__r["r"]
+        generated__dev__act__taskand__dev__v1__bin__answer["answer"]
+        generated__dev__act__taskand__dev__v1__bin__run["run"]
+        generated__dev__act__taskand__dev__v1__bin__resolved["resolved"]
+        generated__dev__act__taskand__dev__v1__bin__result["result"]
+        generated__dev__act__taskand__dev__v1__bin__evolve["evolve"]
+        generated__dev__act__taskand__dev__v1__bin__ev["ev"]
+    end
+    subgraph generated__developer
+        generated__developer__spawn__taskand__dev__v1__bin__raw["raw"]
+        generated__developer__spawn__taskand__dev__v1__bin__KEY["KEY"]
+        generated__developer__spawn__taskand__dev__v1__bin__org["org"]
+    end
+    subgraph generated__doctor
+        generated__doctor__prescribe__taskand__dev__v1__bin__raw["raw"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__probe["probe"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__r["r"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__checkService["checkService"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__checkCatalog["checkCatalog"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__cat["cat"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__broken["broken"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__total["total"]
+        generated__doctor__diagnose__taskand__dev__v1__bin__passed["passed"]
+    end
+    subgraph generated__file
+        generated__file__ops__taskand__dev__v1__bin__raw["raw"]
+        generated__file__ops__taskand__dev__v1__bin__op["op"]
+        generated__file__ops__taskand__dev__v1__bin__target["target"]
+    end
+    subgraph generated__hw
+        generated__hw__monitor__taskand__dev__v1__bin__raw["raw"]
+        generated__hw__monitor__taskand__dev__v1__bin__TEMP_WARN_C["TEMP_WARN_C"]
+        generated__hw__monitor__taskand__dev__v1__bin__readSensorsCmd["readSensorsCmd"]
+        generated__hw__monitor__taskand__dev__v1__bin__out["out"]
+        generated__hw__monitor__taskand__dev__v1__bin__readThermalZones["readThermalZones"]
+        generated__hw__monitor__taskand__dev__v1__bin__temp_c["temp_c"]
+        generated__hw__monitor__taskand__dev__v1__bin__sensor["sensor"]
+        generated__hw__monitor__taskand__dev__v1__bin__pickCpuTemp["pickCpuTemp"]
+        generated__hw__monitor__taskand__dev__v1__bin__hits["hits"]
+        generated__hw__monitor__taskand__dev__v1__bin__cpuTimes["cpuTimes"]
+        generated__hw__monitor__taskand__dev__v1__bin__t["t"]
+        generated__hw__monitor__taskand__dev__v1__bin__cpuUsagePct["cpuUsagePct"]
+        generated__hw__monitor__taskand__dev__v1__bin__a["a"]
+        generated__hw__monitor__taskand__dev__v1__bin__b["b"]
+        generated__hw__monitor__taskand__dev__v1__bin__total["total"]
+        generated__hw__monitor__taskand__dev__v1__bin__diskFreeGb["diskFreeGb"]
+        generated__hw__monitor__taskand__dev__v1__bin__parts["parts"]
+        generated__hw__monitor__taskand__dev__v1__bin__gpioChips["gpioChips"]
+        generated__hw__monitor__taskand__dev__v1__bin__fromCmd["fromCmd"]
+        generated__hw__monitor__taskand__dev__v1__bin__sensors["sensors"]
+        generated__hw__monitor__taskand__dev__v1__bin__cpu["cpu"]
+        generated__hw__monitor__taskand__dev__v1__bin__hot["hot"]
+        generated__hw__monitor__taskand__dev__v1__bin__usage["usage"]
+        generated__hw__monitor__taskand__dev__v1__bin__summary["summary"]
+    end
+    subgraph generated__monitor
+        generated__monitor__cpu__taskand__dev__v1__bin__raw["raw"]
+        generated__monitor__cpu__taskand__dev__v1__bin__cpuPct["cpuPct"]
+        generated__monitor__cpu__taskand__dev__v1__bin__cpus["cpus"]
+        generated__monitor__cpu__taskand__dev__v1__bin__totalIdle["totalIdle"]
+        generated__monitor__cpu__taskand__dev__v1__bin__idlePct["idlePct"]
+        generated__monitor__cpu__taskand__dev__v1__test____dirname["__dirname"]
+        generated__monitor__cpu__taskand__dev__v1__test__r["r"]
+        generated__monitor__cpu__taskand__dev__v1__test__out["out"]
+    end
+    subgraph generated__orchestrator
+        generated__orchestrator__execute__taskand__dev__v1__bin____filename["__filename"]
+        generated__orchestrator__execute__taskand__dev__v1__bin____dirname["__dirname"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__raw["raw"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__plan["plan"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__runId["runId"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__orchDir["orchDir"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__stateFile["stateFile"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__isResume["isResume"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__prev["prev"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__saveState["saveState"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__prevStep["prevStep"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__canExecute["canExecute"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__blockingDep["blockingDep"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__depState["depState"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__port["port"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__isUp["isUp"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__binPath{{binPath CC=21}}
+        generated__orchestrator__execute__taskand__dev__v1__bin__r["r"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__errText["errText"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__parsed["parsed"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__hasFailed["hasFailed"]
+        generated__orchestrator__execute__taskand__dev__v1__bin__hasBlocked["hasBlocked"]
+        generated__orchestrator__execute__taskand__dev__v1__test____dirname["__dirname"]
+        generated__orchestrator__execute__taskand__dev__v1__test__r["r"]
+        generated__orchestrator__execute__taskand__dev__v1__test__out["out"]
+    end
+    subgraph generated__planner
+        generated__planner__plan__taskand__dev__v1__test____dirname["__dirname"]
+        generated__planner__plan__taskand__dev__v1__test__r["r"]
+        generated__planner__plan__taskand__dev__v1__test__out["out"]
+        generated__planner__plan__taskand__dev__v1__bin____filename["__filename"]
+        generated__planner__plan__taskand__dev__v1__bin____dirname["__dirname"]
+        generated__planner__plan__taskand__dev__v1__bin__raw["raw"]
+        generated__planner__plan__taskand__dev__v1__bin__task["task"]
+        generated__planner__plan__taskand__dev__v1__bin__catPath["catPath"]
+        generated__planner__plan__taskand__dev__v1__bin__cat["cat"]
+        generated__planner__plan__taskand__dev__v1__bin__capabilityLines["capabilityLines"]
+        generated__planner__plan__taskand__dev__v1__bin__plan["plan"]
+        generated__planner__plan__taskand__dev__v1__bin__llm["llm"]
+        generated__planner__plan__taskand__dev__v1__bin__kLower("kLower CC=8")
+        generated__planner__plan__taskand__dev__v1__bin__val["val"]
+        generated__planner__plan__taskand__dev__v1__bin__t["t"]
+    end
+    subgraph generated__validator
+        generated__validator__resolve__taskand__dev__v1__test____dirname["__dirname"]
+        generated__validator__resolve__taskand__dev__v1__test__r1["r1"]
+        generated__validator__resolve__taskand__dev__v1__test__r2["r2"]
+        generated__validator__resolve__taskand__dev__v1__bin____filename["__filename"]
+        generated__validator__resolve__taskand__dev__v1__bin____dirname["__dirname"]
+        generated__validator__resolve__taskand__dev__v1__bin__raw["raw"]
+        generated__validator__resolve__taskand__dev__v1__bin__blueprint["blueprint"]
+        generated__validator__resolve__taskand__dev__v1__bin__steps["steps"]
+        generated__validator__resolve__taskand__dev__v1__bin__ids["ids"]
+        generated__validator__resolve__taskand__dev__v1__bin__names["names"]
+        generated__validator__resolve__taskand__dev__v1__bin__color["color"]
+        generated__validator__resolve__taskand__dev__v1__bin__stepMap["stepMap"]
+        generated__validator__resolve__taskand__dev__v1__bin__hasCycle["hasCycle"]
+        generated__validator__resolve__taskand__dev__v1__bin__dfs["dfs"]
+        generated__validator__resolve__taskand__dev__v1__bin__currentStep["currentStep"]
+        generated__validator__resolve__taskand__dev__v1__bin__p["p"]
+        generated__validator__resolve__taskand__dev__v1__bin__val["val"]
+        generated__validator__resolve__taskand__dev__v1__bin__catPath["catPath"]
+        generated__validator__resolve__taskand__dev__v1__bin__catalogMap["catalogMap"]
+        generated__validator__resolve__taskand__dev__v1__bin__entry("entry CC=8")
+        generated__validator__resolve__taskand__dev__v1__bin__fullPath["fullPath"]
+        generated__validator__resolve__taskand__dev__v1__bin__visited["visited"]
+        generated__validator__resolve__taskand__dev__v1__bin__visit["visit"]
+        generated__validator__resolve__taskand__dev__v1__bin__stepObj["stepObj"]
+        generated__validator__resolve__taskand__dev__v1__bin__isValid["isValid"]
+    end
+    subgraph generated__vault
+        generated__vault__secrets__taskand__dev__v1__bin__raw["raw"]
+        generated__vault__secrets__taskand__dev__v1__bin__act["act"]
+    end
+    subgraph generated__web
+        generated__web__serve__taskand__dev__v1__bin__action["action"]
+        generated__web__serve__taskand__dev__v1__test____dirname["__dirname"]
+        generated__web__serve__taskand__dev__v1__test__r["r"]
+        generated__web__serve__taskand__dev__v1__test__out["out"]
+    end
+    generated__monitor__cpu__taskand__dev__v1__bin__cpuPct --> generated__monitor__cpu__taskand__dev__v1__bin__cpus
+    gateway__auth__load_grants --> gateway__auth___parse_simple_yaml
+    gateway__auth__check_auth --> gateway__auth__load_grants
+    gateway__handlers__health__handle_healthz --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__handlers__federation__handle_federation --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__auth__check_auth
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__middleware__logging__log_event
+    gateway__handlers__orchestrator__handle_orchestrator --> gateway__auth__check_grant
+    gateway__handlers__proc__handle_proc_call --> gateway__auth__check_auth
+    gateway__handlers__proc__handle_proc_call --> gateway__utils__find_proc_bin
+    gateway__handlers__proc__handle_proc_call --> gateway__auth__check_grant
+    gateway__handlers__proc__handle_proc_call --> gateway__middleware__logging__log_event
+    generated__validator__resolve__taskand__dev__v1__bin__hasCycle --> generated__validator__resolve__taskand__dev__v1__bin__dfs
+    generated__validator__resolve__taskand__dev__v1__bin__currentStep --> generated__validator__resolve__taskand__dev__v1__bin__dfs
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__errOut --> generated__admin__network_device_discovery__taskand__dev__v1__bin__out
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__vendorFromMac --> generated__admin__network_device_discovery__taskand__dev__v1__bin__loadOui
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__readArp --> generated__admin__network_device_discovery__taskand__dev__v1__bin__run
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe --> generated__admin__network_device_discovery__taskand__dev__v1__bin__fin
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsProbe --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__hostname --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__off --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__qd --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__an --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__r --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__rdlen --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__type --> generated__admin__network_device_discovery__taskand__dev__v1__bin__readName
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget --> generated__admin__network_device_discovery__taskand__dev__v1__bin__tcpProbe
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__probeBudget --> generated__admin__network_device_discovery__taskand__dev__v1__bin__r
+    generated__admin__network_device_discovery__taskand__dev__v1__bin__selfIps --> generated__admin__network_device_discovery__taskand__dev__v1__bin__out
+    generated__hw__monitor__taskand__dev__v1__bin__cpuUsagePct --> generated__hw__monitor__taskand__dev__v1__bin__cpuTimes
+    generated__doctor__diagnose__taskand__dev__v1__bin__checkService --> generated__doctor__diagnose__taskand__dev__v1__bin__probe
+    generated___lib__proc__adoptOwnership --> generated___lib__proc__walk
+    generated___lib__proc__callProc --> generated___lib__proc__uriToPath
+    generated___lib__catalog__resolveUri --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__resolveUri --> generated___lib__catalog__procHash
+    generated___lib__catalog__register --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__register --> generated___lib__catalog__procHash
+    generated___lib__catalog__register --> generated___lib__catalog__saveCatalog
+    generated___lib__catalog__register --> generated___lib__catalog__addToGenome
+    generated___lib__catalog__register --> generated___lib__catalog__at
+    generated___lib__catalog__cat --> generated___lib__catalog__procHash
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__loadCatalog
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__procHash
+    generated___lib__catalog__rehashAll --> generated___lib__catalog__saveCatalog
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__say
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__done
+    generated__dev__composite__taskand__dev__v1__bin__val --> generated__dev__composite__taskand__dev__v1__bin__validate
+    generated__dev__composite__taskand__dev__v1__bin__validate --> generated__dev__composite__taskand__dev__v1__bin__say
+    generated__dev__llm__taskand__dev__v1__context__capabilityContext --> generated__dev__llm__taskand__dev__v1__context__capabilities
+    generated__dev__act__taskand__dev__v1__bin__decision --> generated__dev__act__taskand__dev__v1__bin__run
+    generated__dev__act__taskand__dev__v1__bin__run --> generated__dev__act__taskand__dev__v1__bin__format
+    generated__dev__act__taskand__dev__v1__bin__evolve --> generated__dev__act__taskand__dev__v1__bin__run
+    generated__dev__chat__taskand__dev__v1__intent__hasAny --> generated__dev__chat__taskand__dev__v1__intent__match
+    generated__dev__chat__taskand__dev__v1__intent__matches --> generated__dev__chat__taskand__dev__v1__intent__match
+    generated__dev__chat__taskand__dev__v1__intent__matches --> generated__dev__chat__taskand__dev__v1__intent__hasAny
+    generated__dev__chat__taskand__dev__v1__intent__parseIntent --> generated__dev__chat__taskand__dev__v1__intent__matches
+    generated__dev__chat__taskand__dev__v1__intent__low --> generated__dev__chat__taskand__dev__v1__intent__matches
+    generated__dev__chat__taskand__dev__v1__dispatch__telemetry --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__diagnose --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__webStatus --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism --> generated__dev__chat__taskand__dev__v1__dispatch__organismTemplate
+    generated__dev__chat__taskand__dev__v1__dispatch__spawnOrganism --> generated__dev__chat__taskand__dev__v1__dispatch__replyOf
+    generated__dev__chat__taskand__dev__v1__dispatch__uri --> generated__dev__chat__taskand__dev__v1__dispatch__P
+    generated__dev__chat__taskand__dev__v1__dispatch__bin --> generated__dev__chat__taskand__dev__v1__dispatch__organismTemplate
+    generated__dev__evolve__taskand__dev__v1__bin__MAX_ATTEMPTS --> generated__dev__evolve__taskand__dev__v1__bin__contractTestSource
+    gateway__GatewayHTTPHandler___send --> gateway__middleware__cors__add_cors_headers
+    gateway__GatewayHTTPHandler___send --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__GatewayHTTPHandler__do_OPTIONS --> gateway__middleware__cors__add_cors_headers
+    gateway__GatewayHTTPHandler__do_GET --> gateway__router__dispatch
+    gateway__GatewayHTTPHandler__do_POST --> gateway__router__dispatch
+    gateway__main --> generated__admin__network_device_discovery__taskand__dev__v1__bin__len
+    gateway__utils__find_proc_bin --> gateway__utils__proc_hash
+    gateway__handlers__chat__handle_chat --> gateway__middleware__logging__log_event
+
+    classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
+    class generated__orchestrator__execute__taskand__dev__v1__bin__binPath,generated__admin__network_device_discovery__taskand__dev__v1__bin__readArp,generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsProbe,gateway__handlers__chat__handle_chat highCC
+    class generated__chat__message__taskand__dev__v1__bin__msg,gateway__auth___parse_simple_yaml,gateway__auth__check_auth,gateway__handlers__federation__handle_federation,gateway__handlers__proc__handle_proc_call,generated__validator__resolve__taskand__dev__v1__bin__entry,generated__planner__plan__taskand__dev__v1__bin__kLower,generated__admin__network_device_discovery__taskand__dev__v1__bin__ouiMap,generated__admin__network_device_discovery__taskand__dev__v1__bin__loadOui,generated__admin__network_device_discovery__taskand__dev__v1__bin__localSubnets,generated__admin__network_device_discovery__taskand__dev__v1__bin__ifaces,generated__admin__network_device_discovery__taskand__dev__v1__bin__hostname,generated__admin__network_device_discovery__taskand__dev__v1__bin__ssdpProbe,generated__admin__network_device_discovery__taskand__dev__v1__bin__mdnsMs,generated__admin__network_device_discovery__taskand__dev__v1__bin__ssdpMs,generated__admin__network_device_discovery__taskand__dev__v1__bin__byIp,generated__admin__network_device_discovery__taskand__dev__v1__bin__add,generated___lib__proc__callProc,generated__dev__composite__taskand__dev__v1__bin__stepLine,generated__dev__act__taskand__dev__v1__bin__format,generated__dev__chat__taskand__dev__v1__dispatch__telemetry,generated__dev__evolve__taskand__dev__v1__contract__contractTest,generated__dev__evolve__taskand__dev__v1__bin__MAX_ATTEMPTS,gateway__utils__find_proc_bin medCC

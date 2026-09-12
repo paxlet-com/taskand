@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from gateway.router import dispatch
 from gateway.middleware.cors import add_cors_headers
 from gateway.utils import GENERATED
@@ -41,7 +41,7 @@ class GatewayHTTPHandler(BaseHTTPRequestHandler):
 def main() -> None:
     port = int(os.environ.get("PORT", 8077))
     print(f"Taskand v2.2 Modular Gateway listening on 0.0.0.0:{port} (active processes: {len(list(GENERATED.rglob('bin.mjs')))})")
-    server = HTTPServer(("0.0.0.0", port), GatewayHTTPHandler)
+    server = ThreadingHTTPServer(("0.0.0.0", port), GatewayHTTPHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

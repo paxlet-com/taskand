@@ -1,0 +1,1238 @@
+project: /home/tom/github/semcod/taskand/glm53
+generated_from: code2llm call graph analysis
+stats:
+  total_nodes: 83
+  total_edges: 70
+  modules_count: 23
+nodes:
+  generated.doctor.diagnose.taskand.dev.v1.bin.probe:
+    name: probe
+    module: generated.doctor.diagnose.taskand.dev.v1.bin
+    line: 15
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  generated.dev.chat.taskand.dev.v1.dispatch.telemetry:
+    name: telemetry
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 25
+    cyclomatic_complexity: 8
+    calls_out: 7
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.intent.hasAny:
+    name: hasAny
+    module: generated.dev.chat.taskand.dev.v1.intent
+    line: 21
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 1
+  generated.doctor.diagnose.taskand.dev.v1.bin.checkService:
+    name: checkService
+    module: generated.doctor.diagnose.taskand.dev.v1.bin
+    line: 24
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  gateway.handlers.health.handle_healthz:
+    name: handle_healthz
+    module: gateway.handlers.health
+    line: 3
+    cyclomatic_complexity: 2
+    calls_out: 5
+    calls_in: 0
+  gateway.GatewayHTTPHandler.do_GET:
+    name: do_GET
+    module: gateway
+    line: 24
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  generated.validator.resolve.taskand.dev.v1.bin.dfs:
+    name: dfs
+    module: generated.validator.resolve.taskand.dev.v1.bin
+    line: 82
+    cyclomatic_complexity: 7
+    calls_out: 3
+    calls_in: 2
+  gateway.auth.check_auth:
+    name: check_auth
+    module: gateway.auth
+    line: 67
+    cyclomatic_complexity: 8
+    calls_out: 15
+    calls_in: 2
+  generated.monitor.cpu.taskand.dev.v1.bin.cpus:
+    name: cpus
+    module: generated.monitor.cpu.taskand.dev.v1.bin
+    line: 16
+    cyclomatic_complexity: 4
+    calls_out: 2
+    calls_in: 1
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac:
+    name: vendorFromMac
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 53
+    cyclomatic_complexity: 3
+    calls_out: 5
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps:
+    name: selfIps
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 277
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 0
+  generated._lib.proc.walk:
+    name: walk
+    module: generated._lib.proc
+    line: 30
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 1
+  gateway.auth.check_grant:
+    name: check_grant
+    module: gateway.auth
+    line: 107
+    cyclomatic_complexity: 7
+    calls_out: 3
+    calls_in: 2
+  generated._lib.catalog.rehashAll:
+    name: rehashAll
+    module: generated._lib.catalog
+    line: 89
+    cyclomatic_complexity: 5
+    calls_out: 6
+    calls_in: 0
+  generated._lib.catalog.procHash:
+    name: procHash
+    module: generated._lib.catalog
+    line: 27
+    cyclomatic_complexity: 3
+    calls_out: 10
+    calls_in: 4
+  generated._lib.catalog.saveCatalog:
+    name: saveCatalog
+    module: generated._lib.catalog
+    line: 20
+    cyclomatic_complexity: 1
+    calls_out: 4
+    calls_in: 2
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.out:
+    name: out
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 14
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 2
+  gateway.main:
+    name: main
+    module: gateway
+    line: 41
+    cyclomatic_complexity: 2
+    calls_out: 9
+    calls_in: 0
+  generated.dev.llm.taskand.dev.v1.context.capabilities:
+    name: capabilities
+    module: generated.dev.llm.taskand.dev.v1.context
+    line: 7
+    cyclomatic_complexity: 4
+    calls_out: 4
+    calls_in: 1
+  generated.dev.composite.taskand.dev.v1.bin.done:
+    name: done
+    module: generated.dev.composite.taskand.dev.v1.bin
+    line: 14
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  generated.dev.composite.taskand.dev.v1.bin.val:
+    name: val
+    module: generated.dev.composite.taskand.dev.v1.bin
+    line: 31
+    cyclomatic_complexity: 7
+    calls_out: 6
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname:
+    name: hostname
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 148
+    cyclomatic_complexity: 11
+    calls_out: 6
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.intent.parseIntent:
+    name: parseIntent
+    module: generated.dev.chat.taskand.dev.v1.intent
+    line: 29
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  gateway.auth._parse_simple_yaml:
+    name: _parse_simple_yaml
+    module: gateway.auth
+    line: 13
+    cyclomatic_complexity: 14
+    calls_out: 19
+    calls_in: 1
+  generated.dev.chat.taskand.dev.v1.dispatch.diagnose:
+    name: diagnose
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 39
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 0
+  gateway.handlers.chat.handle_chat:
+    name: handle_chat
+    module: gateway.handlers.chat
+    line: 14
+    cyclomatic_complexity: 29
+    calls_out: 83
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.readName:
+    name: readName
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 151
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 8
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen:
+    name: rdlen
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 179
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  generated._lib.catalog.addToGenome:
+    name: addToGenome
+    module: generated._lib.catalog
+    line: 71
+    cyclomatic_complexity: 5
+    calls_out: 10
+    calls_in: 1
+  generated.dev.chat.taskand.dev.v1.dispatch.webStatus:
+    name: webStatus
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 45
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut:
+    name: errOut
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 19
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  gateway.router.dispatch:
+    name: dispatch
+    module: gateway.router
+    line: 20
+    cyclomatic_complexity: 3
+    calls_out: 4
+    calls_in: 2
+  generated._lib.catalog.cat:
+    name: cat
+    module: generated._lib.catalog
+    line: 90
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 0
+  generated._lib.catalog.loadCatalog:
+    name: loadCatalog
+    module: generated._lib.catalog
+    line: 12
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 3
+  generated.hw.monitor.taskand.dev.v1.bin.cpuTimes:
+    name: cpuTimes
+    module: generated.hw.monitor.taskand.dev.v1.bin
+    line: 53
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 1
+  generated.monitor.cpu.taskand.dev.v1.bin.cpuPct:
+    name: cpuPct
+    module: generated.monitor.cpu.taskand.dev.v1.bin
+    line: 14
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.an:
+    name: an
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 173
+    cyclomatic_complexity: 5
+    calls_out: 2
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.dispatch.bin:
+    name: bin
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 54
+    cyclomatic_complexity: 2
+    calls_out: 6
+    calls_in: 0
+  generated._lib.catalog.resolveUri:
+    name: resolveUri
+    module: generated._lib.catalog
+    line: 40
+    cyclomatic_complexity: 6
+    calls_out: 5
+    calls_in: 0
+  generated.dev.llm.taskand.dev.v1.context.capabilityContext:
+    name: capabilityContext
+    module: generated.dev.llm.taskand.dev.v1.context
+    line: 14
+    cyclomatic_complexity: 2
+    calls_out: 3
+    calls_in: 0
+  generated._lib.proc.callProc:
+    name: callProc
+    module: generated._lib.proc
+    line: 47
+    cyclomatic_complexity: 8
+    calls_out: 6
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.dispatch.uri:
+    name: uri
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 53
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  generated._lib.proc.adoptOwnership:
+    name: adoptOwnership
+    module: generated._lib.proc
+    line: 27
+    cyclomatic_complexity: 4
+    calls_out: 9
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.intent.matches:
+    name: matches
+    module: generated.dev.chat.taskand.dev.v1.intent
+    line: 23
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 2
+  generated.dev.composite.taskand.dev.v1.bin.say:
+    name: say
+    module: generated.dev.composite.taskand.dev.v1.bin
+    line: 13
+    cyclomatic_complexity: 1
+    calls_out: 2
+    calls_in: 2
+  generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct:
+    name: cpuUsagePct
+    module: generated.hw.monitor.taskand.dev.v1.bin
+    line: 62
+    cyclomatic_complexity: 2
+    calls_out: 4
+    calls_in: 0
+  gateway.GatewayHTTPHandler.do_POST:
+    name: do_POST
+    module: gateway
+    line: 27
+    cyclomatic_complexity: 4
+    calls_out: 6
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.dispatch.P:
+    name: P
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 7
+    cyclomatic_complexity: 1
+    calls_out: 0
+    calls_in: 5
+  generated.dev.act.taskand.dev.v1.bin.run:
+    name: run
+    module: generated.dev.act.taskand.dev.v1.bin
+    line: 46
+    cyclomatic_complexity: 3
+    calls_out: 3
+    calls_in: 2
+  generated._lib.catalog.register:
+    name: register
+    module: generated._lib.catalog
+    line: 51
+    cyclomatic_complexity: 4
+    calls_out: 11
+    calls_in: 0
+  generated._lib.proc.uriToPath:
+    name: uriToPath
+    module: generated._lib.proc
+    line: 39
+    cyclomatic_complexity: 4
+    calls_out: 7
+    calls_in: 1
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe:
+    name: mdnsProbe
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 138
+    cyclomatic_complexity: 15
+    calls_out: 18
+    calls_in: 0
+  generated.validator.resolve.taskand.dev.v1.bin.currentStep:
+    name: currentStep
+    module: generated.validator.resolve.taskand.dev.v1.bin
+    line: 84
+    cyclomatic_complexity: 7
+    calls_out: 3
+    calls_in: 0
+  gateway.middleware.cors.add_cors_headers:
+    name: add_cors_headers
+    module: gateway.middleware.cors
+    line: 1
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 2
+  gateway.GatewayHTTPHandler.do_OPTIONS:
+    name: do_OPTIONS
+    module: gateway
+    line: 19
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.dispatch.organismTemplate:
+    name: organismTemplate
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 71
+    cyclomatic_complexity: 6
+    calls_out: 4
+    calls_in: 2
+  gateway.utils.proc_hash:
+    name: proc_hash
+    module: gateway.utils
+    line: 31
+    cyclomatic_complexity: 5
+    calls_out: 9
+    calls_in: 1
+  gateway.utils.find_proc_bin:
+    name: find_proc_bin
+    module: gateway.utils
+    line: 42
+    cyclomatic_complexity: 9
+    calls_out: 9
+    calls_in: 3
+  generated.dev.act.taskand.dev.v1.bin.evolve:
+    name: evolve
+    module: generated.dev.act.taskand.dev.v1.bin
+    line: 53
+    cyclomatic_complexity: 7
+    calls_out: 5
+    calls_in: 0
+  generated.validator.resolve.taskand.dev.v1.bin.hasCycle:
+    name: hasCycle
+    module: generated.validator.resolve.taskand.dev.v1.bin
+    line: 79
+    cyclomatic_complexity: 7
+    calls_out: 4
+    calls_in: 0
+  generated.dev.act.taskand.dev.v1.bin.format:
+    name: format
+    module: generated.dev.act.taskand.dev.v1.bin
+    line: 71
+    cyclomatic_complexity: 8
+    calls_out: 2
+    calls_in: 1
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.run:
+    name: run
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 10
+    cyclomatic_complexity: 1
+    calls_out: 3
+    calls_in: 1
+  gateway.handlers.orchestrator.handle_orchestrator:
+    name: handle_orchestrator
+    module: gateway.handlers.orchestrator
+    line: 7
+    cyclomatic_complexity: 6
+    calls_out: 17
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.fin:
+    name: fin
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 129
+    cyclomatic_complexity: 2
+    calls_out: 2
+    calls_in: 1
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.off:
+    name: 'off'
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 150
+    cyclomatic_complexity: 5
+    calls_out: 4
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp:
+    name: readArp
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 70
+    cyclomatic_complexity: 20
+    calls_out: 12
+    calls_in: 0
+  gateway.handlers.federation.handle_federation:
+    name: handle_federation
+    module: gateway.handlers.federation
+    line: 4
+    cyclomatic_complexity: 8
+    calls_out: 15
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget:
+    name: probeBudget
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 252
+    cyclomatic_complexity: 3
+    calls_out: 8
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.type:
+    name: type
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 180
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.r:
+    name: r
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 175
+    cyclomatic_complexity: 3
+    calls_out: 2
+    calls_in: 1
+  gateway.handlers.proc.handle_proc_call:
+    name: handle_proc_call
+    module: gateway.handlers.proc
+    line: 7
+    cyclomatic_complexity: 9
+    calls_out: 26
+    calls_in: 0
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.qd:
+    name: qd
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 171
+    cyclomatic_complexity: 2
+    calls_out: 1
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.intent.match:
+    name: match
+    module: generated.dev.chat.taskand.dev.v1.intent
+    line: 32
+    cyclomatic_complexity: 2
+    calls_out: 0
+    calls_in: 2
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe:
+    name: tcpProbe
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 125
+    cyclomatic_complexity: 2
+    calls_out: 8
+    calls_in: 1
+  generated.dev.act.taskand.dev.v1.bin.decision:
+    name: decision
+    module: generated.dev.act.taskand.dev.v1.bin
+    line: 18
+    cyclomatic_complexity: 1
+    calls_out: 1
+    calls_in: 0
+  gateway.GatewayHTTPHandler._send:
+    name: _send
+    module: gateway
+    line: 10
+    cyclomatic_complexity: 1
+    calls_out: 10
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism:
+    name: spawnOrganism
+    module: generated.dev.chat.taskand.dev.v1.dispatch
+    line: 52
+    cyclomatic_complexity: 4
+    calls_out: 13
+    calls_in: 0
+  generated.dev.chat.taskand.dev.v1.intent.low:
+    name: low
+    module: generated.dev.chat.taskand.dev.v1.intent
+    line: 30
+    cyclomatic_complexity: 3
+    calls_out: 1
+    calls_in: 0
+  gateway.auth.load_grants:
+    name: load_grants
+    module: gateway.auth
+    line: 40
+    cyclomatic_complexity: 7
+    calls_out: 10
+    calls_in: 1
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.len:
+    name: len
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 154
+    cyclomatic_complexity: 2
+    calls_out: 0
+    calls_in: 6
+  generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui:
+    name: loadOui
+    module: generated.admin.network-device-discovery.taskand.dev.v1.bin
+    line: 35
+    cyclomatic_complexity: 11
+    calls_out: 10
+    calls_in: 1
+  generated.dev.composite.taskand.dev.v1.bin.validate:
+    name: validate
+    module: generated.dev.composite.taskand.dev.v1.bin
+    line: 65
+    cyclomatic_complexity: 5
+    calls_out: 3
+    calls_in: 1
+  gateway.middleware.logging.log_event:
+    name: log_event
+    module: gateway.middleware.logging
+    line: 11
+    cyclomatic_complexity: 2
+    calls_out: 7
+    calls_in: 3
+edges:
+- caller: generated.monitor.cpu.taskand.dev.v1.bin.cpuPct
+  callee: generated.monitor.cpu.taskand.dev.v1.bin.cpus
+  call_type: resolved
+- caller: gateway.auth.load_grants
+  callee: gateway.auth._parse_simple_yaml
+  call_type: resolved
+- caller: gateway.auth.check_auth
+  callee: gateway.auth.load_grants
+  call_type: resolved
+- caller: gateway.handlers.health.handle_healthz
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  call_type: resolved
+- caller: gateway.handlers.federation.handle_federation
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  call_type: resolved
+- caller: gateway.handlers.orchestrator.handle_orchestrator
+  callee: gateway.auth.check_auth
+  call_type: resolved
+- caller: gateway.handlers.orchestrator.handle_orchestrator
+  callee: gateway.middleware.logging.log_event
+  call_type: resolved
+- caller: gateway.handlers.orchestrator.handle_orchestrator
+  callee: gateway.auth.check_grant
+  call_type: resolved
+- caller: gateway.handlers.proc.handle_proc_call
+  callee: gateway.auth.check_auth
+  call_type: resolved
+- caller: gateway.handlers.proc.handle_proc_call
+  callee: gateway.utils.find_proc_bin
+  call_type: resolved
+- caller: gateway.handlers.proc.handle_proc_call
+  callee: gateway.auth.check_grant
+  call_type: resolved
+- caller: generated.validator.resolve.taskand.dev.v1.bin.hasCycle
+  callee: generated.validator.resolve.taskand.dev.v1.bin.dfs
+  call_type: resolved
+- caller: generated.validator.resolve.taskand.dev.v1.bin.currentStep
+  callee: generated.validator.resolve.taskand.dev.v1.bin.dfs
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.out
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.run
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.fin
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.off
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.qd
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.an
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.r
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.type
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.r
+  call_type: resolved
+- caller: generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.out
+  call_type: resolved
+- caller: generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct
+  callee: generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
+  call_type: resolved
+- caller: generated.doctor.diagnose.taskand.dev.v1.bin.checkService
+  callee: generated.doctor.diagnose.taskand.dev.v1.bin.probe
+  call_type: resolved
+- caller: generated._lib.proc.adoptOwnership
+  callee: generated._lib.proc.walk
+  call_type: resolved
+- caller: generated._lib.proc.callProc
+  callee: generated._lib.proc.uriToPath
+  call_type: resolved
+- caller: generated._lib.catalog.resolveUri
+  callee: generated._lib.catalog.loadCatalog
+  call_type: resolved
+- caller: generated._lib.catalog.resolveUri
+  callee: generated._lib.catalog.procHash
+  call_type: resolved
+- caller: generated._lib.catalog.register
+  callee: generated._lib.catalog.loadCatalog
+  call_type: resolved
+- caller: generated._lib.catalog.register
+  callee: generated._lib.catalog.procHash
+  call_type: resolved
+- caller: generated._lib.catalog.register
+  callee: generated._lib.catalog.saveCatalog
+  call_type: resolved
+- caller: generated._lib.catalog.register
+  callee: generated._lib.catalog.addToGenome
+  call_type: resolved
+- caller: generated._lib.catalog.cat
+  callee: generated._lib.catalog.procHash
+  call_type: resolved
+- caller: generated._lib.catalog.rehashAll
+  callee: generated._lib.catalog.loadCatalog
+  call_type: resolved
+- caller: generated._lib.catalog.rehashAll
+  callee: generated._lib.catalog.procHash
+  call_type: resolved
+- caller: generated._lib.catalog.rehashAll
+  callee: generated._lib.catalog.saveCatalog
+  call_type: resolved
+- caller: generated.dev.composite.taskand.dev.v1.bin.val
+  callee: generated.dev.composite.taskand.dev.v1.bin.say
+  call_type: resolved
+- caller: generated.dev.composite.taskand.dev.v1.bin.val
+  callee: generated.dev.composite.taskand.dev.v1.bin.done
+  call_type: resolved
+- caller: generated.dev.composite.taskand.dev.v1.bin.val
+  callee: generated.dev.composite.taskand.dev.v1.bin.validate
+  call_type: resolved
+- caller: generated.dev.composite.taskand.dev.v1.bin.validate
+  callee: generated.dev.composite.taskand.dev.v1.bin.say
+  call_type: resolved
+- caller: generated.dev.llm.taskand.dev.v1.context.capabilityContext
+  callee: generated.dev.llm.taskand.dev.v1.context.capabilities
+  call_type: resolved
+- caller: generated.dev.act.taskand.dev.v1.bin.decision
+  callee: generated.dev.act.taskand.dev.v1.bin.run
+  call_type: resolved
+- caller: generated.dev.act.taskand.dev.v1.bin.run
+  callee: generated.dev.act.taskand.dev.v1.bin.format
+  call_type: resolved
+- caller: generated.dev.act.taskand.dev.v1.bin.evolve
+  callee: generated.dev.act.taskand.dev.v1.bin.run
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.intent.hasAny
+  callee: generated.dev.chat.taskand.dev.v1.intent.match
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.intent.matches
+  callee: generated.dev.chat.taskand.dev.v1.intent.match
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.intent.matches
+  callee: generated.dev.chat.taskand.dev.v1.intent.hasAny
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.intent.parseIntent
+  callee: generated.dev.chat.taskand.dev.v1.intent.matches
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.intent.low
+  callee: generated.dev.chat.taskand.dev.v1.intent.matches
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.telemetry
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.P
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.diagnose
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.P
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.webStatus
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.P
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.P
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.organismTemplate
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.uri
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.P
+  call_type: resolved
+- caller: generated.dev.chat.taskand.dev.v1.dispatch.bin
+  callee: generated.dev.chat.taskand.dev.v1.dispatch.organismTemplate
+  call_type: resolved
+- caller: gateway.GatewayHTTPHandler._send
+  callee: gateway.middleware.cors.add_cors_headers
+  call_type: resolved
+- caller: gateway.GatewayHTTPHandler._send
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  call_type: resolved
+- caller: gateway.GatewayHTTPHandler.do_OPTIONS
+  callee: gateway.middleware.cors.add_cors_headers
+  call_type: resolved
+- caller: gateway.GatewayHTTPHandler.do_GET
+  callee: gateway.router.dispatch
+  call_type: resolved
+- caller: gateway.GatewayHTTPHandler.do_POST
+  callee: gateway.router.dispatch
+  call_type: resolved
+- caller: gateway.main
+  callee: generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  call_type: resolved
+- caller: gateway.utils.find_proc_bin
+  callee: gateway.utils.proc_hash
+  call_type: resolved
+- caller: gateway.handlers.chat.handle_chat
+  callee: gateway.middleware.logging.log_event
+  call_type: resolved
+modules:
+  gateway:
+  - gateway.GatewayHTTPHandler._send
+  - gateway.GatewayHTTPHandler.do_GET
+  - gateway.GatewayHTTPHandler.do_OPTIONS
+  - gateway.GatewayHTTPHandler.do_POST
+  - gateway.main
+  gateway.auth:
+  - gateway.auth._parse_simple_yaml
+  - gateway.auth.check_auth
+  - gateway.auth.check_grant
+  - gateway.auth.load_grants
+  gateway.handlers.chat:
+  - gateway.handlers.chat.handle_chat
+  gateway.handlers.federation:
+  - gateway.handlers.federation.handle_federation
+  gateway.handlers.health:
+  - gateway.handlers.health.handle_healthz
+  gateway.handlers.orchestrator:
+  - gateway.handlers.orchestrator.handle_orchestrator
+  gateway.handlers.proc:
+  - gateway.handlers.proc.handle_proc_call
+  gateway.middleware.cors:
+  - gateway.middleware.cors.add_cors_headers
+  gateway.middleware.logging:
+  - gateway.middleware.logging.log_event
+  gateway.router:
+  - gateway.router.dispatch
+  gateway.utils:
+  - gateway.utils.find_proc_bin
+  - gateway.utils.proc_hash
+  generated._lib.catalog:
+  - generated._lib.catalog.addToGenome
+  - generated._lib.catalog.cat
+  - generated._lib.catalog.loadCatalog
+  - generated._lib.catalog.procHash
+  - generated._lib.catalog.register
+  - generated._lib.catalog.rehashAll
+  - generated._lib.catalog.resolveUri
+  - generated._lib.catalog.saveCatalog
+  generated._lib.proc:
+  - generated._lib.proc.adoptOwnership
+  - generated._lib.proc.callProc
+  - generated._lib.proc.uriToPath
+  - generated._lib.proc.walk
+  generated.admin.network-device-discovery.taskand.dev.v1.bin:
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.an
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.fin
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.len
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.off
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.out
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.qd
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.r
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.run
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.type
+  - generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac
+  generated.dev.act.taskand.dev.v1.bin:
+  - generated.dev.act.taskand.dev.v1.bin.decision
+  - generated.dev.act.taskand.dev.v1.bin.evolve
+  - generated.dev.act.taskand.dev.v1.bin.format
+  - generated.dev.act.taskand.dev.v1.bin.run
+  generated.dev.chat.taskand.dev.v1.dispatch:
+  - generated.dev.chat.taskand.dev.v1.dispatch.P
+  - generated.dev.chat.taskand.dev.v1.dispatch.bin
+  - generated.dev.chat.taskand.dev.v1.dispatch.diagnose
+  - generated.dev.chat.taskand.dev.v1.dispatch.organismTemplate
+  - generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
+  - generated.dev.chat.taskand.dev.v1.dispatch.telemetry
+  - generated.dev.chat.taskand.dev.v1.dispatch.uri
+  - generated.dev.chat.taskand.dev.v1.dispatch.webStatus
+  generated.dev.chat.taskand.dev.v1.intent:
+  - generated.dev.chat.taskand.dev.v1.intent.hasAny
+  - generated.dev.chat.taskand.dev.v1.intent.low
+  - generated.dev.chat.taskand.dev.v1.intent.match
+  - generated.dev.chat.taskand.dev.v1.intent.matches
+  - generated.dev.chat.taskand.dev.v1.intent.parseIntent
+  generated.dev.composite.taskand.dev.v1.bin:
+  - generated.dev.composite.taskand.dev.v1.bin.done
+  - generated.dev.composite.taskand.dev.v1.bin.say
+  - generated.dev.composite.taskand.dev.v1.bin.val
+  - generated.dev.composite.taskand.dev.v1.bin.validate
+  generated.dev.llm.taskand.dev.v1.context:
+  - generated.dev.llm.taskand.dev.v1.context.capabilities
+  - generated.dev.llm.taskand.dev.v1.context.capabilityContext
+  generated.doctor.diagnose.taskand.dev.v1.bin:
+  - generated.doctor.diagnose.taskand.dev.v1.bin.checkService
+  - generated.doctor.diagnose.taskand.dev.v1.bin.probe
+  generated.hw.monitor.taskand.dev.v1.bin:
+  - generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
+  - generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct
+  generated.monitor.cpu.taskand.dev.v1.bin:
+  - generated.monitor.cpu.taskand.dev.v1.bin.cpuPct
+  - generated.monitor.cpu.taskand.dev.v1.bin.cpus
+  generated.validator.resolve.taskand.dev.v1.bin:
+  - generated.validator.resolve.taskand.dev.v1.bin.currentStep
+  - generated.validator.resolve.taskand.dev.v1.bin.dfs
+  - generated.validator.resolve.taskand.dev.v1.bin.hasCycle
+entry_points:
+- gateway.GatewayHTTPHandler._send
+- gateway.GatewayHTTPHandler.do_GET
+- gateway.GatewayHTTPHandler.do_OPTIONS
+- gateway.GatewayHTTPHandler.do_POST
+- gateway.GatewayHTTPHandler.log_message
+- gateway.handlers.chat.handle_chat
+- gateway.handlers.doctor.handle_doctor
+- gateway.handlers.federation.handle_federation
+- gateway.handlers.health.handle_healthz
+- gateway.handlers.orchestrator.handle_orchestrator
+- gateway.handlers.planner.handle_planner
+- gateway.handlers.proc.handle_proc_call
+- gateway.main
+- generated._lib.catalog.CATALOG_PATH
+- generated._lib.catalog.GENOME_PATH
+- generated._lib.catalog.bin
+- generated._lib.catalog.blockEnd
+- generated._lib.catalog.cat
+- generated._lib.catalog.changed
+- generated._lib.catalog.dir
+- generated._lib.catalog.entry
+- generated._lib.catalog.h
+- generated._lib.catalog.idx
+- generated._lib.catalog.modules
+- generated._lib.catalog.register
+- generated._lib.catalog.rehashAll
+- generated._lib.catalog.resolveUri
+- generated._lib.catalog.rest
+- generated._lib.catalog.text
+- generated._lib.proc.GEN
+- generated._lib.proc.ROOT
+- generated._lib.proc.adoptOwnership
+- generated._lib.proc.bin
+- generated._lib.proc.callProc
+- generated._lib.proc.emit
+- generated._lib.proc.here
+- generated._lib.proc.out
+- generated._lib.proc.parts
+- generated._lib.proc.r
+- generated._lib.proc.raw
+- generated._lib.proc.readInput
+- generated._lib.proc.ver
+- generated.admin.chat.taskand.dev.v1.bin.input
+- generated.admin.chat.taskand.dev.v1.bin.message
+- generated.admin.chat.taskand.dev.v1.bin.r
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.TIMEOUT_MS
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.add
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.alive
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.an
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.byIp
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.cur
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.deadline
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.done
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.existing
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.hex
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ifaces
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ip
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ipParts
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.lines
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.localSubnets
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.m
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.maskBits
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.maskParts
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsMs
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.mip
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.mmac
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.names
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.netParts
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.nets
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.netsInfo
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.off
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ouiMap
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.p
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.parseArpText
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.parts
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ptr
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.q
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.qd
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.raw
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.rd
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.s
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.sock
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ssdpMs
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.ssdpProbe
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.st
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.sub
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.t
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.timeLeft
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.timer
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.type
+- generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac
+- generated.admin.network-device-discovery.taskand.dev.v1.test.out
+- generated.admin.network-device-discovery.taskand.dev.v1.test.r
+- generated.alert.telegram.taskand.dev.v1.bin.alertMsg
+- generated.alert.telegram.taskand.dev.v1.bin.chatId
+- generated.alert.telegram.taskand.dev.v1.bin.cpuVal
+- generated.alert.telegram.taskand.dev.v1.bin.credRef
+- generated.alert.telegram.taskand.dev.v1.bin.depData
+- generated.alert.telegram.taskand.dev.v1.bin.isOver
+- generated.alert.telegram.taskand.dev.v1.bin.raw
+- generated.alert.telegram.taskand.dev.v1.bin.threshold
+- generated.alert.telegram.taskand.dev.v1.test.__dirname
+- generated.alert.telegram.taskand.dev.v1.test.out
+- generated.alert.telegram.taskand.dev.v1.test.r
+- generated.browser.session.taskand.dev.v1.bin.act
+- generated.browser.session.taskand.dev.v1.bin.dev
+- generated.browser.session.taskand.dev.v1.bin.raw
+- generated.browser.session.taskand.dev.v1.bin.url
+- generated.chat.message.taskand.dev.v1.bin.msg
+- generated.chat.message.taskand.dev.v1.bin.raw
+- generated.dev.act.taskand.dev.v1.bin.answer
+- generated.dev.act.taskand.dev.v1.bin.data
+- generated.dev.act.taskand.dev.v1.bin.decide
+- generated.dev.act.taskand.dev.v1.bin.decision
+- generated.dev.act.taskand.dev.v1.bin.ev
+- generated.dev.act.taskand.dev.v1.bin.evolve
+- generated.dev.act.taskand.dev.v1.bin.head
+- generated.dev.act.taskand.dev.v1.bin.input
+- generated.dev.act.taskand.dev.v1.bin.invalid
+- generated.dev.act.taskand.dev.v1.bin.message
+- generated.dev.act.taskand.dev.v1.bin.organism
+- generated.dev.act.taskand.dev.v1.bin.r
+- generated.dev.act.taskand.dev.v1.bin.resolved
+- generated.dev.act.taskand.dev.v1.bin.result
+- generated.dev.act.taskand.dev.v1.bin.summary
+- generated.dev.act.taskand.dev.v1.bin.why
+- generated.dev.chat.taskand.dev.v1.bin.input
+- generated.dev.chat.taskand.dev.v1.bin.intent
+- generated.dev.chat.taskand.dev.v1.bin.prompt
+- generated.dev.chat.taskand.dev.v1.dispatch.bin
+- generated.dev.chat.taskand.dev.v1.dispatch.d
+- generated.dev.chat.taskand.dev.v1.dispatch.diagnose
+- generated.dev.chat.taskand.dev.v1.dispatch.dispatch
+- generated.dev.chat.taskand.dev.v1.dispatch.hw
+- generated.dev.chat.taskand.dev.v1.dispatch.input
+- generated.dev.chat.taskand.dev.v1.dispatch.message
+- generated.dev.chat.taskand.dev.v1.dispatch.r
+- generated.dev.chat.taskand.dev.v1.dispatch.sensors
+- generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
+- generated.dev.chat.taskand.dev.v1.dispatch.telemetry
+- generated.dev.chat.taskand.dev.v1.dispatch.uri
+- generated.dev.chat.taskand.dev.v1.dispatch.web
+- generated.dev.chat.taskand.dev.v1.dispatch.webStatus
+- generated.dev.chat.taskand.dev.v1.intent.low
+- generated.dev.chat.taskand.dev.v1.intent.parseIntent
+- generated.dev.chat.taskand.dev.v1.test.out
+- generated.dev.chat.taskand.dev.v1.test.r
+- generated.dev.codegen.taskand.dev.v1.bin.desc
+- generated.dev.codegen.taskand.dev.v1.bin.raw
+- generated.dev.composite.taskand.dev.v1.bin.deps
+- generated.dev.composite.taskand.dev.v1.bin.detail
+- generated.dev.composite.taskand.dev.v1.bin.ev
+- generated.dev.composite.taskand.dev.v1.bin.input
+- generated.dev.composite.taskand.dev.v1.bin.o
+- generated.dev.composite.taskand.dev.v1.bin.orch
+- generated.dev.composite.taskand.dev.v1.bin.organism
+- generated.dev.composite.taskand.dev.v1.bin.plan
+- generated.dev.composite.taskand.dev.v1.bin.r
+- generated.dev.composite.taskand.dev.v1.bin.step
+- generated.dev.composite.taskand.dev.v1.bin.stepLine
+- generated.dev.composite.taskand.dev.v1.bin.task
+- generated.dev.composite.taskand.dev.v1.bin.val
+- generated.dev.evolve.taskand.dev.v1.bin.MAX_ATTEMPTS
+- generated.dev.evolve.taskand.dev.v1.bin.bin
+- generated.dev.evolve.taskand.dev.v1.bin.desc
+- generated.dev.evolve.taskand.dev.v1.bin.dir
+- generated.dev.evolve.taskand.dev.v1.bin.gen
+- generated.dev.evolve.taskand.dev.v1.bin.input
+- generated.dev.evolve.taskand.dev.v1.bin.name
+- generated.dev.evolve.taskand.dev.v1.bin.organism
+- generated.dev.evolve.taskand.dev.v1.bin.out
+- generated.dev.evolve.taskand.dev.v1.bin.r
+- generated.dev.evolve.taskand.dev.v1.bin.slug
+- generated.dev.evolve.taskand.dev.v1.bin.test
+- generated.dev.evolve.taskand.dev.v1.bin.violation
+- generated.dev.evolve.taskand.dev.v1.contract.contractTest
+- generated.dev.evolve.taskand.dev.v1.contract.guard
+- generated.dev.evolve.taskand.dev.v1.contract.hit
+- generated.dev.evolve.taskand.dev.v1.contract.r
+- generated.dev.execute.taskand.dev.v1.bin.__dirname
+- generated.dev.execute.taskand.dev.v1.bin.__filename
+- generated.dev.execute.taskand.dev.v1.bin.desc
+- generated.dev.execute.taskand.dev.v1.bin.devChatBin
+- generated.dev.execute.taskand.dev.v1.bin.intent
+- generated.dev.execute.taskand.dev.v1.bin.out
+- generated.dev.execute.taskand.dev.v1.bin.r
+- generated.dev.execute.taskand.dev.v1.bin.raw
+- generated.dev.execute.taskand.dev.v1.test.out
+- generated.dev.execute.taskand.dev.v1.test.r
+- generated.dev.file-router.taskand.dev.v1.bin.input
+- generated.dev.file-router.taskand.dev.v1.bin.kind
+- generated.dev.file-router.taskand.dev.v1.bin.path
+- generated.dev.file-router.taskand.dev.v1.bin.st
+- generated.dev.llm.taskand.dev.v1.bin.KEY
+- generated.dev.llm.taskand.dev.v1.bin.MODEL
+- generated.dev.llm.taskand.dev.v1.bin.URL
+- generated.dev.llm.taskand.dev.v1.bin.candidate
+- generated.dev.llm.taskand.dev.v1.bin.choice
+- generated.dev.llm.taskand.dev.v1.bin.content
+- generated.dev.llm.taskand.dev.v1.bin.data
+- generated.dev.llm.taskand.dev.v1.bin.end
+- generated.dev.llm.taskand.dev.v1.bin.extractJson
+- generated.dev.llm.taskand.dev.v1.bin.fenced
+- generated.dev.llm.taskand.dev.v1.bin.input
+- generated.dev.llm.taskand.dev.v1.bin.json
+- generated.dev.llm.taskand.dev.v1.bin.messages
+- generated.dev.llm.taskand.dev.v1.bin.resp
+- generated.dev.llm.taskand.dev.v1.bin.start
+- generated.dev.llm.taskand.dev.v1.context.capabilityContext
+- generated.dev.llm.taskand.dev.v1.context.procs
+- generated.developer.spawn.taskand.dev.v1.bin.KEY
+- generated.developer.spawn.taskand.dev.v1.bin.org
+- generated.developer.spawn.taskand.dev.v1.bin.raw
+- generated.doctor.diagnose.taskand.dev.v1.bin.broken
+- generated.doctor.diagnose.taskand.dev.v1.bin.cat
+- generated.doctor.diagnose.taskand.dev.v1.bin.checkCatalog
+- generated.doctor.diagnose.taskand.dev.v1.bin.checkService
+- generated.doctor.diagnose.taskand.dev.v1.bin.passed
+- generated.doctor.diagnose.taskand.dev.v1.bin.r
+- generated.doctor.diagnose.taskand.dev.v1.bin.total
+- generated.doctor.prescribe.taskand.dev.v1.bin.raw
+- generated.file.ops.taskand.dev.v1.bin.op
+- generated.file.ops.taskand.dev.v1.bin.raw
+- generated.file.ops.taskand.dev.v1.bin.target
+- generated.hw.monitor.taskand.dev.v1.bin.TEMP_WARN_C
+- generated.hw.monitor.taskand.dev.v1.bin.a
+- generated.hw.monitor.taskand.dev.v1.bin.b
+- generated.hw.monitor.taskand.dev.v1.bin.cpu
+- generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct
+- generated.hw.monitor.taskand.dev.v1.bin.diskFreeGb
+- generated.hw.monitor.taskand.dev.v1.bin.fromCmd
+- generated.hw.monitor.taskand.dev.v1.bin.gpioChips
+- generated.hw.monitor.taskand.dev.v1.bin.hits
+- generated.hw.monitor.taskand.dev.v1.bin.hot
+- generated.hw.monitor.taskand.dev.v1.bin.out
+- generated.hw.monitor.taskand.dev.v1.bin.parts
+- generated.hw.monitor.taskand.dev.v1.bin.pickCpuTemp
+- generated.hw.monitor.taskand.dev.v1.bin.raw
+- generated.hw.monitor.taskand.dev.v1.bin.readSensorsCmd
+- generated.hw.monitor.taskand.dev.v1.bin.readThermalZones
+- generated.hw.monitor.taskand.dev.v1.bin.sensor
+- generated.hw.monitor.taskand.dev.v1.bin.sensors
+- generated.hw.monitor.taskand.dev.v1.bin.summary
+- generated.hw.monitor.taskand.dev.v1.bin.t
+- generated.hw.monitor.taskand.dev.v1.bin.temp_c
+- generated.hw.monitor.taskand.dev.v1.bin.total
+- generated.hw.monitor.taskand.dev.v1.bin.usage
+- generated.monitor.cpu.taskand.dev.v1.bin.cpuPct
+- generated.monitor.cpu.taskand.dev.v1.bin.idlePct
+- generated.monitor.cpu.taskand.dev.v1.bin.raw
+- generated.monitor.cpu.taskand.dev.v1.bin.totalIdle
+- generated.monitor.cpu.taskand.dev.v1.test.__dirname
+- generated.monitor.cpu.taskand.dev.v1.test.out
+- generated.monitor.cpu.taskand.dev.v1.test.r
+- generated.orchestrator.execute.taskand.dev.v1.bin.__dirname
+- generated.orchestrator.execute.taskand.dev.v1.bin.__filename
+- generated.orchestrator.execute.taskand.dev.v1.bin.binPath
+- generated.orchestrator.execute.taskand.dev.v1.bin.blockingDep
+- generated.orchestrator.execute.taskand.dev.v1.bin.canExecute
+- generated.orchestrator.execute.taskand.dev.v1.bin.depState
+- generated.orchestrator.execute.taskand.dev.v1.bin.errText
+- generated.orchestrator.execute.taskand.dev.v1.bin.hasBlocked
+- generated.orchestrator.execute.taskand.dev.v1.bin.hasFailed
+- generated.orchestrator.execute.taskand.dev.v1.bin.isResume
+- generated.orchestrator.execute.taskand.dev.v1.bin.isUp
+- generated.orchestrator.execute.taskand.dev.v1.bin.orchDir
+- generated.orchestrator.execute.taskand.dev.v1.bin.parsed
+- generated.orchestrator.execute.taskand.dev.v1.bin.plan
+- generated.orchestrator.execute.taskand.dev.v1.bin.port
+- generated.orchestrator.execute.taskand.dev.v1.bin.prev
+- generated.orchestrator.execute.taskand.dev.v1.bin.prevStep
+- generated.orchestrator.execute.taskand.dev.v1.bin.r
+- generated.orchestrator.execute.taskand.dev.v1.bin.raw
+- generated.orchestrator.execute.taskand.dev.v1.bin.runId
+- generated.orchestrator.execute.taskand.dev.v1.bin.saveState
+- generated.orchestrator.execute.taskand.dev.v1.bin.stateFile
+- generated.orchestrator.execute.taskand.dev.v1.test.__dirname
+- generated.orchestrator.execute.taskand.dev.v1.test.out
+- generated.orchestrator.execute.taskand.dev.v1.test.r
+- generated.planner.plan.taskand.dev.v1.bin.__dirname
+- generated.planner.plan.taskand.dev.v1.bin.__filename
+- generated.planner.plan.taskand.dev.v1.bin.capabilityLines
+- generated.planner.plan.taskand.dev.v1.bin.cat
+- generated.planner.plan.taskand.dev.v1.bin.catPath
+- generated.planner.plan.taskand.dev.v1.bin.kLower
+- generated.planner.plan.taskand.dev.v1.bin.llm
+- generated.planner.plan.taskand.dev.v1.bin.plan
+- generated.planner.plan.taskand.dev.v1.bin.raw
+- generated.planner.plan.taskand.dev.v1.bin.t
+- generated.planner.plan.taskand.dev.v1.bin.task
+- generated.planner.plan.taskand.dev.v1.bin.val
+- generated.planner.plan.taskand.dev.v1.test.__dirname
+- generated.planner.plan.taskand.dev.v1.test.out
+- generated.planner.plan.taskand.dev.v1.test.r
+- generated.validator.resolve.taskand.dev.v1.bin.__dirname
+- generated.validator.resolve.taskand.dev.v1.bin.__filename
+- generated.validator.resolve.taskand.dev.v1.bin.blueprint
+- generated.validator.resolve.taskand.dev.v1.bin.catPath
+- generated.validator.resolve.taskand.dev.v1.bin.catalogMap
+- generated.validator.resolve.taskand.dev.v1.bin.color
+- generated.validator.resolve.taskand.dev.v1.bin.currentStep
+- generated.validator.resolve.taskand.dev.v1.bin.entry
+- generated.validator.resolve.taskand.dev.v1.bin.fullPath
+- generated.validator.resolve.taskand.dev.v1.bin.hasCycle
+- generated.validator.resolve.taskand.dev.v1.bin.ids
+- generated.validator.resolve.taskand.dev.v1.bin.isValid
+- generated.validator.resolve.taskand.dev.v1.bin.names
+- generated.validator.resolve.taskand.dev.v1.bin.p
+- generated.validator.resolve.taskand.dev.v1.bin.raw
+- generated.validator.resolve.taskand.dev.v1.bin.stepMap
+- generated.validator.resolve.taskand.dev.v1.bin.stepObj
+- generated.validator.resolve.taskand.dev.v1.bin.steps
+- generated.validator.resolve.taskand.dev.v1.bin.val
+- generated.validator.resolve.taskand.dev.v1.bin.visit
+- generated.validator.resolve.taskand.dev.v1.bin.visited
+- generated.validator.resolve.taskand.dev.v1.test.__dirname
+- generated.validator.resolve.taskand.dev.v1.test.r1
+- generated.validator.resolve.taskand.dev.v1.test.r2
+- generated.vault.secrets.taskand.dev.v1.bin.act
+- generated.vault.secrets.taskand.dev.v1.bin.raw
+- generated.web.serve.taskand.dev.v1.bin.action
+- generated.web.serve.taskand.dev.v1.test.__dirname
+- generated.web.serve.taskand.dev.v1.test.out
+- generated.web.serve.taskand.dev.v1.test.r

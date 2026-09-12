@@ -1,0 +1,623 @@
+# glm53 | 72f 3490L | python:13,yaml:15,shell:1,javascript:39,json:1 | 2026-09-12
+# generated in 0.01s
+# producer: code2llm | artifact: map.toon.yaml | schema: 1
+# stats: 373 func | 0 cls | 72 mod | CC̄=3.1 | critical:4 | cycles:0
+# alerts[5]: CC handle_chat=29; fan-out handle_chat=22; CC binPath=21; CC readArp=20; fan-out mdnsProbe=18
+# hotspots[5]: handle_chat fan=22; mdnsProbe fan=18; ssdpProbe fan=15; handle_proc_call fan=14; MAX_ATTEMPTS fan=14
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[72]:
+  Dockerfile,68
+  Makefile,50
+  docker-compose.yaml,52
+  gateway/__init__.py,48
+  gateway/auth.py,124
+  gateway/handlers/chat.py,138
+  gateway/handlers/doctor.py,16
+  gateway/handlers/federation.py,25
+  gateway/handlers/health.py,11
+  gateway/handlers/orchestrator.py,49
+  gateway/handlers/planner.py,29
+  gateway/handlers/proc.py,65
+  gateway/middleware/cors.py,4
+  gateway/middleware/logging.py,22
+  gateway/router.py,27
+  gateway/utils.py,56
+  generated/_lib/catalog.mjs,109
+  generated/_lib/proc.mjs,58
+  generated/admin/chat/taskand.dev/v1/bin.mjs,9
+  generated/admin/chat/taskand.dev/v1/proc.yaml,5
+  generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs,292
+  generated/admin/network-device-discovery/taskand.dev/v1/proc.yaml,6
+  generated/admin/network-device-discovery/taskand.dev/v1/test.mjs,5
+  generated/alert/telegram/taskand.dev/v1/bin.mjs,59
+  generated/alert/telegram/taskand.dev/v1/proc.yaml,6
+  generated/alert/telegram/taskand.dev/v1/test.mjs,18
+  generated/browser/session/taskand.dev/v1/bin.mjs,23
+  generated/chat/message/taskand.dev/v1/bin.mjs,24
+  generated/dev/act/taskand.dev/v1/bin.mjs,79
+  generated/dev/chat/taskand.dev/v1/bin.mjs,16
+  generated/dev/chat/taskand.dev/v1/dispatch.mjs,82
+  generated/dev/chat/taskand.dev/v1/intent.mjs,36
+  generated/dev/chat/taskand.dev/v1/proc.yaml,7
+  generated/dev/chat/taskand.dev/v1/test.mjs,9
+  generated/dev/codegen/taskand.dev/v1/bin.mjs,17
+  generated/dev/composite/taskand.dev/v1/bin.mjs,82
+  generated/dev/evolve/taskand.dev/v1/bin.mjs,76
+  generated/dev/evolve/taskand.dev/v1/contract.mjs,61
+  generated/dev/execute/taskand.dev/v1/bin.mjs,41
+  generated/dev/execute/taskand.dev/v1/proc.yaml,10
+  generated/dev/execute/taskand.dev/v1/test.mjs,9
+  generated/dev/file-router/taskand.dev/v1/bin.mjs,17
+  generated/dev/llm/taskand.dev/v1/bin.mjs,59
+  generated/dev/llm/taskand.dev/v1/context.mjs,16
+  generated/developer/spawn/taskand.dev/v1/bin.mjs,19
+  generated/doctor/diagnose/taskand.dev/v1/bin.mjs,50
+  generated/doctor/prescribe/taskand.dev/v1/bin.mjs,19
+  generated/file/ops/taskand.dev/v1/bin.mjs,20
+  generated/hw/monitor/taskand.dev/v1/bin.mjs,112
+  generated/monitor/cpu/taskand.dev/v1/bin.mjs,48
+  generated/monitor/cpu/taskand.dev/v1/proc.yaml,6
+  generated/monitor/cpu/taskand.dev/v1/test.mjs,14
+  generated/orchestrator/execute/taskand.dev/v1/bin.mjs,242
+  generated/orchestrator/execute/taskand.dev/v1/proc.yaml,6
+  generated/orchestrator/execute/taskand.dev/v1/test.mjs,41
+  generated/planner/plan/taskand.dev/v1/bin.mjs,157
+  generated/planner/plan/taskand.dev/v1/proc.yaml,6
+  generated/planner/plan/taskand.dev/v1/test.mjs,14
+  generated/validator/resolve/taskand.dev/v1/bin.mjs,212
+  generated/validator/resolve/taskand.dev/v1/proc.yaml,6
+  generated/validator/resolve/taskand.dev/v1/test.mjs,37
+  generated/vault/secrets/taskand.dev/v1/bin.mjs,20
+  generated/web/capsule.yaml,9
+  generated/web/serve/taskand.dev/v1/bin.mjs,10
+  generated/web/serve/taskand.dev/v1/proc.yaml,7
+  generated/web/serve/taskand.dev/v1/test.mjs,9
+  genome.yaml,65
+  grants.yaml,31
+  proc-catalog.json,247
+  project.sh,59
+  tasks/inbox.yaml,0
+  vms/fedora-minimal/Dockerfile,9
+D:
+  gateway/handlers/chat.py:
+    e: llm_env,handle_chat
+    llm_env()
+    handle_chat(request_handler;body)
+  generated/orchestrator/execute/taskand.dev/v1/bin.mjs:
+    i: node:child_process,node:fs,node:path,node:url
+    e: __filename,__dirname,raw,plan,runId,orchDir,stateFile,isResume,prev,saveState,prevStep,canExecute,blockingDep,depState,port,isUp,binPath,r,errText,parsed,hasFailed,hasBlocked
+    __filename()
+    __dirname()
+    raw()
+    plan()
+    runId()
+    orchDir()
+    stateFile()
+    isResume()
+    prev()
+    saveState()
+    prevStep()
+    canExecute()
+    blockingDep()
+    depState()
+    port()
+    isUp()
+    binPath()
+    r()
+    errText()
+    parsed()
+    hasFailed()
+    hasBlocked()
+  generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:
+    i: node:child_process,node:dgram,node:dns/promises,node:fs,node:net,node:os,node:util
+    e: run,TIMEOUT_MS,deadline,out,errOut,raw,timeLeft,ouiMap,loadOui,lines,parts,hex,vendorFromMac,hex,parseArpText,m,readArp,t,p,mip,mmac,localSubnets,ifaces,ipParts,maskParts,maskBits,netParts,tcpProbe,s,done,fin,mdnsProbe,sock,timer,ip,hostname,off,readName,len,ptr,sub,qd,an,r,rdlen,type,rd,q,ssdpProbe,sock,timer,ip,existing,st,nets,netsInfo,mdnsMs,ssdpMs,byIp,add,cur,probeBudget,alive,names,selfIps
+    run()
+    TIMEOUT_MS()
+    deadline()
+    out()
+    errOut()
+    raw()
+    timeLeft()
+    ouiMap()
+    loadOui()
+    lines()
+    parts()
+    hex()
+    vendorFromMac()
+    hex()
+    parseArpText()
+    m()
+    readArp()
+    t()
+    p()
+    mip()
+    mmac()
+    localSubnets()
+    ifaces()
+    ipParts()
+    maskParts()
+    maskBits()
+    netParts()
+    tcpProbe()
+    s()
+    done()
+    fin()
+    mdnsProbe()
+    sock()
+    timer()
+    ip()
+    hostname()
+    off()
+    readName()
+    len()
+    ptr()
+    sub()
+    qd()
+    an()
+    r()
+    rdlen()
+    type()
+    rd()
+    q()
+    ssdpProbe()
+    sock()
+    timer()
+    ip()
+    existing()
+    st()
+    nets()
+    netsInfo()
+    mdnsMs()
+    ssdpMs()
+    byIp()
+    add()
+    cur()
+    probeBudget()
+    alive()
+    names()
+    selfIps()
+  gateway/auth.py:
+    e: _parse_simple_yaml,load_grants,check_auth,check_grant
+    _parse_simple_yaml(text)
+    load_grants()
+    check_auth(headers)
+    check_grant(user;target_uri;action)
+  generated/chat/message/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,msg
+    raw()
+    msg()
+  gateway/handlers/proc.py:
+    e: handle_proc_call
+    handle_proc_call(request_handler;body)
+  generated/dev/composite/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs
+    e: input,task,organism,say,done,plan,deps,val,step,ev,orch,validate,r,stepLine,o,detail
+    input()
+    task()
+    organism()
+    say()
+    done()
+    plan()
+    deps()
+    val()
+    step()
+    ev()
+    orch()
+    validate()
+    r()
+    stepLine()
+    o()
+    detail()
+  generated/dev/evolve/taskand.dev/v1/contract.mjs:
+    i: node:child_process
+    e: guard,hit,contractTest,r
+    guard()
+    hit()
+    contractTest()
+    r()
+  generated/dev/evolve/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,./contract.mjs,node:fs,node:path
+    e: input,slug,organism,name,bin,dir,MAX_ATTEMPTS,gen,violation,test,desc,contractTestSource,r,out
+    input()
+    slug()
+    organism()
+    name()
+    bin()
+    dir()
+    MAX_ATTEMPTS()
+    gen()
+    violation()
+    test()
+    desc()
+    contractTestSource()
+    r()
+    out()
+  gateway/utils.py:
+    e: proc_hash,find_proc_bin
+    proc_hash(binpath)
+    find_proc_bin(uri)
+  gateway/handlers/federation.py:
+    e: handle_federation
+    handle_federation(request_handler;body)
+  generated/validator/resolve/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/catalog.mjs,node:fs,node:path,node:url
+    e: __filename,__dirname,raw,blueprint,steps,ids,names,color,stepMap,hasCycle,dfs,currentStep,p,val,catPath,catalogMap,entry,fullPath,visited,visit,stepObj,isValid
+    __filename()
+    __dirname()
+    raw()
+    blueprint()
+    steps()
+    ids()
+    names()
+    color()
+    stepMap()
+    hasCycle()
+    dfs()
+    currentStep()
+    p()
+    val()
+    catPath()
+    catalogMap()
+    entry()
+    fullPath()
+    visited()
+    visit()
+    stepObj()
+    isValid()
+  generated/planner/plan/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs,node:fs,node:path,node:url
+    e: __filename,__dirname,raw,task,catPath,cat,capabilityLines,plan,llm,kLower,val,t
+    __filename()
+    __dirname()
+    raw()
+    task()
+    catPath()
+    cat()
+    capabilityLines()
+    plan()
+    llm()
+    kLower()
+    val()
+    t()
+  generated/_lib/proc.mjs:
+    i: node:child_process,node:fs,node:path,node:url
+    e: here,ROOT,GEN,readInput,raw,emit,adoptOwnership,walk,uriToPath,parts,ver,callProc,bin,r,out
+    here()
+    ROOT()
+    GEN()
+    readInput()
+    raw()
+    emit()
+    adoptOwnership()
+    walk()
+    uriToPath()
+    parts()
+    ver()
+    callProc()
+    bin()
+    r()
+    out()
+  generated/dev/act/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,../../../llm/taskand.dev/v1/context.mjs
+    e: input,message,organism,decision,decide,r,answer,run,resolved,result,evolve,ev,invalid,why,format,head,summary,data
+    input()
+    message()
+    organism()
+    decision()
+    decide()
+    r()
+    answer()
+    run()
+    resolved()
+    result()
+    evolve()
+    ev()
+    invalid()
+    why()
+    format()
+    head()
+    summary()
+    data()
+  generated/dev/chat/taskand.dev/v1/dispatch.mjs:
+    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,../../../../_lib/proc.mjs,node:fs,node:path
+    e: P,replyOf,dispatch,telemetry,hw,sensors,diagnose,d,webStatus,d,web,spawnOrganism,uri,bin,r,organismTemplate,input,message,r
+    P()
+    replyOf()
+    dispatch()
+    telemetry()
+    hw()
+    sensors()
+    diagnose()
+    d()
+    webStatus()
+    d()
+    web()
+    spawnOrganism()
+    uri()
+    bin()
+    r()
+    organismTemplate()
+    input()
+    message()
+    r()
+  gateway/handlers/orchestrator.py:
+    e: handle_orchestrator
+    handle_orchestrator(request_handler;body)
+  generated/_lib/catalog.mjs:
+    i: ./proc.mjs,node:crypto,node:fs,node:path,node:url
+    e: CATALOG_PATH,GENOME_PATH,loadCatalog,saveCatalog,procHash,dir,h,modules,resolveUri,entry,bin,register,bin,cat,addToGenome,text,idx,rest,blockEnd,at,rehashAll,cat,bin,h,changed
+    CATALOG_PATH()
+    GENOME_PATH()
+    loadCatalog()
+    saveCatalog()
+    procHash()
+    dir()
+    h()
+    modules()
+    resolveUri()
+    entry()
+    bin()
+    register()
+    bin()
+    cat()
+    addToGenome()
+    text()
+    idx()
+    rest()
+    blockEnd()
+    at()
+    rehashAll()
+    cat()
+    bin()
+    h()
+    changed()
+  generated/dev/llm/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs
+    e: input,KEY,MODEL,URL,messages,extractJson,fenced,candidate,start,end,resp,data,choice,content,json
+    input()
+    KEY()
+    MODEL()
+    URL()
+    messages()
+    extractJson()
+    fenced()
+    candidate()
+    start()
+    end()
+    resp()
+    data()
+    choice()
+    content()
+    json()
+  generated/monitor/cpu/taskand.dev/v1/bin.mjs:
+    i: node:fs,node:os
+    e: raw,cpuPct,cpus,totalIdle,idlePct
+    raw()
+    cpuPct()
+    cpus()
+    totalIdle()
+    idlePct()
+  generated/alert/telegram/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,cpuVal,depData,threshold,chatId,credRef,isOver,alertMsg
+    raw()
+    cpuVal()
+    depData()
+    threshold()
+    chatId()
+    credRef()
+    isOver()
+    alertMsg()
+  gateway/handlers/planner.py:
+    e: handle_planner
+    handle_planner(request_handler;body)
+  generated/dev/chat/taskand.dev/v1/intent.mjs:
+    e: hasAny,matches,parseIntent,low,match
+    hasAny()
+    matches()
+    parseIntent()
+    low()
+    match()
+  gateway/__init__.py:
+    e: GatewayHTTPHandler,main
+    GatewayHTTPHandler(BaseHTTPRequestHandler): _send(2),do_OPTIONS(0),do_GET(0),do_POST(0),log_message(1)
+    main()
+  gateway/handlers/doctor.py:
+    e: handle_doctor
+    handle_doctor(request_handler;body)
+  generated/hw/monitor/taskand.dev/v1/bin.mjs:
+    i: node:child_process,node:fs,node:os
+    e: raw,TEMP_WARN_C,readSensorsCmd,out,readThermalZones,temp_c,sensor,pickCpuTemp,hits,cpuTimes,t,cpuUsagePct,a,b,total,diskFreeGb,parts,gpioChips,fromCmd,sensors,cpu,hot,usage,summary
+    raw()
+    TEMP_WARN_C()
+    readSensorsCmd()
+    out()
+    readThermalZones()
+    temp_c()
+    sensor()
+    pickCpuTemp()
+    hits()
+    cpuTimes()
+    t()
+    cpuUsagePct()
+    a()
+    b()
+    total()
+    diskFreeGb()
+    parts()
+    gpioChips()
+    fromCmd()
+    sensors()
+    cpu()
+    hot()
+    usage()
+    summary()
+  generated/doctor/diagnose/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs
+    e: probe,r,checkService,checkCatalog,cat,broken,total,passed
+    probe()
+    r()
+    checkService()
+    checkCatalog()
+    cat()
+    broken()
+    total()
+    passed()
+  generated/dev/llm/taskand.dev/v1/context.mjs:
+    i: ../../../../_lib/catalog.mjs
+    e: capabilities,procs,capabilityContext
+    capabilities()
+    procs()
+    capabilityContext()
+  generated/developer/spawn/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,KEY,org
+    raw()
+    KEY()
+    org()
+  generated/orchestrator/execute/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r,out
+    __dirname()
+    r()
+    out()
+  generated/dev/chat/taskand.dev/v1/test.mjs:
+    i: node:child_process
+    e: r,out
+    r()
+    out()
+  generated/browser/session/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,act,url,dev
+    raw()
+    act()
+    url()
+    dev()
+  gateway/router.py:
+    e: dispatch
+    dispatch(method;path;request_handler;body)
+  generated/vault/secrets/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,act
+    raw()
+    act()
+  generated/web/serve/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: action
+    action()
+  generated/web/serve/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r,out
+    __dirname()
+    r()
+    out()
+  generated/file/ops/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,op,target
+    raw()
+    op()
+    target()
+  generated/doctor/prescribe/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw
+    raw()
+  generated/dev/codegen/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,desc
+    raw()
+    desc()
+  generated/dev/execute/taskand.dev/v1/bin.mjs:
+    i: node:child_process,node:fs,node:path,node:url
+    e: __filename,__dirname,raw,intent,desc,devChatBin,r,out
+    __filename()
+    __dirname()
+    raw()
+    intent()
+    desc()
+    devChatBin()
+    r()
+    out()
+  generated/dev/execute/taskand.dev/v1/test.mjs:
+    i: node:child_process
+    e: r,out
+    r()
+    out()
+  gateway/middleware/logging.py:
+    e: log_event
+    log_event(event_type;payload)
+  gateway/handlers/health.py:
+    e: handle_healthz
+    handle_healthz(request_handler;body)
+  generated/admin/chat/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs
+    e: input,message,r
+    input()
+    message()
+    r()
+  generated/dev/file-router/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs,node:fs
+    e: input,path,st,kind
+    input()
+    path()
+    st()
+    kind()
+  generated/dev/chat/taskand.dev/v1/bin.mjs:
+    i: ../../../../_lib/proc.mjs,./dispatch.mjs,./intent.mjs
+    e: input,prompt,intent
+    input()
+    prompt()
+    intent()
+  generated/validator/resolve/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r1,r2
+    __dirname()
+    r1()
+    r2()
+  generated/planner/plan/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r,out
+    __dirname()
+    r()
+    out()
+  generated/monitor/cpu/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r,out
+    __dirname()
+    r()
+    out()
+  generated/alert/telegram/taskand.dev/v1/test.mjs:
+    i: node:child_process,node:path,node:url
+    e: __dirname,r,out
+    __dirname()
+    r()
+    out()
+  gateway/middleware/cors.py:
+    e: add_cors_headers
+    add_cors_headers(handler)
+  generated/admin/network-device-discovery/taskand.dev/v1/test.mjs:
+    i: node:child_process
+    e: r,out
+    r()
+    out()
+  grants.yaml:
+  Dockerfile:
+  project.sh:
+  generated/validator/resolve/taskand.dev/v1/proc.yaml:
+  generated/planner/plan/taskand.dev/v1/proc.yaml:
+  generated/web/capsule.yaml:
+  generated/web/serve/taskand.dev/v1/proc.yaml:
+  generated/monitor/cpu/taskand.dev/v1/proc.yaml:
+  generated/alert/telegram/taskand.dev/v1/proc.yaml:
+  generated/orchestrator/execute/taskand.dev/v1/proc.yaml:
+  generated/dev/chat/taskand.dev/v1/proc.yaml:
+  generated/dev/execute/taskand.dev/v1/proc.yaml:
+  tasks/inbox.yaml:
+  vms/fedora-minimal/Dockerfile:
+  proc-catalog.json:
+  genome.yaml:
+  docker-compose.yaml:
+  Makefile:
+  generated/admin/network-device-discovery/taskand.dev/v1/proc.yaml:
+  generated/admin/chat/taskand.dev/v1/proc.yaml:

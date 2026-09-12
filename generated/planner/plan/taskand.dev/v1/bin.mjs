@@ -5,6 +5,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
+import { callProc } from "../../../../_lib/proc.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,9 +24,6 @@ try {
 
 const task = input.task || input.message || "stan systemu";
 
-const KEY = process.env.TASKAND_LLM_API_KEY;
-const MODEL = process.env.TASKAND_LLM_MODEL || "glm-5.3";
-const URL = process.env.TASKAND_LLM_ENDPOINT || "https://api.z.ai/api/paas/v4/chat/completions";
 
 // Dynamic Capability Context z proc-catalog.json
 let catalogProcs = [];
@@ -70,28 +68,8 @@ Zwróć WYŁĄCZNIE poprawny JSON o strukturze:
 }`;
 
 let plan = null;
-if (KEY) {
-  try {
-    const resp = await fetch(URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${KEY}` },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: "system", content: SYSTEM }, { role: "user", content: task }],
-        temperature: 0.1,
-        max_tokens: 1000
-      })
-    });
-    const data = await resp.json();
-    const raw = data.choices?.[0]?.message?.content || "";
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      plan = JSON.parse(jsonMatch[0]);
-    }
-  } catch (err) {
-    // Network or LLM error
-  }
-}
+const llm = callProc("proc://taskand.dev/dev/llm/v1", { system: SYSTEM, prompt: task, json: true, temperature: 0.1, max_tokens: 4000 }, { timeout: 120000 });
+if (llm.ok) plan = llm.json;
 
 // Sanitization: obrona w głąb przed przypadkowymi jawnymi kluczami w wyjściu LLM
 if (plan && plan.blueprint && Array.isArray(plan.blueprint.steps)) {

@@ -1,6 +1,7 @@
 import os
 import pathlib
 import json
+import hashlib
 
 BASE = pathlib.Path("/taskand") if pathlib.Path("/taskand/generated").exists() else pathlib.Path(__file__).resolve().parent.parent
 GENERATED = BASE / "generated"
@@ -27,36 +28,29 @@ LLM_KEY = os.environ.get("TASKAND_LLM_API_KEY", "")
 LLM_ENDPOINT = os.environ.get("TASKAND_LLM_ENDPOINT", "https://api.z.ai/api/paas/v4/chat/completions")
 LLM_MODEL = os.environ.get("TASKAND_LLM_MODEL", "glm-5.3")
 
-def find_proc_bin(uri: str) -> pathlib.Path:
-    # 1. Lookup in proc-catalog.json first (source of truth)
-    cat_path = BASE / "proc-catalog.json"
-    if cat_path.exists():
-        try:
-            with open(cat_path, "r", encoding="utf-8") as f:
-                cat = json.load(f)
-                for p in cat.get("processes", []):
-                    if p.get("uri") == uri and p.get("path"):
-                        full = BASE / p.get("path")
-                        if full.exists():
-                            return full
-        except Exception:
-            pass
+def proc_hash(binpath: pathlib.Path) -> str:
+    """bindingHash procesu: wszystkie moduły .mjs w katalogu procesu (bez test.mjs).
+    Ten sam algorytm co generated/_lib/catalog.mjs:procHash."""
+    h = hashlib.sha256()
+    for name in sorted(f.name for f in binpath.parent.iterdir() if f.suffix == ".mjs" and f.name != "test.mjs"):
+        h.update(name.encode() + b"\0")
+        h.update((binpath.parent / name).read_bytes())
+        h.update(b"\0")
+    return "sha256:" + h.hexdigest()
 
-    # 2. Heuristic resolution
-    clean = uri.replace("proc://taskand.dev/", "").strip("/")
-    parts = clean.split("/")
-    if len(parts) >= 2:
-        version = parts[-1]
-        proc_path = "/".join(parts[:-1])
-        c1 = GENERATED / proc_path / "taskand.dev" / version / "bin.mjs"
-        if c1.exists():
-            return c1
-        c2 = GENERATED / parts[0] / parts[1] / "taskand.dev" / version / "bin.mjs"
-        if c2.exists():
-            return c2
 
-    for p in GENERATED.rglob("bin.mjs"):
-        rel = str(p.relative_to(GENERATED))
-        if all(part in rel for part in parts):
-            return p
-    return None
+def find_proc_bin(uri: str):
+    """URI → wpis w proc-catalog.json → ścieżka z weryfikacją bindingHash. Brak heurystyk."""
+    try:
+        catalog = json.loads((BASE / "proc-catalog.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    entry = next((p for p in catalog.get("processes", []) if p.get("uri") == uri), None)
+    if not entry or not entry.get("path"):
+        return None
+    path = BASE / entry["path"]
+    if not path.is_file():
+        return None
+    if entry.get("bindingHash") and proc_hash(path) != entry["bindingHash"]:
+        return None
+    return path
