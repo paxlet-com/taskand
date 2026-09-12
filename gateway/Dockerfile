@@ -1,7 +1,7 @@
 # taskand · Uniwersalna Bramka REST API dla zadań, logów, historii i Digital Twin
 FROM python:3.13-alpine
 
-RUN apk add --no-cache bash docker-cli git
+RUN apk add --no-cache bash docker-cli git nodejs
 
 WORKDIR /app
 
@@ -54,6 +54,61 @@ def parse_yaml_tasks(file_path):
         if "id" in task:
             tasks.append(task)
     return tasks
+
+def resolve_proc_file(uri):
+    # 1. Root proc-catalog.json
+    root_cat = os.path.join(BASE_DIR, "proc-catalog.json")
+    if os.path.exists(root_cat):
+        try:
+            with open(root_cat, "r", encoding="utf-8") as f:
+                cat = json.load(f)
+                for b in cat.get("bindings", []):
+                    if b.get("uri") == uri:
+                        return os.path.join(BASE_DIR, b.get("path"), "bin.mjs")
+        except Exception:
+            pass
+    # 2. Packages/*/proc-catalog.json
+    pkgs_dir = os.path.join(BASE_DIR, "packages")
+    if os.path.exists(pkgs_dir):
+        for pkg in sorted(os.listdir(pkgs_dir)):
+            pkg_cat = os.path.join(pkgs_dir, pkg, "proc-catalog.json")
+            if os.path.exists(pkg_cat):
+                try:
+                    with open(pkg_cat, "r", encoding="utf-8") as f:
+                        cat = json.load(f)
+                        for b in cat.get("bindings", []):
+                            if b.get("uri") == uri:
+                                return os.path.join(pkgs_dir, pkg, b.get("path"), "bin.mjs")
+                except Exception:
+                    pass
+    return None
+
+def execute_proc(uri, input_data):
+    bin_path = resolve_proc_file(uri)
+    if not bin_path or not os.path.exists(bin_path):
+        return {
+            "ok": False,
+            "error": f"Nie znaleziono procesu dla URI: {uri}",
+            "exit_code": 404
+        }
+    cmd = ["node", bin_path]
+    try:
+        raw_in = json.dumps(input_data)
+        res = subprocess.run(cmd, input=raw_in, text=True, capture_output=True, timeout=30)
+        parsed_out = None
+        try:
+            parsed_out = json.loads(res.stdout.strip())
+        except Exception:
+            parsed_out = res.stdout.strip()
+        return {
+            "ok": res.returncode == 0,
+            "uri": uri,
+            "exit_code": res.returncode,
+            "output": parsed_out,
+            "stderr": res.stderr.strip()
+        }
+    except Exception as e:
+        return {"ok": False, "uri": uri, "error": str(e), "exit_code": 500}
 
 class Gateway(BaseHTTPRequestHandler):
     server_version = "taskand-gateway/0.4.2"
@@ -236,6 +291,47 @@ class Gateway(BaseHTTPRequestHandler):
                 "output": res.stdout,
                 "error": res.stderr
             })
+        elif path in ["/proc", "/api/proc", "/api/proc/call"]:
+            uri = payload.get("uri") or payload.get("taskand", {}).get("uri")
+            data = payload.get("data") if "data" in payload else payload.get("input", payload)
+            if not uri:
+                self.send_json(400, {"ok": False, "error": "Brak wymaganego pola 'uri'"})
+                return
+            result = execute_proc(uri, data)
+            status_code = 200 if result.get("ok") else (422 if result.get("exit_code") == 2 else 500)
+            self.send_json(status_code, result)
+        elif path in ["/chat", "/api/chat"]:
+            msg = payload.get("message") or payload.get("text") or payload.get("prompt")
+            conv_id = payload.get("conversationId") or "conv-web"
+            if not msg:
+                self.send_json(400, {"ok": False, "error": "Brak treści wiadomości ('message')"})
+                return
+            chat_input = {"message": msg, "conversationId": conv_id}
+            result = execute_proc("proc://taskand.dev/chat/message/v1", chat_input)
+            conv_dir = os.path.join(BASE_DIR, "log")
+            os.makedirs(conv_dir, exist_ok=True)
+            conv_file = os.path.join(conv_dir, "conversations.jsonl")
+            log_entry = {
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "conversationId": conv_id,
+                "user": msg,
+                "proc": "proc://taskand.dev/chat/message/v1",
+                "result": result.get("output") if result.get("ok") else result.get("error")
+            }
+            try:
+                with open(conv_file, "a", encoding="utf-8") as cf:
+                    cf.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+            self.send_json(200 if result.get("ok") else 500, result)
+        elif path in ["/voice", "/api/voice"]:
+            transcript = payload.get("transcript") or payload.get("spoken")
+            if not transcript:
+                self.send_json(400, {"ok": False, "error": "Brak transkrypcji ('transcript')"})
+                return
+            voice_input = {"transcript": transcript}
+            result = execute_proc("proc://taskand.dev/chat/voice/v1", voice_input)
+            self.send_json(200 if result.get("ok") else 500, result)
         else:
             self.send_json(404, {"ok": False, "error": "Endpoint not found"})
 

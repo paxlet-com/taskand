@@ -1193,18 +1193,36 @@ async function submitTask(desc){
     toast('Wpisz lub podyktuj treść zadania');
     return;
   }
-  appendCockpitLog(`Wysyłanie zadania: "${desc}"...`, 'var(--pacc)');
+  const clean = desc.trim();
+  appendCockpitLog(`[USER]: "${clean}"`, 'var(--pacc)');
+  
+  // 1. Bezpośrednie wywołanie procesu organizmu czatu: proc://taskand.dev/chat/message/v1
+  try {
+    const chatRes = await fetch(getGwUrl() + '/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: clean})
+    });
+    const chatData = await chatRes.json();
+    if(chatData.ok && chatData.output){
+      appendCockpitLog(`[taskand-chat]: ${chatData.output.reply}`, '#27AE60');
+      speakVoice(chatData.output.reply);
+    }
+  } catch(err){
+    console.warn('Chat proc fallback:', err);
+  }
+
+  // 2. Dodanie zadania wykonawczego do kolejki kontrolera
   try {
     const res = await fetch(getGwUrl() + '/api/tasks', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({z: desc.trim()})
+      body: JSON.stringify({z: clean})
     });
     const d = await res.json();
     if(res.ok && d.ok){
-      appendCockpitLog(`✓ Zadanie [${d.id}] dodane do inbox. Typ: ${d.typ}`, '#27AE60');
+      appendCockpitLog(`✓ Zadanie [${d.id}] dodane do inbox (typ: ${d.typ})`, 'var(--pkey)');
       toast(`Zadanie [${d.id}] w kolejce!`);
-      speakVoice(`Zadanie ${d.id} dodane do realizacji`);
       taskPrompt.value = '';
       setTimeout(() => { fetchTasks(); fetchLogs(); }, 1200);
     } else {
@@ -1395,30 +1413,33 @@ if(SpeechRecognition){
     micBtn.classList.remove('active');
     micLabel.textContent = 'Mów do taskand';
     isRecording = false;
-    const spoken = taskPrompt.value.trim().toLowerCase();
+    const spoken = taskPrompt.value.trim();
     if(spoken){
-      if(spoken.includes('pokaż logi') || spoken.includes('logi')){
-        speakVoice('Pokazuję logi kontrolera');
-        fetchLogs();
-      } else if(spoken.includes('pokaż zadania') || spoken.includes('status')){
-        speakVoice('Odświeżam listę zadań');
-        fetchTasks();
-      } else if(spoken.includes('cyfrowy bliźniak') || spoken.includes('digital twin')){
-        runTwinQuick();
-      } else if(spoken.includes('cofnij') || spoken.includes('przywróć')){
-        runRollbackQuick();
-      } else if(spoken.includes('historia')){
-        fetchHistoryQuick();
-      } else if(spoken.includes('federacj') || spoken.includes('rejestr') || spoken.includes('pakiety')){
-        fetchFederationQuick();
-      } else if(spoken.includes('katalog') || spoken.includes('zasoby') || spoken.includes('procesy')){
-        fetchCatalogQuick();
-      } else if(spoken.includes('kapsuła') || spoken.includes('uprawnienia') || spoken.includes('grants')){
-        fetchCapsuleQuick();
-      } else {
-        speakVoice(`Rozpoznano zadanie: ${spoken}. Wysyłam.`);
-        submitTask(taskPrompt.value);
-      }
+      // Delegacja do procesu proc://taskand.dev/chat/voice/v1
+      fetch(getGwUrl() + '/api/voice', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({transcript: spoken})
+      }).then(r => r.json()).then(d => {
+        if(d.ok && d.output){
+          if(d.output.voiceFeedback) speakVoice(d.output.voiceFeedback);
+          const act = d.output.action;
+          if(act === 'fetch-logs') fetchLogs();
+          else if(act === 'fetch-tasks') fetchTasks();
+          else if(act === 'run-twin') runTwinQuick();
+          else if(act === 'rollback') runRollbackQuick();
+          else {
+            const low = spoken.toLowerCase();
+            if(low.includes('federacj') || low.includes('rejestr')) fetchFederationQuick();
+            else if(low.includes('katalog') || low.includes('zasoby')) fetchCatalogQuick();
+            else if(low.includes('kapsuła') || low.includes('grants')) fetchCapsuleQuick();
+            else if(low.includes('historia')) fetchHistoryQuick();
+            else submitTask(spoken);
+          }
+        } else {
+          submitTask(spoken);
+        }
+      }).catch(() => submitTask(spoken));
     }
   };
 
