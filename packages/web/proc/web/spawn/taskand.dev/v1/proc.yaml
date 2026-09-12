@@ -1,9 +1,0 @@
-uri: proc://taskand.dev/web/spawn/v1
-name: spawn
-version: "1.0.0"
-role: presentation
-interface:
-  stdin: { organism: string, template?: string, role?: string }
-  stdout: { spawned: boolean, organism: string, healthy: boolean }
-  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
-entrypoint: bin.mjs

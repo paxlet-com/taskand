@@ -1,9 +1,0 @@
-# taskand · rejestr historii zadań i migawek (snapshots)
-- id: snap-t1789203598
-  task_id: t1789203598
-  created_at: "2026-09-12 11:00:00"
-  type: czyszczenie
-  description: "Kopia zapasowa podkatalogu taskand (duplikaty i pliki systemowe)"
-  target: taskand
-  sha256: 6477ea25eba8bcb5e650725cf5c5e2baefe8b26bcde5cf8a797f68c924c79ada
-  status: backed_up

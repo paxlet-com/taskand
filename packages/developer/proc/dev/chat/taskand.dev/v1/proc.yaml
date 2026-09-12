@@ -1,9 +1,0 @@
-uri: proc://taskand.dev/dev/chat/v1
-name: chat
-version: "1.0.0"
-role: worker
-interface:
-  stdin: { type: object }
-  stdout: { type: object, required: [ok, uri, reply] }
-  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
-entrypoint: bin.mjs

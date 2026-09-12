@@ -1,8 +1,0 @@
-apiVersion: taskand.dev/v1
-kind: Claim
-metadata:
-  id: claim-developer-capabilities
-spec:
-  status: potwierdzona
-  rule: until_resolved
-  assertion: "Proces dewelopera potrafi wygenerować plan i przeprowadzić kwalifikację w 3 próbach"

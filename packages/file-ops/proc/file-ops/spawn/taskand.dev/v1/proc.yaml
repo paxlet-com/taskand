@@ -1,5 +1,0 @@
-uri: proc://taskand.dev/file-ops/spawn/v1
-name: spawn
-version: "1.0.0"
-role: worker
-entrypoint: bin.mjs

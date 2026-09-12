@@ -1,9 +1,0 @@
-uri: proc://taskand.dev/bootstrap/handover/v1
-name: handover
-version: "1.0.0"
-role: worker
-interface:
-  stdin: { type: object }
-  stdout: { type: object, required: [ok, uri, targetRole] }
-  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
-entrypoint: bin.mjs

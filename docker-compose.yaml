@@ -1,81 +1,46 @@
-# taskand · docker-compose.yaml v1.6 (multi-device + Digital Twin VMs)
-name: taskand
+version: "3.9"
 
 services:
-  # ── MASTER (stacja robocza) ──
-  nucleus:
+  # ── BOOTSTRAP (zygota — startuje system) ──
+  bootstrap:
     build: .
-    container_name: taskand-nucleus
-    env_file:
-      - path: .env
-        required: false
     environment:
-      TASKAND_HOST_HOME: ${HOME}
-      TASKAND_HOST_DIR: ${TASKAND_HOST_DIR:-.}
-      TASKAND_ROLE: master
-      TASKAND_DEVICES: rpi5:192.168.1.50,vm-test:localhost
+      - TASKAND_LLM_API_KEY=${TASKAND_LLM_API_KEY:-}
+      - TASKAND_LLM_MODEL=${TASKAND_LLM_MODEL:-glm-5.3}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - "${TASKAND_HOST_DIR:-.}:/taskand"
-    restart: unless-stopped
+      - ./generated:/taskand/generated
+      - ./log:/taskand/log
+    restart: "no"
 
+  # ── GATEWAY (jeden punkt wejścia REST API) ──
   gateway:
-    build: ./gateway
-    container_name: taskand-gateway
-    ports: ["8077:8077"]   # Uniwersalna bramka REST API dla zadan, logow i Digital Twin
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - "${TASKAND_HOST_DIR:-.}:/taskand"
-      - "${HOME:-/home/tom}:${HOME:-/home/tom}"
-    restart: unless-stopped
-
-  landing:
-    build: ./landing
-    container_name: taskand-landing
-    ports: ["8090:80"]
-    volumes:
-      - "./landing:/usr/share/nginx/html:ro"
-    restart: unless-stopped
-
-  # ── VM BROWSER (digital twin RPi5 / noVNC) ──
-  vm-browser:
-    image: linuxserver/firefox:latest
-    container_name: taskand-vm-browser
+    image: python:3.12-alpine
+    command: sh -c "apk add --no-cache nodejs curl && python3 /app/server.py"
     environment:
-      - TZ=Europe/Warsaw
-    ports:
-      - "3010:3000"               # noVNC web interface
+      - TASKAND_LLM_API_KEY=${TASKAND_LLM_API_KEY:-}
+      - TASKAND_LLM_MODEL=${TASKAND_LLM_MODEL:-glm-5.3}
+      - TASKAND_LLM_ENDPOINT=${TASKAND_LLM_ENDPOINT:-https://api.z.ai/api/paas/v4/chat/completions}
     volumes:
-      - ./vm-browser-data:/config
+      - ./generated:/taskand/generated:ro
+      - ./gateway.py:/app/server.py:ro
+      - ./log:/taskand/log
+    ports: ["8077:8077"]
+    restart: unless-stopped
+
+  # ── LANDING (Web Cockpit) ──
+  landing:
+    image: nginx:alpine
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+    ports: ["8090:80"]
+    restart: unless-stopped
+
+  # ── VM BROWSER (digital twin — test przeglądarki noVNC) ──
+  vm-browser:
+    image: lscr.io/linuxserver/chromium:latest
+    ports: ["3010:3000"]
     shm_size: "2gb"
     restart: unless-stopped
     labels:
-      org.taskand.urn: "urn:taskand:vm:browser"
       org.taskand.device: "vm-test"
-
-  # ── VM DESKTOP (full Xfce / noVNC) ──
-  vm-desktop:
-    image: dorowu/ubuntu-desktop-lxde-vnc
-    container_name: taskand-vm-desktop
-    ports:
-      - "3020:80"                 # noVNC web (desktop)
-    volumes:
-      - ./vm-desktop-data:/home/ubuntu
-    privileged: true              # GPIO simulation
-    restart: unless-stopped
-    labels:
-      org.taskand.urn: "urn:taskand:vm:desktop"
-      org.taskand.device: "vm-desktop"
-
-  # ── VM FEDORA (SSH, symulacja RPi5) ──
-  vm-fedora:
-    build: ./vms/fedora-minimal
-    container_name: taskand-vm-fedora
-    ports:
-      - "3022:22"                 # SSH
-    volumes:
-      - ./vm-fedora-data:/home/taskand
-    restart: unless-stopped
-    labels:
-      org.taskand.urn: "urn:taskand:vm:fedora"
-      org.taskand.device: "vm-fedora"

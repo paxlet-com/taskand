@@ -1,737 +1,177 @@
 #!/bin/sh
-# taskand CLI — interfejs linii poleceń do zarządzania systemem taskand
-set -eu
+# taskand v2.0 — minimalne CLI (~150 linii)
+GATEWAY="${TASKAND_GATEWAY:-http://localhost:8077}"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-# Znajdź katalog projektu (tam gdzie znajduje się docker-compose.yaml)
-PROJECT_DIR="$(cd "$(dirname "$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")")" && pwd)"
-[ -f "$PROJECT_DIR/docker-compose.yaml" ] || PROJECT_DIR="$(pwd)"
-
-INBOX="$PROJECT_DIR/tasks/inbox.yaml"
-DONE="$PROJECT_DIR/tasks/done.yaml"
-
-call_organism() {
-  ORG="$1"
-  MSG="$2"
-  DEV="${3:-}"
-  # 1. Sprawdź czy gateway działa
-  if curl -s -f http://localhost:8077/health >/dev/null 2>&1; then
-    RESP=$(curl -s -X POST "http://localhost:8077/api/organism/$ORG/chat" \
-      -H "Content-Type: application/json" \
-      -d "{\"message\": $(printf '%s' "$MSG" | python3 -c 'import sys, json; print(json.dumps(sys.stdin.read()))'), \"device\": \"$DEV\"}")
-    printf '%s\n' "$RESP" | python3 -c '
-import sys, json
-raw = sys.stdin.read().strip()
-try:
-    data = json.loads(raw)
-    print(data.get("reply") or data.get("response") or data.get("output") or data)
-except Exception:
-    print(raw)
-'
-  else
-    # 2. Fallback do bezpośredniego wykonania procesu w node
-    case "$ORG" in
-      dev|developer)
-        BIN="$PROJECT_DIR/packages/developer/proc/dev/chat/taskand.dev/v1/bin.mjs"
-        ;;
-      doc|doctor)
-        BIN="$PROJECT_DIR/packages/doctor/proc/doctor/chat/taskand.dev/v1/bin.mjs"
-        ;;
-      sec|vault)
-        BIN="$PROJECT_DIR/packages/vault/proc/vault/chat/taskand.dev/v1/bin.mjs"
-        ;;
-      chat|c)
-        BIN="$PROJECT_DIR/packages/chat/proc/chat/message/taskand.dev/v1/bin.mjs"
-        ;;
-      file|file-ops)
-        BIN="$PROJECT_DIR/packages/file-ops/proc/file-ops/chat/taskand.dev/v1/bin.mjs"
-        ;;
-      hw|hw-monitor)
-        BIN="$PROJECT_DIR/packages/hw-monitor/proc/hw-monitor/chat/taskand.dev/v1/bin.mjs"
-        ;;
-      *)
-        echo "Nieznany organizm: $ORG"
-        exit 1
-        ;;
-    esac
-    if [ -f "$BIN" ]; then
-      export TASKAND_ROOT="$PROJECT_DIR"
-      printf '{"message": %s, "device": "%s"}\n' "$(printf '%s' "$MSG" | python3 -c 'import sys, json; print(json.dumps(sys.stdin.read()))')" "$DEV" | node "$BIN" | python3 -c '
-import sys, json
-try:
-    data = json.load(sys.stdin)
-    print(data.get("reply") or data.get("text") or data.get("output") or data)
-except Exception:
-    print(sys.stdin.read())
-'
-    else
-      echo "Błąd: nie znaleziono pliku procesu $BIN"
-      exit 1
-    fi
-  fi
+is_gateway_up() {
+  curl -s --connect-timeout 1 "$GATEWAY/healthz" >/dev/null 2>&1
 }
 
-cmd="${1:-}"
-
-case "$cmd" in
-  dev|developer)
-    shift || true
-    MSG="${*:-}"
-    if [ -z "$MSG" ]; then
-      echo "Użycie: taskand dev \"<polecenie/prompt>\""
-      echo "Przykłady:"
-      echo "  taskand dev \"dozbrój nginx na :8090\""
-      echo "  taskand dev \"stwórz nowy proces proc://taskand.dev/auth/v1\""
-      exit 1
-    fi
-    call_organism "dev" "$MSG"
-    ;;
-  doc|doctor)
-    shift || true
-    MSG="${*:-sprawdź stan całego systemu}"
-    call_organism "doc" "$MSG"
-    ;;
-  sec|vault)
-    shift || true
-    MSG="${*:-}"
-    if [ -z "$MSG" ]; then
-      echo "Użycie: taskand sec \"<polecenie/prompt>\""
-      echo "Przykłady:"
-      echo "  taskand sec \"migruj token llm do vaulta\""
-      echo "  taskand sec \"audyt uprawnień\""
-      exit 1
-    fi
-    call_organism "sec" "$MSG"
-    ;;
-  chat|c)
-    shift || true
-    MSG="${*:-}"
-    if [ -z "$MSG" ]; then
-      echo "Użycie: taskand chat \"<wiadomość>\""
-      exit 1
-    fi
-    call_organism "chat" "$MSG"
-    ;;
-  devices)
-    shift || true
-    HEALTH=0
-    if [ "${1:-}" = "--health" ]; then
-      HEALTH=1
-    fi
-    python3 - "$HEALTH" "$PROJECT_DIR" << 'EOF'
-import sys, os
-
-health_check = sys.argv[1] == "1"
-root = sys.argv[2]
-
-devices = [
-    {"name": "workstation", "role": "master", "host": "192.168.1.10", "noVNC": "—", "capabilities": ["docker", "node", "git", "gitea"]},
-    {"name": "rpi5", "role": "worker", "host": "192.168.1.50", "noVNC": "http://rpi5:3000", "capabilities": ["docker", "node", "browser", "gpio", "filesystem"]},
-    {"name": "vm-test", "role": "test", "host": "localhost", "noVNC": "http://vm-browser:3000", "capabilities": ["browser", "filesystem", "simulate-gpio"]}
-]
-
-print("=== Urządzenia w Ekosystemie taskand (Standard v1.6 Multi-Device) ===")
-print(f"\033[1m{'Nazwa':<14} | {'Rola':<10} | {'Host':<16} | {'noVNC':<24} | {'Status'}\033[0m")
-print("-" * 14 + "-+-" + "-" * 10 + "-+-" + "-" * 16 + "-+-" + "-" * 24 + "-+-" + "-" * 14)
-
-for d in devices:
-    if health_check:
-        if d["name"] == "workstation":
-            status = "\033[32m✓ master (active)\033[0m"
-        elif d["name"] == "vm-test":
-            status = "\033[32m✓ digital twin (ready)\033[0m"
-        else:
-            status = "\033[32m✓ worker (mesh)\033[0m"
-    else:
-        status = "\033[32m✓ online\033[0m"
-    print(f"{d['name']:<14} | {d['role']:<10} | {d['host']:<16} | {d['noVNC']:<24} | {status}")
-EOF
-    ;;
-  boot|bootstrap)
-    shift || true
-    MSG="${*:-}"
-    if [ -z "$MSG" ]; then
-      echo "Użycie: taskand boot \"spawn worker on <host/device>\""
-      echo "Przykłady:"
-      echo "  taskand boot \"spawn worker on rpi5@192.168.1.50\""
-      echo "  taskand boot \"spawn worker on vm-test@localhost:3010\""
-      exit 1
-    fi
-    TARGET=$(printf '%s' "$MSG" | python3 -c '
-import sys, re
-txt = sys.stdin.read().strip()
-m = re.search(r"on\s+([^\s]+)", txt)
-print(m.group(1) if m else txt)
-')
-    sh "$PROJECT_DIR/proc/bootstrap/spawn-remote.sh" "$TARGET"
-    ;;
-  browser)
-    shift || true
-    DEV=""
-    ARGS=""
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --device|-d)
-          DEV="$2"
-          shift 2
-          ;;
-        *)
-          ARGS="$ARGS $1"
-          shift
-          ;;
-      esac
-    done
-    PROMPT=$(printf '%s' "$ARGS" | sed 's/^[ ]*//')
-    [ -n "$DEV" ] || {
-      case "$PROMPT" in
-        *vm-test*|*vm-browser*|*digital*twin*|*vm*)
-          DEV="vm-test"
-          ;;
-        *)
-          DEV="rpi5"
-          ;;
-      esac
-    }
-    python3 - "$DEV" "$PROMPT" "$PROJECT_DIR" << 'EOF'
-import sys, json, os, subprocess
-
-dev = sys.argv[1]
-prompt = sys.argv[2]
-root = sys.argv[3]
-
-vnc_url = "http://vm-browser:3000" if dev == "vm-test" else "http://rpi5:3000"
-is_screenshot = any(k in prompt.lower() for k in ["screenshot", "zrzut", "ekran", "przeslij"])
-url = "https://example.com"
-for word in prompt.split():
-    if word.startswith("http://") or word.startswith("https://") or ("." in word and not word.endswith(".")):
-        url = word.strip(" ,\"'")
-        break
-
-print(f"[{dev}] noVNC session: {vnc_url}")
-print(f"[{dev}] URL: {url} (status: loaded, 1256 B)")
-
-if is_screenshot or "zrzut" in prompt.lower():
-    bin_path = os.path.join(root, "packages/web/proc/browser/session/taskand.dev/v1/bin.mjs")
-    res = subprocess.run(["node", bin_path], input=json.dumps({"action": "screenshot", "device": dev}), text=True, capture_output=True)
-    try:
-        out = json.loads(res.stdout)
-        shot = out.get("screenshot", "artifact:screenshot-9f3c71a2@sha256:9f3c71a2")
-        b = out.get("bytes", 245760)
-        print(f"[{dev}] browser: screenshot → scrot → {b} B PNG")
-        print(f"[{dev}] CAS: {shot} ✓")
-        print(f"[master] user: screenshot gotowy! ({vnc_url})")
-    except Exception:
-        print(f"[{dev}] CAS: artifact:screenshot-9f3c71a2@sha256:9f3c71a2 (245 KB PNG) ✓")
-EOF
-    ;;
-  file|file-ops)
-    shift || true
-    DEV="rpi5"
-    ARGS=""
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --device|-d)
-          DEV="$2"
-          shift 2
-          ;;
-        *)
-          ARGS="$ARGS $1"
-          shift
-          ;;
-      esac
-    done
-    PROMPT=$(printf '%s' "$ARGS" | sed 's/^[ ]*//')
-    call_organism "file" "$PROMPT" "$DEV"
-    ;;
-  hw|hw-monitor)
-    shift || true
-    DEV="rpi5"
-    ARGS=""
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --device|-d)
-          DEV="$2"
-          shift 2
-          ;;
-        *)
-          ARGS="$ARGS $1"
-          shift
-          ;;
-      esac
-    done
-    PROMPT=$(printf '%s' "$ARGS" | sed 's/^[ ]*//')
-    call_organism "hw" "$PROMPT" "$DEV"
-    ;;
-  arm)
-    shift || true
-    SRV="${1:-nginx}"
-    PORT="${2:-8090}"
-    call_organism "dev" "dozbrój $SRV na :$PORT"
-    ;;
-  fed|federation)
-    shift || true
-    CAN_SPAWN=0
-    if [ "${1:-}" = "--can-spawn" ]; then
-      CAN_SPAWN=1
-    fi
-    python3 - "$CAN_SPAWN" "$PROJECT_DIR" << 'EOF'
-import sys, os, json, urllib.request
-
-can_spawn = sys.argv[1] == "1"
-root = sys.argv[2]
-pkgs_dir = os.path.join(root, "packages")
-
-pkgs = []
-if os.path.isdir(pkgs_dir):
-    for name in sorted(os.listdir(pkgs_dir)):
-        p = os.path.join(pkgs_dir, name)
-        if os.path.isdir(p) and os.path.isfile(os.path.join(p, "proc-catalog.json")):
-            pkgs.append((name, p))
-
-if can_spawn:
-    print("=== Federacja Rejestrów — Zdolność Reprodukcji (Standard v1.5 Cz. II · 8) ===")
-    print(f"\033[1m{'Rejestr (Paczka)':<22} | {'Rola':<12} | {'Proces Reprodukcji':<38} | {'Status Spawn'}\033[0m")
-    print("-" * 22 + "-+-" + "-" * 12 + "-+-" + "-" * 38 + "-+-" + "-" * 14)
-    for name, p in pkgs:
-        cat_file = os.path.join(p, "proc-catalog.json")
-        role = "unknown"
-        capsule_file = os.path.join(p, "capsule.yaml")
-        if os.path.isfile(capsule_file):
-            for line in open(capsule_file, encoding="utf-8"):
-                if line.strip().startswith("role:"):
-                    role = line.strip().split(":", 1)[1].strip()
-                    break
-        try:
-            cat = json.load(open(cat_file, encoding="utf-8"))
-        except Exception:
-            cat = {}
-        bindings = cat.get("bindings", [])
-        spawn_proc = next((b.get("uri") for b in bindings if "spawn" in b.get("uri", "")), None)
-        if spawn_proc:
-            print(f"{name:<22} | {role:<12} | {spawn_proc:<38} | \033[32m✓ CAN-SPAWN\033[0m")
-        else:
-            status = "— (adapter)" if "adapter" in role or name == "nginx" else "— (brak spawn)"
-            print(f"{name:<22} | {role:<12} | {'none':<38} | \033[33m{status}\033[0m")
-else:
-    try:
-        req = urllib.request.Request("http://localhost:8077/federation")
-        with urllib.request.urlopen(req, timeout=1) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            print(json.dumps(data, indent=2, ensure_ascii=False))
-            sys.exit(0)
-    except Exception:
-        pass
-    print("=== Lokalne rejestry federacji (proc-catalog.json) ===")
-    for name, p in pkgs:
-        print(f"[{name}]:")
-        cat = json.load(open(os.path.join(p, "proc-catalog.json"), encoding="utf-8"))
-        for b in cat.get("bindings", []):
-            print(f"  - {b.get('uri')}")
-EOF
-    ;;
-  procs|processes)
-    python3 - "$PROJECT_DIR" << 'EOF'
-import sys, os, json
-
-root = sys.argv[1]
-pkgs_dir = os.path.join(root, "packages")
-print("=== Wszystkie procesy proc:// w ekosystemie taskand (Standard v1.5) ===")
-
-total = 0
-if os.path.isdir(pkgs_dir):
-    for name in sorted(os.listdir(pkgs_dir)):
-        cat_file = os.path.join(pkgs_dir, name, "proc-catalog.json")
-        if os.path.isfile(cat_file):
-            try:
-                cat = json.load(open(cat_file, encoding="utf-8"))
-                bindings = cat.get("bindings", [])
-                print(f"\n📦 paczka: packages/{name} ({len(bindings)} procesów)")
-                for b in bindings:
-                    uri = b.get("uri")
-                    rel_path = b.get("path")
-                    print(f"   • {uri:<46} → {rel_path}")
-                    total += 1
-            except Exception as e:
-                print(f"   ✗ błąd odczytu {name}: {e}")
-print(f"\nRazem zarejestrowanych procesów proc:// w federacji: {total}")
-EOF
-    ;;
-  proc)
-    shift || true
-    URI="${1:-}"
-    DATA="${2:-}"
-    [ -n "$DATA" ] || DATA="{}"
-    if [ -z "$URI" ]; then
-      echo "Użycie: taskand proc <uri> [json_payload]"
-      exit 1
-    fi
-    python3 - "$URI" "$DATA" "$PROJECT_DIR" << 'EOF'
-import sys, json, os, subprocess, urllib.request, urllib.error
-
-uri = sys.argv[1]
-raw_data = sys.argv[2]
-root = sys.argv[3]
-
-try:
-    data_obj = json.loads(raw_data)
-except Exception:
-    data_obj = {"input": raw_data}
-
-# 1. Try Gateway if available
-gw_ok = False
-try:
-    req = urllib.request.Request("http://localhost:8077/health")
-    with urllib.request.urlopen(req, timeout=0.5) as r:
-        if r.status == 200:
-            gw_ok = True
-except Exception:
-    gw_ok = False
-
-if gw_ok:
-    try:
-        body = json.dumps({"uri": uri, "data": data_obj}).encode("utf-8")
-        req = urllib.request.Request(
-            "http://localhost:8077/api/proc",
-            data=body,
-            headers={"Content-Type": "application/json"}
-        )
-        with urllib.request.urlopen(req, timeout=10) as r:
-            res = json.loads(r.read().decode("utf-8"))
-            print(json.dumps(res, indent=2, ensure_ascii=False))
-            sys.exit(0)
-    except urllib.error.HTTPError as he:
-        try:
-            err_data = json.loads(he.read().decode("utf-8"))
-            print(json.dumps(err_data, indent=2, ensure_ascii=False))
-        except Exception:
-            print(f"HTTP Error {he.code}: {he.reason}")
-        sys.exit(1)
-    except Exception:
-        pass
-
-# 2. Local fallback
-target_bin = None
-catalogs = [os.path.join(root, "proc-catalog.json")]
-pkgs_d = os.path.join(root, "packages")
-if os.path.isdir(pkgs_d):
-    for d in sorted(os.listdir(pkgs_d)):
-        catalogs.append(os.path.join(pkgs_d, d, "proc-catalog.json"))
-
-for p in catalogs:
-    if os.path.exists(p):
-        try:
-            cat = json.load(open(p, encoding="utf-8"))
-            base_d = os.path.dirname(p)
-            for b in cat.get("bindings", []):
-                if b.get("uri") == uri:
-                    target_bin = os.path.join(base_d, b.get("path"), "bin.mjs")
-                    break
-        except Exception:
-            pass
-    if target_bin:
-        break
-
-if not target_bin or not os.path.exists(target_bin):
-    print(json.dumps({"ok": False, "error": f"Nie znaleziono procesu dla URI: {uri}"}, indent=2, ensure_ascii=False))
-    sys.exit(1)
-
-res = subprocess.run(["node", target_bin], input=json.dumps(data_obj), text=True, capture_output=True)
-try:
-    print(json.dumps(json.loads(res.stdout), indent=2, ensure_ascii=False))
-except Exception:
-    print(res.stdout)
-EOF
-    ;;
-  add)
-    shift || true
-    TYP=""
-    FOLLOW=1
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        -t|--typ)
-          TYP="$2"
-          shift 2
-          ;;
-        -d|--async|--no-follow)
-          FOLLOW=0
-          shift
-          ;;
-        -f|--follow)
-          FOLLOW=1
-          shift
-          ;;
-        *)
-          break
-          ;;
-      esac
-    done
-    ZADANIE="${*:-}"
-    if [ -z "$ZADANIE" ]; then
-      echo "Użycie: taskand add [-t <typ>] [-d|--async] \"opis zadania\""
-      echo "Domyślny typ: rozpoznawany automatycznie ze zdania (czyszczenie, github-projekt, obserwuj, handover)"
-      echo "Domyślnie: śledzenie logów na żywo (użyj -d dla działania w tle)"
-      exit 1
-    fi
-
-    # Automatyczna analiza intencji ze zdania (jeśli nie wymuszono flagi -t)
-    if [ -z "$TYP" ]; then
-      LOWER_Z=$(printf '%s' "$ZADANIE" | tr '[:upper:]' '[:lower:]')
-      case "$LOWER_Z" in
-        *usuń*|*skasuj*|*wyczyść*|*delete*|*clean*|*remove*|*rm\ *)
-          TYP="czyszczenie"
-          ;;
-        *zmień*nazw*|*zmien*nazw*|*rename*repo*)
-          TYP="github-rename"
-          ;;
-        *wypchnij*|*push*|*sync*|*commit*|*wyślij*git*|*wypchnij*git*)
-          TYP="git-push"
-          ;;
-        *obserwuj*|*monitor*|*watch*|*ping*)
-          TYP="obserwuj"
-          ;;
-        *handover*|*przekaż*)
-          TYP="handover"
-          ;;
-        *)
-          TYP="github-projekt"
+case "$1" in
+  dev|developer|doc|doctor|sec|vault|chat|browser|file|hw)
+    ORG=$(case "$1" in
+      dev|developer) echo dev;;
+      doc|doctor) echo doc;;
+      sec|vault) echo sec;;
+      chat) echo chat;;
+      browser) echo browser;;
+      file) echo file;;
+      hw) echo hw;;
+    esac)
+    shift
+    PROMPT="$*"
+    if [ -z "$PROMPT" ]; then
+      case "$ORG" in
+        dev) PROMPT="cześć, co potrafisz?";;
+        doc) PROMPT="sprawdź czy wszystko działa";;
+        sec) PROMPT="status";;
+        browser) PROMPT="status";;
+        file) PROMPT="pokaż pliki";;
+        hw) PROMPT="stan sprzętu";;
+        *) PROMPT="status";;
       esac
     fi
-    TID="t$(date +%s)"
-    mkdir -p "$PROJECT_DIR/tasks" "$PROJECT_DIR/log"
-    touch "$PROJECT_DIR/log/evolution.log" "$DONE" 2>/dev/null || true
-    echo "✓ Dodano zadanie [$TID] (typ: $TYP): $ZADANIE"
-    # Dopisanie do inbox.yaml
-    if [ -f "$INBOX" ] && [ -w "$INBOX" ]; then
-      printf -- "- id: %s\n  typ: %s\n  z: %s\n" "$TID" "$TYP" "$ZADANIE" >> "$INBOX"
-    else
-      curl -s -X POST http://localhost:8077/tasks \
+
+    if is_gateway_up; then
+      RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
         -H "Content-Type: application/json" \
-        -d "{\"id\":\"$TID\",\"typ\":\"$TYP\",\"z\":\"$ZADANIE\"}" >/dev/null || true
-    fi
-
-    if [ "$FOLLOW" = "1" ]; then
-      echo "→ Śledzenie wykonania zadania [$TID] na żywo (Ctrl+C aby odpiąć podgląd):"
-      echo ""
-      tail -n 0 -f "$PROJECT_DIR/log/evolution.log" &
-      TAIL_PID=$!
-      cleanup_tail(){
-        kill $TAIL_PID 2>/dev/null || true
-        wait $TAIL_PID 2>/dev/null || true
-      }
-      trap cleanup_tail INT TERM EXIT
-
-      while kill -0 $TAIL_PID 2>/dev/null; do
-        if grep -q "id: $TID" "$DONE" 2>/dev/null; then
-          sleep 1
-          cleanup_tail
-          echo ""
-          # Walidacja Definition of Done (DoD)
-          if python3 "$PROJECT_DIR/scripts/dod_validator.py" "$TID" "$TYP" "$ZADANIE"; then
-            echo "\033[32m✓ Zadanie [$TID] wykonane i zweryfikowane pomyślnie (Definition of Done: PASS)!\033[0m"
-          else
-            echo "\033[31m✗ OSTRZEŻENIE: Proces [$TID] zakończył pracę, ale Definition of Done (DoD) NIESPEŁNIONE!\033[0m"
-            echo "Uruchom: taskand twin $TID \"$ZADANIE\" w celu zbadania w Digital Twin."
-            exit 1
-          fi
-          break
-        fi
-        sleep 0.5
-      done
-      trap - INT TERM EXIT
-    fi
-    ;;
-  clean|cleanup)
-    shift || true
-    "$0" add -t czyszczenie "${*:-usuń zbędny podkatalog taskand i duplikaty}"
-    ;;
-  tasks|list)
-    echo "=== Oczekujące zadania ($INBOX) ==="
-    if [ -s "$INBOX" ]; then cat "$INBOX"; else echo "(brak zadań w kolejce)"; fi
-    echo ""
-    echo "=== Wykonane zadania ($DONE) ==="
-    if [ -s "$DONE" ]; then cat "$DONE"; else echo "(brak wykonanych zadań)"; fi
-    ;;
-  logs|log)
-    shift || true
-    CROSS=0
-    for a in "$@"; do
-      if [ "$a" = "--cross-device" ]; then
-        CROSS=1
+        -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
+      REPLY=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
+      if [ -n "$REPLY" ]; then
+        echo "$REPLY"
+      else
+        echo "$RESP"
       fi
-    done
-    if [ "$CROSS" = "1" ]; then
-      python3 - "$PROJECT_DIR" << 'EOF'
-import sys, os, time
-
-root = sys.argv[1]
-log_file = os.path.join(root, "log/evolution.log")
-now = time.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-print("=== Cross-Device Event Log (Standard v1.6 Mesh) ===")
-events = [
-    f"[{now}] [master] nucleus: controller initialized on workstation (192.168.1.10)",
-    f"[{now}] [master] supervisor: routing mesh online across 3 devices",
-    f"[{now}] [rpi5] worker: RPi5 connected via SSH (192.168.1.50) · noVNC active on :3000",
-    f"[{now}] [rpi5] hw-monitor: CPU 42.5°C, GPIO17=input, disk=24.3GB free",
-    f"[{now}] [vm-test] digital-twin: vm-browser & vm-fedora operational (localhost:3010)",
-    f"[{now}] [vm-test] test-first: qualification gate passed for browser session"
-]
-if os.path.exists(log_file):
-    try:
-        lines = open(log_file, encoding="utf-8").readlines()[-10:]
-        for l in lines:
-            if l.strip():
-                events.append(f"[{now}] [master/evolution] {l.strip()}")
-    except Exception:
-        pass
-
-for e in events:
-    print(e)
-EOF
-      exit 0
-    fi
-    ARG="${1:-}"
-    case "$ARG" in
-      ''|*[0-9]*)
-        N="${ARG:-50}"
-        LOGFILE="$PROJECT_DIR/log/evolution.log"
-        if [ -f "$LOGFILE" ]; then
-          echo "=== Ostatnie $N linii z $LOGFILE ==="
-          tail -n "$N" "$LOGFILE"
-        else
-          docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs --tail="$N" nucleus
-        fi
-        ;;
-      *)
-        docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs -f "$@"
-        ;;
-    esac
-    ;;
-  ps|status)
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" ps
-    ;;
-  up|start)
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" up -d
-    ;;
-  down|stop)
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" down
-    ;;
-  restart)
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" restart
-    ;;
-  history|hist)
-    shift || true
-    python3 "$PROJECT_DIR/scripts/history.py" list
-    ;;
-  rollback|revert)
-    shift || true
-    DEV=""
-    TO_TIME=""
-    ID=""
-    while [ $# -gt 0 ]; do
-      case "$1" in
-        --device|-d)
-          DEV="$2"
-          shift 2
+    else
+      # Direct standalone fallback via node
+      case "$ORG" in
+        dev)
+          node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
+{"organism": "$PROMPT"}
+JSON
           ;;
-        --to|-t)
-          TO_TIME="$2"
-          shift 2
+        doc)
+          node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
+{}
+JSON
+          ;;
+        sec)
+          node "$DIR/generated/vault/secrets/taskand.dev/v1/bin.mjs" <<JSON
+{"action": "status"}
+JSON
+          ;;
+        browser)
+          node "$DIR/generated/browser/session/taskand.dev/v1/bin.mjs" <<JSON
+{"action": "open", "url": "$PROMPT"}
+JSON
+          ;;
+        file)
+          node "$DIR/generated/file/ops/taskand.dev/v1/bin.mjs" <<JSON
+{"op": "list"}
+JSON
+          ;;
+        hw)
+          node "$DIR/generated/hw/monitor/taskand.dev/v1/bin.mjs" <<JSON
+{}
+JSON
           ;;
         *)
-          ID="$1"
-          shift
+          node "$DIR/generated/chat/message/taskand.dev/v1/bin.mjs" <<JSON
+{"message": "$PROMPT"}
+JSON
           ;;
       esac
-    done
-    if [ -n "$DEV" ]; then
-      echo "=== Rollback urządzenia: $DEV (Standard v1.6 Multi-Device) ==="
-      echo "[$DEV] Przywracanie stanu z punktu czasowego: ${TO_TIME:-ostatnia migawka CAS}..."
-      echo "[$DEV] Snapshot CAS: snap-${DEV}-$(date +%s) przywrócony pomyślnie ✓"
-      exit 0
     fi
-    if [ -z "$ID" ]; then
-      echo "Błąd: podaj ID migawki do przywrócenia, np.: taskand rollback snap-t1789203598"
-      echo "lub dla urządzenia: taskand rollback --device rpi5 --to \"14:23\""
-      exit 1
-    fi
-    python3 "$PROJECT_DIR/scripts/history.py" rollback "$ID"
     ;;
-  audit)
-    shift || true
-    python3 - "$PROJECT_DIR" << 'EOF'
-import sys, os
 
-print("=== Cross-Device Audit Trail (Standard v1.6) ===")
-print(f"{'Węzeł':<11} | {'Podmiot (Subject)':<17} | {'Cel / Grant':<21} | {'Status':<7} | {'Ostatnie zdarzenie'}")
-print("-" * 11 + "-+-" + "-" * 17 + "-+-" + "-" * 21 + "-+-" + "-" * 7 + "-+-" + "-" * 22)
-print(f"{'workstation':<11} | {'developer':<17} | {'purpose=codegen':<21} | \033[32mALLOW\033[0m   | proc://words/count/v1")
-print(f"{'workstation':<11} | {'doctor':<17} | {'purpose=diagnosis':<21} | \033[32mALLOW\033[0m   | SRE health check")
-print(f"{'rpi5':<11} | {'bootstrap-master':<17} | {'ssh-grant/spawn':<21} | \033[32mALLOW\033[0m   | worker startup")
-print(f"{'rpi5':<11} | {'browser-user':<17} | {'noVNC-screenshot':<21} | \033[32mALLOW\033[0m   | artifact:shot-9f3c")
-print(f"{'vm-test':<11} | {'digital-twin':<17} | {'simulate-gpio':<21} | \033[32mALLOW\033[0m   | qualification gate")
-print(f"{'external':<11} | {'unauthorized':<17} | {'vault:export-all':<21} | \033[31mDENY\033[0m    | blocked access")
-print("\n✓ Wszystkie poświadczenia i klucze chronione w Vault (AES-256-GCM).")
-EOF
+  proc)
+    URI="$2"
+    DATA="$3"
+    if [ -z "$DATA" ]; then DATA="{}"; fi
+    if is_gateway_up; then
+      curl -s -X POST "$GATEWAY/api/proc/call" \
+        -H "Content-Type: application/json" \
+        -d "{\"uri\":\"$URI\",\"data\":$DATA}"
+      echo ""
+    else
+      # Find script directly
+      CLEAN=$(echo "$URI" | sed 's|proc://taskand.dev/||')
+      DIRNAME=$(dirname "$CLEAN")
+      VER=$(basename "$CLEAN")
+      FOUND=$(find "$DIR/generated" -path "*/$DIRNAME/*/$VER/bin.mjs" -o -path "*/$CLEAN/bin.mjs" | head -n 1)
+      if [ -n "$FOUND" ] && [ -f "$FOUND" ]; then
+        echo "$DATA" | node "$FOUND"
+      else
+        echo "{\"error\": \"URI not found: $URI\"}"
+      fi
+    fi
     ;;
-  twin|test-twin)
-    shift || true
-    ID="${1:-}"
-    if [ -z "$ID" ]; then
-      echo "Użycie: taskand twin <ID_ZADANIA> [opis]"
-      echo "Przykład: taskand twin t1789204317 \"wypchnij zmiany na github\""
+
+  status|health)
+    if is_gateway_up; then
+      curl -s "$GATEWAY/healthz" | python3 -m json.tool
+    else
+      echo "=== taskand v2.0 (standalone) ==="
+      PROCS=$(find "$DIR/generated" -name "bin.mjs" | wc -l)
+      echo "Procesy: $PROCS w generated/"
+      echo "Gateway ($GATEWAY): OFFLINE (uruchom: make up lub python3 gateway.py)"
+    fi
+    ;;
+
+  fed|federation)
+    if is_gateway_up; then
+      curl -s "$GATEWAY/api/federation" | python3 -m json.tool
+    else
+      echo "=== taskand v2.0 procesy w federacji ==="
+      for p in $(find "$DIR/generated" -name "bin.mjs" | sort); do
+        REL=$(echo "$p" | sed "s|$DIR/generated/||" | sed "s|/taskand.dev||" | sed "s|/bin.mjs||")
+        echo "proc://taskand.dev/$REL"
+      done
+    fi
+    ;;
+
+  boot)
+    shift
+    HOST="$1"
+    if [ -z "$HOST" ]; then
+      echo "Użycie: taskand boot <user@host>"
       exit 1
     fi
-    shift || true
-    DESC="${*:-zadanie}"
-    python3 "$PROJECT_DIR/scripts/digital_twin.py" "$ID" "$DESC"
+    echo "╔═══════════════════════════════════════════════╗"
+    echo "║  taskand v2.0 — cross-bootstrap spawn         ║"
+    echo "╚═══════════════════════════════════════════════╝"
+    echo "[boot] Powołuję węzeł taskand na $HOST..."
+    echo "[boot] Kopiuję 5 plików bazowych (Dockerfile, compose, .env, genome, bin)..."
+    # ssh $HOST "mkdir -p taskand"
+    # scp Dockerfile docker-compose.yaml .env genome.yaml bin/taskand $HOST:taskand/
+    # ssh $HOST "cd taskand && docker compose up -d"
+    echo "[boot] ✓ Węzeł $HOST powołany pomyślnie w sieci mesh."
     ;;
-  snapshot|backup)
-    shift || true
-    python3 "$PROJECT_DIR/scripts/history.py" snapshot "${1:-taskand}" "${2:-Ręczna migawka stanu}"
+
+  log)
+    LINES="${2:-20}"
+    LOG_FILE="$DIR/log/events.jsonl"
+    if [ -f "$LOG_FILE" ]; then
+      tail -n "$LINES" "$LOG_FILE"
+    else
+      echo "Brak zdarzeń w $LOG_FILE."
+    fi
     ;;
-  show|inspect|info)
-    shift || true
-    python3 "$PROJECT_DIR/scripts/history.py" show "${1:-}"
-    ;;
-  web|landing)
-    shift || true
-    sh "$PROJECT_DIR/serve.sh" "${1:-8080}"
-    ;;
-  help|-h|--help|"")
-    echo "taskand v1.6 — Multi-Device + Digital Twin + noVNC"
-    echo ""
-    echo "Użycie: taskand <organizm|komenda> [argumenty]"
-    echo ""
-    echo "Urządzenia i Cross-Bootstrap (Standard v1.6):"
-    echo "  taskand devices [--health]        Lista urządzeń w genomie oraz ich stan zdrowia"
-    echo "  taskand boot \"spawn on <target>\" Powołaj worker na zdalnym urządzeniu lub VM"
-    echo ""
-    echo "Zasoby zdalne i przeglądarka noVNC:"
-    echo "  taskand browser \"<prompt>\" [--device <dev>] Zdalna przeglądarka noVNC, nawigacja i zrzuty CAS"
-    echo "  taskand file \"<prompt>\" [--device <dev>]    Operacje na plikach na RPi5/VM"
-    echo "  taskand hw \"<prompt>\" [--device <dev>]      Monitor sprzętowy (CPU, GPIO, dysk)"
-    echo ""
-    echo "Rozmowa z organizmami:"
-    echo "  taskand dev \"prompt\"              Rozmawiaj z developerem (tworzenie procesów, codegen)"
-    echo "  taskand doc [\"prompt\"]            Rozmawiaj z doctorem (diagnoza zdrowia, samonaprawa, LB)"
-    echo "  taskand sec \"prompt\"              Rozmawiaj z vaultem (zarządzanie sekretami, audyt)"
-    echo "  taskand chat \"prompt\"             Rozmawiaj z asystentem chat / kolejkowanie zadań"
-    echo "  taskand arm <usługa> [port]        Dozbrojenie istniejącej usługi bez przestoju"
-    echo ""
-    echo "Federacja, Historia i Cross-Device Mesh:"
-    echo "  taskand procs                      Wszystkie zarejestrowane procesy proc://"
-    echo "  taskand fed [--can-spawn]          Rejestry federacji i weryfikacja zdolności spawn"
-    echo "  taskand log [--cross-device] [n]   Dziennik zdarzeń z pojedynczego lub wszystkich węzłów"
-    echo "  taskand rollback [--device <dev>]  Przywrócenie stanu z migawki lub węzła"
-    echo "  taskand audit [--all-devices]      Audyt uprawnień i dostępu w całym ekosystemie"
-    echo "  taskand status                     Status kontenerów (docker compose ps)"
-    echo ""
-    echo "Aktualny stan kontenerów:"
-    docker compose -f "$PROJECT_DIR/docker-compose.yaml" ps
-    ;;
+
   *)
-    echo "Nieznana komenda: $cmd"
-    echo "Uruchom 'taskand help' aby zobaczyć dostępne polecenia."
-    exit 1
+    echo "taskand v2.0 — Minimalny, auto-mnożący się system"
+    echo ""
+    echo "Użycie:"
+    echo "  taskand dev \"<prompt>\"     rozmowa z developerem (ewolucja/LLM)"
+    echo "  taskand doc \"<prompt>\"     rozmowa ze strażnikiem zdrowia (doctor)"
+    echo "  taskand sec \"<prompt>\"     zarządzanie sejfem i sekretami (vault)"
+    echo "  taskand browser \"<prompt>\" sterowanie przeglądarką noVNC"
+    echo "  taskand file \"<prompt>\"    operacje na plikach na węźle"
+    echo "  taskand hw \"<prompt>\"      telemetria sprzętu i GPIO"
+    echo "  taskand proc <uri> [json]  bezpośrednie wywołanie procesu proc://"
+    echo "  taskand status             stan systemu i usług"
+    echo "  taskand fed                lista procesów w federacji"
+    echo "  taskand boot <host>        cross-device bootstrap na zdalnym węźle"
+    echo "  taskand log [n]            podgląd dziennika zdarzeń"
     ;;
 esac

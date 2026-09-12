@@ -1,8 +1,0 @@
-apiVersion: taskand.dev/v1
-kind: Claim
-metadata:
-  id: claim-chat-memory
-spec:
-  status: potwierdzona
-  rule: until_resolved
-  assertion: "Procesy czatu poprawnie integrują Web Speech API oraz pamięć kontekstową"
