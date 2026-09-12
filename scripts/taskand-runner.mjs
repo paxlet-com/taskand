@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * taskand v1.0 — Uniwersalny Launcher Procesów URI (proc://...)
+ * wellmanifest/taskand — Uniwersalny Launcher Procesów URI (proc://...)
  * Zapewnia: URI -> binding -> runtime -> JSON stdin -> JSON stdout
  */
 import { readFileSync, existsSync } from 'node:fs';
@@ -8,8 +8,10 @@ import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const uri = process.argv[2];
+const inlinePayload = process.argv[3];
+
 if (!uri) {
-  process.stderr.write('Użycie: printf \'%s\' \'$JSON\' | node scripts/taskand-runner.mjs <proc://...>\n');
+  process.stderr.write('Użycie: node operations/runner.mjs <proc://...> [payloadJSON] | lub przez stdin\n');
   process.exit(2);
 }
 
@@ -31,11 +33,16 @@ if (!existsSync(binPath)) {
   process.exit(2);
 }
 
-// Przekazanie stdin do procesu potomnego
-let inputBuffer = Buffer.alloc(0);
-try {
-  inputBuffer = readFileSync(0);
-} catch (e) {
+let inputBuffer;
+if (inlinePayload !== undefined) {
+  inputBuffer = Buffer.from(inlinePayload);
+} else if (!process.stdin.isTTY) {
+  try {
+    inputBuffer = readFileSync(0);
+  } catch (e) {
+    inputBuffer = Buffer.from('{}');
+  }
+} else {
   inputBuffer = Buffer.from('{}');
 }
 
