@@ -1,0 +1,7 @@
+uri: proc://taskand.dev/web/serve/v1
+interface:
+  stdin: { action: string }
+  stdout: { status: string, port: number }
+  exit: { 0: ok, 1: fail, 2: kontrakt }
+runtimes: [{ kind: node, bin: bin.mjs }]
+grants: { run: [web-serve] }

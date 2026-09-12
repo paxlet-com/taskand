@@ -192,3 +192,67 @@ taskand boot worker@192.168.1.50            # Replikacja systemu na nowe urządz
 | **Rola LLM** | Zewnętrzny asystent | **Bootstrap pyta i generuje wszystko w locie** |
 | **Replikacja multi-device** | Złożone skrypty instalacyjne | **Kopiowanie 5 plików przez SSH i docker up** |
 
+
+---
+
+<a id="10-zasada-19"></a>
+## 10 · Zasada #19 — Developer WYKONUJE, nie wyjaśnia
+
+> **Zasada #19:** Developer w taskand v2.0 nie jest ogólnym chatbotem ani asystentem zewnętrznym. Gdy użytkownik zadaje pytanie „jak mogę…” lub zleca zadanie — developer natychmiast **TWORZY, TESTUJE i URUCHAMIA** odpowiednie procesy oraz zwraca adres URL lub wynik, zamiast odsyłać do zewnętrznych stron czy instruować użytkownika, jak zrobić to samodzielnie.
+
+### Architektura deterministycznego Intent Routera
+
+Zamiast pozwalać modelowi LLM swobodnie decydować o konwersacji, proces `proc://taskand.dev/dev/chat/v1` stosuje 3-etapowy model decyzyjny:
+
+1. **Deterministyczny Intent Routing (kodem JS, przed LLM):**
+   * Słowa kluczowe `przeglądarka`, `web`, `interfejs`, `gui`, `jak używać w przeglądarce` → natychmiastowy intent `SPAWN_WEB`.
+   * Słowa `sprawdź`, `diagnozuj`, `działa` → natychmiastowa delegacja do `doctor/diagnose`.
+   * Słowa `stwórz`, `utwórz`, `zrób` → generowanie procesu w `generated/` z testami fail-closed.
+2. **System Prompt Constraint (jeśli zapytanie trafia do LLM):**
+   ```
+   Jesteś DEVELOPEREM taskand v2.0. NIE jesteś asystentem.
+   Gdy user pyta o coś — WYKONAJ (stwórz plik, uruchom proces, sprawdź stan).
+   NIE tłumacz jak coś zrobić z zewnątrz — TY to robisz tutaj.
+   Odpowiadaj: [działanie] → [proc://…] → [wynik].
+   ```
+3. **Wbudowane Szablony Awaryjne (Fallback Templates):**
+   Gdy model LLM jest nieosiągalny lub brak klucza API, developer korzysta ze sprawdzonych szablonów kodu generujących kompletne kapsuły i manifesty.
+
+### Nowy proces: `proc://taskand.dev/dev/execute/v1`
+
+Silnik bezpośredniego wykonywania intencji i zadań deweloperskich:
+```yaml
+uri: proc://taskand.dev/dev/execute/v1
+interface:
+  stdin: { intent: "spawn-web|spawn-chat|diagnose|evolve-create", desc: string }
+  stdout: { reply: string, url?: string, proc?: string, status: string }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+grants: [spawn-web, spawn-chat, call-doctor, evolve-create]
+binding:
+  runtime: node
+  bin: bin.mjs
+  env: [TASKAND_LLM_API_KEY, TASKAND_LLM_MODEL]
+```
+
+### Checklist weryfikacyjny
+
+```bash
+# 1 · Wyślij prompt do developera
+taskand dev "jak moge cie uzywac w przegladarce?"
+
+# 2 · Sprawdź utworzone pliki organizmu web
+ls generated/web/serve/taskand.dev/v1/   # bin.mjs, proc.yaml, test.mjs
+ls web-root/index.html                  # interfejs Web Cockpit
+
+# 3 · Sprawdź działanie serwera HTTP
+curl -sf localhost:8090 | head -3       # <!doctype html>... ✓
+
+# 4 · Sprawdź wpis w katalogu federacji
+cat proc-catalog.json | grep web        # "proc://taskand.dev/web/serve/v1" ✓
+
+# 5 · Wywołaj nowy proces przez magistralę URI
+curl -s -X POST http://localhost:8077/api/proc/call \
+  -H "Content-Type: application/json" \
+  -d '{"uri":"proc://taskand.dev/web/serve/v1","data":{"action":"health"}}'
+# → {"status":"ok","port":8090} ✓
+```

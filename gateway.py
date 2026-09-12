@@ -233,18 +233,29 @@ class H(BaseHTTPRequestHandler):
                 self._send(200, {"ok": True, "organism": "hw-monitor", "reply": reply})
                 return
 
-            # 6. Routing to developer
+            # 6. Routing to developer (WYKONUJE, nie wyjaśnia)
             if org in ["dev", "developer"] or "stwórz" in msg or "stworz" in msg:
+                binpath = GENERATED / "dev" / "chat" / "taskand.dev" / "v1" / "bin.mjs"
+                if not binpath.exists():
+                    binpath = GENERATED / "developer" / "spawn" / "taskand.dev" / "v1" / "bin.mjs"
+                env = os.environ.copy()
                 if LLM_KEY:
-                    llm_reply = call_glm_llm(msg, "Jesteś organizmem deweloperskim taskand v2.0 (LLM GLM-5.3). Odpowiedz krótko i konstruktywnie z planem generowania kodu procesu.")
-                    if llm_reply:
-                        self._send(200, {"ok": True, "organism": "developer", "reply": f"[developer/LLM] {llm_reply}"})
-                        return
-                binpath = GENERATED / "developer" / "spawn" / "taskand.dev" / "v1" / "bin.mjs"
-                r = subprocess.run(["node", str(binpath)], input=json.dumps({"organism": msg}), capture_output=True, text=True)
-                d = json.loads(r.stdout) if r.returncode == 0 else {}
-                reply = f"[developer] Przyjąłem zlecenie ewolucji: {msg}. Tryb: {d.get('mode')} (LLM: {d.get('llm') or 'fallback template'})."
-                self._send(200, {"ok": True, "organism": "developer", "reply": reply})
+                    env["TASKAND_LLM_API_KEY"] = LLM_KEY
+                    env["TASKAND_LLM_MODEL"] = LLM_MODEL
+                r = subprocess.run(
+                    ["node", str(binpath)],
+                    input=json.dumps({"message": msg}),
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    env=env
+                )
+                try:
+                    res = json.loads(r.stdout)
+                    reply = res.get("reply", r.stdout)
+                except Exception:
+                    reply = r.stdout
+                self._send(200, {"ok": r.returncode == 0, "organism": "developer", "reply": reply})
                 return
 
             # Default: chat/message

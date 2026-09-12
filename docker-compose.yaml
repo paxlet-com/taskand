@@ -22,7 +22,10 @@ services:
       - TASKAND_LLM_MODEL=${TASKAND_LLM_MODEL:-glm-5.3}
       - TASKAND_LLM_ENDPOINT=${TASKAND_LLM_ENDPOINT:-https://api.z.ai/api/paas/v4/chat/completions}
     volumes:
-      - ./generated:/taskand/generated:ro
+      - ./generated:/taskand/generated
+      - ./proc-catalog.json:/taskand/proc-catalog.json
+      - ./web-root:/taskand/web-root
+      - ./index.html:/taskand/index.html
       - ./gateway.py:/app/server.py:ro
       - ./log:/taskand/log
     ports: ["8077:8077"]

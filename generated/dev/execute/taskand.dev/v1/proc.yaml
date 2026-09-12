@@ -1,0 +1,10 @@
+uri: proc://taskand.dev/dev/execute/v1
+interface:
+  stdin: { intent: string, desc: string }
+  stdout: { reply: string, status: string, proc: string, url: string }
+  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
+grants: [spawn-web, spawn-chat, call-doctor, evolve-create]
+binding:
+  runtime: node
+  bin: bin.mjs
+  env: [TASKAND_LLM_API_KEY, TASKAND_LLM_MODEL]

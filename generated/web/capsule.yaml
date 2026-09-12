@@ -1,0 +1,9 @@
+apiVersion: taskand.dev/v1
+kind: Capsule
+metadata: { name: taskand-web, version: "1.0.0" }
+spec:
+  role: interface
+  processes:
+    - uri: proc://taskand.dev/web/serve/v1
+  interfaces:
+    - { name: cockpit, kind: web, port: 8090 }

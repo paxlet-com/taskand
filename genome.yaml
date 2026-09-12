@@ -11,16 +11,22 @@ organisms:
 
   - name: developer
     processes:
+      - { uri: proc://taskand.dev/dev/chat/v1, desc: "interfejs konwersacyjny developera (WYKONUJE, nie wyjaśnia)" }
+      - { uri: proc://taskand.dev/dev/execute/v1, desc: "silnik bezpośredniego wykonywania intencji i zadań" }
       - { uri: proc://taskand.dev/dev/codegen/v1, desc: "generuje kod przez LLM" }
       - { uri: proc://taskand.dev/dev/spawn/v1, desc: "powołuje nowe organizmy" }
 
+  - name: web
+    processes:
+      - { uri: proc://taskand.dev/web/serve/v1, desc: "serwuje interfejs Web Cockpit na :8090" }
+
   - name: browser
     processes:
-      - { uri: proc://taskand.dev/browser/session/v1, desc: "steruje przeglądarką (noVNC)" }
+      - { uri: proc://taskand.dev/browser/session/v1, desc: "steruje przeglądarką (noVNC :3010)" }
 
   - name: vault
     processes:
-      - { uri: proc://taskand.dev/vault/secrets/v1, desc: "zarządza sekretami" }
+      - { uri: proc://taskand.dev/vault/secrets/v1, desc: "zarządza sekretami (AES-256-GCM)" }
 
   - name: file-ops
     processes:

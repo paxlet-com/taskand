@@ -1,0 +1,7 @@
+uri: proc://taskand.dev/dev/chat/v1
+interface:
+  stdin: { message: string }
+  stdout: { reply: string, intent: string }
+  exit: { 0: ok, 1: fail, 2: kontrakt }
+runtimes: [{ kind: node, bin: bin.mjs }]
+grants: { run: [dev-chat, spawn-web, diagnose, evolve-create] }

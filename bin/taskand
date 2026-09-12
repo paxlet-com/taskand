@@ -65,19 +65,12 @@ case "$1" in
       # Direct standalone execution via Node/Python with loaded .env
       case "$ORG" in
         dev)
-          if [ -n "$TASKAND_LLM_API_KEY" ]; then
-            PYTHONPATH="$DIR" python3 -c "
-import sys
-from gateway import call_glm_llm
-prompt = sys.argv[1]
-res = call_glm_llm(prompt, 'Jesteś organizmem deweloperskim taskand v2.0 (LLM GLM-5.3). Odpowiedz krótko i konstruktywnie z planem implementacji lub odpowiedzią na pytanie deweloperskie.')
-if res:
-    print(f'[developer/LLM] {res}')
-else:
-    print('[developer] Błąd połączenia z modelem LLM. Używam trybu lokalnego.')
-" "$PROMPT" 2>/dev/null || node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
-{"organism": "$PROMPT"}
+          if [ -f "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" ]; then
+            RESP=$(node "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" <<JSON
+{"message": "$PROMPT"}
 JSON
+)
+            echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || echo "$RESP"
           else
             node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
 {"organism": "$PROMPT"}

@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "updated": "2026-09-12T17:40:00Z",
+  "processes": [
+    {
+      "uri": "proc://taskand.dev/browser/session/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/chat/message/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/dev/codegen/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/developer/spawn/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/doctor/diagnose/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/doctor/prescribe/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/file/ops/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/hw/monitor/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/vault/secrets/v1",
+      "status": "active"
+    },
+    {
+      "uri": "proc://taskand.dev/web/serve/v1",
+      "status": "active"
+    }
+  ]
+}
