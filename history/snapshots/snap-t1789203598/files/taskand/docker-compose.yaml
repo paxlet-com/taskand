@@ -1,0 +1,56 @@
+# taskand · docker-compose.yaml v0.4
+# controller: nucleus (ten sam Dockerfile w trybie daemon) · planista: .env
+name: taskand
+
+services:
+  nucleus:
+    build: .
+    container_name: taskand-nucleus
+    env_file:
+      - path: .env          # klucz GLM-5.3 — runtime, nigdy do obrazu
+        required: false     # działa też bez .env (plan lokalny)
+    environment:
+      TASKAND_HOST_HOME: ${HOME}   # rozwinie się NA HOŚCIE (montaż gh w zadaniach)
+      TASKAND_HOST_DIR: ${TASKAND_HOST_DIR:-.}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${TASKAND_HOST_DIR:-.}/docker-compose.yaml:/taskand/docker-compose.yaml
+      - ${TASKAND_HOST_DIR:-.}/evolution:/taskand/evolution
+      - ${TASKAND_HOST_DIR:-.}/tasks:/taskand/tasks
+      - ${TASKAND_HOST_DIR:-.}/log:/taskand/log
+      - ${TASKAND_HOST_DIR:-.}/answers:/taskand/answers
+    restart: unless-stopped
+
+  gateway:
+    build: ./gateway
+    container_name: taskand-gateway
+    ports: ["8077:8077"]   # przeglądarka → POST /tasks (opcjonalne)
+    volumes:
+      - "${TASKAND_HOST_DIR:-.}/tasks:/taskand/tasks"
+    restart: unless-stopped
+
+  task-t1789203289:
+    build: ./evolution/t1789203289
+    restart: unless-stopped
+
+  task-t1789203378:
+    build: ./evolution/t1789203378
+    volumes:
+      - /home/tom/.config/gh:/root/.config/gh:ro
+    restart: "no"
+
+  task-t1789203531:
+    build: ./evolution/t1789203531
+    volumes:
+      - /home/tom/.config/gh:/root/.config/gh:ro
+    restart: "no"
+
+  orchestrator:
+    build: ./evolution/orchestrator
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-compose.yaml:/taskand/docker-compose.yaml
+      - ./tasks:/taskand/tasks
+      - ./evolution:/taskand/evolution
+      - ./log:/taskand/log
+    restart: unless-stopped

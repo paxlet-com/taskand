@@ -1,0 +1,181 @@
+#!/bin/sh
+# taskand CLI — interfejs linii poleceń do zarządzania systemem taskand
+set -eu
+
+# Znajdź katalog projektu (tam gdzie znajduje się docker-compose.yaml)
+PROJECT_DIR="$(cd "$(dirname "$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")")" && pwd)"
+[ -f "$PROJECT_DIR/docker-compose.yaml" ] || PROJECT_DIR="$(pwd)"
+
+INBOX="$PROJECT_DIR/tasks/inbox.yaml"
+DONE="$PROJECT_DIR/tasks/done.yaml"
+
+cmd="${1:-}"
+
+case "$cmd" in
+  add)
+    shift || true
+    TYP=""
+    FOLLOW=1
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        -t|--typ)
+          TYP="$2"
+          shift 2
+          ;;
+        -d|--async|--no-follow)
+          FOLLOW=0
+          shift
+          ;;
+        -f|--follow)
+          FOLLOW=1
+          shift
+          ;;
+        *)
+          break
+          ;;
+      esac
+    done
+    ZADANIE="${*:-}"
+    if [ -z "$ZADANIE" ]; then
+      echo "Użycie: taskand add [-t <typ>] [-d|--async] \"opis zadania\""
+      echo "Domyślny typ: rozpoznawany automatycznie ze zdania (czyszczenie, github-projekt, obserwuj, handover)"
+      echo "Domyślnie: śledzenie logów na żywo (użyj -d dla działania w tle)"
+      exit 1
+    fi
+
+    # Automatyczna analiza intencji ze zdania (jeśli nie wymuszono flagi -t)
+    if [ -z "$TYP" ]; then
+      LOWER_Z=$(printf '%s' "$ZADANIE" | tr '[:upper:]' '[:lower:]')
+      case "$LOWER_Z" in
+        *usuń*|*skasuj*|*wyczyść*|*delete*|*clean*|*remove*|*rm\ *)
+          TYP="czyszczenie"
+          ;;
+        *wypchnij*|*push*|*sync*|*commit*|*wyślij*git*|*wypchnij*git*)
+          TYP="git-push"
+          ;;
+        *obserwuj*|*monitor*|*watch*|*ping*)
+          TYP="obserwuj"
+          ;;
+        *handover*|*przekaż*)
+          TYP="handover"
+          ;;
+        *)
+          TYP="github-projekt"
+          ;;
+      esac
+    fi
+    TID="t$(date +%s)"
+    mkdir -p "$PROJECT_DIR/tasks" "$PROJECT_DIR/log"
+    touch "$PROJECT_DIR/log/evolution.log" "$DONE" 2>/dev/null || true
+    if ! printf -- "- id: %s\n  typ: %s\n  z: %s\n" "$TID" "$TYP" "$ZADANIE" >> "$INBOX" 2>/dev/null; then
+      # Fallback przez lokalną bramkę HTTP Gateway (działającą jako root w kontenerze)
+      curl -s -X POST http://localhost:8077/tasks \
+        -H "Content-Type: application/json" \
+        -d "{\"id\":\"$TID\",\"typ\":\"$TYP\",\"z\":\"$ZADANIE\"}" >/dev/null || {
+          echo "Błąd: brak uprawnień zapisu do $INBOX i bramka HTTP nie odpowiada!"
+          exit 1
+        }
+    fi
+    echo "✓ Dodano zadanie [$TID] (typ: $TYP): $ZADANIE"
+
+    if [ "$FOLLOW" = "1" ]; then
+      echo "→ Śledzenie wykonania zadania [$TID] na żywo (Ctrl+C aby odpiąć podgląd):"
+      echo ""
+      tail -n 0 -f "$PROJECT_DIR/log/evolution.log" &
+      TAIL_PID=$!
+      cleanup_tail(){
+        kill $TAIL_PID 2>/dev/null || true
+        wait $TAIL_PID 2>/dev/null || true
+      }
+      trap cleanup_tail INT TERM EXIT
+
+      while kill -0 $TAIL_PID 2>/dev/null; do
+        if grep -q "id: $TID" "$DONE" 2>/dev/null; then
+          sleep 1
+          cleanup_tail
+          echo ""
+          echo "✓ Zadanie [$TID] wykonane pomyślnie!"
+          break
+        fi
+        sleep 0.5
+      done
+      trap - INT TERM EXIT
+    fi
+    ;;
+  clean|cleanup)
+    shift || true
+    "$0" add -t czyszczenie "${*:-usuń zbędny podkatalog taskand i duplikaty}"
+    ;;
+  tasks|list)
+    echo "=== Oczekujące zadania ($INBOX) ==="
+    if [ -s "$INBOX" ]; then cat "$INBOX"; else echo "(brak zadań w kolejce)"; fi
+    echo ""
+    echo "=== Wykonane zadania ($DONE) ==="
+    if [ -s "$DONE" ]; then cat "$DONE"; else echo "(brak wykonanych zadań)"; fi
+    ;;
+  logs|log)
+    shift || true
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" logs -f "${@:-nucleus}"
+    ;;
+  ps|status)
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" ps
+    ;;
+  up|start)
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" up -d
+    ;;
+  down|stop)
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" down
+    ;;
+  restart)
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" restart
+    ;;
+  history|hist)
+    shift || true
+    python3 "$PROJECT_DIR/scripts/history.py" list
+    ;;
+  rollback|revert)
+    shift || true
+    python3 "$PROJECT_DIR/scripts/history.py" rollback "${1:-}"
+    ;;
+  snapshot|backup)
+    shift || true
+    python3 "$PROJECT_DIR/scripts/history.py" snapshot "${1:-taskand}" "${2:-Ręczna migawka stanu}"
+    ;;
+  show|inspect|info)
+    shift || true
+    python3 "$PROJECT_DIR/scripts/history.py" show "${1:-}"
+    ;;
+  web|landing)
+    shift || true
+    sh "$PROJECT_DIR/serve.sh" "${1:-8080}"
+    ;;
+  help|-h|--help|"")
+    echo "taskand v0.4 — system zadań sterowany procesami-Dockerfile"
+    echo ""
+    echo "Użycie: taskand <komenda> [opcje]"
+    echo ""
+    echo "Polecenia:"
+    echo "  taskand add \"opis zadania\"          Dodaj zadanie i śledź wykonanie na żywo"
+    echo "  taskand add -d \"opis\"              Dodaj zadanie w tle (async)"
+    echo "  taskand add -t <typ> \"opis\"        Dodaj zadanie wybranego typu (github-projekt, czyszczenie, obserwuj)"
+    echo "  taskand clean                        Uruchom zadanie czyszczenia zbędnego podkatalogu taskand"
+    echo "  taskand tasks                        Pokaż kolejkę zadań (inbox) i historię (done)"
+    echo "  taskand history                      Wyświetl historię zadań i dostępnych migawek z hashami"
+    echo "  taskand rollback [snap_id_lub_hash]  Przywróć stan plików z wybranej migawki"
+    echo "  taskand snapshot [ścieżka] [opis]    Utwórz ręczną migawkę stanu plików (SHA-256)"
+    echo "  taskand logs [nucleus|gateway]       Śledź logi na żywo"
+    echo "  taskand status                       Status kontenerów (docker compose ps)"
+    echo "  taskand up                           Uruchom kontenery w tle"
+    echo "  taskand down                         Zatrzymaj kontenery"
+    echo "  taskand restart                      Zrestartuj kontenery"
+    echo "  taskand web [port]                   Uruchom serwer strony landing (np. 8080)"
+    echo ""
+    echo "Aktualny stan kontenerów:"
+    docker compose -f "$PROJECT_DIR/docker-compose.yaml" ps
+    ;;
+  *)
+    echo "Nieznana komenda: $cmd"
+    echo "Uruchom 'taskand help' aby zobaczyć dostępne polecenia."
+    exit 1
+    ;;
+esac

@@ -1,0 +1,9 @@
+# Environment & secrets
+.env
+
+# Logs
+log/
+*.log
+
+# Large snapshot archives
+history/*.tar.gz
