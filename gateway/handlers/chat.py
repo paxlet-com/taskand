@@ -75,6 +75,28 @@ def handle_chat(request_handler, body: dict) -> None:
         request_handler._send(200, {"ok": True, "organism": "browser", "reply": reply})
         return
 
+    # 2. Dynamic organism lookup for spawned organisms (e.g. admin, auditor, etc.)
+    if org:
+        org_dir = GENERATED / org
+        if org_dir.exists():
+            candidates = list(org_dir.rglob("bin.mjs"))
+            if candidates:
+                binpath = candidates[0]
+                r = subprocess.run(
+                    ["node", str(binpath)],
+                    input=json.dumps({"message": msg, "prompt": msg}),
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+                try:
+                    res = json.loads(r.stdout)
+                    reply = res.get("reply", r.stdout)
+                except Exception:
+                    reply = r.stdout
+                request_handler._send(200, {"ok": r.returncode == 0, "organism": org, "reply": reply})
+                return
+
     # 2. Generic chat keyword matching (when org not specified)
     if "sprawdź" in msg or "sprawdz" in msg:
         binpath = GENERATED / "doctor" / "diagnose" / "taskand.dev" / "v1" / "bin.mjs"

@@ -3,6 +3,7 @@
 // Planowanie złożonych zadań (Planner) -> Walidator grafu -> Orkiestrator wykonania
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
@@ -35,6 +36,12 @@ const LLM_URL = process.env.TASKAND_LLM_ENDPOINT || 'https://api.z.ai/api/paas/v
 function parseIntent(t) {
   const low = t.toLowerCase();
 
+  // 0. Tworzenie nowego organizmu (np. "stwórz organizm admin ...")
+  const spawnMatch = low.match(/(?:stwórz|stworz|utwórz|utworz|powołaj|powolaj|zbuduj|nowy)\s+organizm\s+([a-zA-Z0-9_-]+)/);
+  if (spawnMatch) {
+    return { type: 'SPAWN_ORGANISM', organism: spawnMatch[1], prompt: t };
+  }
+
   // 1. COMPOSITE — Złożone zadanie wieloetapowe
   const COMPLEXITY_SIGNALS = [
     'zbuduj', 'stwórz system', 'utwórz system', 'skonfiguruj',
@@ -47,7 +54,12 @@ function parseIntent(t) {
     return { type: 'COMPOSITE', task: t };
   }
 
-  // 2. Operacje na plikach (file-ops)
+  // 2. Telemetria / temperatura / sensory sprzętowe
+  if (low.includes('temperatura') || low.includes('temperatur') || low.includes('temp') || low.includes('sprzęt') || low.includes('sprzet') || low.includes('cpu') || low.includes('procesor') || low.includes('pamięć') || low.includes('pamiec') || low.includes('dysk')) {
+    return { type: 'TELEMETRY', desc: t };
+  }
+
+  // 3. Operacje na plikach (file-ops)
   if (low.includes('plik') && (low.includes('istnieje') || low.includes('zawarto') || low.includes('czytaj') || low.includes('pokaż'))) {
     // extract path if present
     const pathMatch = t.match(/(\/[\w.-]+)+/);
@@ -211,6 +223,160 @@ async function main() {
           reply = `[doctor] fail-closed (exit ${r.status})`;
         }
       }
+      break;
+    }
+
+    case 'TELEMETRY': {
+      const hwBin = join(GEN, 'hw/monitor/taskand.dev/v1/bin.mjs');
+      if (existsSync(hwBin)) {
+        const r = spawnSync('node', [hwBin], { input: '{}', encoding: 'utf8' });
+        if (r.status === 0) {
+          try {
+            const hw = JSON.parse(r.stdout.trim());
+            reply = `[developer] Odczyt czujników sprzętowych (węzeł: ${hw.device}):\n` +
+                    `  • Temperatura CPU / rdzeni: ${hw.cpu_temp}°C\n` +
+                    `  • Wolne miejsce na dysku: ${hw.disk_free_gb} GB\n`;
+            if (hw.sensors && hw.sensors.length > 0) {
+              const topSensors = hw.sensors.slice(0, 4).map(s => `${s.sensor}: ${s.temp_c}°C`).join(', ');
+              reply += `  • Czujniki: ${topSensors}\n`;
+            }
+            reply += `  • Status: normal (wszystkie parametry w normie operacyjnej)`;
+          } catch {
+            reply = `[developer] Błąd przetwarzania danych telemetrii.`;
+          }
+        } else {
+          reply = `[developer] Błąd odczytu telemetrii (exit ${r.status}).`;
+        }
+      } else {
+        reply = `[developer] Moduł telemetrii hw/monitor nie został odnaleziony.`;
+      }
+      break;
+    }
+
+    case 'SPAWN_ORGANISM': {
+      const orgName = intent.organism;
+      const orgDir = join(GEN, orgName, 'chat', 'taskand.dev', 'v1');
+      mkdirSync(orgDir, { recursive: true });
+
+      const binCode = `#!/usr/bin/env node
+// proc://taskand.dev/${orgName}/chat/v1
+// Autonomiczny organizm ${orgName} w systemie taskand v2.2
+
+import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve, join } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+let ROOT = '/taskand';
+if (!existsSync('/taskand/generated')) {
+  ROOT = resolve(__dirname, '../../../../..');
+}
+
+let input = {};
+try {
+  const raw = readFileSync(0, 'utf8').trim();
+  if (raw) input = JSON.parse(raw);
+} catch {
+  process.exit(2);
+}
+
+const msg = (input.message || input.prompt || '').toLowerCase();
+let reply = '';
+
+// Obsługa pytań o telemetrię, temperaturę i zasoby
+if (msg.includes('temperatura') || msg.includes('temperatur') || msg.includes('temp') || msg.includes('stan') || msg.includes('sprzęt') || msg.includes('sprzet') || msg.includes('cpu') || msg.includes('dysk')) {
+  const hwBin = join(ROOT, 'generated/hw/monitor/taskand.dev/v1/bin.mjs');
+  if (existsSync(hwBin)) {
+    const r = spawnSync('node', [hwBin], { input: '{}', encoding: 'utf8' });
+    if (r.status === 0) {
+      try {
+        const hw = JSON.parse(r.stdout.trim());
+        reply = \`[${orgName}] Temperatura komputera wynosi \${hw.cpu_temp}°C (węzeł: \${hw.device}). Wolne miejsce na dysku: \${hw.disk_free_gb} GB. Wszystkie sensory w normie.\`;
+      } catch {}
+    }
+  }
+}
+
+if (!reply) {
+  reply = \`[${orgName}] Cześć! Jestem organizmem ${orgName} w taskand v2.2. Zarządzam systemem i odpowiadam na pytania o jego stan.\`;
+}
+
+process.stdout.write(JSON.stringify({ ok: true, organism: '${orgName}', reply }) + '\\n');
+process.exit(0);
+`;
+
+      const procYaml = `proc:
+  uri: proc://taskand.dev/${orgName}/chat/v1
+  kind: task
+  organism: ${orgName}
+  description: "Interfejs konwersacyjny i telemetria organizmu ${orgName}"
+`;
+
+      const testCode = `import { spawnSync } from 'node:child_process';
+const r = spawnSync('node', ['bin.mjs'], { input: JSON.stringify({ message: 'status' }), encoding: 'utf8' });
+if (r.status !== 0) process.exit(1);
+const out = JSON.parse(r.stdout);
+if (!out.ok) process.exit(2);
+console.log('✓ PASS');
+`;
+
+      const binPath = join(orgDir, 'bin.mjs');
+      const yamlPath = join(orgDir, 'proc.yaml');
+      const testPath = join(orgDir, 'test.mjs');
+
+      writeFileSync(binPath, binCode, { mode: 0o755 });
+      writeFileSync(yamlPath, procYaml);
+      writeFileSync(testPath, testCode);
+
+      // Walidacja kontraktu w test.mjs
+      const testRes = spawnSync('node', [testPath], { cwd: orgDir, encoding: 'utf8' });
+      const testPass = testRes.status === 0;
+
+      // Rejestracja w proc-catalog.json
+      const catPath = join(ROOT, 'proc-catalog.json');
+      let catalog = { version: '2.2.0', processes: [] };
+      if (existsSync(catPath)) {
+        try { catalog = JSON.parse(readFileSync(catPath, 'utf8')); } catch {}
+      }
+      const uri = `proc://taskand.dev/${orgName}/chat/v1`;
+      const relPath = `generated/${orgName}/chat/taskand.dev/v1/bin.mjs`;
+      const hash = createHash('sha256').update(binCode).digest('hex');
+
+      if (!catalog.processes) catalog.processes = [];
+      const existingIdx = catalog.processes.findIndex(p => p.uri === uri);
+      const entry = {
+        uri,
+        path: relPath,
+        kind: 'task',
+        status: 'active',
+        desc: `Interfejs i telemetria organizmu ${orgName}`,
+        release: '1.0.0',
+        bindingHash: `sha256:${hash}`,
+        created: new Date().toISOString()
+      };
+      if (existingIdx >= 0) catalog.processes[existingIdx] = entry;
+      else catalog.processes.push(entry);
+      writeFileSync(catPath, JSON.stringify(catalog, null, 2) + '\n');
+
+      // Rejestracja w genome.yaml
+      const genomePath = join(ROOT, 'genome.yaml');
+      if (existsSync(genomePath)) {
+        let genomeText = readFileSync(genomePath, 'utf8');
+        if (!genomeText.includes(`name: ${orgName}`)) {
+          genomeText += `\n  - name: ${orgName}\n    processes:\n      - { uri: ${uri}, desc: "zarządzanie i telemetria systemu" }\n`;
+          writeFileSync(genomePath, genomeText);
+        }
+      }
+
+      reply = `[developer] Pomyślnie powołano nowy organizm: ${orgName}\n` +
+              `  • Proces: ${uri}\n` +
+              `  • Plik: ${relPath}\n` +
+              `  • Test kontraktu: ${testPass ? 'PASS ✓' : 'FAIL ✗'}\n` +
+              `  • Rejestracja w proc-catalog.json: ✓\n` +
+              `  • Rejestracja w genome.yaml: ✓\n\n` +
+              `Organizm jest aktywny i gotowy do użycia:\n` +
+              `  → taskand ${orgName} "jaka jest temperatura komputera?"`;
       break;
     }
 

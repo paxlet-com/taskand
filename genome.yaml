@@ -54,3 +54,7 @@ organisms:
   - name: hw-monitor
     processes:
       - { uri: proc://taskand.dev/hw/monitor/v1, desc: "telemetria sprzętu i GPIO" }
+
+  - name: admin
+    processes:
+      - { uri: proc://taskand.dev/admin/chat/v1, desc: "zarządzanie i telemetria systemu" }

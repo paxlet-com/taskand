@@ -171,6 +171,16 @@
       "release": "1.0.0",
       "created": "2026-09-12T17:50:00Z",
       "bindingHash": "sha256:c784f635674724ad14639965e9610aee303f26c7f8a43a68de090b0be9ebfb0d"
+    },
+    {
+      "uri": "proc://taskand.dev/admin/chat/v1",
+      "path": "generated/admin/chat/taskand.dev/v1/bin.mjs",
+      "kind": "task",
+      "status": "active",
+      "desc": "Interfejs i telemetria organizmu admin",
+      "release": "1.0.0",
+      "bindingHash": "sha256:518e804714a0aba06964fb8140031edfbdf6e7d1b215d0f6b254f15829b95fd7",
+      "created": "2026-09-12T18:15:41.050Z"
     }
   ]
 }

@@ -24,6 +24,7 @@ services:
     volumes:
       - ./generated:/taskand/generated
       - ./proc-catalog.json:/taskand/proc-catalog.json
+      - ./genome.yaml:/taskand/genome.yaml
       - ./grants.yaml:/taskand/grants.yaml:ro
       - ./web-root:/taskand/web-root
       - ./index.html:/taskand/index.html

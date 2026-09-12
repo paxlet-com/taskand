@@ -1,5 +1,68 @@
 # Changelog
 
+## [Unreleased] - 2026-09-12
+
+### Fixed
+- Fix ruff-sorted-imports issues (ticket-6b1d726f)
+- Fix magic-numbers issues (ticket-417670b9)
+- Fix import-optimization issues (ticket-76552210)
+- Fix ast-sorted-imports issues (ticket-b0fae0bb)
+- Fix ruff-sorted-imports issues (ticket-1f5433f9)
+- Fix magic-numbers issues (ticket-7010d414)
+- Fix string-formatting issues (ticket-1669b9bd)
+- Fix import-optimization issues (ticket-c2d1f9ec)
+- Fix ast-unused-imports issues (ticket-3ddf3ca9)
+- Fix ast-sorted-imports issues (ticket-2ab2b50e)
+- Fix ast-print-statements issues (ticket-fab23633)
+- Fix ast-missing-return-type issues (ticket-40d562ae)
+- Fix ruff-unused-imports issues (ticket-7f6ea4f4)
+- Fix ruff-print-statements issues (ticket-d4819018)
+- Fix ruff-sorted-imports issues (ticket-44fcda40)
+- Fix smart-return-type issues (ticket-54ee205b)
+- Fix unused-imports issues (ticket-c466783d)
+- Fix magic-numbers issues (ticket-b6809962)
+- Fix import-optimization issues (ticket-1add9241)
+- Fix ast-sorted-imports issues (ticket-7e1263c1)
+- Fix ruff-sorted-imports issues (ticket-2aa4579b)
+- Fix import-optimization issues (ticket-081f6e3d)
+- Fix ruff-sorted-imports issues (ticket-b08b0b49)
+- Fix magic-numbers issues (ticket-8ab98003)
+- Fix import-optimization issues (ticket-d226c4f3)
+- Fix ruff-sorted-imports issues (ticket-6bf78b59)
+- Fix magic-numbers issues (ticket-2efeb2a7)
+- Fix import-optimization issues (ticket-8bb69b3f)
+- Fix ast-sorted-imports issues (ticket-42567390)
+- Fix ruff-sorted-imports issues (ticket-d16e971c)
+- Fix magic-numbers issues (ticket-290da211)
+- Fix import-optimization issues (ticket-1badb2db)
+- Fix ast-sorted-imports issues (ticket-d74846c3)
+- Fix ruff-sorted-imports issues (ticket-482c5324)
+- Fix magic-numbers issues (ticket-061ba0bc)
+- Fix import-optimization issues (ticket-b7f61a9d)
+- Fix ast-sorted-imports issues (ticket-b1b3c675)
+- Fix ruff-sorted-imports issues (ticket-aa913c78)
+- Fix magic-numbers issues (ticket-86d125c4)
+- Fix import-optimization issues (ticket-09ede8fd)
+- Fix ast-sorted-imports issues (ticket-8c499c8a)
+- Fix ast-string-concat issues (ticket-5324b0c6)
+- Fix ruff-sorted-imports issues (ticket-8a072d16)
+- Fix string-concat-fstring issues (ticket-47fe35f0)
+- Fix string-formatting issues (ticket-9ef37d2b)
+- Fix import-optimization issues (ticket-0008c9ce)
+- Fix ast-sorted-imports issues (ticket-f5e57079)
+- Fix ruff-sorted-imports issues (ticket-d97ef4f8)
+- Fix magic-numbers issues (ticket-0a8ab495)
+- Fix import-optimization issues (ticket-9c6b01be)
+- Fix ast-unused-imports issues (ticket-08ca7f50)
+- Fix ast-sorted-imports issues (ticket-c88d6e99)
+- Fix ruff-unused-imports issues (ticket-e4e2e719)
+- Fix ruff-sorted-imports issues (ticket-fbbe0c7d)
+- Fix unused-imports issues (ticket-eed5a986)
+- Fix ai-boilerplate issues (ticket-7e73e316)
+- Fix import-optimization issues (ticket-4d088f66)
+- Fix ast-sorted-imports issues (ticket-b3eb38e7)
+- Fix ruff-sorted-imports issues (ticket-e813135c)
+
 ## [2.2.0] - 2026-09-12
 
 ### Added
@@ -16,6 +79,10 @@
 - Error taxonomy: `DEPENDENCY_BLOCKED`, `RETRYABLE`, `DENIED`, `VALIDATION_FAILED`, `FATAL`, `EXEC_ERROR`
 - Release pinning and SHA-256 `bindingHash` integrity verification in `proc-catalog.json` and validator
 - Automated negative test suite (`tests/negative_tests.mjs` running 10 edge case scenarios)
+- Real hardware telemetry sensor reading in `hw/monitor` (CPU thermal zones, core temperatures, disk free)
+- Real autonomous organism creation in `dev/chat` (`SPAWN_ORGANISM`) with contract test verification, catalog and genome registration
+- Dynamic organism routing in CLI (`bin/taskand`) and Gateway (`gateway/handlers/chat.py`) supporting newly spawned organisms (e.g. `taskand admin`)
+- Fix developer LLM assistant hallucination on hardware queries by directly invoking telemetry tools
 
 ## [Unreleased] - 2026-09-12
 

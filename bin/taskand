@@ -26,90 +26,116 @@ is_gateway_up() {
   curl -s --connect-timeout 1 "$GATEWAY/healthz" >/dev/null 2>&1
 }
 
-case "$1" in
-  dev|developer|doc|doctor|sec|vault|chat|browser|file|hw)
-    ORG=$(case "$1" in
-      dev|developer) echo dev;;
-      doc|doctor) echo doc;;
-      sec|vault) echo sec;;
-      chat) echo chat;;
-      browser) echo browser;;
-      file) echo file;;
-      hw) echo hw;;
-    esac)
-    shift
-    PROMPT="$*"
-    if [ -z "$PROMPT" ]; then
-      case "$ORG" in
-        dev) PROMPT="cześć, co potrafisz?";;
-        doc) PROMPT="sprawdź czy wszystko działa";;
-        sec) PROMPT="status";;
-        browser) PROMPT="status";;
-        file) PROMPT="pokaż pliki";;
-        hw) PROMPT="stan sprzętu";;
-        *) PROMPT="status";;
-      esac
-    fi
-
-    if is_gateway_up; then
-      RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
-        -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
-      REPLY=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
-      if [ -n "$REPLY" ]; then
-        echo "$REPLY"
-      else
-        echo "$RESP"
+is_organism() {
+  case "$1" in
+    dev|developer|doc|doctor|sec|vault|chat|browser|file|hw) return 0;;
+    *)
+      if [ -d "$DIR/generated/$1" ] || grep -q "name: $1" "$DIR/genome.yaml" 2>/dev/null; then
+        return 0
       fi
+      return 1
+      ;;
+  esac
+}
+
+handle_organism() {
+  ORG=$(case "$1" in
+    dev|developer) echo dev;;
+    doc|doctor) echo doc;;
+    sec|vault) echo sec;;
+    chat) echo chat;;
+    browser) echo browser;;
+    file) echo file;;
+    hw) echo hw;;
+    *) echo "$1";;
+  esac)
+  shift
+  PROMPT="$*"
+  if [ -z "$PROMPT" ]; then
+    case "$ORG" in
+      dev) PROMPT="cześć, co potrafisz?";;
+      doc) PROMPT="sprawdź czy wszystko działa";;
+      sec) PROMPT="status";;
+      browser) PROMPT="status";;
+      file) PROMPT="pokaż pliki";;
+      hw) PROMPT="stan sprzętu";;
+      *) PROMPT="status";;
+    esac
+  fi
+
+  if is_gateway_up; then
+    RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
+      -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
+    REPLY=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
+    if [ -n "$REPLY" ]; then
+      echo "$REPLY"
     else
-      # Direct standalone execution via Node/Python with loaded .env
-      case "$ORG" in
-        dev)
-          if [ -f "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" ]; then
-            RESP=$(node "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" <<JSON
+      echo "$RESP"
+    fi
+  else
+    # Direct standalone execution via Node/Python with loaded .env
+    case "$ORG" in
+      dev)
+        if [ -f "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" ]; then
+          RESP=$(node "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" <<JSON
 {"message": "$PROMPT"}
 JSON
 )
-            echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || echo "$RESP"
-          else
-            node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
+          echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || echo "$RESP"
+        else
+          node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
 {"organism": "$PROMPT"}
 JSON
-          fi
-          ;;
-        doc)
-          node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
+        fi
+        ;;
+      doc)
+        node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
 {}
 JSON
-          ;;
-        sec)
-          node "$DIR/generated/vault/secrets/taskand.dev/v1/bin.mjs" <<JSON
+        ;;
+      sec)
+        node "$DIR/generated/vault/secrets/taskand.dev/v1/bin.mjs" <<JSON
 {"action": "status"}
 JSON
-          ;;
-        browser)
-          node "$DIR/generated/browser/session/taskand.dev/v1/bin.mjs" <<JSON
+        ;;
+      browser)
+        node "$DIR/generated/browser/session/taskand.dev/v1/bin.mjs" <<JSON
 {"action": "open", "url": "$PROMPT"}
 JSON
-          ;;
-        file)
-          node "$DIR/generated/file/ops/taskand.dev/v1/bin.mjs" <<JSON
+        ;;
+      file)
+        node "$DIR/generated/file/ops/taskand.dev/v1/bin.mjs" <<JSON
 {"op": "list"}
 JSON
-          ;;
-        hw)
-          node "$DIR/generated/hw/monitor/taskand.dev/v1/bin.mjs" <<JSON
+        ;;
+      hw)
+        node "$DIR/generated/hw/monitor/taskand.dev/v1/bin.mjs" <<JSON
 {}
 JSON
-          ;;
-        *)
+        ;;
+      *)
+        FOUND_BIN=$(find "$DIR/generated/$ORG" -name "bin.mjs" 2>/dev/null | head -n 1)
+        if [ -n "$FOUND_BIN" ] && [ -f "$FOUND_BIN" ]; then
+          RESP=$(node "$FOUND_BIN" <<JSON
+{"message": "$PROMPT", "prompt": "$PROMPT"}
+JSON
+)
+          echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || echo "$RESP"
+        else
           node "$DIR/generated/chat/message/taskand.dev/v1/bin.mjs" <<JSON
 {"message": "$PROMPT"}
 JSON
-          ;;
-      esac
-    fi
+        fi
+        ;;
+    esac
+  fi
+}
+
+case "$1" in
+  dev|developer|doc|doctor|sec|vault|chat|browser|file|hw)
+    handle_organism "$@"
     ;;
 
   proc)
@@ -189,19 +215,34 @@ JSON
     ;;
 
   *)
-    echo "taskand v2.0 — Minimalny, auto-mnożący się system"
-    echo ""
-    echo "Użycie:"
-    echo "  taskand dev \"<prompt>\"     rozmowa z developerem (ewolucja/LLM)"
-    echo "  taskand doc \"<prompt>\"     rozmowa ze strażnikiem zdrowia (doctor)"
-    echo "  taskand sec \"<prompt>\"     zarządzanie sejfem i sekretami (vault)"
-    echo "  taskand browser \"<prompt>\" sterowanie przeglądarką noVNC"
-    echo "  taskand file \"<prompt>\"    operacje na plikach na węźle"
-    echo "  taskand hw \"<prompt>\"      telemetria sprzętu i GPIO"
-    echo "  taskand proc <uri> [json]  bezpośrednie wywołanie procesu proc://"
-    echo "  taskand status             stan systemu i usług"
-    echo "  taskand fed                lista procesów w federacji"
-    echo "  taskand boot <host>        cross-device bootstrap na zdalnym węźle"
-    echo "  taskand log [n]            podgląd dziennika zdarzeń"
+    if [ -n "$1" ] && is_organism "$1"; then
+      handle_organism "$@"
+    else
+      echo "taskand v2.2 — Minimalny, auto-mnożący się system"
+      echo ""
+      echo "Użycie:"
+      echo "  taskand dev \"<prompt>\"     rozmowa z developerem (ewolucja/LLM)"
+      echo "  taskand doc \"<prompt>\"     rozmowa ze strażnikiem zdrowia (doctor)"
+      echo "  taskand sec \"<prompt>\"     zarządzanie sejfem i sekretami (vault)"
+      echo "  taskand browser \"<prompt>\" sterowanie przeglądarką noVNC"
+      echo "  taskand file \"<prompt>\"    operacje na plikach na węźle"
+      echo "  taskand hw \"<prompt>\"      telemetria sprzętu i GPIO"
+      if [ -d "$DIR/generated" ]; then
+        for o in "$DIR/generated"/*; do
+          if [ -d "$o" ]; then
+            oname=$(basename "$o")
+            case "$oname" in
+              dev|developer|doctor|doc|vault|sec|browser|file|hw|chat|alert|monitor|planner|validator|orchestrator|web) ;;
+              *) echo "  taskand $oname \"<prompt>\"   autonomiczny organizm $oname" ;;
+            esac
+          fi
+        done
+      fi
+      echo "  taskand proc <uri> [json]  bezpośrednie wywołanie procesu proc://"
+      echo "  taskand status             stan systemu i usług"
+      echo "  taskand fed                lista procesów w federacji"
+      echo "  taskand boot <host>        cross-device bootstrap na zdalnym węźle"
+      echo "  taskand log [n]            podgląd dziennika zdarzeń"
+    fi
     ;;
 esac

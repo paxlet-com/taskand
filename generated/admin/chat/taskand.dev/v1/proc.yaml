@@ -1,0 +1,5 @@
+proc:
+  uri: proc://taskand.dev/admin/chat/v1
+  kind: task
+  organism: admin
+  description: "Interfejs konwersacyjny i telemetria organizmu admin"
