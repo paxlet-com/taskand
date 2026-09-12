@@ -1,3 +1,5 @@
+![img.png](img.png)
+
 # taskand v2.0 — Minimalny, auto-mnożący się ekosystem (Standard v2.0)
 
 > **taskand v2.0** redukuje złożoność systemu do zaledwie **5 kluczowych plików**. Likwiduje 5 zbędnych warstw pośredniczących i setki zduplikowanych plików z wersji legacy. Bootstrap (zygota) czyta genom, sprawdza dostępność klucza LLM (`TASKAND_LLM_API_KEY` z modelem **GLM-5.3**): jeśli klucz jest obecny — AI autonomicznie generuje kod procesów w locie; jeśli nie — system korzysta ze sprawdzonych, wbudowanych szablonów.

@@ -3,6 +3,24 @@
 ## [Unreleased] - 2026-09-12
 
 ### Fixed
+- Fix ast-duplicate-imports issues (ticket-1b0c6508)
+- Fix ast-sorted-imports issues (ticket-c88d6e99)
+- Fix ast-string-concat issues (ticket-ace36772)
+- Fix ast-print-statements issues (ticket-59513206)
+- Fix ast-missing-return-type issues (ticket-94b3ac97)
+- Fix ruff-print-statements issues (ticket-995cf87a)
+- Fix ruff-sorted-imports issues (ticket-fbbe0c7d)
+- Fix smart-return-type issues (ticket-367fadf1)
+- Fix string-concat-fstring issues (ticket-b93f8379)
+- Fix importchecker-duplicate-imports issues (ticket-f129ddaa)
+- Fix magic-numbers issues (ticket-46566321)
+- Fix ai-boilerplate issues (ticket-7e73e316)
+- Fix string-formatting issues (ticket-065cc1f4)
+- Fix import-optimization issues (ticket-4d088f66)
+
+## [Unreleased] - 2026-09-12
+
+### Fixed
 - Fix ast-duplicate-imports issues (ticket-e22adcbf)
 - Fix ast-sorted-imports issues (ticket-a831034e)
 - Fix ast-string-concat issues (ticket-2432c0cb)
