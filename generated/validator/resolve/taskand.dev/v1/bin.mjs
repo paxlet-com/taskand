@@ -116,9 +116,22 @@ for (const s of steps) {
 
 // 5. Rozwiązanie procesów URI przez rejestr (status active + bindingHash weryfikuje registry/core)
 const resolvedSteps = [];
+const activeCatalog = registry('list', { status: 'active' });
 for (const s of steps) {
   const stepCopy = { ...s };
   if (s.process && s.process.startsWith("spawn:")) {
+    const match = /^spawn:(?:([a-z0-9-]+)\/)?([a-z0-9-]+)$/.exec(s.process);
+    const candidates = match ? (activeCatalog.processes || []).filter(p =>
+      p.uri.match(/^proc:\/\/taskand\.dev\/[^/]+\/([^/]+)\/v\d+$/)?.[1] === match[2] && (!match[1] || p.organism === match[1])) : [];
+    const owners = [...new Set(candidates.map(p => p.organism))];
+    if (owners.length === 1) {
+      const reused = registry('select', { organism: owners[0], capability: match[2] });
+      if (reused.ok) {
+        resolvedSteps.push({ ...stepCopy, process: reused.uri, hash: reused.entry.hash, kind: reused.entry.kind, reused: true });
+        continue;
+      }
+      errors.push(`Krok "${s.name}": istniejący proces nie przeszedł weryfikacji: ${reused.error}`);
+    }
     unresolvedCapabilities.push({
       stepId: s.id,
       name: s.name,
