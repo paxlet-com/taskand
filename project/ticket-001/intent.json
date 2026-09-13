@@ -1,0 +1,217 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-001",
+  "summary": "Taskand: complementary context, planner DSL and live user-twin observability",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    ".aider.conf.yml",
+    ".cursor/**",
+    ".githooks/**",
+    ".github/**",
+    ".gitignore",
+    ".governance/**",
+    ".subactor/.gitignore",
+    ".subactor/manifest.json",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "GEMINI.md",
+    "project.bat",
+    "project/governance-check.*",
+    "project/new-ticket.sh",
+    "project/readme.sh",
+    "scripts/install-agent-hosts.sh",
+    "scripts/runtime.sh",
+    "wellmanifest_governance.py",
+    "worktree-guard.yaml",
+    "VERSION",
+    "project/ticket-001/**",
+    "project/TICKETS.md",
+    "project/lease-controller.py",
+    "gateway/context.py",
+    "gateway/__init__.py",
+    "gateway/utils.py",
+    "gateway/handlers/context.py",
+    "gateway/router.py",
+    "index.html",
+    "generated/planner/plan/taskand.dev/v1/bin.mjs",
+    "generated/planner/registry.json",
+    "tests/context_test.py",
+    "docs/information/complementary-runtime.md",
+    "docs/README.md",
+    "docker-compose.yaml",
+    "Dockerfile",
+    "bin/taskand",
+    "gateway/handlers/mesh.py",
+    "tests/mesh_test.py",
+    "docs/information/instance-network.md",
+    "gateway/handlers/observers.py",
+    "tests/observers_test.py",
+    "docs/analysis/digital-twin.md",
+    "examples/web-twin-github.json",
+    "examples/web-twin-subactor.json",
+    "examples/web-twin-task.mjs",
+    "generated/browser/registry.json",
+    "generated/browser/web-model/taskand.dev/v1/transport.mjs",
+    "tests/web_twin.test.mjs",
+    "generated/vault/registry.json",
+    "generated/vault/secrets/taskand.dev/v1/proc.yaml"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md",
+    ".env",
+    "vault/**"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "9f6da15c928ad6ecb89b54502d84a1d419c3f173",
+    "targetBranch": "main",
+    "outcome": "Preserve and reconcile the existing complementary runtime, document actual federation/privacy/publication gaps and add a read-only instance/process dashboard with measured registry radar. The user explicitly approved one recovery-only commit, ticket-branch push and draft PR of the existing snapshot despite failed governance. This exception covers the 129 preserved pending paths and bounded authorization/documentation updates, not new implementation. Main integration, release and deployment still require full governance and independent CI gates.",
+    "nonGoals": [
+      "Unreviewed merge, release or deployment; deleting unknown worktrees",
+      "Production website submissions or external network attacks",
+      "Inference of real human psychology or credentials",
+      "Implementation changes in doctor-agent or other repositories",
+      "Claims of complete device/backend twins",
+      "Automatic discovery or scanning beyond explicitly configured peers",
+      "Reading browser, IDE or shell history without a scoped opt-in observer",
+      "VPS deployment without an explicit host and authorization"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 120,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Keep existing URI broker and twins; add owner-scoped versioned context at the trusted intake boundary, read-only graph projection, deterministic planner contract and local lease compatibility adapter. The user explicitly authorized takeover of both paused Taskand checkouts for lossless reconciliation into this existing ticket. Include the primary-only web twin changes and ignored public vault process metadata, retaining the verified archive of both staged and working layers. Do not increase delivery budgets or infer publication approval from this takeover.",
+      "components": [
+        {
+          "name": "governance",
+          "paths": [
+            ".aider.conf.yml",
+            ".cursor/**",
+            ".githooks/**",
+            ".github/**",
+            ".gitignore",
+            ".governance/**",
+            ".subactor/.gitignore",
+            ".subactor/manifest.json",
+            "AGENTS.md",
+            "CLAUDE.md",
+            "GEMINI.md",
+            "project.bat",
+            "project/governance-check.*",
+            "project/new-ticket.sh",
+            "project/readme.sh",
+            "scripts/install-agent-hosts.sh",
+            "scripts/runtime.sh",
+            "wellmanifest_governance.py",
+            "worktree-guard.yaml",
+            "VERSION",
+            "project/ticket-001/**",
+            "project/TICKETS.md",
+            "project/lease-controller.py"
+          ]
+        },
+        {
+          "name": "gateway-context",
+          "paths": [
+            "gateway/**",
+            "index.html",
+            "bin/taskand"
+          ]
+        },
+        {
+          "name": "planner",
+          "paths": [
+            "generated/planner/**"
+          ]
+        },
+        {
+          "name": "verification",
+          "paths": [
+            "tests/context_test.py",
+            "tests/mesh_test.py",
+            "tests/observers_test.py",
+            "tests/web_twin.test.mjs",
+            "examples/web-twin-github.json",
+            "examples/web-twin-subactor.json",
+            "examples/web-twin-task.mjs",
+            "docs/**"
+          ]
+        },
+        {
+          "name": "runtime",
+          "paths": [
+            "Dockerfile",
+            "docker-compose.yaml",
+            "generated/browser/registry.json",
+            "generated/browser/web-model/taskand.dev/v1/transport.mjs",
+            "generated/vault/registry.json",
+            "generated/vault/secrets/taskand.dev/v1/proc.yaml"
+          ]
+        }
+      ],
+      "responsibilityChanges": true,
+      "interfaceChanges": [
+        "Owner-scoped context commands and queries",
+        "Read-only request-state and instance/process projections",
+        "Planner DSL proposal contract"
+      ],
+      "dataChanges": [
+        "Private prompt metadata and explicit redacted content",
+        "Versioned synthetic user profiles and typed references"
+      ],
+      "ui": {
+        "impact": "multi-state",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "success"
+        ],
+        "evidence": [
+          "tests/context_test.py",
+          "docs/information/complementary-runtime.md"
+        ]
+      },
+      "rollback": "Preserve primary source and data; revert preview container bindings to the observed primary checkout without deleting context records."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "./project/governance-check.sh --format json --changed-file <each exact changed path>"
+        ],
+        "evidence": "Private governance report; zero errors required before completion."
+      },
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "python3 -m unittest discover -s tests -p context_test.py",
+          "make test",
+          "python3 -m unittest discover -s tests -p mesh_test.py",
+          "python3 -m unittest discover -s tests -p observers_test.py"
+        ],
+        "evidence": "Private test receipts; provenance, ACL, missing references and live-state checks."
+      }
+    ],
+    "standardAdoption": {
+      "sourceRepository": "wellmanifest/new-project",
+      "fromRevision": null,
+      "toRevision": "6d2da011088b69ebe1636f3bf681e5ec21a062ab"
+    }
+  }
+}

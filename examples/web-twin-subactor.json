@@ -1,0 +1,12 @@
+{
+  "action": "run",
+  "urls": ["https://subactor.com/login_up.php"],
+  "steps": [
+    {"action": "goto", "url": "https://subactor.com/login_up.php"},
+    {"action": "assert", "selector": "input[type=text]", "visible": true},
+    {"action": "fill", "selector": "input[type=text]", "value": "twin-demo"},
+    {"action": "assert", "selector": "input[type=text]", "value": "twin-demo"},
+    {"action": "fill", "selector": "input[type=password]", "value": "test-only"},
+    {"action": "assert", "selector": "input[type=password]", "value": "test-only"}
+  ]
+}

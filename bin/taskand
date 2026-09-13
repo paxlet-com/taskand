@@ -22,7 +22,7 @@ function loadEnv() {
   }
 }
 loadEnv();
-const TOKEN = process.env.TASKAND_AUTH_TOKEN || 'taskand-admin-key';
+const credential = process.env.TASKAND_AUTH_TOKEN || 'taskand-admin-key';
 
 async function gatewayUp() {
   try {
@@ -35,25 +35,46 @@ async function gatewayUp() {
 async function post(path, body) {
   const r = await fetch(`${GATEWAY}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${credential}` },
     body: JSON.stringify(body)
   });
   return r.json();
 }
 
 function local(action, payload) {
-  const r = spawnSync('node', [REGISTRY], { input: JSON.stringify({ action, ...payload }), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  try {
+  const audit = input => {
+    const r = spawnSync('python3', [join(ROOT, 'gateway/context.py')], {
+      input: JSON.stringify(input), encoding: 'utf8', timeout: 30000
+    });
+    if (r.status !== 0) throw new Error('CONTEXT_STORE_UNAVAILABLE');
     return JSON.parse(r.stdout);
-  } catch {
-    return { ok: false, error: r.stderr || 'registry/core: brak odpowiedzi' };
+  };
+  let receipt;
+  if (action === 'call') {
+    try { receipt = audit({ action: 'begin', input: payload }); }
+    catch { return { ok: false, error: 'CONTEXT_STORE_UNAVAILABLE', executed: false }; }
   }
+  const r = spawnSync('node', [REGISTRY], { input: JSON.stringify({ action, ...payload }), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  let result;
+  try {
+    result = JSON.parse(r.stdout);
+  } catch {
+    result = { ok: false, error: 'registry/core: brak poprawnej odpowiedzi', outcomeUnknown: true };
+  }
+  if (receipt) {
+    try { return { ...result, ...audit({ action: 'finish', requestId: receipt.requestId, result }) }; }
+    catch { return { ok: false, error: 'AUDIT_COMMIT_FAILED', outcomeUnknown: true, ...receipt }; }
+  }
+  return result;
 }
 
 // Akcja rejestru: przez gateway (z autoryzacją) lub lokalnie
 async function reg(action, payload = {}) {
   if (!(await gatewayUp())) return local(action, payload);
-  if (action === 'call') return (await post('/api/proc/call', { uri: payload.uri, data: payload.input, timeout: 900 })).result;
+  if (action === 'call') {
+    const response = await post('/api/proc/call', { uri: payload.uri, data: payload.input, timeout: 900 });
+    return response.result ? { ...response.result, requestId: response.requestId, promptRef: response.promptRef, answerRef: response.answerRef } : response;
+  }
   const r = await post('/api/registry', { action, ...payload });
   return r.result || r;
 }
@@ -116,7 +137,7 @@ const COMMANDS = {
       input: { action, ...(action === 'status' ? { id } : { taskId: id, scan: { scope: 'lan' } }) }, timeout_ms: 180000 }));
   },
   async proc([uri, data = '{}']) {
-    print(await reg('call', { uri, input: JSON.parse(data) }));
+    print(await reg('call', { uri, input: JSON.parse(data), timeout_ms: 900000 }));
   },
   async status() {
     const up = await gatewayUp();

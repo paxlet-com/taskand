@@ -8,7 +8,10 @@ export function normalizeURL(value) {
   url.hash = '';
   return url.href;
 }
-export const requestKey = request => `${request.method || 'GET'} ${normalizeURL(request.url)} ${hash(request.postData || '')}`;
+export function requestKey(request) {
+  if (request.hasPostData && typeof request.postData !== 'string') throw new Error('Niepełna treść żądania; model nie może dopasować jej jako pustej');
+  return `${request.method || 'GET'} ${normalizeURL(request.url)} ${hash(request.postData || '')}`;
+}
 export function fixture(input) {
   if (!input || (input.body !== undefined && typeof input.body !== 'string')) throw new Error('body modelu musi być dokładnym ciągiem żądania');
   const request = { method: input.method || 'GET', url: normalizeURL(input.url), postData: input.body || '' };

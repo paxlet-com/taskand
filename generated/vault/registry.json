@@ -1,0 +1,26 @@
+{
+  "organism": "vault",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/vault/secrets/v1": {
+      "uri": "proc://taskand.dev/vault/secrets/v1",
+      "organism": "vault",
+      "path": "generated/vault/secrets/taskand.dev/v1",
+      "desc": "Sejf sekretów AES-256-GCM: status, list, exists, set, delete (bez odczytu wartości)",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [
+        "TASKAND_VAULT_KEY"
+      ],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:4aab0c21fa19e37f3180f96401cf44ac0d6f57117ddaf607e925be9ecbb445fa",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.979Z"
+    }
+  },
+  "updated": "2026-09-12T19:09:04.979Z"
+}
