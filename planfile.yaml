@@ -589,3 +589,16 @@ sprints:
     model_hints:
       planning: balanced
       implementation: balanced
+  - id: ticket-8bb69b3f
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway/handlers/health.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/health.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

@@ -6,9 +6,11 @@ import { call, resolve } from './exec.mjs';
 import { register, refresh, approve, deprecate, list, verify, scan } from './lifecycle.mjs';
 import { exportCatalog, packagePayload, pull } from './federation.mjs';
 import { policy, audit, readPeers, addPeer, removePeer } from './store.mjs';
+import { select } from './select.mjs';
 
 const ACTIONS = {
   call,
+  select,
   resolve: ({ uri }) => resolve(uri),
   list,
   register,

@@ -15,6 +15,7 @@ organisms:
       - { uri: proc://taskand.dev/admin/chat/v1, desc: "Interfejs konwersacyjny organizmu admin (deleguje do dev/act)" }
       - { uri: proc://taskand.dev/admin/network-device-discovery/v2, desc: "Pakiet wykrywa urządzenia w sieciach lokalnych przez tabelę ARP, sondy mDNS/SSDP, skan TCP wybranych portów, reverse DNS i bazę OUI, pomijając sieci dockerowe." }
       - { uri: proc://taskand.dev/admin/network-device-discovery/v3, desc: "Pakiet skanuje sieć lokalną (ARP, ping sweep, mDNS/SSDP, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem OUI, z odpornym scalaniem wyników (brak regresji)." }
+      - { uri: proc://taskand.dev/admin/network-device-discovery/v4, desc: "Inwentaryzacja wszystkich interfejsów, podsieci i zakresów IPv4/IPv6; ograniczony skan LAN przez nmap. mode: inventory|scan, scope: lan|all. Bez parametrów: instrukcja." }
 
   - name: alert
     processes:
@@ -84,3 +85,7 @@ organisms:
   - name: cluster
     processes:
       - { uri: proc://taskand.dev/cluster/monitor/v1, desc: "Monitoring węzłów: sonda /healthz każdego peera z genome, liczność procesów, opcjonalny pull nowych pakietów jako candidate" }
+
+  - name: twin
+    processes:
+      - { uri: proc://taskand.dev/twin/environment/v1, desc: "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}." }

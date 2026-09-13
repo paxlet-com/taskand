@@ -2,6 +2,11 @@
 
 ## [Unreleased] - 2026-09-13
 
+### Fixed
+- Fix import-optimization issues (ticket-8bb69b3f)
+
+## [Unreleased] - 2026-09-13
+
 ### Added — klaster węzłów i powoływanie (occupy)
 - `cluster/monitor/v1`: monitoring peerów (sonda `/healthz` + katalog), `findings` `PEER_DOWN` / `PEER_DEGRADED` / `PEER_NEW_PACKAGES`, `{"pull":true}` pobiera brakujące pakiety jako candidate; wpięte w `doctor/diagnose`
 - Rejestr: akcje `peers`, `peer_add`, `peer_remove`; `readPeers/addPeer/removePeer` w `store.mjs` (blok `peers:` w `genome.yaml`); grantowane w gateway (`read`/`admin`)

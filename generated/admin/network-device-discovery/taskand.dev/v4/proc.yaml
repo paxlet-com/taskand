@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/admin/network-device-discovery/v4
+organism: admin
+kind: task
+origin: builtin
+desc: "Inwentaryzacja wszystkich interfejsów, podsieci i zakresów IPv4/IPv6; ograniczony skan LAN przez nmap. mode: inventory|scan, scope: lan|all. Bez parametrów: instrukcja."
+capability: "network-device-discovery"

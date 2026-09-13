@@ -6,6 +6,7 @@ const LONG = 900000;
 const replyOf = r => r.reply || r.summary || (r.ok === false ? `✗ ${r.error}` : JSON.stringify(r));
 
 export const HANDLERS = {
+  twin: () => replyOf(call(P('twin/environment'), { action: 'run', scan: { scope: 'lan' } }, LONG)),
   'spawn-organism': ({ match }) => replyOf(call(P('dev/spawn'), { organism: match[1].toLowerCase(), capability: match[2] }, LONG)),
   composite: ({ text }) => replyOf(call(P('dev/composite'), { task: text }, LONG)),
   telemetry: () => telemetry(),

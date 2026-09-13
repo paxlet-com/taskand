@@ -16,10 +16,12 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:e3eedeefe4518c01e67037d54619057b12265dc6ccdcfa65b613c004b61a63f9",
+      "hash": "sha256:9dfceefc4157d5369135bda53198f7436c45ebc792eed4ba13a05c9ed376acf6",
       "status": "active",
-      "registered": "2026-09-12T19:09:04.975Z"
+      "registered": "2026-09-12T19:09:04.975Z",
+      "capability": "Trwały orkiestrator: kroki przez rejestr, blokady zależności, resume",
+      "refreshedAt": "2026-09-13T07:02:41.460Z"
     }
   },
-  "updated": "2026-09-12T19:09:04.975Z"
+  "updated": "2026-09-13T07:02:41.460Z"
 }

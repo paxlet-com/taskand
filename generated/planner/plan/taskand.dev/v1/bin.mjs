@@ -33,6 +33,8 @@ Dostępne procesy w katalogu federacji:
 ${capabilityLines}
 
 ZASADY:
+0. Dla skanowania sieci używaj najnowszego aktywnego admin/network-device-discovery z listy (reuse URI, nigdy spawn gdy zdolność istnieje).
+   Orkiestrator automatycznie tworzy i weryfikuje cyfrowy bliźniak dla takiego kroku; porażka bliźniaka blokuje zależne kroki.
 1. Każdy krok to operacja:
    - id: unikalny int (1, 2, 3...)
    - name: unikalna nazwa (np. "monitor_cpu", "alert_telegram", "dashboard_ui")

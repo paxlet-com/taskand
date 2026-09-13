@@ -16,9 +16,11 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:c2afe0c0c396cd449a0ebc82fcef52db8ae1536c807dd1d4ce6f7125ba83c824",
+      "hash": "sha256:1982eadcab94e90f9d230e548620783f73b08e71eb4cbc6ffef6f99ea62180cc",
       "status": "active",
-      "registered": "2026-09-12T19:09:04.960Z"
+      "registered": "2026-09-12T19:09:04.960Z",
+      "capability": "Wykonuje zadanie: wybiera aktywny proces z rejestru lub ewoluuje nowy",
+      "refreshedAt": "2026-09-13T07:06:47.263Z"
     },
     "proc://taskand.dev/dev/chat/v1": {
       "uri": "proc://taskand.dev/dev/chat/v1",
@@ -36,11 +38,11 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:ccf73a2e963266f4cf93c2b7914e42ce33f33cacce57ab540a56123bf6e95057",
+      "hash": "sha256:97e240e840d8fa28d7c6a831d7b7297e7380b624e115dcae73cc532eb9efddb5",
       "status": "active",
       "registered": "2026-09-12T19:09:04.961Z",
       "capability": "Jedyne wejście konwersacyjne: organizm/intencja → proces przez rejestr",
-      "refreshedAt": "2026-09-13T05:42:54.930Z"
+      "refreshedAt": "2026-09-13T07:05:51.120Z"
     },
     "proc://taskand.dev/dev/codegen/v1": {
       "uri": "proc://taskand.dev/dev/codegen/v1",
@@ -159,5 +161,5 @@
       "capability": "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)"
     }
   },
-  "updated": "2026-09-13T06:52:46.329Z"
+  "updated": "2026-09-13T07:06:47.263Z"
 }

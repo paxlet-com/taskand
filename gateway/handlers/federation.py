@@ -4,7 +4,7 @@ from gateway.utils import registry, status_for
 REGISTRY_URI = "proc://taskand.dev/registry/core/v1"
 # Akcje rejestru dostępne przez /api/registry i wymagany rodzaj grantu
 ACTION_GRANTS = {
-    "list": "read", "resolve": "read", "verify": "read", "export": "read", "package": "read", "peers": "read", "policy": "read",
+    "list": "read", "resolve": "read", "select": "read", "verify": "read", "export": "read", "package": "read", "peers": "read", "policy": "read",
     "approve": "admin", "refresh": "admin", "deprecate": "admin", "scan": "admin", "pull": "admin",
     "peer_add": "admin", "peer_remove": "admin",
 }

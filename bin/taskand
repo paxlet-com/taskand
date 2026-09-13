@@ -103,6 +103,12 @@ async function waitHealthz(url, ms = 45000) {
 }
 
 const COMMANDS = {
+  // Twin needs the operator host's network inventory and user namespaces.
+  // Explicit local transport also avoids mistaking a container's network for the host.
+  async twin([action = 'run', id]) {
+    print(local('call', { uri: 'proc://taskand.dev/twin/environment/v1',
+      input: { action, ...(action === 'status' ? { id } : { taskId: id, scan: { scope: 'lan' } }) }, timeout_ms: 180000 }));
+  },
   async proc([uri, data = '{}']) {
     print(await reg('call', { uri, input: JSON.parse(data) }));
   },
@@ -234,6 +240,7 @@ const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
 
   taskand <organizm> "<zadanie>"   dev | doc | sec | hw | file | browser | admin | <dowolny powołany>
   taskand proc <uri> ['<json>']    bezpośrednie wywołanie procesu proc://
+  taskand twin [run|create|status] [id]    lokalny bliźniak sieci i weryfikacja skanu URI
   taskand procs [organizm]         procesy w rejestrze (status, URI, opis)
   taskand approve <uri>            candidate → active (wyewoluowane / pobrane od peerów)
   taskand deprecate <uri>          wycofanie procesu

@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { call } from "./registry-client.mjs";
 
 const ROOT = fileURLToPath(new URL("../../../../..", import.meta.url));
-const STEP_TIMEOUT_MS = 60000;
+const STEP_TIMEOUT_MS = 180000;
 
 let input = {};
 try {
@@ -25,6 +25,10 @@ if (!plan || !Array.isArray(plan.steps)) {
 }
 
 const runId = input.runId || `orch-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$/.test(runId)) {
+  process.stdout.write(JSON.stringify({ ok: false, errorType: 'VALIDATION_FAILED', error: 'Niepoprawne runId' }) + '\n');
+  process.exit(0);
+}
 const orchDir = join(ROOT, "log/orchestrations");
 mkdirSync(orchDir, { recursive: true });
 const stateFile = join(orchDir, `${runId}.json`);
@@ -123,7 +127,10 @@ for (const step of plan.steps) {
 
   // Wykonanie przez rejestr: URI → status active → bindingHash → izolowane env (granty, credentialRef) → spawn.
   // resolvedPath z wejścia jest ignorowany — plan nie może wskazać dowolnego pliku.
-  const result = call(step.process, stepInput, STEP_TIMEOUT_MS);
+  const requiresTwin = /^proc:\/\/taskand\.dev\/admin\/network-device-discovery\/v\d+$/.test(step.process);
+  const result = requiresTwin
+    ? call('proc://taskand.dev/twin/environment/v1', { action: 'run', taskId: `${runId}`.slice(0, 80), process: step.process, scan: step.params || {} }, STEP_TIMEOUT_MS)
+    : call(step.process, stepInput, STEP_TIMEOUT_MS);
   if (result.errorType || result.ok === false) {
     stepRecord.status = "FAILED";
     stepRecord.errorType = result.errorType || "VALIDATION_FAILED";
@@ -152,6 +159,7 @@ state.finishedAt = new Date().toISOString();
 saveState();
 
 const response = {
+  ok: state.status === 'SUCCEEDED',
   runId,
   status: state.status,
   goal: state.goal,

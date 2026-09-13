@@ -37,6 +37,12 @@ function capabilityContext() {
 }
 
 function decide() {
+  // Known network tasks reuse a registered capability without asking an LLM to regenerate it.
+  if (!input.forceEvolve && /skan|scan|znajdź|znajdz|wykryj/.test(message.toLowerCase()) && /sie[cć]|network|\blan\b/.test(message.toLowerCase())) {
+    const selected = registry('select', { organism: 'twin', capability: 'environment' });
+    return selected.ok ? { action: 'call', uri: selected.uri, input: { action: 'run', scan: { scope: 'lan' } } }
+      : { action: 'unavailable', error: selected.error };
+  }
   const r = call('proc://taskand.dev/dev/llm/v1', {
     system: `Jesteś organizmem "${organism}" systemu taskand. System WYKONUJE zadania na węźle — nie odsyłaj usera do narzędzi.
 Aktywne procesy w rejestrze (proc://):
@@ -60,11 +66,19 @@ function answer() {
 }
 
 function run(uri, procInput = {}, evolved = null) {
-  const result = call(uri, procInput, 60000);
+  const networkScan = /^proc:\/\/taskand\.dev\/admin\/network-device-discovery\/v\d+$/.test(uri);
+  const target = networkScan ? 'proc://taskand.dev/twin/environment/v1' : uri;
+  const data = networkScan ? { action: 'run', process: uri, scan: procInput.params || procInput } : procInput;
+  const result = call(target, data, networkScan || target.includes('/twin/') ? 180000 : 60000);
   return { ok: result.ok !== false, action: evolved ? 'evolve' : 'call', uri, evolved, result, reply: format(uri, result, evolved) };
 }
 
 function evolve() {
+  if (!input.forceEvolve && decision.name) {
+    const existing = registry('select', { organism, capability: decision.name });
+    if (existing.ok) return run(existing.uri, decision.input);
+    if (existing.errorType !== 'NOT_FOUND') return { ok: false, action: 'none', reply: `${tag} ✗ ${existing.error}` };
+  }
   const ev = call('proc://taskand.dev/dev/evolve/v1', {
     organism,
     name: decision.name,

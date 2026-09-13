@@ -9,6 +9,8 @@ const CREATE = ['stwórz', 'stworz', 'utwórz', 'utworz', 'zrób', 'zrob'];
 
 export const INTENTS = [
   { name: 'spawn-organism', re: /(?:stwórz|stworz|utwórz|utworz|powołaj|powolaj|zbuduj|nowy)\s+organizm\s+([\p{L}0-9_-]+)(?:[\s,]+(?:który|ktory|aby|żeby|zeby)\s+(.+))?/iu },
+  { name: 'twin', re: /digital\s*twin|cyfrow\w*\s+bli[źz]niak/iu },
+  { name: 'query', all: [['skan', 'scan', 'wykryj'], ['sieć', 'sieci', 'siec', 'network', 'lan']] },
   { name: 'composite', any: COMPLEXITY_SIGNALS },
   { name: 'telemetry', any: ['temperatur', 'temp', 'sprzęt', 'sprzet', 'cpu', 'procesor', 'pamięć', 'pamiec', 'dysk'] },
   { name: 'file-ops', all: [['plik'], ['istnieje', 'zawarto', 'czytaj', 'pokaż']] },
@@ -27,7 +29,8 @@ const ORGANISM_INTENTS = {
   sec: 'vault', vault: 'vault',
   hw: 'telemetry',
   file: 'file-list',
-  browser: 'browser'
+  browser: 'browser',
+  twin: 'twin'
 };
 const DEVELOPER = new Set(['', 'dev', 'developer', 'chat']);
 

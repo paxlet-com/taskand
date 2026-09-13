@@ -1,0 +1,30 @@
+{
+  "organism": "twin",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/twin/environment/v1": {
+      "uri": "proc://taskand.dev/twin/environment/v1",
+      "organism": "twin",
+      "path": "generated/twin/environment/taskand.dev/v1",
+      "desc": "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}.",
+      "capability": "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}.",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "capture.mjs",
+        "model.mjs",
+        "proc.yaml",
+        "registry-client.mjs",
+        "runtime.mjs"
+      ],
+      "hash": "sha256:781c00ab54181efac1ec7de8b237fe22748d0706ff258d9bea5c524fb936505b",
+      "status": "active",
+      "registered": "2026-09-13T07:02:41.371Z",
+      "refreshedAt": "2026-09-13T07:05:51.074Z"
+    }
+  },
+  "updated": "2026-09-13T07:05:51.074Z"
+}
