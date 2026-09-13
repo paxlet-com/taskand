@@ -1,0 +1,26 @@
+{
+  "organism": "cluster",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/cluster/monitor/v1": {
+      "uri": "proc://taskand.dev/cluster/monitor/v1",
+      "organism": "cluster",
+      "path": "generated/cluster/monitor/taskand.dev/v1",
+      "desc": "Monitoring węzłów: sonda /healthz każdego peera z genome, liczność procesów, opcjonalny pull nowych pakietów jako candidate",
+      "capability": "Monitoring węzłów: sonda /healthz każdego peera z genome, liczność procesów, opcjonalny pull nowych pakietów jako candidate",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:52ab94b488ef3339291c30e844c83b48e236710dabdc96027a743877ea230073",
+      "status": "active",
+      "registered": "2026-09-13T06:00:18.487Z"
+    }
+  },
+  "updated": "2026-09-13T06:00:18.488Z"
+}

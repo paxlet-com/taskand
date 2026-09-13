@@ -70,6 +70,12 @@ taskand proc "proc://taskand.dev/monitor/cpu/v1" '{}'
 taskand status
 taskand fed
 taskand log 20
+
+# Klaster węzłów: peery i powoływanie kolejnego hosta (operatorskie, domyślnie tylko plan)
+taskand peers
+taskand peer add http://rpi5:8077
+taskand occupy deploy@rpi5            # plan (dry-run)
+taskand occupy deploy@rpi5 --run --token <token-mastera>
 ```
 
 ---

@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+# linuxserver custom service: Chromium z oknem słucha CDP tylko na 127.0.0.1:9222 w kontenerze,
+# więc przekazujemy 0.0.0.0:9223 → 127.0.0.1:9222 (host mapuje wyłącznie 127.0.0.1:9222 → 9223).
+exec /usr/bin/python3 - <<'PY'
+import asyncio
+
+async def pipe(reader, writer):
+    try:
+        while data := await reader.read(65536):
+            writer.write(data)
+            await writer.drain()
+    finally:
+        writer.close()
+
+async def handle(client_r, client_w):
+    try:
+        up_r, up_w = await asyncio.open_connection("127.0.0.1", 9222)
+    except OSError:
+        client_w.close()
+        return
+    await asyncio.gather(pipe(client_r, up_w), pipe(up_r, client_w), return_exceptions=True)
+
+async def main():
+    server = await asyncio.start_server(handle, "0.0.0.0", 9223)
+    async with server:
+        await server.serve_forever()
+
+asyncio.run(main())
+PY

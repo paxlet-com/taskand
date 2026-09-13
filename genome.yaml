@@ -6,7 +6,6 @@ policy:
 
 peers:
   - http://127.0.0.1:8077
-  - http://127.0.0.1:9
 
 organisms:
 

@@ -152,12 +152,12 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:ab5257758869a84c9b08958ac6732c8064980a905bea6bb84b421c0a0a5deff9",
+      "hash": "sha256:07bd3e73d853d07ee9d19734a0f423007bf3026b68fd5cea417d34be38af0eba",
       "status": "active",
       "registered": "2026-09-12T19:09:43.331Z",
-      "refreshedAt": "2026-09-13T05:53:02.737Z",
+      "refreshedAt": "2026-09-13T06:52:46.329Z",
       "capability": "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)"
     }
   },
-  "updated": "2026-09-13T05:53:02.737Z"
+  "updated": "2026-09-13T06:52:46.329Z"
 }

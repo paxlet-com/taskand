@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/cluster/monitor/v1
+organism: cluster
+kind: task
+origin: builtin
+desc: "Monitoring węzłów: sonda /healthz każdego peera z genome, liczność procesów, opcjonalny pull nowych pakietów jako candidate"

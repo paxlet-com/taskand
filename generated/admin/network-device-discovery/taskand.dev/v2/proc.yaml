@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/admin/network-device-discovery/v2
+organism: admin
+kind: task
+origin: evolved
+desc: "Pakiet wykrywa urządzenia w sieciach lokalnych przez tabelę ARP, sondy mDNS/SSDP, skan TCP wybranych portów, reverse DNS i bazę OUI, pomijając sieci dockerowe."
+capability: "Wykrywa urządzenia w sieciach lokalnych węzła: tabela ARP (/proc/net/arp, ip neigh), sondy mDNS i SSDP, szybkie sondy TCP popularnych portów, reverse DNS i producent z OUI MAC. Pomija sieci dockerowe (interfejsy docker*, br-*, veth*) chyba że params.include_docker=true. Zwraca listę urządzeń (ip, mac, hostname, vendor, sources) i przeskanowane sieci."

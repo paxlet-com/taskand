@@ -1,11 +1,11 @@
 // taskand — testy integracyjne bez LLM: intencje, łańcuch przez rejestr, realne zachowanie procesów (anty-atrapy), guard
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseIntent } from '../generated/dev/chat/taskand.dev/v1/intent.mjs';
 import { guard, contractTest } from '../generated/dev/evolve/taskand.dev/v1/contract.mjs';
-import { digest } from '../generated/dev/evolve/taskand.dev/v1/gate.mjs';
+import { digest, compareCounts } from '../generated/dev/evolve/taskand.dev/v1/gate.mjs';
 
 let passed = 0;
 let failed = 0;
@@ -106,6 +106,43 @@ const heal = call(P('doctor/heal'), {});
 check('doctor/heal bez {"run": true} tylko planuje', heal.mode === 'plan' && (heal.executed || []).length === 0, JSON.stringify(heal).slice(0, 300));
 const dg = digest({ ok: true, summary: 's', devices: Array.from({ length: 40 }, (_, i) => ({ ip: `10.0.0.${i}` })), meta: { networks: [1, 2] } });
 check('bramka regresji: skrót zawiera pełne liczności tablic zamiast obciętego JSON', dg.counts.devices === 40 && dg.counts['meta.networks'] === 2 && dg.samples.devices.length === 5);
+
+// Deterministyczna część bramki: regresja liczności wychwytywana bez LLM
+const dev = n => ({ ok: true, devices: Array.from({ length: n }, (_, i) => ({ ip: `10.0.0.${i}` })) });
+check('bramka: mniej elementów niż poprzednia wersja → worse bez udziału LLM',
+  compareCounts(dev(8), dev(1))?.verdict === 'worse', JSON.stringify(compareCounts(dev(8), dev(1))));
+check('bramka: więcej elementów → better bez udziału LLM', compareCounts(dev(1), dev(8))?.verdict === 'better');
+check('bramka: zniknięcie całej tablicy liczone jako 0 → worse', compareCounts(dev(3), { ok: true })?.verdict === 'worse');
+check('bramka: równe liczności → null (o jakości rozstrzyga dopiero LLM)', compareCounts(dev(5), dev(5)) === null);
+
+// 6. Powoływanie węzłów (occupy) — replikacja operatorska, nie autonomiczna
+const manifest = readFileSync('bin/bootstrap.manifest', 'utf8').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+const openFiles = manifest.filter(l => !l.startsWith('@secret ')).map(l => l);
+const secretFiles = manifest.filter(l => l.startsWith('@secret ')).map(l => l.slice(8).trim());
+check('manifest węzła: każda niesekretna ścieżka istnieje na dysku', openFiles.every(p => existsSync(p)), openFiles.filter(p => !existsSync(p)).join(', '));
+check('manifest węzła: .env i vault są oznaczone @secret (nie kopiowane domyślnie)', secretFiles.includes('.env') && secretFiles.includes('vault') && !openFiles.includes('.env') && !openFiles.includes('vault'));
+
+const occupy = (extra = []) => {
+  const r = spawnSync('node', ['bin/taskand', 'occupy', 'deployer@test-node.local', '--json', ...extra], { encoding: 'utf8', timeout: 30000, env: { ...ENV, TASKAND_GATEWAY: 'http://127.0.0.1:1' } });
+  try { return JSON.parse(r.stdout); } catch { return { ok: false, error: r.stderr }; }
+};
+const dry = occupy();
+const planStr = JSON.stringify(dry.plan || []);
+check('occupy: domyślnie dry-run (żadnego SSH nie wykonuje)', dry.ok === true && dry.mode === 'dry-run', JSON.stringify(dry).slice(0, 200));
+check('occupy: plan zawiera rsync + docker compose up', /rsync\b/.test(planStr) && /docker compose up/.test(planStr));
+check('occupy: bez --with-secrets plan NIE kopiuje .env ani vault', !(dry.files || []).includes('.env') && !(dry.files || []).includes('vault') && dry.secrets === false);
+check('occupy: bez --token handshake pominięty; z --token krok pull mastera obecny', dry.handshake === false && occupy(['--token', 'T']).post.some(p => /node bin\/taskand pull /.test(p)));
+check('occupy: --with-secrets dołącza .env i vault', occupy(['--with-secrets']).files.includes('.env'));
+
+// 7. Peery: dopisz/usuń przez rejestr, stan genome netto bez zmian
+const regAct = (action, payload = {}) => { const r = spawnSync('node', ['generated/registry/core/taskand.dev/v1/bin.mjs'], { input: JSON.stringify({ action, ...payload }), encoding: 'utf8', env: ENV }); try { return JSON.parse(r.stdout); } catch { return { ok: false }; } };
+const peers0 = (regAct('peers').peers || []).slice().sort();
+const TESTPEER = 'http://occupy-test.invalid:8077';
+regAct('peer_add', { url: TESTPEER });
+const withTest = regAct('peers').peers || [];
+regAct('peer_remove', { url: TESTPEER });
+const peers1 = (regAct('peers').peers || []).slice().sort();
+check('peer add/remove: dopisany peer pojawia się i znika, genome netto bez zmian', withTest.includes(TESTPEER) && JSON.stringify(peers0) === JSON.stringify(peers1), JSON.stringify({ peers0, peers1 }));
 
 const ms = Date.now() - t0;
 check(`czas całości < 20 s (${ms} ms)`, ms < 20000);

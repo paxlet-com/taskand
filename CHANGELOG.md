@@ -2,7 +2,25 @@
 
 ## [Unreleased] - 2026-09-13
 
+### Added — klaster węzłów i powoływanie (occupy)
+- `cluster/monitor/v1`: monitoring peerów (sonda `/healthz` + katalog), `findings` `PEER_DOWN` / `PEER_DEGRADED` / `PEER_NEW_PACKAGES`, `{"pull":true}` pobiera brakujące pakiety jako candidate; wpięte w `doctor/diagnose`
+- Rejestr: akcje `peers`, `peer_add`, `peer_remove`; `readPeers/addPeer/removePeer` w `store.mjs` (blok `peers:` w `genome.yaml`); grantowane w gateway (`read`/`admin`)
+- `/healthz`: identyfikator węzła (`node`) dla federacji i monitoringu klastra
+- `doctor/prescribe`: recepty dla `PEER_*` (pull → organizm; `PEER_DOWN`/`PEER_DEGRADED` → człowiek)
+- CLI: `taskand peers`, `taskand peer add|remove <url>`, `taskand occupy <user@host>` (kopia plików przez SSH + `docker compose up` + rejestracja peera + handshake pull)
+- `bin/bootstrap.manifest`: jedno źródło prawdy o plikach węzła; `.env`/`vault` oznaczone `@secret` (kopiowane tylko z `--with-secrets`)
+- Testy integracyjne +8 (39/39): integralność manifestu, plan `occupy` (dry-run), bramka handshake, roundtrip peerów
+
+### Changed — bramka regresji rozstrzyga deterministycznie przed LLM
+- `dev/evolve/gate.mjs`: nowe `compareCounts` — regresja liczności (mniej elementów w tablicy, brak tablicy = 0) daje `worse` **bez udziału LLM**; więcej i nigdzie mniej = `better`; LLM ocenia dopiero remis. Werdykt niesie `deterministic: true|false`
+- Skutek: bramka działa bez klucza LLM i nie zależy od tego, czy model dobrze policzy elementy (wcześniej trafny werdykt bywał uzasadniany błędnie)
+
+### Granica bezpieczeństwa — replikacja operatorska, nie autonomiczna
+- `occupy` jest jawne i operatorskie: domyślnie tylko plan (dry-run), realne działanie wymaga `--run` i SSH operatora; organizmy jej nie uruchamiają (mogą tylko zaproponować przez `doctor`). Wykrywanie hostów daje kandydatów do przeglądu, nie do automatycznego zajęcia.
+
 ### Fixed
+- Konformacja: `bindingHash` builtin odświeżony po edycjach z poprzedniej sesji (doctor/diagnose, doctor/prescribe, registry/core)
+- `genome.yaml`: usunięty błędny wpis peera `http://127.0.0.1:9`
 - Fix magic-numbers issues (ticket-970d9128)
 - Fix magic-numbers issues (ticket-38e0e0d7)
 
