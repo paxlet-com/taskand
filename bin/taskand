@@ -106,6 +106,12 @@ const COMMANDS = {
   // Twin needs the operator host's network inventory and user namespaces.
   // Explicit local transport also avoids mistaking a container's network for the host.
   async twin([action = 'run', id]) {
+    if (action === 'web') {
+      const input = /^https?:\/\//.test(id || '')
+        ? { action: 'run', urls: [id], steps: [{ action: 'goto', url: id }, { action: 'assert', selector: 'body', visible: true }] }
+        : JSON.parse(readFileSync(id, 'utf8'));
+      return print(local('call', { uri: 'proc://taskand.dev/twin/web/v1', input, timeout_ms: 330000 }));
+    }
     print(local('call', { uri: 'proc://taskand.dev/twin/environment/v1',
       input: { action, ...(action === 'status' ? { id } : { taskId: id, scan: { scope: 'lan' } }) }, timeout_ms: 180000 }));
   },
@@ -241,6 +247,7 @@ const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
   taskand <organizm> "<zadanie>"   dev | doc | sec | hw | file | browser | admin | <dowolny powołany>
   taskand proc <uri> ['<json>']    bezpośrednie wywołanie procesu proc://
   taskand twin [run|create|status] [id]    lokalny bliźniak sieci i weryfikacja skanu URI
+  taskand twin web <URL|plik.json>        bliźniak strony/API i scenariusz offline (URL = test widoczności body)
   taskand procs [organizm]         procesy w rejestrze (status, URI, opis)
   taskand approve <uri>            candidate → active (wyewoluowane / pobrane od peerów)
   taskand deprecate <uri>          wycofanie procesu

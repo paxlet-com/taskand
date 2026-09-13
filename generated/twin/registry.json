@@ -24,7 +24,26 @@
       "status": "active",
       "registered": "2026-09-13T07:02:41.371Z",
       "refreshedAt": "2026-09-13T07:05:51.074Z"
+    },
+    "proc://taskand.dev/twin/web/v1": {
+      "uri": "proc://taskand.dev/twin/web/v1",
+      "organism": "twin",
+      "path": "generated/twin/web/taskand.dev/v1",
+      "desc": "Bliźniak stron i API przed implementacją: wybór browser/web-model z rejestru, publiczna migawka GET, scenariusz offline, bramka kompletności. action: run|capture, urls?, modelId?, steps?, mocks?.",
+      "capability": "Bliźniak stron i API przed implementacją: wybór browser/web-model z rejestru, publiczna migawka GET, scenariusz offline, bramka kompletności. action: run|capture, urls?, modelId?, steps?, mocks?.",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:743aff98330166713f15565597b94b9812a815300aff411564eca3324e05c1d2",
+      "status": "active",
+      "registered": "2026-09-13T07:28:34.893Z"
     }
   },
-  "updated": "2026-09-13T07:05:51.074Z"
+  "updated": "2026-09-13T07:28:34.893Z"
 }

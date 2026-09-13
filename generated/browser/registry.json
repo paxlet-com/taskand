@@ -22,7 +22,31 @@
       "status": "active",
       "registered": "2026-09-12T19:09:04.958Z",
       "refreshedAt": "2026-09-12T19:27:54.199Z"
+    },
+    "proc://taskand.dev/browser/web-model/v1": {
+      "uri": "proc://taskand.dev/browser/web-model/v1",
+      "organism": "browser",
+      "path": "generated/browser/web-model/taskand.dev/v1",
+      "desc": "Model stron i API: capture zapisuje publiczne GET przez kontrolowany transport, replay sprawdza scenariusz Chromium bez dostępu do sieci/plików hosta. action: capture|replay|status.",
+      "capability": "Model stron i API: capture zapisuje publiczne GET przez kontrolowany transport, replay sprawdza scenariusz Chromium bez dostępu do sieci/plików hosta. action: capture|replay|status.",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "cdp.mjs",
+        "driver.mjs",
+        "proc.yaml",
+        "scenario.mjs",
+        "store.mjs",
+        "transport.mjs"
+      ],
+      "hash": "sha256:4c77bd2859ab658b9cbb249c050ef3911438c0a6a60c7c776f109992afcf3226",
+      "status": "active",
+      "registered": "2026-09-13T07:26:24.475Z",
+      "refreshedAt": "2026-09-13T07:35:34.272Z"
     }
   },
-  "updated": "2026-09-12T19:27:54.199Z"
+  "updated": "2026-09-13T07:35:34.272Z"
 }

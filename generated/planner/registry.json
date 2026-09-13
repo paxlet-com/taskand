@@ -16,12 +16,12 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:5b3e1d62a0a474ddc210a5334db501b3984b1bb842b309139346f68d24e49279",
+      "hash": "sha256:1ac7117ed6624da552b98a64f451fadcf234ed5db93fa90b9af249d56bdb1682",
       "status": "active",
       "registered": "2026-09-12T19:09:04.976Z",
-      "refreshedAt": "2026-09-13T07:02:41.462Z",
+      "refreshedAt": "2026-09-13T07:28:35.011Z",
       "capability": "Dekomponuje złożone zadanie na kandydat Blueprint (LLM, bez wykonania)"
     }
   },
-  "updated": "2026-09-13T07:02:41.462Z"
+  "updated": "2026-09-13T07:28:35.011Z"
 }

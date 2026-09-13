@@ -33,6 +33,9 @@ Dostępne procesy w katalogu federacji:
 ${capabilityLines}
 
 ZASADY:
+0a. Przed implementacją zadania na stronie/API użyj twin/web z konkretnymi urls i steps zawierającymi asercje wyniku.
+    Nieznane operacje backendu to brak pokrycia, nie sukces. Samo capture ani widoczność body nie weryfikują całego zadania.
+    POST/PUT/DELETE testuj wyłącznie na jawnych modelach odpowiedzi offline; nie generuj połączenia do produkcji jako obejścia braku modelu.
 0. Dla skanowania sieci używaj najnowszego aktywnego admin/network-device-discovery z listy (reuse URI, nigdy spawn gdy zdolność istnieje).
    Orkiestrator automatycznie tworzy i weryfikuje cyfrowy bliźniak dla takiego kroku; porażka bliźniaka blokuje zależne kroki.
 1. Każdy krok to operacja:

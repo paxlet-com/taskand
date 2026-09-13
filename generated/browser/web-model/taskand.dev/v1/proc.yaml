@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/browser/web-model/v1
+organism: browser
+kind: task
+origin: builtin
+desc: "Model stron i API: capture zapisuje publiczne GET przez kontrolowany transport, replay sprawdza scenariusz Chromium bez dostępu do sieci/plików hosta. action: capture|replay|status."

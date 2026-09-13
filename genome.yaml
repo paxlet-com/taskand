@@ -24,6 +24,7 @@ organisms:
   - name: browser
     processes:
       - { uri: proc://taskand.dev/browser/session/v1, desc: "Sterowanie przeglądarką digital twin przez CDP: status, open, list, close" }
+      - { uri: proc://taskand.dev/browser/web-model/v1, desc: "Model stron i API: capture zapisuje publiczne GET przez kontrolowany transport, replay sprawdza scenariusz Chromium bez dostępu do sieci/plików hosta. action: capture|replay|status." }
 
   - name: chat
     processes:
@@ -89,3 +90,4 @@ organisms:
   - name: twin
     processes:
       - { uri: proc://taskand.dev/twin/environment/v1, desc: "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}." }
+      - { uri: proc://taskand.dev/twin/web/v1, desc: "Bliźniak stron i API przed implementacją: wybór browser/web-model z rejestru, publiczna migawka GET, scenariusz offline, bramka kompletności. action: run|capture, urls?, modelId?, steps?, mocks?." }
