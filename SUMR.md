@@ -58,25 +58,19 @@ workflow[name="status"] {
 
 workflow[name="test"] {
   trigger: manual;
-  step-1: depend target=test-contracts;
-  step-2: depend target=test-negative;
+  step-1: depend target=conformance;
+  step-2: depend target=test-contracts;
+  step-3: depend target=test-negative;
+}
+
+workflow[name="conformance"] {
+  trigger: manual;
+  step-1: run cmd=node tests/conformance.mjs;
 }
 
 workflow[name="test-contracts"] {
   trigger: manual;
-  step-1: run cmd=echo "=== Weryfikacja kontraktów procesów taskand v2.2 (fail-closed) ===";
-  step-2: run cmd=passed=0; total=0; \;
-  step-3: run cmd=for bin in $$(find generated -name "bin.mjs" | sort); do \;
-  step-4: run cmd=total=$$((total + 1)); \;
-  step-5: run cmd=if echo '{}' | node "$$bin" >/dev/null 2>&1; then \;
-  step-6: run cmd=echo "  $$bin: PASS ✓"; \;
-  step-7: run cmd=passed=$$((passed + 1)); \;
-  step-8: run cmd=else \;
-  step-9: run cmd=echo "  $$bin: FAIL ✗"; \;
-  step-10: run cmd=fi \;
-  step-11: run cmd=done; \;
-  step-12: run cmd=echo "Wynik kontraktów: $$passed/$$total PASS ✓"; \;
-  step-13: run cmd=[ "$$passed" -eq "$$total" ];
+  step-1: run cmd=node tests/contract_tests.mjs;
 }
 
 workflow[name="test-negative"] {
@@ -91,7 +85,7 @@ workflow[name="integration"] {
 
 workflow[name="catalog"] {
   trigger: manual;
-  step-1: run cmd=node generated/_lib/catalog.mjs rehash;
+  step-1: run cmd=node generated/registry/core/taskand.dev/v1/bin.mjs <<< '{"action":"refresh"}';
 }
 
 workflow[name="bootstrap"] {
@@ -107,6 +101,10 @@ workflow[name="gateway"] {
 workflow[name="clean"] {
   trigger: manual;
   step-1: run cmd=rm -rf log/events.jsonl;
+}
+
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
 }
 
 env_vars {
@@ -130,68 +128,68 @@ environment[name="local"] {
 
 ## Call Graph
 
-*83 nodes · 70 edges · 23 modules · CC̄=3.1*
+*210 nodes · 184 edges · 50 modules · CC̄=3.1*
 
 ### Hubs (by degree)
 
 | Function | CC | in | out | total |
 |----------|----|----|-----|-------|
-| `handle_chat` *(in gateway.handlers.chat)* | 29 ⚠ | 0 | 83 | **83** |
-| `handle_proc_call` *(in gateway.handlers.proc)* | 9 | 0 | 26 | **26** |
 | `_parse_simple_yaml` *(in gateway.auth)* | 14 ⚠ | 1 | 19 | **20** |
+| `probeMdns` *(in generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns)* | 8 | 0 | 19 | **19** |
+| `sleep` *(in generated.registry.core.taskand.dev.v1.store)* | 7 | 3 | 16 | **19** |
+| `handle_chat` *(in gateway.handlers.chat)* | 4 | 0 | 18 | **18** |
 | `mdnsProbe` *(in generated.admin.network-device-discovery.taskand.dev.v1.bin)* | 15 ⚠ | 0 | 18 | **18** |
-| `check_auth` *(in gateway.auth)* | 8 | 2 | 15 | **17** |
-| `handle_orchestrator` *(in gateway.handlers.orchestrator)* | 6 | 0 | 17 | **17** |
-| `handle_federation` *(in gateway.handlers.federation)* | 8 | 0 | 15 | **15** |
-| `procHash` *(in generated._lib.catalog)* | 3 | 4 | 10 | **14** |
+| `call` *(in generated.registry.core.taskand.dev.v1.exec)* | 6 | 0 | 17 | **17** |
+| `check_auth` *(in gateway.auth)* | 9 | 1 | 16 | **17** |
+| `updateRegistry` *(in generated.registry.core.taskand.dev.v1.store)* | 7 | 0 | 17 | **17** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/taskand/glm53
-# generated in 0.05s
-# nodes: 83 | edges: 70 | modules: 23
+# generated in 0.12s
+# nodes: 210 | edges: 184 | modules: 50
 # CC̄=3.1
 
 HUBS[20]:
-  gateway.handlers.chat.handle_chat
-    CC=29  in:0  out:83  total:83
-  gateway.handlers.proc.handle_proc_call
-    CC=9  in:0  out:26  total:26
   gateway.auth._parse_simple_yaml
     CC=14  in:1  out:19  total:20
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns
+    CC=8  in:0  out:19  total:19
+  generated.registry.core.taskand.dev.v1.store.sleep
+    CC=7  in:3  out:16  total:19
+  gateway.handlers.chat.handle_chat
+    CC=4  in:0  out:18  total:18
   generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
     CC=15  in:0  out:18  total:18
-  gateway.auth.check_auth
-    CC=8  in:2  out:15  total:17
-  gateway.handlers.orchestrator.handle_orchestrator
+  generated.registry.core.taskand.dev.v1.exec.call
     CC=6  in:0  out:17  total:17
-  gateway.handlers.federation.handle_federation
-    CC=8  in:0  out:15  total:15
-  generated._lib.catalog.procHash
-    CC=3  in:4  out:10  total:14
-  generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
-    CC=4  in:0  out:13  total:13
-  gateway.utils.find_proc_bin
-    CC=9  in:3  out:9  total:12
+  gateway.auth.check_auth
+    CC=9  in:1  out:16  total:17
+  generated.registry.core.taskand.dev.v1.store.updateRegistry
+    CC=7  in:0  out:17  total:17
+  generated.registry.core.taskand.dev.v1.lifecycle.register
+    CC=13  in:3  out:14  total:17
+  generated.registry.core.taskand.dev.v1.package.unquote
+    CC=13  in:1  out:14  total:15
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp
+    CC=6  in:0  out:14  total:14
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT
+    CC=6  in:0  out:14  total:14
+  generated.registry.core.taskand.dev.v1.package.checkPackage
+    CC=13  in:0  out:14  total:14
+  generated.registry.core.taskand.dev.v1.package.readManifest
+    CC=4  in:2  out:11  total:13
   generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
     CC=20  in:0  out:12  total:12
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-    CC=5  in:8  out:3  total:11
-  generated._lib.catalog.addToGenome
-    CC=5  in:1  out:10  total:11
-  generated._lib.catalog.register
-    CC=4  in:0  out:11  total:11
-  gateway.auth.load_grants
-    CC=7  in:1  out:10  total:11
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
-    CC=11  in:1  out:10  total:11
-  gateway.utils.proc_hash
-    CC=5  in:1  out:9  total:10
-  gateway.GatewayHTTPHandler._send
-    CC=1  in:0  out:10  total:10
-  gateway.middleware.logging.log_event
-    CC=2  in:3  out:7  total:10
-  gateway.main
-    CC=2  in:0  out:9  total:9
+  generated.registry.core.taskand.dev.v1.lifecycle.setStatus
+    CC=6  in:2  out:10  total:12
+  generated.registry.core.taskand.dev.v1.federation.install
+    CC=9  in:1  out:11  total:12
+  gateway.handlers.proc.handle_proc_call
+    CC=3  in:0  out:12  total:12
+  gateway.auth.require_grant
+    CC=3  in:6  out:6  total:12
+  generated.registry.core.taskand.dev.v1.lifecycle.scan
+    CC=3  in:0  out:11  total:11
 
 MODULES:
   gateway  [5 funcs]
@@ -199,45 +197,42 @@ MODULES:
     do_GET  CC=1  out:1
     do_OPTIONS  CC=1  out:3
     do_POST  CC=4  out:6
-    main  CC=2  out:9
-  gateway.auth  [4 funcs]
+    main  CC=3  out:9
+  gateway.auth  [7 funcs]
     _parse_simple_yaml  CC=14  out:19
-    check_auth  CC=8  out:15
+    bind_address  CC=1  out:1
+    check_auth  CC=9  out:16
     check_grant  CC=7  out:3
+    is_loopback_bind  CC=1  out:1
     load_grants  CC=7  out:10
+    require_grant  CC=3  out:6
   gateway.handlers.chat  [1 funcs]
-    handle_chat  CC=29  out:83
-  gateway.handlers.federation  [1 funcs]
-    handle_federation  CC=8  out:15
+    handle_chat  CC=4  out:18
+  gateway.handlers.doctor  [1 funcs]
+    handle_doctor  CC=3  out:5
+  gateway.handlers.federation  [3 funcs]
+    handle_federation  CC=2  out:5
+    handle_registry  CC=6  out:11
+    handle_well_known_catalog  CC=1  out:3
   gateway.handlers.health  [1 funcs]
     handle_healthz  CC=2  out:5
   gateway.handlers.orchestrator  [1 funcs]
-    handle_orchestrator  CC=6  out:17
+    handle_orchestrator  CC=3  out:7
+  gateway.handlers.planner  [1 funcs]
+    handle_planner  CC=3  out:5
   gateway.handlers.proc  [1 funcs]
-    handle_proc_call  CC=9  out:26
+    handle_proc_call  CC=3  out:12
   gateway.middleware.cors  [1 funcs]
     add_cors_headers  CC=1  out:3
   gateway.middleware.logging  [1 funcs]
-    log_event  CC=2  out:7
-  gateway.router  [1 funcs]
-    dispatch  CC=3  out:4
-  gateway.utils  [2 funcs]
-    find_proc_bin  CC=9  out:9
-    proc_hash  CC=5  out:9
-  generated._lib.catalog  [8 funcs]
-    addToGenome  CC=5  out:10
-    cat  CC=5  out:4
-    loadCatalog  CC=2  out:2
-    procHash  CC=3  out:10
-    register  CC=4  out:11
-    rehashAll  CC=5  out:6
-    resolveUri  CC=6  out:5
-    saveCatalog  CC=1  out:4
-  generated._lib.proc  [4 funcs]
-    adoptOwnership  CC=4  out:9
-    callProc  CC=8  out:6
-    uriToPath  CC=4  out:7
-    walk  CC=2  out:6
+    log_event  CC=2  out:8
+  gateway.utils  [3 funcs]
+    call_process  CC=1  out:1
+    registry  CC=3  out:5
+    status_for  CC=1  out:2
+  generated.admin.chat.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.admin.network-device-discovery.taskand.dev.v1.bin  [20 funcs]
     an  CC=5  out:2
     errOut  CC=1  out:1
@@ -249,62 +244,198 @@ MODULES:
     off  CC=5  out:4
     out  CC=1  out:3
     probeBudget  CC=3  out:8
-  generated.dev.act.taskand.dev.v1.bin  [4 funcs]
+  generated.admin.network-device-discovery.taskand.dev.v2.merge  [4 funcs]
+    addSource  CC=2  out:2
+    get  CC=2  out:2
+    map  CC=2  out:3
+    mergeDevices  CC=13  out:9
+  generated.admin.network-device-discovery.taskand.dev.v2.networks  [5 funcs]
+    cidrFromAddrMask  CC=10  out:7
+    execFileP  CC=1  out:1
+    ifaces  CC=9  out:4
+    isDockerIface  CC=1  out:1
+    listLocalNetworks  CC=15  out:9
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp  [3 funcs]
+    execFileP  CC=6  out:10
+    readArpTable  CC=6  out:10
+    refreshArpWithIpNeigh  CC=2  out:2
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns  [2 funcs]
+    map  CC=3  out:3
+    reverseDns  CC=3  out:5
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns  [5 funcs]
+    extractNames  CC=6  out:4
+    finish  CC=2  out:2
+    ip  CC=4  out:5
+    probeMdns  CC=8  out:19
+    timer  CC=1  out:3
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp  [4 funcs]
+    SSDP_PORT  CC=6  out:14
+    finish  CC=2  out:2
+    probeSsdp  CC=6  out:14
+    timer  CC=1  out:3
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp  [4 funcs]
+    CONNECT_TIMEOUT  CC=3  out:8
+    finish  CC=3  out:2
+    probePort  CC=3  out:8
+    probeTcp  CC=5  out:5
+  generated.alert.telegram.taskand.dev.v1.bin  [5 funcs]
+    body  CC=2  out:1
+    chatId  CC=3  out:1
+    emit  CC=1  out:5
+    threshold  CC=2  out:1
+    token  CC=3  out:1
+  generated.browser.session.taskand.dev.v1.bin  [5 funcs]
+    cdp  CC=3  out:5
+    tab  CC=1  out:2
+    tabs  CC=1  out:3
+    text  CC=2  out:1
+    v  CC=1  out:1
+  generated.dev.act.taskand.dev.v1.bin  [8 funcs]
+    capabilityContext  CC=3  out:8
+    decide  CC=5  out:3
     decision  CC=1  out:1
-    evolve  CC=7  out:5
-    format  CC=8  out:2
-    run  CC=3  out:3
-  generated.dev.chat.taskand.dev.v1.dispatch  [8 funcs]
+    evolve  CC=6  out:3
+    format  CC=7  out:1
+    r  CC=4  out:3
+    result  CC=2  out:1
+    run  CC=2  out:2
+  generated.dev.act.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.chat.taskand.dev.v1.dispatch  [11 funcs]
     P  CC=1  out:0
-    bin  CC=2  out:6
-    diagnose  CC=5  out:4
-    organismTemplate  CC=6  out:4
-    spawnOrganism  CC=4  out:13
+    d  CC=1  out:2
+    diagnose  CC=3  out:4
+    dispatch  CC=1  out:0
+    fileList  CC=4  out:6
+    organismChat  CC=2  out:3
+    path  CC=1  out:2
+    r  CC=1  out:2
+    replyOf  CC=4  out:1
     telemetry  CC=8  out:7
-    uri  CC=1  out:1
-    webStatus  CC=2  out:6
-  generated.dev.chat.taskand.dev.v1.intent  [5 funcs]
+  generated.dev.chat.taskand.dev.v1.intent  [6 funcs]
+    DEVELOPER  CC=5  out:3
     hasAny  CC=5  out:2
     low  CC=3  out:1
     match  CC=2  out:0
     matches  CC=5  out:3
-    parseIntent  CC=3  out:2
-  generated.dev.composite.taskand.dev.v1.bin  [4 funcs]
-    done  CC=1  out:2
-    say  CC=1  out:2
-    val  CC=7  out:6
-    validate  CC=5  out:3
-  generated.dev.llm.taskand.dev.v1.context  [2 funcs]
-    capabilities  CC=4  out:4
-    capabilityContext  CC=2  out:3
+    parseIntent  CC=5  out:3
+  generated.dev.chat.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.codegen.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.composite.taskand.dev.v1.bin  [5 funcs]
+    done  CC=1  out:4
+    evolveStep  CC=4  out:6
+    say  CC=1  out:4
+    val  CC=3  out:2
+    validate  CC=4  out:3
+  generated.dev.composite.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.evolve.taskand.dev.v1.bin  [7 funcs]
+    GEN  CC=1  out:1
+    MAX_ATTEMPTS  CC=1  out:1
+    done  CC=1  out:3
+    name  CC=4  out:1
+    nextVersion  CC=3  out:2
+    organism  CC=4  out:1
+    slug  CC=4  out:1
+  generated.dev.evolve.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.file-router.taskand.dev.v1.bin  [4 funcs]
+    emit  CC=1  out:3
+    kind  CC=1  out:1
+    path  CC=2  out:2
+    st  CC=1  out:1
+  generated.dev.llm.taskand.dev.v1.bin  [5 funcs]
+    choice  CC=6  out:3
+    content  CC=6  out:3
+    data  CC=6  out:3
+    emit  CC=1  out:3
+    json  CC=2  out:1
+  generated.dev.spawn.taskand.dev.v1.bin  [2 funcs]
+    done  CC=1  out:3
+    organism  CC=2  out:2
+  generated.dev.spawn.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.doctor.diagnose.taskand.dev.v1.bin  [2 funcs]
     checkService  CC=3  out:1
     probe  CC=2  out:2
+  generated.doctor.diagnose.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.doctor.prescribe.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.hw.monitor.taskand.dev.v1.bin  [2 funcs]
     cpuTimes  CC=1  out:2
     cpuUsagePct  CC=2  out:4
-  generated.monitor.cpu.taskand.dev.v1.bin  [2 funcs]
-    cpuPct  CC=5  out:3
-    cpus  CC=4  out:2
+  generated.orchestrator.execute.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.planner.plan.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.registry.core.taskand.dev.v1.exec  [13 funcs]
+    actual  CC=2  out:1
+    call  CC=6  out:17
+    credentialEnv  CC=11  out:7
+    entry  CC=2  out:1
+    errorType  CC=3  out:3
+    fail  CC=1  out:0
+    matches  CC=11  out:6
+    outcome  CC=13  out:4
+    parseJson  CC=5  out:4
+    parsed  CC=6  out:3
+  generated.registry.core.taskand.dev.v1.federation  [6 funcs]
+    fetchJson  CC=2  out:4
+    install  CC=9  out:11
+    pkg  CC=2  out:3
+    pull  CC=6  out:8
+    pullOne  CC=10  out:7
+    remote  CC=1  out:2
+  generated.registry.core.taskand.dev.v1.lifecycle  [9 funcs]
+    approve  CC=1  out:1
+    deprecate  CC=1  out:1
+    initialStatus  CC=5  out:2
+    register  CC=13  out:14
+    results  CC=2  out:2
+    scan  CC=3  out:11
+    setStatus  CC=6  out:10
+    src  CC=5  out:5
+    unregistered  CC=2  out:2
+  generated.registry.core.taskand.dev.v1.package  [6 funcs]
+    checkPackage  CC=13  out:14
+    h  CC=2  out:4
+    packageFiles  CC=1  out:6
+    packageHash  CC=2  out:6
+    readManifest  CC=4  out:11
+    unquote  CC=13  out:14
+  generated.registry.core.taskand.dev.v1.store  [14 funcs]
+    adoptOwnership  CC=4  out:7
+    allEntries  CC=1  out:4
+    deadline  CC=7  out:6
+    findEntry  CC=2  out:2
+    lock  CC=7  out:6
+    organisms  CC=2  out:6
+    parseUri  CC=3  out:3
+    readRegistry  CC=2  out:3
+    reg  CC=1  out:1
+    registryFile  CC=2  out:2
   generated.validator.resolve.taskand.dev.v1.bin  [3 funcs]
     currentStep  CC=7  out:3
     dfs  CC=7  out:3
     hasCycle  CC=7  out:4
+  generated.validator.resolve.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
 
 EDGES:
-  generated.monitor.cpu.taskand.dev.v1.bin.cpuPct → generated.monitor.cpu.taskand.dev.v1.bin.cpus
-  gateway.auth.load_grants → gateway.auth._parse_simple_yaml
-  gateway.auth.check_auth → gateway.auth.load_grants
-  gateway.handlers.health.handle_healthz → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
-  gateway.handlers.federation.handle_federation → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_auth
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.middleware.logging.log_event
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_grant
-  gateway.handlers.proc.handle_proc_call → gateway.auth.check_auth
-  gateway.handlers.proc.handle_proc_call → gateway.utils.find_proc_bin
-  gateway.handlers.proc.handle_proc_call → gateway.auth.check_grant
-  generated.validator.resolve.taskand.dev.v1.bin.hasCycle → generated.validator.resolve.taskand.dev.v1.bin.dfs
-  generated.validator.resolve.taskand.dev.v1.bin.currentStep → generated.validator.resolve.taskand.dev.v1.bin.dfs
   generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
   generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac → generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
   generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp → generated.admin.network-device-discovery.taskand.dev.v1.bin.run
@@ -321,27 +452,40 @@ EDGES:
   generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.r
   generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
   generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct → generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
-  generated.doctor.diagnose.taskand.dev.v1.bin.checkService → generated.doctor.diagnose.taskand.dev.v1.bin.probe
-  generated._lib.proc.adoptOwnership → generated._lib.proc.walk
-  generated._lib.proc.callProc → generated._lib.proc.uriToPath
-  generated._lib.catalog.resolveUri → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.resolveUri → generated._lib.catalog.procHash
-  generated._lib.catalog.register → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.register → generated._lib.catalog.procHash
-  generated._lib.catalog.register → generated._lib.catalog.saveCatalog
-  generated._lib.catalog.register → generated._lib.catalog.addToGenome
-  generated._lib.catalog.cat → generated._lib.catalog.procHash
-  generated._lib.catalog.rehashAll → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.rehashAll → generated._lib.catalog.procHash
-  generated._lib.catalog.rehashAll → generated._lib.catalog.saveCatalog
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.say
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.done
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.validate
-  generated.dev.composite.taskand.dev.v1.bin.validate → generated.dev.composite.taskand.dev.v1.bin.say
-  generated.dev.llm.taskand.dev.v1.context.capabilityContext → generated.dev.llm.taskand.dev.v1.context.capabilities
-  generated.dev.act.taskand.dev.v1.bin.decision → generated.dev.act.taskand.dev.v1.bin.run
-  generated.dev.act.taskand.dev.v1.bin.run → generated.dev.act.taskand.dev.v1.bin.format
-  generated.dev.act.taskand.dev.v1.bin.evolve → generated.dev.act.taskand.dev.v1.bin.run
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.reverseDns → generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.map
+  generated.planner.plan.taskand.dev.v1.registry-client.call → generated.planner.plan.taskand.dev.v1.registry-client.registry
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.timer → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.chat.taskand.dev.v1.registry-client.call → generated.admin.chat.taskand.dev.v1.registry-client.registry
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.execFileP
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.readArpTable
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.CONNECT_TIMEOUT → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probeTcp → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.execFileP
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
+  generated.validator.resolve.taskand.dev.v1.registry-client.call → generated.validator.resolve.taskand.dev.v1.registry-client.registry
+  generated.registry.core.taskand.dev.v1.exec.resolve → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.entry → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.actual → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.credentialEnv → generated.registry.core.taskand.dev.v1.exec.matches
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.resolve
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.secretSource
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.credentialEnv
+  generated.registry.core.taskand.dev.v1.exec.secrets → generated.registry.core.taskand.dev.v1.exec.credentialEnv
+  generated.registry.core.taskand.dev.v1.exec.outcome → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.outcome → generated.registry.core.taskand.dev.v1.exec.parseJson
+  generated.registry.core.taskand.dev.v1.exec.parsed → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.errorType → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.fetchJson
+  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.pullOne
+  generated.registry.core.taskand.dev.v1.federation.remote → generated.registry.core.taskand.dev.v1.federation.fetchJson
+  generated.registry.core.taskand.dev.v1.federation.pullOne → generated.registry.core.taskand.dev.v1.federation.fetchJson
 ```
 
 ## Test Contracts
@@ -363,51 +507,51 @@ EDGES:
 
 ```toon markpact:analysis path=project/calls.toon.yaml
 # code2llm call graph | /home/tom/github/semcod/taskand/glm53
-# generated in 0.05s
-# nodes: 83 | edges: 70 | modules: 23
+# generated in 0.12s
+# nodes: 210 | edges: 184 | modules: 50
 # CC̄=3.1
 
 HUBS[20]:
-  gateway.handlers.chat.handle_chat
-    CC=29  in:0  out:83  total:83
-  gateway.handlers.proc.handle_proc_call
-    CC=9  in:0  out:26  total:26
   gateway.auth._parse_simple_yaml
     CC=14  in:1  out:19  total:20
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns
+    CC=8  in:0  out:19  total:19
+  generated.registry.core.taskand.dev.v1.store.sleep
+    CC=7  in:3  out:16  total:19
+  gateway.handlers.chat.handle_chat
+    CC=4  in:0  out:18  total:18
   generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
     CC=15  in:0  out:18  total:18
-  gateway.auth.check_auth
-    CC=8  in:2  out:15  total:17
-  gateway.handlers.orchestrator.handle_orchestrator
+  generated.registry.core.taskand.dev.v1.exec.call
     CC=6  in:0  out:17  total:17
-  gateway.handlers.federation.handle_federation
-    CC=8  in:0  out:15  total:15
-  generated._lib.catalog.procHash
-    CC=3  in:4  out:10  total:14
-  generated.dev.chat.taskand.dev.v1.dispatch.spawnOrganism
-    CC=4  in:0  out:13  total:13
-  gateway.utils.find_proc_bin
-    CC=9  in:3  out:9  total:12
+  gateway.auth.check_auth
+    CC=9  in:1  out:16  total:17
+  generated.registry.core.taskand.dev.v1.store.updateRegistry
+    CC=7  in:0  out:17  total:17
+  generated.registry.core.taskand.dev.v1.lifecycle.register
+    CC=13  in:3  out:14  total:17
+  generated.registry.core.taskand.dev.v1.package.unquote
+    CC=13  in:1  out:14  total:15
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp
+    CC=6  in:0  out:14  total:14
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT
+    CC=6  in:0  out:14  total:14
+  generated.registry.core.taskand.dev.v1.package.checkPackage
+    CC=13  in:0  out:14  total:14
+  generated.registry.core.taskand.dev.v1.package.readManifest
+    CC=4  in:2  out:11  total:13
   generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
     CC=20  in:0  out:12  total:12
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-    CC=5  in:8  out:3  total:11
-  generated._lib.catalog.addToGenome
-    CC=5  in:1  out:10  total:11
-  generated._lib.catalog.register
-    CC=4  in:0  out:11  total:11
-  gateway.auth.load_grants
-    CC=7  in:1  out:10  total:11
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
-    CC=11  in:1  out:10  total:11
-  gateway.utils.proc_hash
-    CC=5  in:1  out:9  total:10
-  gateway.GatewayHTTPHandler._send
-    CC=1  in:0  out:10  total:10
-  gateway.middleware.logging.log_event
-    CC=2  in:3  out:7  total:10
-  gateway.main
-    CC=2  in:0  out:9  total:9
+  generated.registry.core.taskand.dev.v1.lifecycle.setStatus
+    CC=6  in:2  out:10  total:12
+  generated.registry.core.taskand.dev.v1.federation.install
+    CC=9  in:1  out:11  total:12
+  gateway.handlers.proc.handle_proc_call
+    CC=3  in:0  out:12  total:12
+  gateway.auth.require_grant
+    CC=3  in:6  out:6  total:12
+  generated.registry.core.taskand.dev.v1.lifecycle.scan
+    CC=3  in:0  out:11  total:11
 
 MODULES:
   gateway  [5 funcs]
@@ -415,45 +559,42 @@ MODULES:
     do_GET  CC=1  out:1
     do_OPTIONS  CC=1  out:3
     do_POST  CC=4  out:6
-    main  CC=2  out:9
-  gateway.auth  [4 funcs]
+    main  CC=3  out:9
+  gateway.auth  [7 funcs]
     _parse_simple_yaml  CC=14  out:19
-    check_auth  CC=8  out:15
+    bind_address  CC=1  out:1
+    check_auth  CC=9  out:16
     check_grant  CC=7  out:3
+    is_loopback_bind  CC=1  out:1
     load_grants  CC=7  out:10
+    require_grant  CC=3  out:6
   gateway.handlers.chat  [1 funcs]
-    handle_chat  CC=29  out:83
-  gateway.handlers.federation  [1 funcs]
-    handle_federation  CC=8  out:15
+    handle_chat  CC=4  out:18
+  gateway.handlers.doctor  [1 funcs]
+    handle_doctor  CC=3  out:5
+  gateway.handlers.federation  [3 funcs]
+    handle_federation  CC=2  out:5
+    handle_registry  CC=6  out:11
+    handle_well_known_catalog  CC=1  out:3
   gateway.handlers.health  [1 funcs]
     handle_healthz  CC=2  out:5
   gateway.handlers.orchestrator  [1 funcs]
-    handle_orchestrator  CC=6  out:17
+    handle_orchestrator  CC=3  out:7
+  gateway.handlers.planner  [1 funcs]
+    handle_planner  CC=3  out:5
   gateway.handlers.proc  [1 funcs]
-    handle_proc_call  CC=9  out:26
+    handle_proc_call  CC=3  out:12
   gateway.middleware.cors  [1 funcs]
     add_cors_headers  CC=1  out:3
   gateway.middleware.logging  [1 funcs]
-    log_event  CC=2  out:7
-  gateway.router  [1 funcs]
-    dispatch  CC=3  out:4
-  gateway.utils  [2 funcs]
-    find_proc_bin  CC=9  out:9
-    proc_hash  CC=5  out:9
-  generated._lib.catalog  [8 funcs]
-    addToGenome  CC=5  out:10
-    cat  CC=5  out:4
-    loadCatalog  CC=2  out:2
-    procHash  CC=3  out:10
-    register  CC=4  out:11
-    rehashAll  CC=5  out:6
-    resolveUri  CC=6  out:5
-    saveCatalog  CC=1  out:4
-  generated._lib.proc  [4 funcs]
-    adoptOwnership  CC=4  out:9
-    callProc  CC=8  out:6
-    uriToPath  CC=4  out:7
-    walk  CC=2  out:6
+    log_event  CC=2  out:8
+  gateway.utils  [3 funcs]
+    call_process  CC=1  out:1
+    registry  CC=3  out:5
+    status_for  CC=1  out:2
+  generated.admin.chat.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.admin.network-device-discovery.taskand.dev.v1.bin  [20 funcs]
     an  CC=5  out:2
     errOut  CC=1  out:1
@@ -465,62 +606,198 @@ MODULES:
     off  CC=5  out:4
     out  CC=1  out:3
     probeBudget  CC=3  out:8
-  generated.dev.act.taskand.dev.v1.bin  [4 funcs]
+  generated.admin.network-device-discovery.taskand.dev.v2.merge  [4 funcs]
+    addSource  CC=2  out:2
+    get  CC=2  out:2
+    map  CC=2  out:3
+    mergeDevices  CC=13  out:9
+  generated.admin.network-device-discovery.taskand.dev.v2.networks  [5 funcs]
+    cidrFromAddrMask  CC=10  out:7
+    execFileP  CC=1  out:1
+    ifaces  CC=9  out:4
+    isDockerIface  CC=1  out:1
+    listLocalNetworks  CC=15  out:9
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp  [3 funcs]
+    execFileP  CC=6  out:10
+    readArpTable  CC=6  out:10
+    refreshArpWithIpNeigh  CC=2  out:2
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns  [2 funcs]
+    map  CC=3  out:3
+    reverseDns  CC=3  out:5
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns  [5 funcs]
+    extractNames  CC=6  out:4
+    finish  CC=2  out:2
+    ip  CC=4  out:5
+    probeMdns  CC=8  out:19
+    timer  CC=1  out:3
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp  [4 funcs]
+    SSDP_PORT  CC=6  out:14
+    finish  CC=2  out:2
+    probeSsdp  CC=6  out:14
+    timer  CC=1  out:3
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp  [4 funcs]
+    CONNECT_TIMEOUT  CC=3  out:8
+    finish  CC=3  out:2
+    probePort  CC=3  out:8
+    probeTcp  CC=5  out:5
+  generated.alert.telegram.taskand.dev.v1.bin  [5 funcs]
+    body  CC=2  out:1
+    chatId  CC=3  out:1
+    emit  CC=1  out:5
+    threshold  CC=2  out:1
+    token  CC=3  out:1
+  generated.browser.session.taskand.dev.v1.bin  [5 funcs]
+    cdp  CC=3  out:5
+    tab  CC=1  out:2
+    tabs  CC=1  out:3
+    text  CC=2  out:1
+    v  CC=1  out:1
+  generated.dev.act.taskand.dev.v1.bin  [8 funcs]
+    capabilityContext  CC=3  out:8
+    decide  CC=5  out:3
     decision  CC=1  out:1
-    evolve  CC=7  out:5
-    format  CC=8  out:2
-    run  CC=3  out:3
-  generated.dev.chat.taskand.dev.v1.dispatch  [8 funcs]
+    evolve  CC=6  out:3
+    format  CC=7  out:1
+    r  CC=4  out:3
+    result  CC=2  out:1
+    run  CC=2  out:2
+  generated.dev.act.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.chat.taskand.dev.v1.dispatch  [11 funcs]
     P  CC=1  out:0
-    bin  CC=2  out:6
-    diagnose  CC=5  out:4
-    organismTemplate  CC=6  out:4
-    spawnOrganism  CC=4  out:13
+    d  CC=1  out:2
+    diagnose  CC=3  out:4
+    dispatch  CC=1  out:0
+    fileList  CC=4  out:6
+    organismChat  CC=2  out:3
+    path  CC=1  out:2
+    r  CC=1  out:2
+    replyOf  CC=4  out:1
     telemetry  CC=8  out:7
-    uri  CC=1  out:1
-    webStatus  CC=2  out:6
-  generated.dev.chat.taskand.dev.v1.intent  [5 funcs]
+  generated.dev.chat.taskand.dev.v1.intent  [6 funcs]
+    DEVELOPER  CC=5  out:3
     hasAny  CC=5  out:2
     low  CC=3  out:1
     match  CC=2  out:0
     matches  CC=5  out:3
-    parseIntent  CC=3  out:2
-  generated.dev.composite.taskand.dev.v1.bin  [4 funcs]
-    done  CC=1  out:2
-    say  CC=1  out:2
-    val  CC=7  out:6
-    validate  CC=5  out:3
-  generated.dev.llm.taskand.dev.v1.context  [2 funcs]
-    capabilities  CC=4  out:4
-    capabilityContext  CC=2  out:3
+    parseIntent  CC=5  out:3
+  generated.dev.chat.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.codegen.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.composite.taskand.dev.v1.bin  [5 funcs]
+    done  CC=1  out:4
+    evolveStep  CC=4  out:6
+    say  CC=1  out:4
+    val  CC=3  out:2
+    validate  CC=4  out:3
+  generated.dev.composite.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.evolve.taskand.dev.v1.bin  [7 funcs]
+    GEN  CC=1  out:1
+    MAX_ATTEMPTS  CC=1  out:1
+    done  CC=1  out:3
+    name  CC=4  out:1
+    nextVersion  CC=3  out:2
+    organism  CC=4  out:1
+    slug  CC=4  out:1
+  generated.dev.evolve.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.dev.file-router.taskand.dev.v1.bin  [4 funcs]
+    emit  CC=1  out:3
+    kind  CC=1  out:1
+    path  CC=2  out:2
+    st  CC=1  out:1
+  generated.dev.llm.taskand.dev.v1.bin  [5 funcs]
+    choice  CC=6  out:3
+    content  CC=6  out:3
+    data  CC=6  out:3
+    emit  CC=1  out:3
+    json  CC=2  out:1
+  generated.dev.spawn.taskand.dev.v1.bin  [2 funcs]
+    done  CC=1  out:3
+    organism  CC=2  out:2
+  generated.dev.spawn.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.doctor.diagnose.taskand.dev.v1.bin  [2 funcs]
     checkService  CC=3  out:1
     probe  CC=2  out:2
+  generated.doctor.diagnose.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.doctor.prescribe.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
   generated.hw.monitor.taskand.dev.v1.bin  [2 funcs]
     cpuTimes  CC=1  out:2
     cpuUsagePct  CC=2  out:4
-  generated.monitor.cpu.taskand.dev.v1.bin  [2 funcs]
-    cpuPct  CC=5  out:3
-    cpus  CC=4  out:2
+  generated.orchestrator.execute.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.planner.plan.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
+  generated.registry.core.taskand.dev.v1.exec  [13 funcs]
+    actual  CC=2  out:1
+    call  CC=6  out:17
+    credentialEnv  CC=11  out:7
+    entry  CC=2  out:1
+    errorType  CC=3  out:3
+    fail  CC=1  out:0
+    matches  CC=11  out:6
+    outcome  CC=13  out:4
+    parseJson  CC=5  out:4
+    parsed  CC=6  out:3
+  generated.registry.core.taskand.dev.v1.federation  [6 funcs]
+    fetchJson  CC=2  out:4
+    install  CC=9  out:11
+    pkg  CC=2  out:3
+    pull  CC=6  out:8
+    pullOne  CC=10  out:7
+    remote  CC=1  out:2
+  generated.registry.core.taskand.dev.v1.lifecycle  [9 funcs]
+    approve  CC=1  out:1
+    deprecate  CC=1  out:1
+    initialStatus  CC=5  out:2
+    register  CC=13  out:14
+    results  CC=2  out:2
+    scan  CC=3  out:11
+    setStatus  CC=6  out:10
+    src  CC=5  out:5
+    unregistered  CC=2  out:2
+  generated.registry.core.taskand.dev.v1.package  [6 funcs]
+    checkPackage  CC=13  out:14
+    h  CC=2  out:4
+    packageFiles  CC=1  out:6
+    packageHash  CC=2  out:6
+    readManifest  CC=4  out:11
+    unquote  CC=13  out:14
+  generated.registry.core.taskand.dev.v1.store  [14 funcs]
+    adoptOwnership  CC=4  out:7
+    allEntries  CC=1  out:4
+    deadline  CC=7  out:6
+    findEntry  CC=2  out:2
+    lock  CC=7  out:6
+    organisms  CC=2  out:6
+    parseUri  CC=3  out:3
+    readRegistry  CC=2  out:3
+    reg  CC=1  out:1
+    registryFile  CC=2  out:2
   generated.validator.resolve.taskand.dev.v1.bin  [3 funcs]
     currentStep  CC=7  out:3
     dfs  CC=7  out:3
     hasCycle  CC=7  out:4
+  generated.validator.resolve.taskand.dev.v1.registry-client  [2 funcs]
+    call  CC=1  out:1
+    registry  CC=6  out:5
 
 EDGES:
-  generated.monitor.cpu.taskand.dev.v1.bin.cpuPct → generated.monitor.cpu.taskand.dev.v1.bin.cpus
-  gateway.auth.load_grants → gateway.auth._parse_simple_yaml
-  gateway.auth.check_auth → gateway.auth.load_grants
-  gateway.handlers.health.handle_healthz → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
-  gateway.handlers.federation.handle_federation → generated.admin.network-device-discovery.taskand.dev.v1.bin.len
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_auth
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.middleware.logging.log_event
-  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.check_grant
-  gateway.handlers.proc.handle_proc_call → gateway.auth.check_auth
-  gateway.handlers.proc.handle_proc_call → gateway.utils.find_proc_bin
-  gateway.handlers.proc.handle_proc_call → gateway.auth.check_grant
-  generated.validator.resolve.taskand.dev.v1.bin.hasCycle → generated.validator.resolve.taskand.dev.v1.bin.dfs
-  generated.validator.resolve.taskand.dev.v1.bin.currentStep → generated.validator.resolve.taskand.dev.v1.bin.dfs
   generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
   generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac → generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
   generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp → generated.admin.network-device-discovery.taskand.dev.v1.bin.run
@@ -537,222 +814,281 @@ EDGES:
   generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.r
   generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
   generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct → generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
-  generated.doctor.diagnose.taskand.dev.v1.bin.checkService → generated.doctor.diagnose.taskand.dev.v1.bin.probe
-  generated._lib.proc.adoptOwnership → generated._lib.proc.walk
-  generated._lib.proc.callProc → generated._lib.proc.uriToPath
-  generated._lib.catalog.resolveUri → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.resolveUri → generated._lib.catalog.procHash
-  generated._lib.catalog.register → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.register → generated._lib.catalog.procHash
-  generated._lib.catalog.register → generated._lib.catalog.saveCatalog
-  generated._lib.catalog.register → generated._lib.catalog.addToGenome
-  generated._lib.catalog.cat → generated._lib.catalog.procHash
-  generated._lib.catalog.rehashAll → generated._lib.catalog.loadCatalog
-  generated._lib.catalog.rehashAll → generated._lib.catalog.procHash
-  generated._lib.catalog.rehashAll → generated._lib.catalog.saveCatalog
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.say
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.done
-  generated.dev.composite.taskand.dev.v1.bin.val → generated.dev.composite.taskand.dev.v1.bin.validate
-  generated.dev.composite.taskand.dev.v1.bin.validate → generated.dev.composite.taskand.dev.v1.bin.say
-  generated.dev.llm.taskand.dev.v1.context.capabilityContext → generated.dev.llm.taskand.dev.v1.context.capabilities
-  generated.dev.act.taskand.dev.v1.bin.decision → generated.dev.act.taskand.dev.v1.bin.run
-  generated.dev.act.taskand.dev.v1.bin.run → generated.dev.act.taskand.dev.v1.bin.format
-  generated.dev.act.taskand.dev.v1.bin.evolve → generated.dev.act.taskand.dev.v1.bin.run
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.reverseDns → generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.map
+  generated.planner.plan.taskand.dev.v1.registry-client.call → generated.planner.plan.taskand.dev.v1.registry-client.registry
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.timer → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+  generated.admin.chat.taskand.dev.v1.registry-client.call → generated.admin.chat.taskand.dev.v1.registry-client.registry
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.execFileP
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.readArpTable
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.CONNECT_TIMEOUT → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
+  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probeTcp → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.execFileP
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
+  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
+  generated.validator.resolve.taskand.dev.v1.registry-client.call → generated.validator.resolve.taskand.dev.v1.registry-client.registry
+  generated.registry.core.taskand.dev.v1.exec.resolve → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.entry → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.actual → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.credentialEnv → generated.registry.core.taskand.dev.v1.exec.matches
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.resolve
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.secretSource
+  generated.registry.core.taskand.dev.v1.exec.call → generated.registry.core.taskand.dev.v1.exec.credentialEnv
+  generated.registry.core.taskand.dev.v1.exec.secrets → generated.registry.core.taskand.dev.v1.exec.credentialEnv
+  generated.registry.core.taskand.dev.v1.exec.outcome → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.outcome → generated.registry.core.taskand.dev.v1.exec.parseJson
+  generated.registry.core.taskand.dev.v1.exec.parsed → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.exec.errorType → generated.registry.core.taskand.dev.v1.exec.fail
+  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.fetchJson
+  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.pullOne
+  generated.registry.core.taskand.dev.v1.federation.remote → generated.registry.core.taskand.dev.v1.federation.fetchJson
+  generated.registry.core.taskand.dev.v1.federation.pullOne → generated.registry.core.taskand.dev.v1.federation.fetchJson
 ```
 
 ### Code Analysis (`project/analysis.toon.yaml`)
 
 ```toon markpact:analysis path=project/analysis.toon.yaml
-# code2llm | 72f 3490L | javascript:39,yaml:15,python:13,shell:1,json:1 | 2026-09-12
-# generated in 0.02s
-# CC̅=3.1 | critical:4/373 | dups:0 | cycles:0
+# code2llm | 119f 5678L | javascript:56,yaml:32,json:14,python:13,shell:1 | 2026-09-13
+# generated in 0.03s
+# CC̅=3.1 | critical:4/575 | dups:0 | cycles:0
 
 HEALTH[4]:
-  🟡 CC    binPath CC=21 (limit:15)
   🟡 CC    readArp CC=20 (limit:15)
   🟡 CC    mdnsProbe CC=15 (limit:15)
-  🟡 CC    handle_chat CC=29 (limit:15)
+  🟡 CC    listLocalNetworks CC=15 (limit:15)
+  🟡 CC    guard CC=16 (limit:15)
 
 REFACTOR[1]:
   1. split 4 high-CC methods  (CC>15)
 
-PIPELINES[260]:
-  [1] Src [r1]: r1
+PIPELINES[405]:
+  [1] Src [TIMEOUT_MS]: TIMEOUT_MS
       PURITY: 100% pure
-  [2] Src [r2]: r2
+  [2] Src [deadline]: deadline
       PURITY: 100% pure
-  [3] Src [act]: act
+  [3] Src [errOut]: errOut → out
       PURITY: 100% pure
-  [4] Src [KEY]: KEY
+  [4] Src [timeLeft]: timeLeft
       PURITY: 100% pure
-  [5] Src [org]: org
+  [5] Src [ouiMap]: ouiMap
       PURITY: 100% pure
-  [6] Src [__dirname]: __dirname
+  [6] Src [lines]: lines
       PURITY: 100% pure
-  [7] Src [r]: r
+  [7] Src [parts]: parts
       PURITY: 100% pure
-  [8] Src [action]: action
+  [8] Src [vendorFromMac]: vendorFromMac → loadOui
       PURITY: 100% pure
-  [9] Src [__dirname]: __dirname
+  [9] Src [parseArpText]: parseArpText
       PURITY: 100% pure
-  [10] Src [r]: r
+  [10] Src [m]: m
       PURITY: 100% pure
-  [11] Src [out]: out
+  [11] Src [readArp]: readArp → run
       PURITY: 100% pure
-  [12] Src [cpuPct]: cpuPct → cpus
+  [12] Src [t]: t
       PURITY: 100% pure
-  [13] Src [totalIdle]: totalIdle
+  [13] Src [p]: p
       PURITY: 100% pure
-  [14] Src [__dirname]: __dirname
+  [14] Src [mip]: mip
       PURITY: 100% pure
-  [15] Src [r]: r
+  [15] Src [mmac]: mmac
       PURITY: 100% pure
-  [16] Src [op]: op
+  [16] Src [localSubnets]: localSubnets
       PURITY: 100% pure
-  [17] Src [target]: target
+  [17] Src [ifaces]: ifaces
       PURITY: 100% pure
-  [18] Src [msg]: msg
+  [18] Src [ipParts]: ipParts
       PURITY: 100% pure
-  [19] Src [cpuVal]: cpuVal
+  [19] Src [maskParts]: maskParts
       PURITY: 100% pure
-  [20] Src [__dirname]: __dirname
+  [20] Src [maskBits]: maskBits
       PURITY: 100% pure
-  [21] Src [r]: r
+  [21] Src [netParts]: netParts
       PURITY: 100% pure
-  [22] Src [__filename]: __filename
+  [22] Src [s]: s
       PURITY: 100% pure
-  [23] Src [__dirname]: __dirname
+  [23] Src [done]: done
       PURITY: 100% pure
-  [24] Src [plan]: plan
+  [24] Src [mdnsProbe]: mdnsProbe → readName
       PURITY: 100% pure
-  [25] Src [runId]: runId
+  [25] Src [sock]: sock
       PURITY: 100% pure
-  [26] Src [orchDir]: orchDir
+  [26] Src [timer]: timer
       PURITY: 100% pure
-  [27] Src [stateFile]: stateFile
+  [27] Src [hostname]: hostname → readName
       PURITY: 100% pure
-  [28] Src [isResume]: isResume
+  [28] Src [off]: off → readName
       PURITY: 100% pure
-  [29] Src [prev]: prev
+  [29] Src [qd]: qd → readName
       PURITY: 100% pure
-  [30] Src [saveState]: saveState
+  [30] Src [an]: an → readName
       PURITY: 100% pure
-  [31] Src [canExecute]: canExecute
+  [31] Src [rdlen]: rdlen → readName
       PURITY: 100% pure
-  [32] Src [blockingDep]: blockingDep
+  [32] Src [type]: type → readName
       PURITY: 100% pure
-  [33] Src [port]: port
+  [33] Src [q]: q
       PURITY: 100% pure
-  [34] Src [isUp]: isUp
+  [34] Src [ssdpProbe]: ssdpProbe
       PURITY: 100% pure
-  [35] Src [binPath]: binPath
+  [35] Src [nets]: nets
       PURITY: 100% pure
-  [36] Src [r]: r
+  [36] Src [netsInfo]: netsInfo
       PURITY: 100% pure
-  [37] Src [errText]: errText
+  [37] Src [mdnsMs]: mdnsMs
       PURITY: 100% pure
-  [38] Src [parsed]: parsed
+  [38] Src [ssdpMs]: ssdpMs
       PURITY: 100% pure
-  [39] Src [hasFailed]: hasFailed
+  [39] Src [byIp]: byIp
       PURITY: 100% pure
-  [40] Src [hasBlocked]: hasBlocked
+  [40] Src [add]: add
       PURITY: 100% pure
-  [41] Src [r]: r
+  [41] Src [cur]: cur
       PURITY: 100% pure
-  [42] Src [out]: out
+  [42] Src [probeBudget]: probeBudget → tcpProbe → fin
       PURITY: 100% pure
-  [43] Src [desc]: desc
+  [43] Src [alive]: alive
       PURITY: 100% pure
-  [44] Src [r]: r
+  [44] Src [selfIps]: selfIps → out
       PURITY: 100% pure
-  [45] Src [out]: out
+  [45] Src [r]: r
       PURITY: 100% pure
-  [46] Src [__filename]: __filename
+  [46] Src [TEMP_WARN_C]: TEMP_WARN_C
       PURITY: 100% pure
-  [47] Src [__dirname]: __dirname
+  [47] Src [readSensorsCmd]: readSensorsCmd
       PURITY: 100% pure
-  [48] Src [intent]: intent
+  [48] Src [out]: out
       PURITY: 100% pure
-  [49] Src [desc]: desc
+  [49] Src [readThermalZones]: readThermalZones
       PURITY: 100% pure
-  [50] Src [devChatBin]: devChatBin
+  [50] Src [temp_c]: temp_c
       PURITY: 100% pure
 
 LAYERS:
-  gateway/                        CC̄=5.7    ←in:7  →out:4
-  │ !! chat                       138L  0C    2m  CC=29     ←0
-  │ auth                       124L  0C    4m  CC=14     ←2
-  │ proc                        65L  0C    1m  CC=9      ←0
-  │ utils                       56L  0C    2m  CC=9      ←2
-  │ orchestrator                49L  0C    1m  CC=6      ←0
-  │ __init__                    48L  1C    6m  CC=4      ←0
-  │ planner                     29L  0C    1m  CC=5      ←0
-  │ router                      27L  0C    1m  CC=3      ←1
-  │ federation                  25L  0C    1m  CC=8      ←0
-  │ logging                     22L  0C    1m  CC=2      ←3
-  │ doctor                      16L  0C    1m  CC=4      ←0
-  │ health                      11L  0C    1m  CC=2      ←0
+  gateway/                        CC̄=3.3    ←in:18  →out:5
+  │ auth                       142L  0C    7m  CC=14     ←7
+  │ __init__                    51L  1C    6m  CC=4      ←0
+  │ utils                       47L  0C    3m  CC=3      ←6
+  │ federation                  35L  0C    3m  CC=6      ←0
+  │ router                      29L  0C    1m  CC=3      ←0
+  │ logging                     28L  0C    1m  CC=2      ←3
+  │ chat                        25L  0C    1m  CC=4      ←0
+  │ proc                        16L  0C    1m  CC=3      ←0
+  │ orchestrator                14L  0C    1m  CC=3      ←0
+  │ health                      12L  0C    1m  CC=2      ←0
+  │ doctor                      11L  0C    1m  CC=3      ←0
+  │ planner                     11L  0C    1m  CC=3      ←0
   │ cors                         4L  0C    1m  CC=1      ←1
   │
-  generated/                      CC̄=3.0    ←in:0  →out:0
-  │ !! bin.mjs                    292L  0C   61m  CC=20     ←3
-  │ !! bin.mjs                    242L  0C   22m  CC=21     ←0
-  │ bin.mjs                    212L  0C   22m  CC=8      ←0
-  │ bin.mjs                    157L  0C   12m  CC=8      ←0
+  generated/                      CC̄=3.1    ←in:0  →out:0
+  │ !! bin.mjs                    292L  0C   61m  CC=20     ←2
+  │ bin.mjs                    178L  0C   17m  CC=7      ←0
+  │ bin.mjs                    168L  0C   17m  CC=7      ←0
+  │ registry.json              159L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                    148L  0C    9m  CC=8      ←0
+  │ store.mjs                  128L  0C   30m  CC=7      ←0
+  │ lifecycle.mjs              119L  0C   25m  CC=13     ←0
   │ bin.mjs                    112L  0C   24m  CC=4      ←0
-  │ catalog.mjs                109L  0C   21m  CC=6      ←0
-  │ bin.mjs                     82L  0C   16m  CC=9      ←0
-  │ dispatch.mjs                82L  0C   17m  CC=8      ←0
-  │ bin.mjs                     79L  0C   18m  CC=8      ←0
-  │ bin.mjs                     76L  0C   14m  CC=9      ←0
-  │ contract.mjs                61L  0C    4m  CC=9      ←0
-  │ bin.mjs                     59L  0C    8m  CC=5      ←0
-  │ bin.mjs                     59L  0C   15m  CC=6      ←0
-  │ proc.mjs                    58L  0C   15m  CC=8      ←0
-  │ bin.mjs                     50L  0C    8m  CC=4      ←0
-  │ bin.mjs                     48L  0C    5m  CC=5      ←0
-  │ test.mjs                    41L  0C    3m  CC=3      ←0
-  │ bin.mjs                     41L  0C    8m  CC=2      ←0
-  │ test.mjs                    37L  0C    3m  CC=1      ←0
-  │ intent.mjs                  36L  0C    5m  CC=5      ←0
-  │ bin.mjs                     24L  0C    2m  CC=12     ←0
-  │ bin.mjs                     23L  0C    4m  CC=3      ←0
-  │ bin.mjs                     20L  0C    2m  CC=2      ←0
-  │ bin.mjs                     20L  0C    3m  CC=2      ←0
-  │ bin.mjs                     19L  0C    3m  CC=3      ←0
-  │ bin.mjs                     19L  0C    1m  CC=2      ←0
-  │ test.mjs                    18L  0C    3m  CC=1      ←0
-  │ bin.mjs                     17L  0C    2m  CC=2      ←0
-  │ bin.mjs                     17L  0C    4m  CC=2      ←0
-  │ context.mjs                 16L  0C    3m  CC=4      ←0
-  │ bin.mjs                     16L  0C    3m  CC=2      ←0
-  │ test.mjs                    14L  0C    3m  CC=1      ←0
-  │ test.mjs                    14L  0C    3m  CC=1      ←0
-  │ bin.mjs                     10L  0C    1m  CC=2      ←0
-  │ proc.yaml                   10L  0C    0m  CC=0.0    ←0
-  │ test.mjs                     9L  0C    3m  CC=2      ←0
-  │ test.mjs                     9L  0C    2m  CC=3      ←0
-  │ test.mjs                     9L  0C    2m  CC=2      ←0
-  │ bin.mjs                      9L  0C    3m  CC=2      ←0
+  │ bin.mjs                    101L  0C   17m  CC=10     ←0
+  │ exec.mjs                    94L  0C   22m  CC=13     ←0
+  │ bin.mjs                     91L  0C   19m  CC=7      ←0
+  │ !! contract.mjs                89L  0C    8m  CC=16     ←0
+  │ !! networks.mjs                74L  0C   18m  CC=15     ←0
+  │ federation.mjs              74L  0C   21m  CC=10     ←0
+  │ bin.mjs                     72L  0C   15m  CC=4      ←0
+  │ bin.mjs                     71L  0C   16m  CC=6      ←0
+  │ registry.json               71L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     66L  0C    8m  CC=7      ←0
+  │ dispatch.mjs                63L  0C   14m  CC=8      ←1
+  │ probe-mdns.mjs              61L  0C   10m  CC=8      ←0
+  │ package.mjs                 61L  0C   12m  CC=13     ←0
+  │ bin.mjs                     60L  0C   11m  CC=3      ←0
+  │ bin.mjs                     59L  0C    9m  CC=5      ←0
+  │ bin.mjs                     58L  0C   12m  CC=4      ←0
+  │ vendor.mjs                  57L  0C    3m  CC=5      ←0
+  │ bin.mjs                     50L  0C   10m  CC=3      ←0
+  │ intent.mjs                  49L  0C    7m  CC=5      ←0
+  │ bin.mjs                     47L  0C   12m  CC=4      ←0
+  │ registry.json               44L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     42L  0C    2m  CC=3      ←0
+  │ merge.mjs                   41L  0C    5m  CC=13     ←0
+  │ bin.mjs                     40L  0C    8m  CC=2      ←0
+  │ probe-tcp.mjs               40L  0C    7m  CC=5      ←0
+  │ bin.mjs                     37L  0C    7m  CC=4      ←0
+  │ probe-ssdp.mjs              37L  0C    6m  CC=6      ←0
+  │ bin.mjs                     37L  0C    4m  CC=4      ←0
+  │ bin.mjs                     36L  0C    3m  CC=2      ←0
+  │ probe-arp.mjs               33L  0C    5m  CC=6      ←0
+  │ registry.json               31L  0C    0m  CC=0.0    ←0
+  │ stdin.mjs                   28L  0C    2m  CC=4      ←0
+  │ registry.json               28L  0C    0m  CC=0.0    ←0
+  │ registry.json               27L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     26L  0C    5m  CC=2      ←0
+  │ registry.json               26L  0C    0m  CC=0.0    ←0
+  │ registry.json               26L  0C    0m  CC=0.0    ←0
+  │ vault.mjs                   25L  0C    4m  CC=6      ←0
+  │ registry.json               25L  0C    0m  CC=0.0    ←0
+  │ registry.json               25L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←2
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ bin.mjs                     23L  0C    2m  CC=2      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ bin.mjs                     22L  0C    2m  CC=2      ←0
+  │ bin.mjs                     18L  0C    3m  CC=2      ←0
+  │ probe-dns.mjs               14L  0C    3m  CC=3      ←0
   │ capsule.yaml                 9L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    7L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    7L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
+  │ test.mjs                     6L  0C    2m  CC=1      ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ test.mjs                     5L  0C    2m  CC=1      ←0
   │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
-  │ proc-catalog.json          247L  0C    0m  CC=0.0    ←0
+  │ !! planfile.yaml              851L  0C    0m  CC=0.0    ←0
+  │ prefact.yaml                94L  0C    0m  CC=0.0    ←0
+  │ genome.yaml                 78L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  68L  0C    0m  CC=0.0    ←0
-  │ genome.yaml                 65L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yaml         63L  0C    0m  CC=0.0    ←0
   │ project.sh                  59L  0C    0m  CC=0.0    ←0
-  │ docker-compose.yaml         52L  0C    0m  CC=0.0    ←0
-  │ Makefile                    50L  0C    0m  CC=0.0    ←0
+  │ Makefile                    42L  0C    0m  CC=0.0    ←0
   │ grants.yaml                 31L  0C    0m  CC=0.0    ←0
   │
   tasks/                          CC̄=0.0    ←in:0  →out:0
@@ -761,20 +1097,24 @@ LAYERS:
   vms/                            CC̄=0.0    ←in:0  →out:0
   │ Dockerfile                   9L  0C    0m  CC=0.0    ←0
   │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-api-smoke.testql.toon.yaml    39L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
      tasks/inbox.yaml                          0L
 
 COUPLING:
-                        gateway.handlers             gateway     generated.admin  gateway.middleware
-    gateway.handlers                  ──                   7                   4                   3  !! fan-out
-             gateway                  ←7                  ──                   2                   2  hub
-     generated.admin                  ←4                  ←2                  ──                      hub
-  gateway.middleware                  ←3                  ←2                                      ──  hub
+                        gateway.handlers             gateway  gateway.middleware   generated.planner     generated.admin       generated.dev
+    gateway.handlers                  ──                  18                   3                   4                   1                      !! fan-out
+             gateway                 ←18                  ──                   2                                       1                   2  hub
+  gateway.middleware                  ←3                  ←2                  ──                                                              hub
+   generated.planner                  ←4                                                          ──                                        
+     generated.admin                  ←1                  ←1                                                          ──                    
+       generated.dev                                      ←2                                                                              ──
   CYCLES: none
-  HUB: generated.admin/ (fan-in=6)
+  HUB: gateway/ (fan-in=18)
   HUB: gateway.middleware/ (fan-in=5)
-  HUB: gateway/ (fan-in=7)
-  SMELL: gateway.handlers/ fan-out=14 → split needed
+  SMELL: gateway.handlers/ fan-out=26 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon
@@ -784,53 +1124,123 @@ EXTERNAL:
 ### Duplication (`project/duplication.toon.yaml`)
 
 ```toon markpact:analysis path=project/duplication.toon.yaml
-# redup/duplication | 0 groups | 50f 3433L | 2026-09-12
+# redup/duplication | 4 groups | 76f 4572L | 2026-09-13
 
 SUMMARY:
-  files_scanned: 50
-  total_lines:   3433
-  dup_groups:    0
-  actionable:    0
+  files_scanned: 76
+  total_lines:   4572
+  dup_groups:    4
+  actionable:    4
   review:        0
   generated:     0
-  actionable_L:  0
+  actionable_L:  174
   review_L:      0
   generated_L:   0
-  dup_fragments: 0
-  saved_lines:   0
-  scan_ms:       199
+  dup_fragments: 20
+  saved_lines:   174
+  scan_ms:       280
+
+HOTSPOTS[7] (files with most duplication):
+  generated/admin/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/act/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/codegen/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/composite/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/evolve/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/spawn/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+
+DUPLICATES[4] (ranked by impact):
+  [0e718323cab5c7af] !! EXAC  registry  L=14 N=12 saved=154 sim=1.00
+      generated/admin/chat/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/act/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/chat/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/codegen/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/composite/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/evolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/spawn/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/doctor/prescribe/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/orchestrator/execute/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/planner/plan/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/validator/resolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+  [cfe7db247084402d]   EXAC  arrow_function  L=4 N=4 saved=12 sim=1.00
+      generated/dev/act/taskand.dev/v1/bin.mjs:19-22  (arrow_function)
+      generated/dev/codegen/taskand.dev/v1/bin.mjs:16-19  (arrow_function)
+      generated/dev/evolve/taskand.dev/v1/bin.mjs:20-23  (arrow_function)
+      generated/dev/spawn/taskand.dev/v1/bin.mjs:18-21  (arrow_function)
+  [7f7e2d64ce928e6c]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
+      generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:37-40  (arrow_function)
+      generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:17-20  (arrow_function)
+  [831e87a319dbea5b]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
+      generated/dev/file-router/taskand.dev/v1/bin.mjs:13-16  (arrow_function)
+      generated/dev/llm/taskand.dev/v1/bin.mjs:14-17  (arrow_function)
+
+REFACTOR[4] (ranked by priority):
+  [1] ○ extract_function   → generated/utils/registry.py
+      WHY: 12 occurrences of 14-line block across 12 files — saves 154 lines
+      FILES: generated/admin/chat/taskand.dev/v1/registry-client.mjs, generated/dev/act/taskand.dev/v1/registry-client.mjs, generated/dev/chat/taskand.dev/v1/registry-client.mjs, generated/dev/codegen/taskand.dev/v1/registry-client.mjs, generated/dev/composite/taskand.dev/v1/registry-client.mjs +7 more
+  [2] ○ extract_function   → generated/dev/utils/arrow_function.py
+      WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
+      FILES: generated/dev/act/taskand.dev/v1/bin.mjs, generated/dev/codegen/taskand.dev/v1/bin.mjs, generated/dev/evolve/taskand.dev/v1/bin.mjs, generated/dev/spawn/taskand.dev/v1/bin.mjs
+  [3] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v2/utils/arrow_function.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs, generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs
+  [4] ○ extract_function   → generated/dev/utils/arrow_function.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: generated/dev/file-router/taskand.dev/v1/bin.mjs, generated/dev/llm/taskand.dev/v1/bin.mjs
+
+QUICK_WINS[2] (low risk, high savings — do first):
+  [1] extract_function   saved=154L  → generated/utils/registry.py
+      FILES: registry-client.mjs, registry-client.mjs, registry-client.mjs +9
+  [2] extract_function   saved=12L  → generated/dev/utils/arrow_function.py
+      FILES: bin.mjs, bin.mjs, bin.mjs +1
+
+EFFORT_ESTIMATE (total ≈ 5.8h):
+  hard   registry                            saved=154L  ~308min
+  easy   arrow_function                      saved=12L  ~24min
+  easy   arrow_function                      saved=4L  ~8min
+  easy   arrow_function                      saved=4L  ~8min
+
+METRICS-TARGET:
+  dup_groups:  4 → 0
+  saved_lines: 174 lines recoverable
 ```
 
 ### Evolution / Churn (`project/evolution.toon.yaml`)
 
 ```toon markpact:analysis path=project/evolution.toon.yaml
-# code2llm/evolution | 373 func | 52f | 2026-09-12
+# code2llm/evolution | 575 func | 69f | 2026-09-13
 # generated in 0.00s
 
-NEXT[4] (ranked by impact):
-  [1] !! SPLIT-FUNC      handle_chat  CC=29  fan=22
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 638
-
-  [2] !  SPLIT-FUNC      mdnsProbe  CC=15  fan=18
+NEXT[5] (ranked by impact):
+  [1] !  SPLIT-FUNC      mdnsProbe  CC=15  fan=18
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 270
 
-  [3] !  SPLIT-FUNC      readArp  CC=20  fan=12
+  [2] !  SPLIT-FUNC      readArp  CC=20  fan=12
       WHY: CC=20 exceeds 15
       EFFORT: ~1h  IMPACT: 240
 
-  [4] !  SPLIT-FUNC      binPath  CC=21  fan=7
-      WHY: CC=21 exceeds 15
-      EFFORT: ~1h  IMPACT: 147
+  [3] !  SPLIT-FUNC      listLocalNetworks  CC=15  fan=9
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 135
+
+  [4] !  SPLIT-FUNC      guard  CC=16  fan=7
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 112
+
+  [5] !! SPLIT           planfile.yaml
+      WHY: 851L, 0 classes, max CC=0
+      EFFORT: ~4h  IMPACT: 0
 
 
-RISKS[0]: none
+RISKS[1]:
+  ⚠ Splitting planfile.yaml may break 0 import paths
 
 METRICS-TARGET:
   CC̄:          3.1 → ≤2.2
-  max-CC:      29 → ≤14
-  god-modules: 0 → 0
+  max-CC:      20 → ≤10
+  god-modules: 1 → 0
   high-CC(≥15): 4 → ≤2
   hub-types:   0 → ≤0
 
@@ -859,7 +1269,7 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=3.1 → now CC̄=3.1
 ```
 
 ## Intent

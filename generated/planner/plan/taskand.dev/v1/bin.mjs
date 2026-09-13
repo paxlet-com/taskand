@@ -2,17 +2,8 @@
 // proc://taskand.dev/planner/plan/v1
 // Rozkłada złożone zadanie na kandydat Blueprint (z dynamicznym kontekstem zdolności)
 
-import { readFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve, join } from "node:path";
-import { callProc } from "../../../../_lib/proc.mjs";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-let ROOT = "/taskand";
-if (!existsSync("/taskand/generated")) {
-  ROOT = resolve(__dirname, "../../../../..");
-}
+import { readFileSync } from "node:fs";
+import { registry, call } from "./registry-client.mjs";
 
 let input = {};
 try {
@@ -22,18 +13,16 @@ try {
   process.exit(2);
 }
 
-const task = input.task || input.message || "stan systemu";
+const task = String(input.task || input.message || "").trim();
+if (!task) {
+  process.stdout.write(JSON.stringify({ ok: true, valid: false, status: "READY", usage: '{"task": "<złożone zadanie>"}' }) + "\n");
+  process.exit(0);
+}
 
 
-// Dynamic Capability Context z proc-catalog.json
-let catalogProcs = [];
-try {
-  const catPath = join(ROOT, "proc-catalog.json");
-  if (existsSync(catPath)) {
-    const cat = JSON.parse(readFileSync(catPath, "utf8"));
-    catalogProcs = cat.processes || [];
-  }
-} catch {}
+// Dynamiczny kontekst zdolności: aktywne procesy z rejestru (bez infrastruktury)
+const INTERNAL = /\/(registry|dev|planner|validator|orchestrator)\//;
+const catalogProcs = (registry("list", { status: "active" }).processes || []).filter(p => !INTERNAL.test(p.uri));
 
 const capabilityLines = catalogProcs.map(p => `  - ${p.uri} (${p.desc || p.kind})`).join("\n");
 
@@ -68,7 +57,7 @@ Zwróć WYŁĄCZNIE poprawny JSON o strukturze:
 }`;
 
 let plan = null;
-const llm = callProc("proc://taskand.dev/dev/llm/v1", { system: SYSTEM, prompt: task, json: true, temperature: 0.1, max_tokens: 4000 }, { timeout: 120000 });
+const llm = call("proc://taskand.dev/dev/llm/v1", { system: SYSTEM, prompt: task, json: true, temperature: 0.1, max_tokens: 4000 }, 120000);
 if (llm.ok) plan = llm.json;
 
 // Sanitization: obrona w głąb przed przypadkowymi jawnymi kluczami w wyjściu LLM
@@ -135,6 +124,7 @@ if (!plan || !plan.blueprint || !Array.isArray(plan.blueprint.steps)) {
   } else {
     // BUG 1: Zwróć PLANNING_UNAVAILABLE z zachowaniem celu!
     process.stdout.write(JSON.stringify({
+      ok: false,
       valid: false,
       status: "PLANNING_UNAVAILABLE",
       goalPreserved: true,
@@ -146,6 +136,7 @@ if (!plan || !plan.blueprint || !Array.isArray(plan.blueprint.steps)) {
 }
 
 const result = {
+  ok: true,
   valid: true,
   status: "PROPOSED",
   blueprint: plan.blueprint,

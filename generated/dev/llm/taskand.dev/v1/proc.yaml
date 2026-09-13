@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/dev/llm/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Jedyny klient LLM (Z.ai/OpenAI-compatible), tryb tekst/JSON"
+env: [TASKAND_LLM_API_KEY, TASKAND_LLM_MODEL, TASKAND_LLM_ENDPOINT, TASKAND_LLM_REASONING]

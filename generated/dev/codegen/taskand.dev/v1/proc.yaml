@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/codegen/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Generuje kod pakietu przez LLM (bez zapisu na dysk)"

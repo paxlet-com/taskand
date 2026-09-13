@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/file-router/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Pytania o pliki: istnienie i rozmiar ścieżki z promptu"

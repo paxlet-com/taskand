@@ -1,9 +1,18 @@
 #!/usr/bin/env node
-// proc://taskand.dev/admin/chat/v1 — organizm admin: deleguje każde zadanie do dev/act (wybór procesu z katalogu lub ewolucja)
-import { readInput, emit, callProc } from '../../../../_lib/proc.mjs';
+// proc://taskand.dev/admin/chat/v1 — organizm admin: każde zadanie → dev/act (wybór procesu z rejestru lub ewolucja)
+import { readFileSync } from 'node:fs';
+import { call } from './registry-client.mjs';
 
-const input = readInput();
+let input;
+try {
+  const raw = readFileSync(0, 'utf8').trim();
+  input = raw ? JSON.parse(raw) : {};
+} catch {
+  process.exit(2);
+}
 const message = input.message || input.prompt || '';
-if (!message) emit({ ok: true, organism: 'admin', reply: '[admin] Gotowy. Podaj zadanie.' });
-const r = callProc('proc://taskand.dev/dev/act/v1', { organism: 'admin', message }, { timeout: 600000 });
-emit({ ok: r.ok !== false, organism: 'admin', reply: r.reply || r.error, action: r.action, uri: r.uri });
+const r = message
+  ? call('proc://taskand.dev/dev/act/v1', { organism: 'admin', message }, 900000)
+  : { ok: true, reply: '[admin] Gotowy. Podaj zadanie.' };
+process.stdout.write(JSON.stringify({ ok: r.ok !== false, organism: 'admin', reply: r.reply || r.error, action: r.action, uri: r.uri }) + '\n');
+process.exit(0);

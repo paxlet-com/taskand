@@ -8,6 +8,18 @@ try:
 except ImportError:
     yaml = None
 
+# Tokeny z repozytorium są publicznie znane — akceptowane tylko, gdy gateway słucha na loopback
+DEFAULT_TOKENS = {"taskand-admin-key", "taskand-operator-key", "taskand-guest-key"}
+
+
+def bind_address() -> str:
+    return os.environ.get("TASKAND_BIND", "127.0.0.1")
+
+
+def is_loopback_bind() -> bool:
+    return bind_address() in ("127.0.0.1", "localhost", "::1")
+
+
 BASE = pathlib.Path("/taskand") if pathlib.Path("/taskand/generated").exists() else pathlib.Path(__file__).resolve().parent.parent
 
 def _parse_simple_yaml(text: str) -> dict:
@@ -81,6 +93,9 @@ def check_auth(headers) -> Tuple[bool, Optional[Dict[str, Any]]]:
     if not token:
         return False, None
 
+    if token in DEFAULT_TOKENS and not is_loopback_bind():
+        return False, None
+
     grants = load_grants()
     users = grants.get("users", {})
     for uname, udata in users.items():
@@ -92,15 +107,6 @@ def check_auth(headers) -> Tuple[bool, Optional[Dict[str, Any]]]:
                 "allowed_actions": udata.get("allowed_actions", ["*"])
             }
             return True, user_info
-
-    # Default fallback for admin token if grants empty
-    if token == "taskand-admin-key":
-        return True, {
-            "name": "admin",
-            "role": "administrator",
-            "allowed_uris": ["proc://taskand.dev/*"],
-            "allowed_actions": ["*"]
-        }
 
     return False, None
 
@@ -122,3 +128,15 @@ def check_grant(user: Dict[str, Any], target_uri: str, action: str = "call") -> 
             return True
 
     return False
+
+
+def require_grant(request_handler, target_uri: str, action: str = "call") -> Optional[Dict[str, Any]]:
+    """Zwraca użytkownika albo wysyła 401/403 i zwraca None."""
+    is_auth, user = check_auth(request_handler.headers)
+    if not is_auth:
+        request_handler._send(401, {"ok": False, "statusCode": 401, "error": "Unauthorized: wymagany nagłówek Authorization: Bearer <token>"})
+        return None
+    if not check_grant(user, target_uri, action):
+        request_handler._send(403, {"ok": False, "statusCode": 403, "error": f"Forbidden: '{user.get('name')}' ({user.get('role')}) nie ma grantu '{action}' do {target_uri}"})
+        return None
+    return user

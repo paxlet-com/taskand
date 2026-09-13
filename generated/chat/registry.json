@@ -1,0 +1,24 @@
+{
+  "organism": "chat",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/chat/message/v1": {
+      "uri": "proc://taskand.dev/chat/message/v1",
+      "organism": "chat",
+      "path": "generated/chat/message/taskand.dev/v1",
+      "desc": "Publiczny punkt wiadomości (guest): potwierdza przyjęcie, nie wykonuje zadań",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:f4d70425a50a5671ff5c1325ba0d1034e26248d7639a962b0ca817a630ff26ef",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.959Z"
+    }
+  },
+  "updated": "2026-09-12T19:09:04.959Z"
+}

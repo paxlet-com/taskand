@@ -1,6 +1,5 @@
-proc:
-  uri: proc://taskand.dev/admin/network-device-discovery/v1
-  kind: task
-  organism: admin
-  origin: evolved
-  description: "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI."
+uri: proc://taskand.dev/admin/network-device-discovery/v1
+organism: admin
+kind: task
+origin: evolved
+desc: "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI."

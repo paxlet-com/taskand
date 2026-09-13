@@ -1,193 +1,239 @@
-# code2llm | 72f 3490L | javascript:39,yaml:15,python:13,shell:1,json:1 | 2026-09-12
-# generated in 0.02s
-# CC̅=3.1 | critical:4/373 | dups:0 | cycles:0
+# code2llm | 119f 5678L | javascript:56,yaml:32,json:14,python:13,shell:1 | 2026-09-13
+# generated in 0.03s
+# CC̅=3.1 | critical:4/575 | dups:0 | cycles:0
 
 HEALTH[4]:
-  🟡 CC    binPath CC=21 (limit:15)
   🟡 CC    readArp CC=20 (limit:15)
   🟡 CC    mdnsProbe CC=15 (limit:15)
-  🟡 CC    handle_chat CC=29 (limit:15)
+  🟡 CC    listLocalNetworks CC=15 (limit:15)
+  🟡 CC    guard CC=16 (limit:15)
 
 REFACTOR[1]:
   1. split 4 high-CC methods  (CC>15)
 
-PIPELINES[260]:
-  [1] Src [r1]: r1
+PIPELINES[405]:
+  [1] Src [TIMEOUT_MS]: TIMEOUT_MS
       PURITY: 100% pure
-  [2] Src [r2]: r2
+  [2] Src [deadline]: deadline
       PURITY: 100% pure
-  [3] Src [act]: act
+  [3] Src [errOut]: errOut → out
       PURITY: 100% pure
-  [4] Src [KEY]: KEY
+  [4] Src [timeLeft]: timeLeft
       PURITY: 100% pure
-  [5] Src [org]: org
+  [5] Src [ouiMap]: ouiMap
       PURITY: 100% pure
-  [6] Src [__dirname]: __dirname
+  [6] Src [lines]: lines
       PURITY: 100% pure
-  [7] Src [r]: r
+  [7] Src [parts]: parts
       PURITY: 100% pure
-  [8] Src [action]: action
+  [8] Src [vendorFromMac]: vendorFromMac → loadOui
       PURITY: 100% pure
-  [9] Src [__dirname]: __dirname
+  [9] Src [parseArpText]: parseArpText
       PURITY: 100% pure
-  [10] Src [r]: r
+  [10] Src [m]: m
       PURITY: 100% pure
-  [11] Src [out]: out
+  [11] Src [readArp]: readArp → run
       PURITY: 100% pure
-  [12] Src [cpuPct]: cpuPct → cpus
+  [12] Src [t]: t
       PURITY: 100% pure
-  [13] Src [totalIdle]: totalIdle
+  [13] Src [p]: p
       PURITY: 100% pure
-  [14] Src [__dirname]: __dirname
+  [14] Src [mip]: mip
       PURITY: 100% pure
-  [15] Src [r]: r
+  [15] Src [mmac]: mmac
       PURITY: 100% pure
-  [16] Src [op]: op
+  [16] Src [localSubnets]: localSubnets
       PURITY: 100% pure
-  [17] Src [target]: target
+  [17] Src [ifaces]: ifaces
       PURITY: 100% pure
-  [18] Src [msg]: msg
+  [18] Src [ipParts]: ipParts
       PURITY: 100% pure
-  [19] Src [cpuVal]: cpuVal
+  [19] Src [maskParts]: maskParts
       PURITY: 100% pure
-  [20] Src [__dirname]: __dirname
+  [20] Src [maskBits]: maskBits
       PURITY: 100% pure
-  [21] Src [r]: r
+  [21] Src [netParts]: netParts
       PURITY: 100% pure
-  [22] Src [__filename]: __filename
+  [22] Src [s]: s
       PURITY: 100% pure
-  [23] Src [__dirname]: __dirname
+  [23] Src [done]: done
       PURITY: 100% pure
-  [24] Src [plan]: plan
+  [24] Src [mdnsProbe]: mdnsProbe → readName
       PURITY: 100% pure
-  [25] Src [runId]: runId
+  [25] Src [sock]: sock
       PURITY: 100% pure
-  [26] Src [orchDir]: orchDir
+  [26] Src [timer]: timer
       PURITY: 100% pure
-  [27] Src [stateFile]: stateFile
+  [27] Src [hostname]: hostname → readName
       PURITY: 100% pure
-  [28] Src [isResume]: isResume
+  [28] Src [off]: off → readName
       PURITY: 100% pure
-  [29] Src [prev]: prev
+  [29] Src [qd]: qd → readName
       PURITY: 100% pure
-  [30] Src [saveState]: saveState
+  [30] Src [an]: an → readName
       PURITY: 100% pure
-  [31] Src [canExecute]: canExecute
+  [31] Src [rdlen]: rdlen → readName
       PURITY: 100% pure
-  [32] Src [blockingDep]: blockingDep
+  [32] Src [type]: type → readName
       PURITY: 100% pure
-  [33] Src [port]: port
+  [33] Src [q]: q
       PURITY: 100% pure
-  [34] Src [isUp]: isUp
+  [34] Src [ssdpProbe]: ssdpProbe
       PURITY: 100% pure
-  [35] Src [binPath]: binPath
+  [35] Src [nets]: nets
       PURITY: 100% pure
-  [36] Src [r]: r
+  [36] Src [netsInfo]: netsInfo
       PURITY: 100% pure
-  [37] Src [errText]: errText
+  [37] Src [mdnsMs]: mdnsMs
       PURITY: 100% pure
-  [38] Src [parsed]: parsed
+  [38] Src [ssdpMs]: ssdpMs
       PURITY: 100% pure
-  [39] Src [hasFailed]: hasFailed
+  [39] Src [byIp]: byIp
       PURITY: 100% pure
-  [40] Src [hasBlocked]: hasBlocked
+  [40] Src [add]: add
       PURITY: 100% pure
-  [41] Src [r]: r
+  [41] Src [cur]: cur
       PURITY: 100% pure
-  [42] Src [out]: out
+  [42] Src [probeBudget]: probeBudget → tcpProbe → fin
       PURITY: 100% pure
-  [43] Src [desc]: desc
+  [43] Src [alive]: alive
       PURITY: 100% pure
-  [44] Src [r]: r
+  [44] Src [selfIps]: selfIps → out
       PURITY: 100% pure
-  [45] Src [out]: out
+  [45] Src [r]: r
       PURITY: 100% pure
-  [46] Src [__filename]: __filename
+  [46] Src [TEMP_WARN_C]: TEMP_WARN_C
       PURITY: 100% pure
-  [47] Src [__dirname]: __dirname
+  [47] Src [readSensorsCmd]: readSensorsCmd
       PURITY: 100% pure
-  [48] Src [intent]: intent
+  [48] Src [out]: out
       PURITY: 100% pure
-  [49] Src [desc]: desc
+  [49] Src [readThermalZones]: readThermalZones
       PURITY: 100% pure
-  [50] Src [devChatBin]: devChatBin
+  [50] Src [temp_c]: temp_c
       PURITY: 100% pure
 
 LAYERS:
-  gateway/                        CC̄=5.7    ←in:7  →out:4
-  │ !! chat                       138L  0C    2m  CC=29     ←0
-  │ auth                       124L  0C    4m  CC=14     ←2
-  │ proc                        65L  0C    1m  CC=9      ←0
-  │ utils                       56L  0C    2m  CC=9      ←2
-  │ orchestrator                49L  0C    1m  CC=6      ←0
-  │ __init__                    48L  1C    6m  CC=4      ←0
-  │ planner                     29L  0C    1m  CC=5      ←0
-  │ router                      27L  0C    1m  CC=3      ←1
-  │ federation                  25L  0C    1m  CC=8      ←0
-  │ logging                     22L  0C    1m  CC=2      ←3
-  │ doctor                      16L  0C    1m  CC=4      ←0
-  │ health                      11L  0C    1m  CC=2      ←0
+  gateway/                        CC̄=3.3    ←in:18  →out:5
+  │ auth                       142L  0C    7m  CC=14     ←7
+  │ __init__                    51L  1C    6m  CC=4      ←0
+  │ utils                       47L  0C    3m  CC=3      ←6
+  │ federation                  35L  0C    3m  CC=6      ←0
+  │ router                      29L  0C    1m  CC=3      ←0
+  │ logging                     28L  0C    1m  CC=2      ←3
+  │ chat                        25L  0C    1m  CC=4      ←0
+  │ proc                        16L  0C    1m  CC=3      ←0
+  │ orchestrator                14L  0C    1m  CC=3      ←0
+  │ health                      12L  0C    1m  CC=2      ←0
+  │ doctor                      11L  0C    1m  CC=3      ←0
+  │ planner                     11L  0C    1m  CC=3      ←0
   │ cors                         4L  0C    1m  CC=1      ←1
   │
-  generated/                      CC̄=3.0    ←in:0  →out:0
-  │ !! bin.mjs                    292L  0C   61m  CC=20     ←3
-  │ !! bin.mjs                    242L  0C   22m  CC=21     ←0
-  │ bin.mjs                    212L  0C   22m  CC=8      ←0
-  │ bin.mjs                    157L  0C   12m  CC=8      ←0
+  generated/                      CC̄=3.1    ←in:0  →out:0
+  │ !! bin.mjs                    292L  0C   61m  CC=20     ←2
+  │ bin.mjs                    178L  0C   17m  CC=7      ←0
+  │ bin.mjs                    168L  0C   17m  CC=7      ←0
+  │ registry.json              159L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                    148L  0C    9m  CC=8      ←0
+  │ store.mjs                  128L  0C   30m  CC=7      ←0
+  │ lifecycle.mjs              119L  0C   25m  CC=13     ←0
   │ bin.mjs                    112L  0C   24m  CC=4      ←0
-  │ catalog.mjs                109L  0C   21m  CC=6      ←0
-  │ bin.mjs                     82L  0C   16m  CC=9      ←0
-  │ dispatch.mjs                82L  0C   17m  CC=8      ←0
-  │ bin.mjs                     79L  0C   18m  CC=8      ←0
-  │ bin.mjs                     76L  0C   14m  CC=9      ←0
-  │ contract.mjs                61L  0C    4m  CC=9      ←0
-  │ bin.mjs                     59L  0C    8m  CC=5      ←0
-  │ bin.mjs                     59L  0C   15m  CC=6      ←0
-  │ proc.mjs                    58L  0C   15m  CC=8      ←0
-  │ bin.mjs                     50L  0C    8m  CC=4      ←0
-  │ bin.mjs                     48L  0C    5m  CC=5      ←0
-  │ test.mjs                    41L  0C    3m  CC=3      ←0
-  │ bin.mjs                     41L  0C    8m  CC=2      ←0
-  │ test.mjs                    37L  0C    3m  CC=1      ←0
-  │ intent.mjs                  36L  0C    5m  CC=5      ←0
-  │ bin.mjs                     24L  0C    2m  CC=12     ←0
-  │ bin.mjs                     23L  0C    4m  CC=3      ←0
-  │ bin.mjs                     20L  0C    2m  CC=2      ←0
-  │ bin.mjs                     20L  0C    3m  CC=2      ←0
-  │ bin.mjs                     19L  0C    3m  CC=3      ←0
-  │ bin.mjs                     19L  0C    1m  CC=2      ←0
-  │ test.mjs                    18L  0C    3m  CC=1      ←0
-  │ bin.mjs                     17L  0C    2m  CC=2      ←0
-  │ bin.mjs                     17L  0C    4m  CC=2      ←0
-  │ context.mjs                 16L  0C    3m  CC=4      ←0
-  │ bin.mjs                     16L  0C    3m  CC=2      ←0
-  │ test.mjs                    14L  0C    3m  CC=1      ←0
-  │ test.mjs                    14L  0C    3m  CC=1      ←0
-  │ bin.mjs                     10L  0C    1m  CC=2      ←0
-  │ proc.yaml                   10L  0C    0m  CC=0.0    ←0
-  │ test.mjs                     9L  0C    3m  CC=2      ←0
-  │ test.mjs                     9L  0C    2m  CC=3      ←0
-  │ test.mjs                     9L  0C    2m  CC=2      ←0
-  │ bin.mjs                      9L  0C    3m  CC=2      ←0
+  │ bin.mjs                    101L  0C   17m  CC=10     ←0
+  │ exec.mjs                    94L  0C   22m  CC=13     ←0
+  │ bin.mjs                     91L  0C   19m  CC=7      ←0
+  │ !! contract.mjs                89L  0C    8m  CC=16     ←0
+  │ !! networks.mjs                74L  0C   18m  CC=15     ←0
+  │ federation.mjs              74L  0C   21m  CC=10     ←0
+  │ bin.mjs                     72L  0C   15m  CC=4      ←0
+  │ bin.mjs                     71L  0C   16m  CC=6      ←0
+  │ registry.json               71L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     66L  0C    8m  CC=7      ←0
+  │ dispatch.mjs                63L  0C   14m  CC=8      ←1
+  │ probe-mdns.mjs              61L  0C   10m  CC=8      ←0
+  │ package.mjs                 61L  0C   12m  CC=13     ←0
+  │ bin.mjs                     60L  0C   11m  CC=3      ←0
+  │ bin.mjs                     59L  0C    9m  CC=5      ←0
+  │ bin.mjs                     58L  0C   12m  CC=4      ←0
+  │ vendor.mjs                  57L  0C    3m  CC=5      ←0
+  │ bin.mjs                     50L  0C   10m  CC=3      ←0
+  │ intent.mjs                  49L  0C    7m  CC=5      ←0
+  │ bin.mjs                     47L  0C   12m  CC=4      ←0
+  │ registry.json               44L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     42L  0C    2m  CC=3      ←0
+  │ merge.mjs                   41L  0C    5m  CC=13     ←0
+  │ bin.mjs                     40L  0C    8m  CC=2      ←0
+  │ probe-tcp.mjs               40L  0C    7m  CC=5      ←0
+  │ bin.mjs                     37L  0C    7m  CC=4      ←0
+  │ probe-ssdp.mjs              37L  0C    6m  CC=6      ←0
+  │ bin.mjs                     37L  0C    4m  CC=4      ←0
+  │ bin.mjs                     36L  0C    3m  CC=2      ←0
+  │ probe-arp.mjs               33L  0C    5m  CC=6      ←0
+  │ registry.json               31L  0C    0m  CC=0.0    ←0
+  │ stdin.mjs                   28L  0C    2m  CC=4      ←0
+  │ registry.json               28L  0C    0m  CC=0.0    ←0
+  │ registry.json               27L  0C    0m  CC=0.0    ←0
+  │ bin.mjs                     26L  0C    5m  CC=2      ←0
+  │ registry.json               26L  0C    0m  CC=0.0    ←0
+  │ registry.json               26L  0C    0m  CC=0.0    ←0
+  │ vault.mjs                   25L  0C    4m  CC=6      ←0
+  │ registry.json               25L  0C    0m  CC=0.0    ←0
+  │ registry.json               25L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry.json               24L  0C    0m  CC=0.0    ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←2
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ bin.mjs                     23L  0C    2m  CC=2      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ registry-client.mjs         23L  0C    4m  CC=6      ←0
+  │ bin.mjs                     22L  0C    2m  CC=2      ←0
+  │ bin.mjs                     18L  0C    3m  CC=2      ←0
+  │ probe-dns.mjs               14L  0C    3m  CC=3      ←0
   │ capsule.yaml                 9L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    7L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    7L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
-  │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
+  │ test.mjs                     6L  0C    2m  CC=1      ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ proc.yaml                    6L  0C    0m  CC=0.0    ←0
   │ test.mjs                     5L  0C    2m  CC=1      ←0
   │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
+  │ proc.yaml                    5L  0C    0m  CC=0.0    ←0
   │
   ./                              CC̄=0.0    ←in:0  →out:0
-  │ proc-catalog.json          247L  0C    0m  CC=0.0    ←0
+  │ !! planfile.yaml              851L  0C    0m  CC=0.0    ←0
+  │ prefact.yaml                94L  0C    0m  CC=0.0    ←0
+  │ genome.yaml                 78L  0C    0m  CC=0.0    ←0
   │ Dockerfile                  68L  0C    0m  CC=0.0    ←0
-  │ genome.yaml                 65L  0C    0m  CC=0.0    ←0
+  │ docker-compose.yaml         63L  0C    0m  CC=0.0    ←0
   │ project.sh                  59L  0C    0m  CC=0.0    ←0
-  │ docker-compose.yaml         52L  0C    0m  CC=0.0    ←0
-  │ Makefile                    50L  0C    0m  CC=0.0    ←0
+  │ Makefile                    42L  0C    0m  CC=0.0    ←0
   │ grants.yaml                 31L  0C    0m  CC=0.0    ←0
   │
   tasks/                          CC̄=0.0    ←in:0  →out:0
@@ -196,20 +242,24 @@ LAYERS:
   vms/                            CC̄=0.0    ←in:0  →out:0
   │ Dockerfile                   9L  0C    0m  CC=0.0    ←0
   │
+  testql-scenarios/               CC̄=0.0    ←in:0  →out:0
+  │ generated-api-smoke.testql.toon.yaml    39L  0C    0m  CC=0.0    ←0
+  │
   ── zero ──
      tasks/inbox.yaml                          0L
 
 COUPLING:
-                        gateway.handlers             gateway     generated.admin  gateway.middleware
-    gateway.handlers                  ──                   7                   4                   3  !! fan-out
-             gateway                  ←7                  ──                   2                   2  hub
-     generated.admin                  ←4                  ←2                  ──                      hub
-  gateway.middleware                  ←3                  ←2                                      ──  hub
+                        gateway.handlers             gateway  gateway.middleware   generated.planner     generated.admin       generated.dev
+    gateway.handlers                  ──                  18                   3                   4                   1                      !! fan-out
+             gateway                 ←18                  ──                   2                                       1                   2  hub
+  gateway.middleware                  ←3                  ←2                  ──                                                              hub
+   generated.planner                  ←4                                                          ──                                        
+     generated.admin                  ←1                  ←1                                                          ──                    
+       generated.dev                                      ←2                                                                              ──
   CYCLES: none
-  HUB: generated.admin/ (fan-in=6)
+  HUB: gateway/ (fan-in=18)
   HUB: gateway.middleware/ (fan-in=5)
-  HUB: gateway/ (fan-in=7)
-  SMELL: gateway.handlers/ fan-out=14 → split needed
+  SMELL: gateway.handlers/ fan-out=26 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

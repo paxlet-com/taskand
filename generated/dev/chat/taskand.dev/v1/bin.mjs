@@ -1,16 +1,23 @@
 #!/usr/bin/env node
-// proc://taskand.dev/dev/chat/v1 — developer taskand v2.2: prompt → intencja → dispatch do procesu
-// Intencje: ./intent.mjs (tabela), routing: ./dispatch.mjs, LLM: dev/llm, ewolucja: dev/act + dev/evolve
-import { readInput, emit } from '../../../../_lib/proc.mjs';
+// proc://taskand.dev/dev/chat/v1 — jedyne wejście konwersacyjne: {message, organism?} → intencja → proces przez rejestr
+import { readFileSync } from 'node:fs';
 import { parseIntent } from './intent.mjs';
 import { dispatch } from './dispatch.mjs';
 
-const input = readInput();
-const prompt = input.message || input.prompt || 'status';
-const intent = parseIntent(prompt);
-
+let input;
 try {
-  emit({ ok: true, intent: intent.name, reply: await dispatch(intent) });
-} catch (err) {
-  emit({ ok: false, intent: intent.name, reply: `[developer] ✗ ${err.message}` }, 1);
+  const raw = readFileSync(0, 'utf8').trim();
+  input = raw ? JSON.parse(raw) : {};
+} catch {
+  process.exit(2);
 }
+
+const intent = parseIntent(input.message || input.prompt || 'status', input.organism || '');
+let out;
+try {
+  out = { ok: true, organism: intent.organism, intent: intent.name, reply: dispatch(intent) };
+} catch (err) {
+  out = { ok: false, organism: intent.organism, intent: intent.name, reply: `[${intent.organism}] ✗ ${err.message}` };
+}
+process.stdout.write(JSON.stringify(out) + '\n');
+process.exit(0);

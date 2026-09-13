@@ -1,0 +1,26 @@
+{
+  "organism": "validator",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/validator/resolve/v1": {
+      "uri": "proc://taskand.dev/validator/resolve/v1",
+      "organism": "validator",
+      "path": "generated/validator/resolve/taskand.dev/v1",
+      "desc": "Deterministyczny walidator: graf DAG, ID, sekrety vault://, URI w rejestrze",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:5233383353864a00227c14d6e3a2fa62a12f9e03e6d379413e173fb92513b69d",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.978Z",
+      "refreshedAt": "2026-09-12T19:15:13.141Z"
+    }
+  },
+  "updated": "2026-09-12T19:15:13.141Z"
+}

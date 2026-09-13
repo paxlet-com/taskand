@@ -1,66 +1,81 @@
 #!/usr/bin/env node
-// proc://taskand.dev/dev/act/v1 — pojedyncze zadanie usera: wybierz proces z katalogu LUB wyewoluuj nowy → wykonaj
+// proc://taskand.dev/dev/act/v1 — pojedyncze zadanie: wybierz aktywny proces z rejestru LUB wyewoluuj nowy → wykonaj
 // in:  { message, organism?, forceEvolve?: bool }
 // out: { ok, reply, action, uri?, evolved?, result? }
-import { readInput, emit, callProc } from '../../../../_lib/proc.mjs';
-import { resolveUri } from '../../../../_lib/catalog.mjs';
-import { capabilityContext } from '../../../llm/taskand.dev/v1/context.mjs';
+import { readFileSync } from 'node:fs';
+import { registry, call } from './registry-client.mjs';
 
-const input = readInput();
+let input;
+try {
+  const raw = readFileSync(0, 'utf8').trim();
+  input = raw ? JSON.parse(raw) : {};
+} catch {
+  process.exit(2);
+}
+
 const message = String(input.message || input.prompt || '').trim();
 const organism = String(input.organism || 'dev').toLowerCase();
 const tag = `[${organism}]`;
-if (!message) emit({ ok: true, reply: `${tag} Podaj zadanie w polu "message".`, action: 'noop' });
+const done = out => {
+  process.stdout.write(JSON.stringify(out) + '\n');
+  process.exit(0);
+};
+if (!message) done({ ok: true, action: 'noop', reply: `${tag} Podaj zadanie w polu "message".` });
 
-const LLM = 'proc://taskand.dev/dev/llm/v1';
-const SAFE_ENV = { PATH: process.env.PATH, HOME: process.env.HOME || '/tmp', LANG: 'C.UTF-8' };
+// Procesy infrastruktury nie są akcjami dla usera
+const INTERNAL = /\/(registry|dev|planner|validator|orchestrator)\//;
 
 const decision = decide();
-const handlers = { answer, call: () => run(decision.uri, decision), evolve };
-emit(await (handlers[decision.action] || invalid)());
+const handlers = { answer, call: () => run(decision.uri, decision.input), evolve };
+done((handlers[decision.action] || invalid)());
+
+function capabilityContext() {
+  const own = `proc://taskand.dev/${organism}/`;
+  const procs = (registry('list', { status: 'active' }).processes || []).filter(p => !INTERNAL.test(p.uri) || p.uri.startsWith(own));
+  procs.sort((a, b) => Number(b.uri.startsWith(own)) - Number(a.uri.startsWith(own)));
+  return procs.map(p => `- ${p.uri} — ${p.desc}`).join('\n');
+}
 
 function decide() {
-  const r = callProc(LLM, {
+  const r = call('proc://taskand.dev/dev/llm/v1', {
     system: `Jesteś organizmem "${organism}" systemu taskand. System WYKONUJE zadania na węźle — nie odsyłaj usera do narzędzi.
-Dostępne procesy (proc://):
-${capabilityContext({ organism })}
+Aktywne procesy w rejestrze (proc://):
+${capabilityContext()}
 
 Wybierz JEDNĄ akcję i zwróć WYŁĄCZNIE JSON:
 - {"action":"call","uri":"<URI z listy>","input":{...}} — gdy istniejący proces realnie spełnia zadanie
-- {"action":"evolve","name":"<kebab-case>","capability":"<precyzyjny opis zdolności do zaimplementowania>","input":{...}} — gdy zadanie wymaga danych/akcji z węzła, a żaden proces tego nie robi
-- {"action":"answer","text":"..."} — WYŁĄCZNIE dla rozmowy/wiedzy ogólnej, która nie wymaga danych z węzła
+- {"action":"evolve","name":"<kebab-case>","capability":"<precyzyjny opis zdolności>","input":{...}} — gdy zadanie wymaga danych/akcji z węzła, a żaden proces tego nie robi
+- {"action":"answer","text":"..."} — WYŁĄCZNIE rozmowa/wiedza ogólna, bez danych z węzła
 ${input.forceEvolve ? 'User jawnie prosi o NOWY proces: wybierz "evolve".' : ''}`,
     prompt: message,
     json: true,
     max_tokens: 800,
     temperature: 0
-  });
-  if (!r.ok) return { action: 'unavailable', error: r.error };
-  return r.json;
+  }, 120000);
+  return r.ok ? r.json : { action: 'unavailable', error: r.error };
 }
 
 function answer() {
   return { ok: true, action: 'answer', reply: decision.text || `${tag} (brak odpowiedzi)` };
 }
 
-async function run(uri, { input: procInput = {} } = {}, evolved = null) {
-  const resolved = resolveUri(uri);
-  if (!resolved.ok) return { ok: false, action: 'call', uri, reply: `${tag} ✗ ${resolved.error}` };
-  const result = callProc(uri, procInput, { timeout: 30000, env: SAFE_ENV });
+function run(uri, procInput = {}, evolved = null) {
+  const result = call(uri, procInput, 60000);
   return { ok: result.ok !== false, action: evolved ? 'evolve' : 'call', uri, evolved, result, reply: format(uri, result, evolved) };
 }
 
-async function evolve() {
-  const ev = callProc('proc://taskand.dev/dev/evolve/v1', {
+function evolve() {
+  const ev = call('proc://taskand.dev/dev/evolve/v1', {
     organism,
     name: decision.name,
     capability: decision.capability || message,
     example_input: decision.input && Object.keys(decision.input).length ? decision.input : undefined
-  }, { timeout: 480000 });
-  if (!ev.ok && !String(ev.error).startsWith('Proces już istnieje')) {
-    return { ok: false, action: 'evolve', reply: `${tag} ✗ Nie wyewoluowałem procesu: ${ev.error}` };
+  }, 900000);
+  if (!ev.uri) return { ok: false, action: 'evolve', reply: `${tag} ✗ Nie wyewoluowałem procesu: ${ev.error}` };
+  if (ev.status !== 'active') {
+    return { ok: true, action: 'evolve', uri: ev.uri, reply: `${tag} ⚙ Wyewoluowałem ${ev.uri} — status "${ev.status}", czeka na zatwierdzenie: taskand approve ${ev.uri}` };
   }
-  return run(ev.uri, decision, ev.ok ? ev : null);
+  return run(ev.uri, decision.input, ev);
 }
 
 function invalid() {
@@ -69,11 +84,8 @@ function invalid() {
 }
 
 function format(uri, result, evolved) {
-  const head = evolved
-    ? `${tag} ⚙ Brakowało zdolności — wyewoluowałem proces ${uri} (próby: ${evolved.attempts}, test kontraktu: PASS)\n`
-    : '';
+  const head = evolved ? `${tag} ⚙ Brakowało zdolności — wyewoluowałem ${uri} (próby: ${evolved.attempts}, test kontraktu: PASS)\n` : '';
   if (result.ok === false) return `${head}${tag} ✗ ${uri}: ${result.error || 'błąd procesu'}`;
   const summary = result.summary || result.reply || result.message;
-  const data = JSON.stringify(result, null, 2);
-  return `${head}${tag} ${summary || '✓ wykonano'}\n${summary ? '' : data}`.trimEnd();
+  return `${head}${tag} ${summary || JSON.stringify(result, null, 2)}`;
 }

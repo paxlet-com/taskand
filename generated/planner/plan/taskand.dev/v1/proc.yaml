@@ -1,6 +1,5 @@
 uri: proc://taskand.dev/planner/plan/v1
-interface:
-  stdin: { task: string }
-  stdout: { valid: boolean, status: string, blueprint?: object, reason?: string }
-  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
-runtimes: [{ kind: node, bin: bin.mjs }]
+organism: planner
+kind: task
+origin: builtin
+desc: "Dekomponuje złożone zadanie na kandydat Blueprint (LLM, bez wykonania)"

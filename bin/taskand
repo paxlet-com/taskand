@@ -1,246 +1,165 @@
-#!/bin/sh
-# taskand v2.0 — uniwersalne CLI
-GATEWAY="${TASKAND_GATEWAY:-http://localhost:8077}"
+#!/usr/bin/env node
+// taskand — CLI. Transport: gateway (gdy /healthz odpowiada) albo lokalnie registry/core. Flaga --json: surowa odpowiedź.
+import { spawnSync, execFileSync } from 'node:child_process';
+import { readFileSync, realpathSync, existsSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-# Resolve symlink to real directory
-REAL_SCRIPT="$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")"
-DIR="$(cd "$(dirname "$REAL_SCRIPT")/.." && pwd)"
+const ROOT = dirname(dirname(realpathSync(fileURLToPath(import.meta.url))));
+const REGISTRY = join(ROOT, 'generated/registry/core/taskand.dev/v1/bin.mjs');
+const GATEWAY = process.env.TASKAND_GATEWAY || 'http://127.0.0.1:8077';
+const argv = process.argv.slice(2);
+const asJson = argv.includes('--json');
+const [cmd, ...args] = argv.filter(a => a !== '--json');
 
-# Load .env if present
-if [ -f "$DIR/.env" ]; then
-  while IFS='=' read -r key val || [ -n "$key" ]; do
-    case "$key" in
-      \#*|"") continue ;;
-      *)
-        key=$(echo "$key" | tr -d ' \t')
-        val=$(echo "$val" | tr -d '\r')
-        if [ -n "$key" ] && [ -z "$(eval "echo \${$key:-}")" ]; then
-          export "$key=$val"
-        fi
-        ;;
-    esac
-  done < "$DIR/.env"
-fi
+function loadEnv() {
+  const file = join(ROOT, '.env');
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
+  }
+}
+loadEnv();
+const TOKEN = process.env.TASKAND_AUTH_TOKEN || 'taskand-admin-key';
 
-is_gateway_up() {
-  curl -s --connect-timeout 1 "$GATEWAY/healthz" >/dev/null 2>&1
+async function gatewayUp() {
+  try {
+    return (await fetch(`${GATEWAY}/healthz`, { signal: AbortSignal.timeout(1000) })).ok;
+  } catch {
+    return false;
+  }
 }
 
-is_organism() {
-  case "$1" in
-    dev|developer|doc|doctor|sec|vault|chat|browser|file|hw) return 0;;
-    *)
-      case "$1" in _*|-*) return 1;; esac
-      if [ -d "$DIR/generated/$1" ] || grep -q "name: $1" "$DIR/genome.yaml" 2>/dev/null; then
-        return 0
-      fi
-      return 1
-      ;;
-  esac
+async function post(path, body) {
+  const r = await fetch(`${GATEWAY}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+    body: JSON.stringify(body)
+  });
+  return r.json();
 }
 
-handle_organism() {
-  ORG=$(case "$1" in
-    dev|developer) echo dev;;
-    doc|doctor) echo doc;;
-    sec|vault) echo sec;;
-    chat) echo chat;;
-    browser) echo browser;;
-    file) echo file;;
-    hw) echo hw;;
-    *) echo "$1";;
-  esac)
-  shift
-  PROMPT="$*"
-  if [ -z "$PROMPT" ]; then
-    case "$ORG" in
-      dev) PROMPT="cześć, co potrafisz?";;
-      doc) PROMPT="sprawdź czy wszystko działa";;
-      sec) PROMPT="status";;
-      browser) PROMPT="status";;
-      file) PROMPT="pokaż pliki";;
-      hw) PROMPT="stan sprzętu";;
-      *) PROMPT="status";;
-    esac
-  fi
-
-  if is_gateway_up; then
-    RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
-      -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
-    REPLY=$(printf '%s\n' "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
-    if [ -n "$REPLY" ]; then
-      echo "$REPLY"
-    else
-      printf '%s\n' "$RESP"
-    fi
-  else
-    # Direct standalone execution via Node/Python with loaded .env
-    case "$ORG" in
-      dev)
-        if [ -f "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" ]; then
-          RESP=$(node "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" <<JSON
-{"message": "$PROMPT"}
-JSON
-)
-          printf '%s\n' "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || printf '%s\n' "$RESP"
-        else
-          node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
-{"organism": "$PROMPT"}
-JSON
-        fi
-        ;;
-      doc)
-        node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
-{}
-JSON
-        ;;
-      sec)
-        node "$DIR/generated/vault/secrets/taskand.dev/v1/bin.mjs" <<JSON
-{"action": "status"}
-JSON
-        ;;
-      browser)
-        node "$DIR/generated/browser/session/taskand.dev/v1/bin.mjs" <<JSON
-{"action": "open", "url": "$PROMPT"}
-JSON
-        ;;
-      file)
-        node "$DIR/generated/file/ops/taskand.dev/v1/bin.mjs" <<JSON
-{"op": "list"}
-JSON
-        ;;
-      hw)
-        node "$DIR/generated/hw/monitor/taskand.dev/v1/bin.mjs" <<JSON
-{}
-JSON
-        ;;
-      *)
-        ORG_BIN="$DIR/generated/$ORG/chat/taskand.dev/v1/bin.mjs"
-        if [ -f "$ORG_BIN" ]; then
-          PAYLOAD=$(python3 -c 'import json,sys; print(json.dumps({"message": sys.argv[1]}))' "$PROMPT")
-        else
-          ORG_BIN="$DIR/generated/dev/act/taskand.dev/v1/bin.mjs"
-          PAYLOAD=$(python3 -c 'import json,sys; print(json.dumps({"message": sys.argv[1], "organism": sys.argv[2]}))' "$PROMPT" "$ORG")
-        fi
-        RESP=$(printf '%s\n' "$PAYLOAD" | node "$ORG_BIN")
-        printf '%s\n' "$RESP" | python3 -c "import json,sys; print(json.load(sys.stdin).get('reply', ''))" 2>/dev/null || printf '%s\n' "$RESP"
-        ;;
-    esac
-  fi
+function local(action, payload) {
+  const r = spawnSync('node', [REGISTRY], { input: JSON.stringify({ action, ...payload }), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  try {
+    return JSON.parse(r.stdout);
+  } catch {
+    return { ok: false, error: r.stderr || 'registry/core: brak odpowiedzi' };
+  }
 }
 
-case "$1" in
-  dev|developer|doc|doctor|sec|vault|chat|browser|file|hw)
-    handle_organism "$@"
-    ;;
+// Akcja rejestru: przez gateway (z autoryzacją) lub lokalnie
+async function reg(action, payload = {}) {
+  if (!(await gatewayUp())) return local(action, payload);
+  if (action === 'call') return (await post('/api/proc/call', { uri: payload.uri, data: payload.input, timeout: 900 })).result;
+  const r = await post('/api/registry', { action, ...payload });
+  return r.result || r;
+}
 
-  proc)
-    URI="$2"
-    DATA="$3"
-    if [ -z "$DATA" ]; then DATA="{}"; fi
-    if is_gateway_up; then
-      curl -s -X POST "$GATEWAY/api/proc/call" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
-        -d "{\"uri\":\"$URI\",\"data\":$DATA}"
-      echo ""
-    else
-      CLEAN=$(echo "$URI" | sed 's|proc://taskand.dev/||')
-      DIRNAME=$(dirname "$CLEAN")
-      VER=$(basename "$CLEAN")
-      FOUND=$(find "$DIR/generated" -path "*/$DIRNAME/*/$VER/bin.mjs" -o -path "*/$CLEAN/bin.mjs" | head -n 1)
-      if [ -n "$FOUND" ] && [ -f "$FOUND" ]; then
-        echo "$DATA" | node "$FOUND"
-      else
-        echo "{\"error\": \"URI not found: $URI\"}"
-      fi
-    fi
-    ;;
+async function chat(organism, message) {
+  if (await gatewayUp()) return post('/api/chat', { message, organism });
+  return local('call', { uri: 'proc://taskand.dev/dev/chat/v1', input: { message, organism }, timeout_ms: 900000 });
+}
 
-  status|health)
-    if is_gateway_up; then
-      curl -s "$GATEWAY/healthz" | python3 -m json.tool
-    else
-      echo "=== taskand v2.0 (standalone) ==="
-      PROCS=$(find "$DIR/generated" -name "bin.mjs" | wc -l)
-      echo "Procesy: $PROCS w generated/"
-      echo "Gateway ($GATEWAY): OFFLINE (uruchom: make up lub make gateway)"
-      if [ -n "$TASKAND_LLM_API_KEY" ]; then
-        echo "LLM: Skonfigurowany (GLM-5.3) ✓"
-      else
-        echo "LLM: Brak klucza w .env (tryb szablonów fallback)"
-      fi
-    fi
-    ;;
+const print = (out, human) => {
+  console.log(asJson || !human ? JSON.stringify(out, null, 2) : human(out));
+  process.exitCode = out?.ok === false ? 1 : 0;
+};
 
-  fed|federation)
-    if is_gateway_up; then
-      curl -s "$GATEWAY/api/federation" | python3 -m json.tool
-    else
-      echo "=== taskand v2.0 procesy w federacji ==="
-      for p in $(find "$DIR/generated" -name "bin.mjs" | sort); do
-        REL=$(echo "$p" | sed "s|$DIR/generated/||" | sed "s|/taskand.dev||" | sed "s|/bin.mjs||")
-        echo "proc://taskand.dev/$REL"
-      done
-    fi
-    ;;
+// ── Powoływanie węzłów (occupy): replikacja operatorska przez SSH, nigdy autonomiczna ──
+// Manifest = jedno źródło prawdy o plikach węzła; @secret pomijane bez --with-secrets.
+function readManifest(withSecrets) {
+  const paths = [];
+  for (const line of readFileSync(join(ROOT, 'bin/bootstrap.manifest'), 'utf8').split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) continue;
+    if (t.startsWith('@secret ')) { if (withSecrets) paths.push(t.slice(8).trim()); }
+    else paths.push(t);
+  }
+  return paths;
+}
 
-  boot)
-    shift
-    HOST="$1"
-    if [ -z "$HOST" ]; then
-      echo "Użycie: taskand boot <user@host>"
-      exit 1
-    fi
-    echo "╔═══════════════════════════════════════════════╗"
-    echo "║  taskand v2.0 — cross-bootstrap spawn         ║"
-    echo "╚═══════════════════════════════════════════════╝"
-    echo "[boot] Powołuję węzeł taskand na $HOST..."
-    echo "[boot] Kopiuję 5 plików bazowych (Dockerfile, compose, .env, genome, bin)..."
-    echo "[boot] ✓ Węzeł $HOST powołany pomyślnie w sieci mesh."
-    ;;
+// Prawdopodobny adres LAN mastera (pomija mosty docker/libvirt) — podpowiedź do handshake; nadpisywalny --master
+function localLanIp() {
+  try {
+    const ips = execFileSync('hostname', ['-I'], { encoding: 'utf8' }).trim().split(/\s+/);
+    const bridge = /^(172\.(1[6-9]|2\d|3[01])\.|192\.168\.(122|144|192|208|240)\.|10\.(42|64|201|240|250)\.)/;
+    return ips.find(ip => /^\d+\.\d+\.\d+\.\d+$/.test(ip) && !bridge.test(ip)) || ips[0] || 'MASTER_IP';
+  } catch { return 'MASTER_IP'; }
+}
 
-  log)
-    LINES="${2:-20}"
-    LOG_FILE="$DIR/log/events.jsonl"
-    if [ -f "$LOG_FILE" ]; then
-      tail -n "$LINES" "$LOG_FILE"
-    else
-      echo "Brak zdarzeń w $LOG_FILE."
-    fi
-    ;;
+async function waitHealthz(url, ms = 45000) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < ms) {
+    try {
+      const r = await fetch(`${url}/healthz`, { signal: AbortSignal.timeout(2000) });
+      if (r.ok) return await r.json();
+    } catch { /* jeszcze nie wstał */ }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  return null;
+}
 
-  *)
-    if [ -n "$1" ] && is_organism "$1"; then
-      handle_organism "$@"
-    else
-      echo "taskand v2.2 — Minimalny, auto-mnożący się system"
-      echo ""
-      echo "Użycie:"
-      echo "  taskand dev \"<prompt>\"     rozmowa z developerem (ewolucja/LLM)"
-      echo "  taskand doc \"<prompt>\"     rozmowa ze strażnikiem zdrowia (doctor)"
-      echo "  taskand sec \"<prompt>\"     zarządzanie sejfem i sekretami (vault)"
-      echo "  taskand browser \"<prompt>\" sterowanie przeglądarką noVNC"
-      echo "  taskand file \"<prompt>\"    operacje na plikach na węźle"
-      echo "  taskand hw \"<prompt>\"      telemetria sprzętu i GPIO"
-      if [ -d "$DIR/generated" ]; then
-        for o in "$DIR/generated"/*; do
-          if [ -d "$o" ]; then
-            oname=$(basename "$o")
-            case "$oname" in
-              _*|dev|developer|doctor|doc|vault|sec|browser|file|hw|chat|alert|monitor|planner|validator|orchestrator|web) ;;
-              *) echo "  taskand $oname \"<prompt>\"   autonomiczny organizm $oname" ;;
-            esac
-          fi
-        done
-      fi
-      echo "  taskand proc <uri> [json]  bezpośrednie wywołanie procesu proc://"
-      echo "  taskand status             stan systemu i usług"
-      echo "  taskand fed                lista procesów w federacji"
-      echo "  taskand boot <host>        cross-device bootstrap na zdalnym węźle"
-      echo "  taskand log [n]            podgląd dziennika zdarzeń"
-    fi
-    ;;
-esac
+const COMMANDS = {
+  async proc([uri, data = '{}']) {
+    print(await reg('call', { uri, input: JSON.parse(data) }));
+  },
+  async status() {
+    const up = await gatewayUp();
+    const d = await reg('call', { uri: 'proc://taskand.dev/doctor/diagnose/v1', input: {} });
+    print(d, o => [`gateway: ${up ? GATEWAY : 'OFFLINE (tryb lokalny)'}`, ...(o.details || [o.error])].join('\n'));
+  },
+  async procs([organism]) {
+    print(await reg('list', { organism }), o => (o.processes || []).map(p => `${p.status.padEnd(10)} ${p.uri}  ${p.desc}`).join('\n') || o.error);
+  },
+  async approve([uri]) {
+    print(await reg('approve', { uri }), o => (o.ok ? `✓ ${uri} → active` : `✗ ${o.error}`));
+  },
+  async deprecate([uri]) {
+    print(await reg('deprecate', { uri }), o => (o.ok ? `✓ ${uri} → deprecated` : `✗ ${o.error}`));
+  },
+  async verify() {
+    print(await reg('verify'), o => (o.ok ? `✓ ${o.checked} pakietów zgodnych z bindingHash` : `✗ zmienione: ${(o.broken || []).join(', ') || o.error}`));
+  },
+  async pull([peer, token]) {
+    print(await reg('pull', { peer, token }), o => (o.ok ? [`${o.remoteNode}: ${o.offered} oferowanych, ${o.imported} zaimportowanych (candidate)`, ...o.report.filter(r => r.result !== 'same').map(r => `  ${r.result} ${r.uri} ${r.reason || ''}`)].join('\n') : `✗ ${o.error}`));
+  },
+  async heal([flag]) {
+    const out = await reg('call', { uri: 'proc://taskand.dev/doctor/heal/v1', input: { run: flag !== '--plan' } });
+    print(out, o => o.reply || `✗ ${o.error}`);
+  },
+  async log([n = '20']) {
+    const file = join(ROOT, 'log/events.jsonl');
+    console.log(existsSync(file) ? readFileSync(file, 'utf8').trim().split('\n').slice(-Number(n)).join('\n') : 'Brak zdarzeń.');
+  }
+};
+COMMANDS.fed = COMMANDS.procs;
+COMMANDS.health = COMMANDS.status;
+
+const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
+
+  taskand <organizm> "<zadanie>"   dev | doc | sec | hw | file | browser | admin | <dowolny powołany>
+  taskand proc <uri> ['<json>']    bezpośrednie wywołanie procesu proc://
+  taskand procs [organizm]         procesy w rejestrze (status, URI, opis)
+  taskand approve <uri>            candidate → active (wyewoluowane / pobrane od peerów)
+  taskand deprecate <uri>          wycofanie procesu
+  taskand verify                   integralność pakietów (bindingHash)
+  taskand pull <http://peer:8077> [token]   pobranie brakujących pakietów od węzła peer
+  taskand status                   diagnoza usług i rejestru
+  taskand heal [--plan]            samonaprawa: recepty organizmów wg policy.healing, reszta dla człowieka
+  taskand log [n]                  dziennik zdarzeń (CloudEvents)
+  --json                           surowa odpowiedź JSON`;
+
+if (!cmd || cmd === 'help' || cmd === '--help') {
+  console.log(HELP);
+} else if (COMMANDS[cmd]) {
+  await COMMANDS[cmd](args);
+} else if (/^[a-z0-9][a-z0-9-]*$/.test(cmd)) {
+  const out = await chat(cmd, args.join(' ') || 'status');
+  print(out, o => o.reply || `✗ ${o.error}`);
+} else {
+  console.log(HELP);
+  process.exitCode = 2;
+}

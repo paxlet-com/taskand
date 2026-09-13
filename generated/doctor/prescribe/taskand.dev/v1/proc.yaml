@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/doctor/prescribe/v1
+organism: doctor
+kind: task
+origin: builtin
+desc: "Recepty naprawcze wyliczane z bieżącej diagnozy"

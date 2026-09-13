@@ -1,5 +1,54 @@
 # Changelog
 
+## [Unreleased] - 2026-09-13
+
+### Fixed
+- Fix magic-numbers issues (ticket-970d9128)
+- Fix magic-numbers issues (ticket-38e0e0d7)
+
+## [3.0.0-dev] - 2026-09-12
+
+### Added — samonaprawa organizmów
+- `doctor/diagnose`: ustrukturyzowane `findings` (SERVICE_DOWN, PACKAGE_TAMPERED, PROCESS_FAILING z dziennika wywołań, CANDIDATE_PENDING, VAULT_UNINITIALIZED, BROWSER_CDP_UNAVAILABLE)
+- `doctor/prescribe`: recepty `organism` (kroki proc://) albo `human` (polecenie + powód)
+- `doctor/heal/v1`: wykonuje recepty organizmów wg `policy.healing`, limity i odstęp, audyt; `taskand heal [--plan]`, `taskand doc "napraw"`
+- `dev/evolve`: `supersedes` + `failure`, bramka regresji (`gate.mjs`), historia odrzuceń (`rejections`), wycofanie poprzedniej wersji tylko po werdykcie better/equal
+- Rejestr: `capability` we wpisie, `approve` z `deprecated` (rollback), `register {hold}`, akcje `policy` i `audit` (`organism.*`)
+- Zweryfikowane end-to-end: zawodzący proces evolved → v2 (18 s); zmieniony pakiet → kwarantanna + v3 (12 s); `admin/network-device-discovery` v3 zastąpiła v1 po odrzuceniu próby z regresją (8/8 urządzeń LAN z tabeli ARP)
+
+### Changed — registry jako organizm, pakiety jako samodzielne byty
+- `registry/core/v1`: jedyna droga wywołań między procesami (URI + JSON): rejestr → status `active` → `bindingHash` → izolowane env → spawn; audyt CloudEvents w `log/events.jsonl`
+- Rejestr per organizm `generated/<organizm>/registry.json` (zapis pod blokadą O_EXCL, atomowy rename) zamiast wspólnego `proc-catalog.json`
+- Pakiet = katalog z `proc.yaml` (uri, organism, kind, origin, desc, `env: [...]`, `credentials: [...]`); `bindingHash` obejmuje wszystkie pliki pakietu; importy tylko `node:*` i `./moduł.mjs` (rejestracja odrzuca inne)
+- Cykl życia: `register` (builtin → active, evolved wg `policy.evolution`, peer → candidate) → `approve` → `deprecate`; `refresh` tylko dla builtin; wersje evolved/peer niezmienne (ewolucja tworzy v2, v3…)
+- Federacja: `GET /.well-known/catalog.json`, `POST /api/registry {action: package}` (auth), `registry pull` weryfikuje hash i instaluje jako candidate
+- Broker sekretów: procesy dostają tylko zmienne z `env:` w `proc.yaml`; `credentialRef: vault://…` odszyfrowuje wyłącznie registry/core dla procesów deklarujących `credentials`
+- Usunięto `generated/_lib`, `developer/spawn`, `dev/execute`, `dev/llm/context.mjs`; nowe `dev/spawn`, `dev/codegen` (LLM → pliki), `dev/evolve` (pakiety wielomodułowe, limit 180 linii/moduł)
+- Gateway: jedna ścieżka `/api/chat` → `dev/chat` (trasuje organizmy), wszystkie handlery przez registry; `network_mode: host`, bind `TASKAND_BIND` (domyślnie 127.0.0.1), domyślne tokeny odrzucane poza loopback
+- Orkiestrator wykonuje kroki przez registry (ignoruje `resolvedPath` z wejścia); walidator i planner korzystają z registry
+- CLI przepisane na Node.js: `procs`, `approve`, `deprecate`, `verify`, `pull`, `--json`; usunięto pozorne `boot`
+- Testy: `make conformance` (4), kontrakty przez registry (24), negatywne 17 (m.in. manipulacja pakietem, import spoza pakietu, candidate, niezmienność, auth `/api/chat`), integracyjne 26 (anty-atrapy)
+
+### Fixed
+- `/api/chat`, `/api/doctor`, `/api/planner` działały bez autoryzacji (wykonanie i ewolucja kodu dla każdego klienta)
+- Orkiestrator uruchamiał dowolny plik wskazany w `resolvedPath` planu
+- Atrapy zwracające stały sukces: `file/ops` (stała lista plików), `vault/secrets`, `browser/session`, `doctor/prescribe`, `chat/message` („Zlecam…”), `web/serve`, `monitor/cpu` (średnia od startu + wartości domyślne), `alert/telegram` (`ALERT_DISPATCHED` bez wysyłki)
+- Test negatywny nr 6 był `assert(true)`
+- Obcinanie dużych odpowiedzi registry na potoku (`process.exit` przed opróżnieniem stdout)
+
+### Changed (Faza A — refaktor dev/chat + realna ewolucja)
+- `dev/chat` rozbity: `bin.mjs` + `intent.mjs` (tabela INTENTS) + `dispatch.mjs`
+- Planner korzysta z `dev/llm` (jeden klient LLM, `reasoning_effort` dla GLM-5.x)
+- Gateway: `ThreadingHTTPServer` (długie żądanie nie blokuje API)
+
+### Fixed (Faza A)
+- Brak generowania procesów: zadania spoza tabeli intencji trafiały do szablonu z odpowiedzią na sztywno; `dev/act` wybiera proces z rejestru albo ewoluuje nowy i go wykonuje
+- `EVOLVE_CREATE` zwracał fałszywe „Utworzono proces… PASS ✓”
+- `hw/monitor`: temperatura CPU z `acpitz` zamiast `x86_pkg_temp`/`Package id`; stałe `cpu_usage_pct: 14.2` i fikcyjne GPIO
+- `doctor/diagnose`: wynik na sztywno (`healthy: true`) zastąpiony sondami HTTP i weryfikacją rejestru
+- `dev/composite`: usunięte stałe „Alerty Telegram ✓ / Dashboard ✓”; kroki `spawn:` są ewoluowane
+- CLI: `echo` w `/bin/sh` psuł JSON; pliki tworzone przez kontener należały do roota
+
 ## [Unreleased] - 2026-09-12
 
 ### Fixed

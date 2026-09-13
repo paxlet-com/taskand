@@ -1,30 +1,35 @@
-# code2llm/evolution | 373 func | 52f | 2026-09-12
+# code2llm/evolution | 575 func | 69f | 2026-09-13
 # generated in 0.00s
 
-NEXT[4] (ranked by impact):
-  [1] !! SPLIT-FUNC      handle_chat  CC=29  fan=22
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 638
-
-  [2] !  SPLIT-FUNC      mdnsProbe  CC=15  fan=18
+NEXT[5] (ranked by impact):
+  [1] !  SPLIT-FUNC      mdnsProbe  CC=15  fan=18
       WHY: CC=15 exceeds 15
       EFFORT: ~1h  IMPACT: 270
 
-  [3] !  SPLIT-FUNC      readArp  CC=20  fan=12
+  [2] !  SPLIT-FUNC      readArp  CC=20  fan=12
       WHY: CC=20 exceeds 15
       EFFORT: ~1h  IMPACT: 240
 
-  [4] !  SPLIT-FUNC      binPath  CC=21  fan=7
-      WHY: CC=21 exceeds 15
-      EFFORT: ~1h  IMPACT: 147
+  [3] !  SPLIT-FUNC      listLocalNetworks  CC=15  fan=9
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 135
+
+  [4] !  SPLIT-FUNC      guard  CC=16  fan=7
+      WHY: CC=16 exceeds 15
+      EFFORT: ~1h  IMPACT: 112
+
+  [5] !! SPLIT           planfile.yaml
+      WHY: 851L, 0 classes, max CC=0
+      EFFORT: ~4h  IMPACT: 0
 
 
-RISKS[0]: none
+RISKS[1]:
+  ⚠ Splitting planfile.yaml may break 0 import paths
 
 METRICS-TARGET:
   CC̄:          3.1 → ≤2.2
-  max-CC:      29 → ≤14
-  god-modules: 0 → 0
+  max-CC:      20 → ≤10
+  god-modules: 1 → 0
   high-CC(≥15): 4 → ≤2
   hub-types:   0 → ≤0
 
@@ -53,4 +58,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=3.1 → now CC̄=3.1

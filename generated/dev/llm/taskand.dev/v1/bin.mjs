@@ -2,9 +2,21 @@
 // proc://taskand.dev/dev/llm/v1 — jedyny klient LLM (Z.ai / OpenAI-compatible)
 // in:  { system?, prompt? | messages?, json?: bool, max_tokens?, temperature?, reasoning_effort?: low|high|max }
 // out: { ok, content, json? } | { ok:false, error }
-import { readInput, emit } from '../../../../_lib/proc.mjs';
+import { readFileSync } from 'node:fs';
 
-const input = readInput();
+let input;
+try {
+  const raw = readFileSync(0, 'utf8').trim();
+  input = raw ? JSON.parse(raw) : {};
+} catch {
+  process.exit(2);
+}
+const emit = out => {
+  process.stdout.write(JSON.stringify(out) + '\n');
+  process.exit(0);
+};
+// AbortSignal.timeout nie podtrzymuje pętli zdarzeń — bez tego zawieszone połączenie kończy proces kodem 13 bez wyjścia
+setInterval(() => {}, 60000);
 const KEY = process.env.TASKAND_LLM_API_KEY;
 const MODEL = process.env.TASKAND_LLM_MODEL || 'glm-5.3';
 const URL = process.env.TASKAND_LLM_ENDPOINT || 'https://api.z.ai/api/paas/v4/chat/completions';

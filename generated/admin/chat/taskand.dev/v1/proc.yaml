@@ -1,5 +1,5 @@
-proc:
-  uri: proc://taskand.dev/admin/chat/v1
-  kind: task
-  organism: admin
-  description: "Interfejs konwersacyjny i telemetria organizmu admin"
+uri: proc://taskand.dev/admin/chat/v1
+organism: admin
+kind: interface
+origin: builtin
+desc: "Interfejs konwersacyjny organizmu admin (deleguje do dev/act)"

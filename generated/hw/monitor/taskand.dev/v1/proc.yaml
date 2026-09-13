@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/hw/monitor/v1
+organism: hw
+kind: task
+origin: builtin
+desc: "Telemetria sprzętu: temperatury czujników, obciążenie CPU, dysk, GPIO"

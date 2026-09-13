@@ -1,114 +1,132 @@
-# glm53 | 72f 3490L | python:13,yaml:15,shell:1,javascript:39,json:1 | 2026-09-12
-# generated in 0.01s
+# glm53 | 119f 5678L | python:13,yaml:32,shell:1,javascript:56,json:14 | 2026-09-13
+# generated in 0.02s
 # producer: code2llm | artifact: map.toon.yaml | schema: 1
-# stats: 373 func | 0 cls | 72 mod | CC̄=3.1 | critical:4 | cycles:0
-# alerts[5]: CC handle_chat=29; fan-out handle_chat=22; CC binPath=21; CC readArp=20; fan-out mdnsProbe=18
-# hotspots[5]: handle_chat fan=22; mdnsProbe fan=18; ssdpProbe fan=15; handle_proc_call fan=14; MAX_ATTEMPTS fan=14
-# evolution: baseline
+# stats: 575 func | 0 cls | 119 mod | CC̄=3.1 | critical:4 | cycles:0
+# alerts[5]: CC readArp=20; fan-out probeMdns=19; fan-out mdnsProbe=18; fan-out call=17; fan-out updateRegistry=17
+# hotspots[5]: probeMdns fan=19; mdnsProbe fan=18; call fan=17; updateRegistry fan=17; sleep fan=16
+# evolution: CC̄ 3.1→3.1 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[72]:
+M[119]:
   Dockerfile,68
-  Makefile,50
-  docker-compose.yaml,52
-  gateway/__init__.py,48
-  gateway/auth.py,124
-  gateway/handlers/chat.py,138
-  gateway/handlers/doctor.py,16
-  gateway/handlers/federation.py,25
-  gateway/handlers/health.py,11
-  gateway/handlers/orchestrator.py,49
-  gateway/handlers/planner.py,29
-  gateway/handlers/proc.py,65
+  Makefile,42
+  docker-compose.yaml,63
+  gateway/__init__.py,51
+  gateway/auth.py,142
+  gateway/handlers/chat.py,25
+  gateway/handlers/doctor.py,11
+  gateway/handlers/federation.py,35
+  gateway/handlers/health.py,12
+  gateway/handlers/orchestrator.py,14
+  gateway/handlers/planner.py,11
+  gateway/handlers/proc.py,16
   gateway/middleware/cors.py,4
-  gateway/middleware/logging.py,22
-  gateway/router.py,27
-  gateway/utils.py,56
-  generated/_lib/catalog.mjs,109
-  generated/_lib/proc.mjs,58
-  generated/admin/chat/taskand.dev/v1/bin.mjs,9
+  gateway/middleware/logging.py,28
+  gateway/router.py,29
+  gateway/utils.py,47
+  generated/admin/chat/taskand.dev/v1/bin.mjs,18
   generated/admin/chat/taskand.dev/v1/proc.yaml,5
+  generated/admin/chat/taskand.dev/v1/registry-client.mjs,23
   generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs,292
-  generated/admin/network-device-discovery/taskand.dev/v1/proc.yaml,6
+  generated/admin/network-device-discovery/taskand.dev/v1/proc.yaml,5
   generated/admin/network-device-discovery/taskand.dev/v1/test.mjs,5
-  generated/alert/telegram/taskand.dev/v1/bin.mjs,59
+  generated/admin/network-device-discovery/taskand.dev/v2/bin.mjs,47
+  generated/admin/network-device-discovery/taskand.dev/v2/merge.mjs,41
+  generated/admin/network-device-discovery/taskand.dev/v2/networks.mjs,74
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-arp.mjs,33
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-dns.mjs,14
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs,61
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs,37
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-tcp.mjs,40
+  generated/admin/network-device-discovery/taskand.dev/v2/proc.yaml,6
+  generated/admin/network-device-discovery/taskand.dev/v2/stdin.mjs,28
+  generated/admin/network-device-discovery/taskand.dev/v2/test.mjs,6
+  generated/admin/network-device-discovery/taskand.dev/v2/vendor.mjs,57
+  generated/admin/registry.json,71
+  generated/alert/registry.json,27
+  generated/alert/telegram/taskand.dev/v1/bin.mjs,58
   generated/alert/telegram/taskand.dev/v1/proc.yaml,6
-  generated/alert/telegram/taskand.dev/v1/test.mjs,18
-  generated/browser/session/taskand.dev/v1/bin.mjs,23
-  generated/chat/message/taskand.dev/v1/bin.mjs,24
-  generated/dev/act/taskand.dev/v1/bin.mjs,79
-  generated/dev/chat/taskand.dev/v1/bin.mjs,16
-  generated/dev/chat/taskand.dev/v1/dispatch.mjs,82
-  generated/dev/chat/taskand.dev/v1/intent.mjs,36
-  generated/dev/chat/taskand.dev/v1/proc.yaml,7
-  generated/dev/chat/taskand.dev/v1/test.mjs,9
-  generated/dev/codegen/taskand.dev/v1/bin.mjs,17
-  generated/dev/composite/taskand.dev/v1/bin.mjs,82
-  generated/dev/evolve/taskand.dev/v1/bin.mjs,76
-  generated/dev/evolve/taskand.dev/v1/contract.mjs,61
-  generated/dev/execute/taskand.dev/v1/bin.mjs,41
-  generated/dev/execute/taskand.dev/v1/proc.yaml,10
-  generated/dev/execute/taskand.dev/v1/test.mjs,9
-  generated/dev/file-router/taskand.dev/v1/bin.mjs,17
-  generated/dev/llm/taskand.dev/v1/bin.mjs,59
-  generated/dev/llm/taskand.dev/v1/context.mjs,16
-  generated/developer/spawn/taskand.dev/v1/bin.mjs,19
-  generated/doctor/diagnose/taskand.dev/v1/bin.mjs,50
-  generated/doctor/prescribe/taskand.dev/v1/bin.mjs,19
-  generated/file/ops/taskand.dev/v1/bin.mjs,20
+  generated/browser/registry.json,28
+  generated/browser/session/taskand.dev/v1/bin.mjs,60
+  generated/browser/session/taskand.dev/v1/proc.yaml,6
+  generated/chat/message/taskand.dev/v1/bin.mjs,22
+  generated/chat/message/taskand.dev/v1/proc.yaml,5
+  generated/chat/registry.json,24
+  generated/dev/act/taskand.dev/v1/bin.mjs,91
+  generated/dev/act/taskand.dev/v1/proc.yaml,5
+  generated/dev/act/taskand.dev/v1/registry-client.mjs,23
+  generated/dev/chat/taskand.dev/v1/bin.mjs,23
+  generated/dev/chat/taskand.dev/v1/dispatch.mjs,63
+  generated/dev/chat/taskand.dev/v1/intent.mjs,49
+  generated/dev/chat/taskand.dev/v1/proc.yaml,5
+  generated/dev/chat/taskand.dev/v1/registry-client.mjs,23
+  generated/dev/codegen/taskand.dev/v1/bin.mjs,37
+  generated/dev/codegen/taskand.dev/v1/proc.yaml,5
+  generated/dev/codegen/taskand.dev/v1/registry-client.mjs,23
+  generated/dev/composite/taskand.dev/v1/bin.mjs,101
+  generated/dev/composite/taskand.dev/v1/proc.yaml,5
+  generated/dev/composite/taskand.dev/v1/registry-client.mjs,23
+  generated/dev/evolve/taskand.dev/v1/bin.mjs,72
+  generated/dev/evolve/taskand.dev/v1/contract.mjs,89
+  generated/dev/evolve/taskand.dev/v1/proc.yaml,5
+  generated/dev/evolve/taskand.dev/v1/registry-client.mjs,23
+  generated/dev/file-router/taskand.dev/v1/bin.mjs,26
+  generated/dev/file-router/taskand.dev/v1/proc.yaml,5
+  generated/dev/llm/taskand.dev/v1/bin.mjs,71
+  generated/dev/llm/taskand.dev/v1/proc.yaml,6
+  generated/dev/registry.json,159
+  generated/dev/spawn/taskand.dev/v1/bin.mjs,66
+  generated/dev/spawn/taskand.dev/v1/proc.yaml,5
+  generated/dev/spawn/taskand.dev/v1/registry-client.mjs,23
+  generated/doctor/diagnose/taskand.dev/v1/bin.mjs,59
+  generated/doctor/diagnose/taskand.dev/v1/proc.yaml,5
+  generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs,23
+  generated/doctor/prescribe/taskand.dev/v1/bin.mjs,36
+  generated/doctor/prescribe/taskand.dev/v1/proc.yaml,5
+  generated/doctor/prescribe/taskand.dev/v1/registry-client.mjs,23
+  generated/doctor/registry.json,44
+  generated/file/ops/taskand.dev/v1/bin.mjs,50
+  generated/file/ops/taskand.dev/v1/proc.yaml,5
+  generated/file/registry.json,24
   generated/hw/monitor/taskand.dev/v1/bin.mjs,112
-  generated/monitor/cpu/taskand.dev/v1/bin.mjs,48
-  generated/monitor/cpu/taskand.dev/v1/proc.yaml,6
-  generated/monitor/cpu/taskand.dev/v1/test.mjs,14
-  generated/orchestrator/execute/taskand.dev/v1/bin.mjs,242
-  generated/orchestrator/execute/taskand.dev/v1/proc.yaml,6
-  generated/orchestrator/execute/taskand.dev/v1/test.mjs,41
-  generated/planner/plan/taskand.dev/v1/bin.mjs,157
-  generated/planner/plan/taskand.dev/v1/proc.yaml,6
-  generated/planner/plan/taskand.dev/v1/test.mjs,14
-  generated/validator/resolve/taskand.dev/v1/bin.mjs,212
-  generated/validator/resolve/taskand.dev/v1/proc.yaml,6
-  generated/validator/resolve/taskand.dev/v1/test.mjs,37
-  generated/vault/secrets/taskand.dev/v1/bin.mjs,20
+  generated/hw/monitor/taskand.dev/v1/proc.yaml,5
+  generated/hw/registry.json,24
+  generated/monitor/cpu/taskand.dev/v1/bin.mjs,40
+  generated/monitor/cpu/taskand.dev/v1/proc.yaml,5
+  generated/monitor/registry.json,24
+  generated/orchestrator/execute/taskand.dev/v1/bin.mjs,168
+  generated/orchestrator/execute/taskand.dev/v1/proc.yaml,5
+  generated/orchestrator/execute/taskand.dev/v1/registry-client.mjs,23
+  generated/orchestrator/registry.json,25
+  generated/planner/plan/taskand.dev/v1/bin.mjs,148
+  generated/planner/plan/taskand.dev/v1/proc.yaml,5
+  generated/planner/plan/taskand.dev/v1/registry-client.mjs,23
+  generated/planner/registry.json,26
+  generated/registry/core/taskand.dev/v1/bin.mjs,42
+  generated/registry/core/taskand.dev/v1/exec.mjs,94
+  generated/registry/core/taskand.dev/v1/federation.mjs,74
+  generated/registry/core/taskand.dev/v1/lifecycle.mjs,119
+  generated/registry/core/taskand.dev/v1/package.mjs,61
+  generated/registry/core/taskand.dev/v1/proc.yaml,5
+  generated/registry/core/taskand.dev/v1/store.mjs,128
+  generated/registry/core/taskand.dev/v1/vault.mjs,25
+  generated/registry/registry.json,31
+  generated/validator/registry.json,26
+  generated/validator/resolve/taskand.dev/v1/bin.mjs,178
+  generated/validator/resolve/taskand.dev/v1/proc.yaml,5
+  generated/validator/resolve/taskand.dev/v1/registry-client.mjs,23
   generated/web/capsule.yaml,9
-  generated/web/serve/taskand.dev/v1/bin.mjs,10
-  generated/web/serve/taskand.dev/v1/proc.yaml,7
-  generated/web/serve/taskand.dev/v1/test.mjs,9
-  genome.yaml,65
+  generated/web/registry.json,25
+  generated/web/serve/taskand.dev/v1/bin.mjs,37
+  generated/web/serve/taskand.dev/v1/proc.yaml,5
+  genome.yaml,78
   grants.yaml,31
-  proc-catalog.json,247
+  planfile.yaml,851
+  prefact.yaml,94
   project.sh,59
   tasks/inbox.yaml,0
+  testql-scenarios/generated-api-smoke.testql.toon.yaml,39
   vms/fedora-minimal/Dockerfile,9
 D:
-  gateway/handlers/chat.py:
-    e: llm_env,handle_chat
-    llm_env()
-    handle_chat(request_handler;body)
-  generated/orchestrator/execute/taskand.dev/v1/bin.mjs:
-    i: node:child_process,node:fs,node:path,node:url
-    e: __filename,__dirname,raw,plan,runId,orchDir,stateFile,isResume,prev,saveState,prevStep,canExecute,blockingDep,depState,port,isUp,binPath,r,errText,parsed,hasFailed,hasBlocked
-    __filename()
-    __dirname()
-    raw()
-    plan()
-    runId()
-    orchDir()
-    stateFile()
-    isResume()
-    prev()
-    saveState()
-    prevStep()
-    canExecute()
-    blockingDep()
-    depState()
-    port()
-    isUp()
-    binPath()
-    r()
-    errText()
-    parsed()
-    hasFailed()
-    hasBlocked()
   generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:
     i: node:child_process,node:dgram,node:dns/promises,node:fs,node:net,node:os,node:util
     e: run,TIMEOUT_MS,deadline,out,errOut,raw,timeLeft,ouiMap,loadOui,lines,parts,hex,vendorFromMac,hex,parseArpText,m,readArp,t,p,mip,mmac,localSubnets,ifaces,ipParts,maskParts,maskBits,netParts,tcpProbe,s,done,fin,mdnsProbe,sock,timer,ip,hostname,off,readName,len,ptr,sub,qd,an,r,rdlen,type,rd,q,ssdpProbe,sock,timer,ip,existing,st,nets,netsInfo,mdnsMs,ssdpMs,byIp,add,cur,probeBudget,alive,names,selfIps
@@ -177,24 +195,162 @@ D:
     alive()
     names()
     selfIps()
+  generated/dev/evolve/taskand.dev/v1/contract.mjs:
+    i: node:child_process,node:url
+    e: MAX_MODULE_LINES,guard,lines,spec,sibling,contractTest,r,r,out
+    MAX_MODULE_LINES()
+    guard()
+    lines()
+    spec()
+    sibling()
+    contractTest()
+    r()
+    r()
+    out()
+  generated/admin/network-device-discovery/taskand.dev/v2/networks.mjs:
+    i: node:child_process,node:os,node:util
+    e: execFileP,isDockerIface,cidrFromAddrMask,ipParts,maskParts,maskBits,m,bits,listLocalNetworks,ifaces,cidr,m,ipInNetworks,a,m,b,bits,mask,byteBits,ai,bi
+    execFileP()
+    isDockerIface()
+    cidrFromAddrMask()
+    ipParts()
+    maskParts()
+    maskBits()
+    m()
+    bits()
+    listLocalNetworks()
+    ifaces()
+    cidr()
+    m()
+    ipInNetworks()
+    a()
+    m()
+    b()
+    bits()
+    mask()
+    byteBits()
+    ai()
+    bi()
   gateway/auth.py:
-    e: _parse_simple_yaml,load_grants,check_auth,check_grant
+    e: bind_address,is_loopback_bind,_parse_simple_yaml,load_grants,check_auth,check_grant,require_grant
+    bind_address()
+    is_loopback_bind()
     _parse_simple_yaml(text)
     load_grants()
     check_auth(headers)
     check_grant(user;target_uri;action)
-  generated/chat/message/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw,msg
+    require_grant(request_handler;target_uri;action)
+  generated/registry/core/taskand.dev/v1/exec.mjs:
+    i: ./package.mjs,./store.mjs,./vault.mjs,node:child_process,node:fs,node:path
+    e: MAX_DEPTH,secretSource,m,resolve,entry,actual,fail,matches,credentialEnv,ref,purpose,v,call,res,secrets,started,r,out,parseJson,v,outcome,parsed,errorType
+    MAX_DEPTH()
+    secretSource()
+    m()
+    resolve()
+    entry()
+    actual()
+    fail()
+    matches()
+    credentialEnv()
+    ref()
+    purpose()
+    v()
+    call()
+    res()
+    secrets()
+    started()
+    r()
+    out()
+    parseJson()
+    v()
+    outcome()
+    parsed()
+    errorType()
+  generated/registry/core/taskand.dev/v1/lifecycle.mjs:
+    i: ./package.mjs,./store.mjs,node:fs,node:path
+    e: initialStatus,register,loc,errors,existing,hash,m,src,setStatus,loc,entry,updated,refresh,targets,loc,problems,hash,m,approve,deprecate,list,processes,verify,broken,scan,found,base,unregistered,results
+    initialStatus()
+    register()
+    loc()
+    errors()
+    existing()
+    hash()
+    m()
+    src()
+    setStatus()
+    loc()
+    entry()
+    updated()
+    refresh()
+    targets()
+    loc()
+    problems()
+    hash()
+    m()
+    approve()
+    deprecate()
+    list()
+    processes()
+    verify()
+    broken()
+    scan()
+    found()
+    base()
+    unregistered()
+    results()
+  generated/admin/network-device-discovery/taskand.dev/v2/merge.mjs:
+    e: mergeDevices,map,get,addSource,dev,dev,dev,dev
+    mergeDevices()
+    map()
+    get()
+    addSource()
+    dev()
+    dev()
+    dev()
+    dev()
+  generated/registry/core/taskand.dev/v1/package.mjs:
+    i: node:crypto,node:fs,node:path
+    e: packageFiles,packageHash,h,readManifest,file,m,raw,unquote,checkPackage,manifest,files,spec
+    packageFiles()
+    packageHash()
+    h()
+    readManifest()
+    file()
+    m()
     raw()
-    msg()
-  gateway/handlers/proc.py:
-    e: handle_proc_call
-    handle_proc_call(request_handler;body)
+    unquote()
+    checkPackage()
+    manifest()
+    files()
+    spec()
+  generated/registry/core/taskand.dev/v1/federation.mjs:
+    i: ./lifecycle.mjs,./package.mjs,./store.mjs,node:fs,node:path
+    e: exportCatalog,processes,packagePayload,entry,files,fetchJson,r,pull,remote,wanted,imported,pullOne,loc,local,pkg,payload,install,names,hash,errors,reg
+    exportCatalog()
+    processes()
+    packagePayload()
+    entry()
+    files()
+    fetchJson()
+    r()
+    pull()
+    remote()
+    wanted()
+    imported()
+    pullOne()
+    loc()
+    local()
+    pkg()
+    payload()
+    install()
+    names()
+    hash()
+    errors()
+    reg()
   generated/dev/composite/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs
-    e: input,task,organism,say,done,plan,deps,val,step,ev,orch,validate,r,stepLine,o,detail
-    input()
+    i: ./registry-client.mjs,node:fs
+    e: raw,task,organism,say,done,plan,deps,val,orch,validate,r,evolveStep,step,ev,stepLine,o,detail
+    raw()
     task()
     organism()
     say()
@@ -202,50 +358,96 @@ D:
     plan()
     deps()
     val()
-    step()
-    ev()
     orch()
     validate()
     r()
+    evolveStep()
+    step()
+    ev()
     stepLine()
     o()
     detail()
-  generated/dev/evolve/taskand.dev/v1/contract.mjs:
-    i: node:child_process
-    e: guard,hit,contractTest,r
-    guard()
-    hit()
-    contractTest()
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:
+    i: node:dgram,node:timers/promises
+    e: MDNS_PORT,QUERY,extractNames,i,len,probeMdns,socket,finish,timer,ip
+    MDNS_PORT()
+    QUERY()
+    extractNames()
+    i()
+    len()
+    probeMdns()
+    socket()
+    finish()
+    timer()
+    ip()
+  generated/planner/plan/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,node:fs
+    e: raw,task,catalogProcs,capabilityLines,plan,llm,kLower,val,t
+    raw()
+    task()
+    catalogProcs()
+    capabilityLines()
+    plan()
+    llm()
+    kLower()
+    val()
+    t()
+  generated/dev/chat/taskand.dev/v1/dispatch.mjs:
+    i: ./registry-client.mjs
+    e: P,LONG,replyOf,organismChat,r,dispatch,telemetry,hw,sensors,diagnose,d,webStatus,d,fileList,path,r
+    P()
+    LONG()
+    replyOf()
+    organismChat()
     r()
-  generated/dev/evolve/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,./contract.mjs,node:fs,node:path
-    e: input,slug,organism,name,bin,dir,MAX_ATTEMPTS,gen,violation,test,desc,contractTestSource,r,out
-    input()
-    slug()
-    organism()
-    name()
-    bin()
-    dir()
-    MAX_ATTEMPTS()
-    gen()
-    violation()
-    test()
-    desc()
-    contractTestSource()
+    dispatch()
+    telemetry()
+    hw()
+    sensors()
+    diagnose()
+    d()
+    webStatus()
+    d()
+    fileList()
+    path()
     r()
-    out()
-  gateway/utils.py:
-    e: proc_hash,find_proc_bin
-    proc_hash(binpath)
-    find_proc_bin(uri)
-  gateway/handlers/federation.py:
-    e: handle_federation
-    handle_federation(request_handler;body)
+  generated/registry/core/taskand.dev/v1/store.mjs:
+    i: node:fs,node:os,node:path,node:url
+    e: ROOT,GEN,NODE_ID,GENOME,LOCK_WAIT_MS,LOCK_STALE_MS,parseUri,m,registryFile,readRegistry,organisms,allEntries,findEntry,loc,adoptOwnership,walk,sleep,updateRegistry,lock,deadline,reg,result,policy,m,addToGenome,text,idx,rest,end,at,audit
+    ROOT()
+    GEN()
+    NODE_ID()
+    GENOME()
+    LOCK_WAIT_MS()
+    LOCK_STALE_MS()
+    parseUri()
+    m()
+    registryFile()
+    readRegistry()
+    organisms()
+    allEntries()
+    findEntry()
+    loc()
+    adoptOwnership()
+    walk()
+    sleep()
+    updateRegistry()
+    lock()
+    deadline()
+    reg()
+    result()
+    policy()
+    m()
+    addToGenome()
+    text()
+    idx()
+    rest()
+    end()
+    at()
+    audit()
   generated/validator/resolve/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/catalog.mjs,node:fs,node:path,node:url
-    e: __filename,__dirname,raw,blueprint,steps,ids,names,color,stepMap,hasCycle,dfs,currentStep,p,val,catPath,catalogMap,entry,fullPath,visited,visit,stepObj,isValid
-    __filename()
-    __dirname()
+    i: ./registry-client.mjs,node:fs
+    e: raw,blueprint,steps,ids,names,color,stepMap,hasCycle,dfs,currentStep,p,val,res,visited,visit,stepObj,isValid
     raw()
     blueprint()
     steps()
@@ -258,59 +460,58 @@ D:
     currentStep()
     p()
     val()
-    catPath()
-    catalogMap()
-    entry()
-    fullPath()
+    res()
     visited()
     visit()
     stepObj()
     isValid()
-  generated/planner/plan/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs,node:fs,node:path,node:url
-    e: __filename,__dirname,raw,task,catPath,cat,capabilityLines,plan,llm,kLower,val,t
-    __filename()
-    __dirname()
+  generated/dev/spawn/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,./registry-client.mjs,node:fs,node:fs,node:path,node:url
+    e: raw,done,organism,dir,reg,r,template,raw,message,r
     raw()
-    task()
-    catPath()
-    cat()
-    capabilityLines()
-    plan()
-    llm()
-    kLower()
-    val()
-    t()
-  generated/_lib/proc.mjs:
-    i: node:child_process,node:fs,node:path,node:url
-    e: here,ROOT,GEN,readInput,raw,emit,adoptOwnership,walk,uriToPath,parts,ver,callProc,bin,r,out
-    here()
-    ROOT()
-    GEN()
-    readInput()
-    raw()
-    emit()
-    adoptOwnership()
-    walk()
-    uriToPath()
-    parts()
-    ver()
-    callProc()
-    bin()
+    done()
+    organism()
+    dir()
+    reg()
     r()
-    out()
+    template()
+    raw()
+    message()
+    r()
+  generated/orchestrator/execute/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,node:fs,node:path,node:url
+    e: ROOT,STEP_TIMEOUT_MS,raw,plan,runId,orchDir,stateFile,isResume,prev,saveState,prevStep,canExecute,blockingDep,depState,result,hasFailed,hasBlocked
+    ROOT()
+    STEP_TIMEOUT_MS()
+    raw()
+    plan()
+    runId()
+    orchDir()
+    stateFile()
+    isResume()
+    prev()
+    saveState()
+    prevStep()
+    canExecute()
+    blockingDep()
+    depState()
+    result()
+    hasFailed()
+    hasBlocked()
   generated/dev/act/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,../../../llm/taskand.dev/v1/context.mjs
-    e: input,message,organism,decision,decide,r,answer,run,resolved,result,evolve,ev,invalid,why,format,head,summary,data
-    input()
+    i: ./registry-client.mjs,node:fs
+    e: raw,message,organism,done,decision,capabilityContext,procs,decide,r,answer,run,result,evolve,ev,invalid,why,format,head,summary
+    raw()
     message()
     organism()
+    done()
     decision()
+    capabilityContext()
+    procs()
     decide()
     r()
     answer()
     run()
-    resolved()
     result()
     evolve()
     ev()
@@ -319,64 +520,63 @@ D:
     format()
     head()
     summary()
+  generated/planner/plan/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:
+    i: node:dgram
+    e: SSDP_PORT,probeSsdp,socket,finish,timer,ip
+    SSDP_PORT()
+    probeSsdp()
+    socket()
+    finish()
+    timer()
+    ip()
+  generated/admin/chat/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-arp.mjs:
+    i: ./networks.mjs,node:child_process,node:fs/promises,node:util
+    e: execFileP,readArpTable,data,parts,refreshArpWithIpNeigh
+    execFileP()
+    readArpTable()
     data()
-  generated/dev/chat/taskand.dev/v1/dispatch.mjs:
-    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs,../../../../_lib/proc.mjs,node:fs,node:path
-    e: P,replyOf,dispatch,telemetry,hw,sensors,diagnose,d,webStatus,d,web,spawnOrganism,uri,bin,r,organismTemplate,input,message,r
-    P()
-    replyOf()
-    dispatch()
-    telemetry()
-    hw()
-    sensors()
-    diagnose()
-    d()
-    webStatus()
-    d()
-    web()
-    spawnOrganism()
-    uri()
-    bin()
+    parts()
+    refreshArpWithIpNeigh()
+  generated/validator/resolve/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
     r()
-    organismTemplate()
-    input()
-    message()
+    call()
+  generated/registry/core/taskand.dev/v1/vault.mjs:
+    i: ./store.mjs,node:crypto,node:fs,node:path
+    e: openSecret,item,key,d
+    openSecret()
+    item()
+    key()
+    d()
+  generated/dev/composite/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
     r()
-  gateway/handlers/orchestrator.py:
-    e: handle_orchestrator
-    handle_orchestrator(request_handler;body)
-  generated/_lib/catalog.mjs:
-    i: ./proc.mjs,node:crypto,node:fs,node:path,node:url
-    e: CATALOG_PATH,GENOME_PATH,loadCatalog,saveCatalog,procHash,dir,h,modules,resolveUri,entry,bin,register,bin,cat,addToGenome,text,idx,rest,blockEnd,at,rehashAll,cat,bin,h,changed
-    CATALOG_PATH()
-    GENOME_PATH()
-    loadCatalog()
-    saveCatalog()
-    procHash()
-    dir()
-    h()
-    modules()
-    resolveUri()
-    entry()
-    bin()
-    register()
-    bin()
-    cat()
-    addToGenome()
-    text()
-    idx()
-    rest()
-    blockEnd()
-    at()
-    rehashAll()
-    cat()
-    bin()
-    h()
-    changed()
+    call()
   generated/dev/llm/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs
-    e: input,KEY,MODEL,URL,messages,extractJson,fenced,candidate,start,end,resp,data,choice,content,json
-    input()
+    i: node:fs
+    e: raw,emit,KEY,MODEL,URL,messages,extractJson,fenced,candidate,start,end,resp,data,choice,content,json
+    raw()
+    emit()
     KEY()
     MODEL()
     URL()
@@ -391,42 +591,107 @@ D:
     choice()
     content()
     json()
-  generated/monitor/cpu/taskand.dev/v1/bin.mjs:
-    i: node:fs,node:os
-    e: raw,cpuPct,cpus,totalIdle,idlePct
+  generated/dev/act/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/doctor/prescribe/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/dev/codegen/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/orchestrator/execute/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/dev/evolve/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/dev/chat/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  generated/dev/spawn/taskand.dev/v1/registry-client.mjs:
+    i: node:child_process,node:url
+    e: REGISTRY,registry,r,call
+    REGISTRY()
+    registry()
+    r()
+    call()
+  gateway/handlers/federation.py:
+    e: handle_well_known_catalog,handle_federation,handle_registry
+    handle_well_known_catalog(request_handler;body)
+    handle_federation(request_handler;body)
+    handle_registry(request_handler;body)
+  generated/admin/network-device-discovery/taskand.dev/v2/vendor.mjs:
+    e: lookupVendor,oui,local
+    lookupVendor()
+    oui()
+    local()
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-tcp.mjs:
+    i: node:net
+    e: CONNECT_TIMEOUT,probePort,socket,done,finish,probeTcp,existing
+    CONNECT_TIMEOUT()
+    probePort()
+    socket()
+    done()
+    finish()
+    probeTcp()
+    existing()
+  generated/doctor/diagnose/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,node:fs
+    e: raw,probe,r,checkService,checkRegistry,v,pending,detail,passed
     raw()
-    cpuPct()
-    cpus()
-    totalIdle()
-    idlePct()
-  generated/alert/telegram/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw,cpuVal,depData,threshold,chatId,credRef,isOver,alertMsg
-    raw()
-    cpuVal()
-    depData()
-    threshold()
-    chatId()
-    credRef()
-    isOver()
-    alertMsg()
-  gateway/handlers/planner.py:
-    e: handle_planner
-    handle_planner(request_handler;body)
+    probe()
+    r()
+    checkService()
+    checkRegistry()
+    v()
+    pending()
+    detail()
+    passed()
   generated/dev/chat/taskand.dev/v1/intent.mjs:
-    e: hasAny,matches,parseIntent,low,match
+    e: DEVELOPER,hasAny,matches,parseIntent,org,low,match
+    DEVELOPER()
     hasAny()
     matches()
     parseIntent()
+    org()
     low()
     match()
   gateway/__init__.py:
     e: GatewayHTTPHandler,main
     GatewayHTTPHandler(BaseHTTPRequestHandler): _send(2),do_OPTIONS(0),do_GET(0),do_POST(0),log_message(1)
     main()
-  gateway/handlers/doctor.py:
-    e: handle_doctor
-    handle_doctor(request_handler;body)
   generated/hw/monitor/taskand.dev/v1/bin.mjs:
     i: node:child_process,node:fs,node:os
     e: raw,TEMP_WARN_C,readSensorsCmd,out,readThermalZones,temp_c,sensor,pickCpuTemp,hits,cpuTimes,t,cpuUsagePct,a,b,total,diskFreeGb,parts,gpioChips,fromCmd,sensors,cpu,hot,usage,summary
@@ -454,170 +719,245 @@ D:
     hot()
     usage()
     summary()
-  generated/doctor/diagnose/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/catalog.mjs,../../../../_lib/proc.mjs
-    e: probe,r,checkService,checkCatalog,cat,broken,total,passed
-    probe()
-    r()
-    checkService()
-    checkCatalog()
-    cat()
-    broken()
-    total()
-    passed()
-  generated/dev/llm/taskand.dev/v1/context.mjs:
-    i: ../../../../_lib/catalog.mjs
-    e: capabilities,procs,capabilityContext
-    capabilities()
-    procs()
-    capabilityContext()
-  generated/developer/spawn/taskand.dev/v1/bin.mjs:
+  generated/web/serve/taskand.dev/v1/bin.mjs:
     i: node:fs
-    e: raw,KEY,org
+    e: raw,params,port,started,status,error,up
     raw()
-    KEY()
-    org()
-  generated/orchestrator/execute/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r,out
-    __dirname()
-    r()
+    params()
+    port()
+    started()
+    status()
+    error()
+    up()
+  generated/admin/network-device-discovery/taskand.dev/v2/bin.mjs:
+    i: ./merge.mjs,./networks.mjs,./probe-arp.mjs,./probe-dns.mjs,./probe-mdns.mjs,./probe-ssdp.mjs,./probe-tcp.mjs,./stdin.mjs,./vendor.mjs
+    e: out,input,params,includeDocker,networks,arpEntries,mdns,ssdp,candidateIps,tcp,dns,devices
     out()
-  generated/dev/chat/taskand.dev/v1/test.mjs:
-    i: node:child_process
-    e: r,out
+    input()
+    params()
+    includeDocker()
+    networks()
+    arpEntries()
+    mdns()
+    ssdp()
+    candidateIps()
+    tcp()
+    dns()
+    devices()
+  generated/admin/network-device-discovery/taskand.dev/v2/stdin.mjs:
+    i: node:timers/promises
+    e: readStdinJson,timer
+    readStdinJson()
+    timer()
+  generated/alert/telegram/taskand.dev/v1/bin.mjs:
+    i: node:fs,node:os,node:path
+    e: raw,params,emit,cpu,threshold,token,chatId,RATE_MS,stamp,last,r,body
+    raw()
+    params()
+    emit()
+    cpu()
+    threshold()
+    token()
+    chatId()
+    RATE_MS()
+    stamp()
+    last()
     r()
-    out()
+    body()
+  generated/dev/codegen/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,node:fs
+    e: raw,done,r,normalized
+    raw()
+    done()
+    r()
+    normalized()
+  generated/dev/evolve/taskand.dev/v1/bin.mjs:
+    i: ./contract.mjs,./registry-client.mjs,node:fs,node:path,node:url
+    e: raw,done,slug,organism,name,GEN,MAX_ATTEMPTS,gen,violations,test,desc,reg,nextVersion,candidate,writeAndTest
+    raw()
+    done()
+    slug()
+    organism()
+    name()
+    GEN()
+    MAX_ATTEMPTS()
+    gen()
+    violations()
+    test()
+    desc()
+    reg()
+    nextVersion()
+    candidate()
+    writeAndTest()
+  gateway/handlers/chat.py:
+    e: handle_chat
+    handle_chat(request_handler;body)
+  generated/admin/network-device-discovery/taskand.dev/v2/probe-dns.mjs:
+    i: node:dns
+    e: reverseDns,map,names
+    reverseDns()
+    map()
+    names()
+  generated/registry/core/taskand.dev/v1/bin.mjs:
+    i: ./exec.mjs,./federation.mjs,./lifecycle.mjs,node:fs
+    e: raw,action
+    raw()
+    action()
   generated/browser/session/taskand.dev/v1/bin.mjs:
     i: node:fs
-    e: raw,act,url,dev
+    e: raw,CDP,NOVNC,action,emit,cdp,r,text,tabs,v,tab
     raw()
-    act()
-    url()
-    dev()
+    CDP()
+    NOVNC()
+    action()
+    emit()
+    cdp()
+    r()
+    text()
+    tabs()
+    v()
+    tab()
+  generated/file/ops/taskand.dev/v1/bin.mjs:
+    i: node:fs,node:os,node:path
+    e: raw,MAX_READ,op,path,scope,emit,st,entries,limit,st,buf
+    raw()
+    MAX_READ()
+    op()
+    path()
+    scope()
+    emit()
+    st()
+    entries()
+    limit()
+    st()
+    buf()
+  gateway/handlers/doctor.py:
+    e: handle_doctor
+    handle_doctor(request_handler;body)
   gateway/router.py:
     e: dispatch
     dispatch(method;path;request_handler;body)
-  generated/vault/secrets/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw,act
-    raw()
-    act()
-  generated/web/serve/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: action
-    action()
-  generated/web/serve/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r,out
-    __dirname()
-    r()
-    out()
-  generated/file/ops/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw,op,target
-    raw()
-    op()
-    target()
-  generated/doctor/prescribe/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw
-    raw()
-  generated/dev/codegen/taskand.dev/v1/bin.mjs:
-    i: node:fs
-    e: raw,desc
-    raw()
-    desc()
-  generated/dev/execute/taskand.dev/v1/bin.mjs:
-    i: node:child_process,node:fs,node:path,node:url
-    e: __filename,__dirname,raw,intent,desc,devChatBin,r,out
-    __filename()
-    __dirname()
-    raw()
-    intent()
-    desc()
-    devChatBin()
-    r()
-    out()
-  generated/dev/execute/taskand.dev/v1/test.mjs:
-    i: node:child_process
-    e: r,out
-    r()
-    out()
-  gateway/middleware/logging.py:
-    e: log_event
-    log_event(event_type;payload)
-  gateway/handlers/health.py:
-    e: handle_healthz
-    handle_healthz(request_handler;body)
+  gateway/handlers/planner.py:
+    e: handle_planner
+    handle_planner(request_handler;body)
+  gateway/utils.py:
+    e: registry,call_process,status_for
+    registry(action;payload;timeout)
+    call_process(uri;data;timeout)
+    status_for(result)
+  gateway/handlers/orchestrator.py:
+    e: handle_orchestrator
+    handle_orchestrator(request_handler;body)
+  gateway/handlers/proc.py:
+    e: handle_proc_call
+    handle_proc_call(request_handler;body)
   generated/admin/chat/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs
-    e: input,message,r
-    input()
+    i: ./registry-client.mjs,node:fs
+    e: raw,message,r
+    raw()
     message()
     r()
+  generated/monitor/cpu/taskand.dev/v1/bin.mjs:
+    i: node:fs,node:os
+    e: raw,SAMPLE_MS,times,t,a,b,total,cpuPct
+    raw()
+    SAMPLE_MS()
+    times()
+    t()
+    a()
+    b()
+    total()
+    cpuPct()
+  generated/chat/message/taskand.dev/v1/bin.mjs:
+    i: node:fs
+    e: raw,message
+    raw()
+    message()
+  generated/doctor/prescribe/taskand.dev/v1/bin.mjs:
+    i: ./registry-client.mjs,node:fs
+    e: raw,diag,recommendations
+    raw()
+    diag()
+    recommendations()
   generated/dev/file-router/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs,node:fs
-    e: input,path,st,kind
-    input()
+    i: node:fs
+    e: raw,emit,path,st,kind
+    raw()
+    emit()
     path()
     st()
     kind()
   generated/dev/chat/taskand.dev/v1/bin.mjs:
-    i: ../../../../_lib/proc.mjs,./dispatch.mjs,./intent.mjs
-    e: input,prompt,intent
-    input()
-    prompt()
+    i: ./dispatch.mjs,./intent.mjs,node:fs
+    e: raw,intent
+    raw()
     intent()
-  generated/validator/resolve/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r1,r2
-    __dirname()
-    r1()
-    r2()
-  generated/planner/plan/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r,out
-    __dirname()
-    r()
-    out()
-  generated/monitor/cpu/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r,out
-    __dirname()
-    r()
-    out()
-  generated/alert/telegram/taskand.dev/v1/test.mjs:
-    i: node:child_process,node:path,node:url
-    e: __dirname,r,out
-    __dirname()
+  gateway/handlers/health.py:
+    e: handle_healthz
+    handle_healthz(request_handler;body)
+  gateway/middleware/logging.py:
+    e: log_event
+    log_event(event_type;payload)
+  generated/admin/network-device-discovery/taskand.dev/v1/test.mjs:
+    i: node:child_process
+    e: r,out
     r()
     out()
   gateway/middleware/cors.py:
     e: add_cors_headers
     add_cors_headers(handler)
-  generated/admin/network-device-discovery/taskand.dev/v1/test.mjs:
-    i: node:child_process
+  generated/admin/network-device-discovery/taskand.dev/v2/test.mjs:
+    i: node:child_process,node:url
     e: r,out
     r()
     out()
   grants.yaml:
   Dockerfile:
   project.sh:
-  generated/validator/resolve/taskand.dev/v1/proc.yaml:
-  generated/planner/plan/taskand.dev/v1/proc.yaml:
   generated/web/capsule.yaml:
-  generated/web/serve/taskand.dev/v1/proc.yaml:
-  generated/monitor/cpu/taskand.dev/v1/proc.yaml:
-  generated/alert/telegram/taskand.dev/v1/proc.yaml:
-  generated/orchestrator/execute/taskand.dev/v1/proc.yaml:
-  generated/dev/chat/taskand.dev/v1/proc.yaml:
-  generated/dev/execute/taskand.dev/v1/proc.yaml:
   tasks/inbox.yaml:
   vms/fedora-minimal/Dockerfile:
-  proc-catalog.json:
-  genome.yaml:
   docker-compose.yaml:
+  planfile.yaml:
+  genome.yaml:
   Makefile:
+  prefact.yaml:
+  generated/validator/registry.json:
+  generated/validator/resolve/taskand.dev/v1/proc.yaml:
+  generated/planner/registry.json:
+  generated/admin/registry.json:
+  generated/web/registry.json:
+  generated/planner/plan/taskand.dev/v1/proc.yaml:
+  generated/admin/network-device-discovery/taskand.dev/v2/proc.yaml:
   generated/admin/network-device-discovery/taskand.dev/v1/proc.yaml:
+  generated/monitor/registry.json:
+  generated/monitor/cpu/taskand.dev/v1/proc.yaml:
+  generated/web/serve/taskand.dev/v1/proc.yaml:
+  generated/file/registry.json:
   generated/admin/chat/taskand.dev/v1/proc.yaml:
+  generated/file/ops/taskand.dev/v1/proc.yaml:
+  generated/hw/registry.json:
+  generated/hw/monitor/taskand.dev/v1/proc.yaml:
+  generated/registry/registry.json:
+  generated/chat/registry.json:
+  generated/registry/core/taskand.dev/v1/proc.yaml:
+  generated/chat/message/taskand.dev/v1/proc.yaml:
+  generated/alert/registry.json:
+  generated/alert/telegram/taskand.dev/v1/proc.yaml:
+  generated/doctor/prescribe/taskand.dev/v1/proc.yaml:
+  generated/doctor/diagnose/taskand.dev/v1/proc.yaml:
+  generated/orchestrator/execute/taskand.dev/v1/proc.yaml:
+  generated/dev/registry.json:
+  generated/dev/composite/taskand.dev/v1/proc.yaml:
+  generated/doctor/registry.json:
+  generated/dev/llm/taskand.dev/v1/proc.yaml:
+  generated/dev/file-router/taskand.dev/v1/proc.yaml:
+  generated/dev/codegen/taskand.dev/v1/proc.yaml:
+  generated/dev/act/taskand.dev/v1/proc.yaml:
+  generated/orchestrator/registry.json:
+  generated/dev/evolve/taskand.dev/v1/proc.yaml:
+  generated/browser/registry.json:
+  generated/dev/spawn/taskand.dev/v1/proc.yaml:
+  generated/browser/session/taskand.dev/v1/proc.yaml:
+  generated/dev/chat/taskand.dev/v1/proc.yaml:
+  testql-scenarios/generated-api-smoke.testql.toon.yaml:

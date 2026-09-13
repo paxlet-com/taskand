@@ -14,9 +14,22 @@ export const INTENTS = [
   { name: 'file-ops', all: [['plik'], ['istnieje', 'zawarto', 'czytaj', 'pokaż']] },
   { name: 'spawn-web', any: ['przeglądar', 'web', 'interfejs', 'gui', 'stron'] },
   { name: 'spawn-web', all: [['jak'], ['używa', 'uzywa']] },
+  { name: 'heal', any: ['napraw', 'wylecz', 'samonapraw'] },
+  { name: 'prescribe', any: ['recept', 'zalece', 'co zrobić', 'co zrobic'] },
   { name: 'diagnose', any: ['sprawdź', 'sprawdz', 'diagnoz', 'działa', 'status'] },
   { name: 'evolve-create', any: CREATE }
 ];
+
+// Wejście przez organizm: aliasy organizmów wbudowanych → intencja; inne organizmy → własny <org>/chat
+const DOCTOR = new Set(['doc', 'doctor']);
+const DOCTOR_INTENTS = INTENTS.filter(i => ['heal', 'prescribe', 'diagnose'].includes(i.name));
+const ORGANISM_INTENTS = {
+  sec: 'vault', vault: 'vault',
+  hw: 'telemetry',
+  file: 'file-list',
+  browser: 'browser'
+};
+const DEVELOPER = new Set(['', 'dev', 'developer', 'chat']);
 
 const hasAny = (low, words) => words.some(w => low.includes(w));
 
@@ -26,11 +39,15 @@ function matches(intent, text, low) {
   return intent.all.every(group => hasAny(low, group)) ? [text] : null;
 }
 
-export function parseIntent(text) {
+export function parseIntent(text, organism = '') {
+  const org = organism.toLowerCase();
+  if (DOCTOR.has(org)) return { name: DOCTOR_INTENTS.find(i => matches(i, text, text.toLowerCase()))?.name || 'diagnose', match: [text], text, organism: org };
+  if (ORGANISM_INTENTS[org]) return { name: ORGANISM_INTENTS[org], match: [text], text, organism: org };
+  if (!DEVELOPER.has(org)) return { name: 'organism', match: [text], text, organism: org };
   const low = text.toLowerCase();
   for (const intent of INTENTS) {
     const match = matches(intent, text, low);
-    if (match) return { name: intent.name, match, text };
+    if (match) return { name: intent.name, match, text, organism: 'dev' };
   }
-  return { name: 'query', match: [text], text };
+  return { name: 'query', match: [text], text, organism: 'dev' };
 }

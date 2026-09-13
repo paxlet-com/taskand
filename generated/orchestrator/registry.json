@@ -1,0 +1,25 @@
+{
+  "organism": "orchestrator",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/orchestrator/execute/v1": {
+      "uri": "proc://taskand.dev/orchestrator/execute/v1",
+      "organism": "orchestrator",
+      "path": "generated/orchestrator/execute/taskand.dev/v1",
+      "desc": "Trwały orkiestrator: kroki przez rejestr, blokady zależności, resume",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:e3eedeefe4518c01e67037d54619057b12265dc6ccdcfa65b613c004b61a63f9",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.975Z"
+    }
+  },
+  "updated": "2026-09-12T19:09:04.975Z"
+}

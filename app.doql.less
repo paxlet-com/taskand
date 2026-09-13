@@ -28,25 +28,19 @@ workflow[name="status"] {
 
 workflow[name="test"] {
   trigger: manual;
-  step-1: depend target=test-contracts;
-  step-2: depend target=test-negative;
+  step-1: depend target=conformance;
+  step-2: depend target=test-contracts;
+  step-3: depend target=test-negative;
+}
+
+workflow[name="conformance"] {
+  trigger: manual;
+  step-1: run cmd=node tests/conformance.mjs;
 }
 
 workflow[name="test-contracts"] {
   trigger: manual;
-  step-1: run cmd=echo "=== Weryfikacja kontraktów procesów taskand v2.2 (fail-closed) ===";
-  step-2: run cmd=passed=0; total=0; \;
-  step-3: run cmd=for bin in $$(find generated -name "bin.mjs" | sort); do \;
-  step-4: run cmd=total=$$((total + 1)); \;
-  step-5: run cmd=if echo '{}' | node "$$bin" >/dev/null 2>&1; then \;
-  step-6: run cmd=echo "  $$bin: PASS ✓"; \;
-  step-7: run cmd=passed=$$((passed + 1)); \;
-  step-8: run cmd=else \;
-  step-9: run cmd=echo "  $$bin: FAIL ✗"; \;
-  step-10: run cmd=fi \;
-  step-11: run cmd=done; \;
-  step-12: run cmd=echo "Wynik kontraktów: $$passed/$$total PASS ✓"; \;
-  step-13: run cmd=[ "$$passed" -eq "$$total" ];
+  step-1: run cmd=node tests/contract_tests.mjs;
 }
 
 workflow[name="test-negative"] {
@@ -61,7 +55,7 @@ workflow[name="integration"] {
 
 workflow[name="catalog"] {
   trigger: manual;
-  step-1: run cmd=node generated/_lib/catalog.mjs rehash;
+  step-1: run cmd=node generated/registry/core/taskand.dev/v1/bin.mjs <<< '{"action":"refresh"}';
 }
 
 workflow[name="bootstrap"] {
@@ -77,6 +71,10 @@ workflow[name="gateway"] {
 workflow[name="clean"] {
   trigger: manual;
   step-1: run cmd=rm -rf log/events.jsonl;
+}
+
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
 }
 
 env_vars {

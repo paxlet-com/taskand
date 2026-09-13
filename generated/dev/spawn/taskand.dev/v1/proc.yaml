@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/spawn/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Powołuje organizm: pakiet <org>/chat + rejestracja"
