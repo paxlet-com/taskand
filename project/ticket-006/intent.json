@@ -1,0 +1,42 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-006",
+  "summary": "Panel authorization recovery and bounded requests",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-006/**", "index.html", "tests/mesh_test.py"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8b4e26a36824bef650042e2e1dc69018ebc6fc6a",
+    "targetBranch": "main",
+    "outcome": "Publish clear panel authorization failures, bounded requests and local logout with browser regressions.",
+    "nonGoals": ["Gateway/UI release identity and production deployment", "Changing grants, accessing credentials or calling a provider", "Weakening OneDev sandbox or trusted publication"],
+    "complexity": "M",
+    "estimatedMinutes": 60,
+    "budgets": {"maxImplementationFiles": 2, "maxAffectedComponents": 2, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Reuse the existing header helper and UI. Centralize bounded JSON requests and session cancellation; render only classified failures and discard stale results after logout.",
+      "components": [{"name":"panel","paths":["index.html"]},{"name":"verification","paths":["tests/mesh_test.py"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {"impact":"multi-state","states":["loading","empty","error","success"],"evidence":["tests/mesh_test.py real-browser regression"]},
+      "rollback": "Restore the previous index.html; no persisted data or gateway contract changes."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion":"AC-01","commands":["python -m unittest discover -s tests -p mesh_test.py"],"evidence":"Isolated Chromium and loopback gateway: auth and failure classification"},
+      {"criterion":"AC-02","commands":["python -m unittest discover -s tests -p mesh_test.py"],"evidence":"Logout, late response and empty storage regressions"},
+      {"criterion":"AC-03","commands":["./project/governance-check.sh","git diff --check"],"evidence":"Managed scope gate and material browser tests"}
+    ]
+  }
+}
