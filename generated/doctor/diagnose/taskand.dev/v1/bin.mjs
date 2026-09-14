@@ -4,16 +4,19 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { registry, call } from './registry-client.mjs';
+import { diagnosticBudget, now, remaining, runChecks, probeService } from './probes.mjs';
 
+let budget;
 try {
   const raw = readFileSync(0, 'utf8').trim();
-  if (raw) JSON.parse(raw);
+  budget = diagnosticBudget(raw ? JSON.parse(raw) : {});
 } catch {
+  process.stdout.write(JSON.stringify({ ok: false, errorType: 'INVALID_INPUT', error: 'Niepoprawne wejście lub budżet diagnozy' }) + '\n');
   process.exit(2);
 }
 
-// AbortSignal.timeout nie podtrzymuje pętli zdarzeń — bez tego zawieszone połączenie kończy proces kodem 13 bez wyjścia
-setInterval(() => {}, 60000);
+const started = now();
+const deadline = started + budget.deadline_ms;
 
 const EVENTS = fileURLToPath(new URL('../../../../../log/events.jsonl', import.meta.url));
 const FAILING_STREAK = 3;
@@ -31,28 +34,16 @@ const findings = [];
 const details = [];
 const find = (code, severity, subject, detail, extra = {}) => findings.push({ code, severity, subject, detail, ...extra });
 
-async function probe(url) {
-  try {
-    return (await fetch(url, { signal: AbortSignal.timeout(2000) })).status < 500;
-  } catch {
-    return false;
+async function checkRegistry() {
+  const listing = await registry('list', {}, remaining(deadline));
+  if (!Array.isArray(listing.processes) || listing.ok === false) {
+    return find('REGISTRY_UNAVAILABLE', 'error', 'registry', 'Brak poprawnego katalogu procesów');
   }
-}
-
-async function checkServices() {
-  for (const s of SERVICES) {
-    let up = false;
-    for (const url of s.urls) if (!up) up = await probe(url);
-    details.push(`${s.name} ${up ? '✓' : '✗ (brak odpowiedzi)'}`);
-    if (!up) find('SERVICE_DOWN', 'error', s.service, `${s.name} nie odpowiada`);
-  }
-}
-
-function checkRegistry(entries) {
-  const v = registry('verify');
-  if (v.errorType) {
-    details.push(`rejestr ✗ (${v.error})`);
-    return find('REGISTRY_UNAVAILABLE', 'error', 'registry', v.error);
+  const entries = new Map(listing.processes.map(e => [e.uri, e]));
+  const v = await registry('verify', {}, remaining(deadline));
+  if (v.errorType || !Array.isArray(v.broken) || !Number.isInteger(v.checked)) {
+    details.push('rejestr ✗ (brak poprawnego wyniku weryfikacji)');
+    return find('REGISTRY_UNAVAILABLE', 'error', 'registry', 'Weryfikacja rejestru niedostępna');
   }
   for (const uri of v.broken) {
     const e = entries.get(uri);
@@ -61,6 +52,7 @@ function checkRegistry(entries) {
   const pending = [...entries.values()].filter(e => e.status === 'candidate');
   for (const e of pending) find('CANDIDATE_PENDING', 'info', e.uri, 'Czeka na zatwierdzenie', { origin: e.origin });
   details.push(v.ok ? `rejestr: ${v.checked} procesów, bindingHash ✓${pending.length ? `, ${pending.length} czeka na zatwierdzenie` : ''}` : `rejestr ✗: zmienione pakiety: ${v.broken.join(', ')}`);
+  checkFailingProcesses(entries);
 }
 
 // Proces zawodzi, gdy jego ostatnie FAILING_STREAK wywołań skończyło się błędem wykonania (nie ok:false z logiki)
@@ -90,27 +82,33 @@ function checkFailingProcesses(entries) {
   }
 }
 
-function checkDependencies() {
-  const vault = call('proc://taskand.dev/vault/secrets/v1', { action: 'status' });
+async function checkVault() {
+  const vault = await call('proc://taskand.dev/vault/secrets/v1', { action: 'status' }, remaining(deadline));
   if (vault.ok && !vault.initialized) find('VAULT_UNINITIALIZED', 'info', 'vault', 'Brak TASKAND_VAULT_KEY — credentialRef (np. alerty Telegram) nie zadziała');
-  const browser = call('proc://taskand.dev/browser/session/v1', { action: 'status' }, 15000);
-  if (browser.ok === false) find('BROWSER_CDP_UNAVAILABLE', 'warning', 'vm-browser', browser.error);
+  else if (vault.ok !== true) find('VAULT_STATUS_UNAVAILABLE', 'warning', 'vault', 'Status magazynu poświadczeń niedostępny');
+}
+
+async function checkBrowser() {
+  const browser = await call('proc://taskand.dev/browser/session/v1', { action: 'status' }, remaining(deadline));
+  if (browser.ok !== true) find('BROWSER_CDP_UNAVAILABLE', 'warning', 'vm-browser', 'Przeglądarka nie odpowiedziała poprawnie w budżecie diagnozy');
 }
 
 // Stan siatki węzłów (peery z genome) delegowany do cluster/monitor
-function checkPeers() {
-  const c = call('proc://taskand.dev/cluster/monitor/v1', {}, 30000);
-  if (c.ok === false) return find('CLUSTER_MONITOR_FAILED', 'warning', 'cluster', c.error);
+async function checkPeers() {
+  const c = await call('proc://taskand.dev/cluster/monitor/v1', {}, remaining(deadline));
+  if (c.ok !== true || !Array.isArray(c.peers) || !Array.isArray(c.findings)) return find('CLUSTER_MONITOR_FAILED', 'warning', 'cluster', 'Brak poprawnego wyniku monitora węzłów');
   for (const f of c.findings || []) findings.push(f);
   if (c.peers?.length) details.push(c.summary);
 }
 
-const entries = new Map((registry('list').processes || []).map(e => [e.uri, e]));
-await checkServices();
-checkRegistry(entries);
-checkFailingProcesses(entries);
-checkDependencies();
-checkPeers();
+const checks = [
+  ...SERVICES.map(service => ({ name: service.service, run: () => probeService(service, deadline, budget.probe_timeout_ms) })),
+  ...[['registry', checkRegistry], ['vault', checkVault], ['browser', checkBrowser], ['peers', checkPeers]].map(([name, run]) => ({
+    name, run: async () => { await run(); return { findings: [], details: [], status: remaining(deadline) ? 'completed' : 'deadline' }; }
+  }))
+];
+const results = await runChecks(checks, budget, deadline);
+for (const result of results) { findings.push(...result.findings); details.push(...result.details); }
 
 const problems = findings.filter(f => f.severity !== 'info');
 process.stdout.write(JSON.stringify({
@@ -120,6 +118,7 @@ process.stdout.write(JSON.stringify({
   passed: details.filter(d => d.includes('✓')).length,
   details,
   findings,
+  metrics: { duration_ms: Math.round(now() - started), budget, deadline_exhausted: remaining(deadline) === 0, stages: results.map(r => ({ ...r.timing, ...(r.attempts ? { attempts: r.attempts } : {}) })) },
   summary: problems.length ? `${problems.length} problemów: ${[...new Set(problems.map(f => f.code))].join(', ')}` : 'System zdrowy',
   ts: new Date().toISOString()
 }) + '\n');

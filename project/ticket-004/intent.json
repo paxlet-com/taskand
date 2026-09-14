@@ -1,0 +1,46 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-004",
+  "summary": "Bounded diagnostic latency and adaptive recovery budgets",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-004/**", ".governance/manifest.json", "generated/doctor/diagnose/taskand.dev/v1/bin.mjs", "generated/doctor/diagnose/taskand.dev/v1/probes.mjs", "generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs", "generated/doctor/registry.json", "tests/doctor_diagnostics.test.mjs", "tests/isolated_integration.sh", "docs/analysis/diagnostic-recovery.md", "docs/README.md"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md", ".env", "vault/**"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8b4e26a36824bef650042e2e1dc69018ebc6fc6a",
+    "targetBranch": "main",
+    "outcome": "Publish bounded, measurable diagnostics and isolated recovery verification, then qualify the next local gateway/UI deployment.",
+    "nonGoals": ["Production healing or credential access", "Changing authentication or trusted publication checks", "Completing F-03 through F-11 in this diagnostic slice"],
+    "complexity": "M",
+    "estimatedMinutes": 90,
+    "budgets": {"maxImplementationFiles": 9, "maxAffectedComponents": 3, "maxPublicInterfaceChanges": 1, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Keep URI broker authorization; run read-only diagnostic stages concurrently with bounded process groups, shared deadline and explicit timing. Declare previously unowned doctor paths in the target-owned integration routing.",
+      "components": [
+        {"name": "diagnostics", "paths": ["generated/doctor/**"]},
+        {"name": "verification", "paths": ["tests/doctor_diagnostics.test.mjs", "tests/isolated_integration.sh"]},
+        {"name": "delivery-evidence", "paths": [".governance/manifest.json", "docs/analysis/diagnostic-recovery.md", "docs/README.md"]}
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Optional bounded diagnostic budget and additive timing evidence"],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Restore the previous doctor package and matching registry binding together; production runtime is a separate snapshot."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["node --test tests/doctor_diagnostics.test.mjs"], "evidence": "Regression output with timing and timeout cases"},
+      {"criterion": "AC-02", "commands": ["bash tests/isolated_integration.sh"], "evidence": "Three network-isolated runs of the unchanged 43-check integration suite"},
+      {"criterion": "AC-03", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Managed gate and recorded delivery limitations"}
+    ]
+  }
+}

@@ -77,6 +77,9 @@
       },
       "integration": {
         "ownedPaths": [
+          "generated/doctor/**",
+          "tests/doctor_diagnostics.test.mjs",
+          "tests/isolated_integration.sh",
           ".gitignore",
           "project/lease-controller.py",
           "gateway/context.py",

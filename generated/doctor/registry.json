@@ -13,13 +13,14 @@
       "credentials": [],
       "files": [
         "bin.mjs",
+        "probes.mjs",
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:2e9a2a709dc4348b04d7a39d1f07d06582269e5e3d966e1b0367d2b40dadbc20",
+      "hash": "sha256:91e2f056647083a6a73a3fb3611b27e04d27cb526543520192b71cdffb4836a3",
       "status": "active",
       "registered": "2026-09-12T19:09:04.970Z",
-      "refreshedAt": "2026-09-13T06:38:40.923Z",
+      "refreshedAt": "2026-09-14T09:48:53.621Z",
       "capability": "Diagnoza: sondy HTTP usług i integralność rejestru"
     },
     "proc://taskand.dev/doctor/prescribe/v1": {
@@ -62,5 +63,5 @@
       "registered": "2026-09-13T05:42:54.873Z"
     }
   },
-  "updated": "2026-09-13T06:38:40.925Z"
+  "updated": "2026-09-14T09:48:53.622Z"
 }
