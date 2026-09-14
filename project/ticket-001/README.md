@@ -8,6 +8,17 @@
 
 ## Goal and scope
 
+Documentation handoff 2026-09-14: the user requested a comprehensive local plan
+for parallel work by other agents in related repositories. The deliverable is
+[`external-dependencies-handoff`](../../docs/refactoring/external-dependencies-handoff.md),
+linked here for discovery. No external implementation or runtime change belongs
+to this documentation slice. The user separately approved a new one-time
+230-file migration contract on a new branch, preserving history, without
+force-push or bypassing tests/independent review. This records session consent,
+not exact-head merge approval or an increase of ticket-001's existing budgets.
+The subsequent user request explicitly authorizes publishing this documentation
+in the existing Taskand PR; failed full-history checks still prohibit merge.
+
 Recovery-only publication authorization: the user answered "kontynuuj, zgadzam sie"
 to the explicit proposal to push the full preserved snapshot to a working branch
 and draft PR despite governance failures. This is an exception for one snapshot,

@@ -42,6 +42,7 @@
     "generated/planner/registry.json",
     "tests/context_test.py",
     "docs/information/complementary-runtime.md",
+    "docs/refactoring/external-dependencies-handoff.md",
     "docs/README.md",
     "docker-compose.yaml",
     "Dockerfile",
@@ -73,7 +74,7 @@
   "delivery": {
     "acceptedBaseSha": "9f6da15c928ad6ecb89b54502d84a1d419c3f173",
     "targetBranch": "main",
-    "outcome": "Preserve and reconcile the existing complementary runtime, document actual federation/privacy/publication gaps and add a read-only instance/process dashboard with measured registry radar. The user explicitly approved one recovery-only commit, ticket-branch push and draft PR of the existing snapshot despite failed governance. This exception covers the 129 preserved pending paths and bounded authorization/documentation updates, not new implementation. Main integration, release and deployment still require full governance and independent CI gates.",
+    "outcome": "Preserve and reconcile the existing complementary runtime, document actual federation/privacy/publication gaps and add a read-only instance/process dashboard with measured registry radar. The user explicitly approved one recovery-only commit, ticket-branch push and draft PR of the existing snapshot despite failed governance. This exception covers the 129 preserved pending paths and bounded authorization/documentation updates, not new implementation. Main integration, release and deployment still require full governance and independent CI gates. Follow-up 2026-09-14 authorizes a local documentation-only dependency handoff plan. The user separately approved a new one-time migration contract for the 230 implementation files on a new branch, preserving history without force-push or bypassing tests and independent review. This documentation slice records that consent; it does not allocate or execute the successor migration, change current ticket budgets, or implement changes in other repositories.",
     "nonGoals": [
       "Unreviewed merge, release or deployment; deleting unknown worktrees",
       "Production website submissions or external network attacks",
