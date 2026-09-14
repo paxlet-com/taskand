@@ -8,10 +8,36 @@
     "priority": "P1",
     "origin": "requested"
   },
-  "allowedPaths": ["project/ticket-002/**"],
+  "allowedPaths": ["project/ticket-002/**", "app/runtime_readiness.py", "tests/runtime_readiness_test.py"],
   "forbiddenPaths": ["project/ticket-*/user-*.md"],
   "stacks": [],
   "dependsOn": ["ticket-001"],
   "conflictsWith": [],
-  "integrationTicket": null
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "557a386aaa9f8cea881c4069b681a951191f1c22",
+    "targetBranch": "main",
+    "outcome": "Publish the bounded read-only runtime readiness slice of the operational supervisor, with streaming diagnostics against an exact source SHA.",
+    "nonGoals": ["Completing the historical supervisor roadmap", "Service deployment or shared executor changes", "Reading secrets or authenticated requests", "Editing concurrent tickets or managed standards"],
+    "complexity": "S",
+    "estimatedMinutes": 45,
+    "budgets": {"maxImplementationFiles": 2, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 1, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Standard-library CLI reads one immutable Git blob and probes fixed loopback routes in bounded disposable child processes sharing a parent deadline. Reports never contain HTTP bodies or confer execution authority.",
+      "components": [{"name": "runtime-readiness", "paths": ["app/runtime_readiness.py", "tests/runtime_readiness_test.py"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Additive read-only diagnostic CLI"],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Remove the additive CLI and tests; no runtime or stored data is changed."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-09", "commands": ["python -m unittest discover -s tests -p runtime_readiness_test.py"], "evidence": "Immutable source, dirty workspace and malformed SHA tests"},
+      {"criterion": "AC-10", "commands": ["python -m unittest discover -s tests -p runtime_readiness_test.py"], "evidence": "Owned HTTP fixtures, authentication boundary and redaction tests"},
+      {"criterion": "AC-11", "commands": ["python -m unittest discover -s tests -p runtime_readiness_test.py"], "evidence": "Shared deadline, slow headers/body and streaming tests"},
+      {"criterion": "AC-12", "commands": ["./project/governance-check.sh"], "evidence": "Managed governance and read-only live observation"}
+    ]
+  }
 }
