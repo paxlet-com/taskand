@@ -30,12 +30,12 @@
   "conflictsWith": [],
   "integrationTicket": null,
   "delivery": {
-    "acceptedBaseSha": "c9fa3f47cb087122c49e70be97030ced9d88ef34",
+    "acceptedBaseSha": "2b160182ac1f6314a04e2ea63062fbd4a4739d9e",
     "targetBranch": "main",
-    "outcome": "Refactor existing documentation into concise topic documents, retaining historical entry paths and changelog links",
+    "outcome": "Publish the compact documentation refactoring through independent protected review and merge",
     "nonGoals": [
       "Runtime changes",
-      "Deploy or remote publication",
+      "Runtime deployment or DSL extension",
       "Claiming protected adoption of the unpublished docs standard"
     ],
     "complexity": "L",

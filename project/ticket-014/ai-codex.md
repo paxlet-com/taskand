@@ -1,5 +1,11 @@
 # Documentation pilot
 
+SESSION_EXECUTION_AUTHORIZATION (2026-09-14): user explicitly requested
+"kontynuuj, wypchnij, scal". Delivery now includes branch push, PR and the
+declared independent protected merge process, never self-approval.
+Rebased onto 2b160182 after confirming the upstream context-recovery change
+does not overlap the documentation scope.
+
 GOV-WORKSTREAM-003: manifest ownership excludes CHANGELOG.md from integration.
 Removed the attempted changelog addition and narrowed allowedPaths; no ownership
 policy was widened. A future publication entry belongs to governance.

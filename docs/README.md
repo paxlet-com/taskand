@@ -2,9 +2,13 @@
 
 ## Zwięzłe plany ewolucji
 
-Lokalny pilotaż kompaktowego formatu wellmanifest/docs: jeden temat na plik,
+Pilotaż kompaktowego formatu wellmanifest/docs: jeden temat na plik,
 `docs/REFACTORING/UPPER_SNAKE_CASE.md`, priorytet w metadanych. To projekty,
 nie potwierdzenie wdrożenia. Dawna ścieżka pozostaje mapą odnośników.
+
+Nowe odwołania kierować do całego pliku tematycznego. Dawne nagłówki służą
+zgodności istniejących linków. Publikacja dokumentów nie instaluje walidatora
+standardu w CI i nie stanowi odbioru opisywanej funkcjonalności.
 
 - [Wydajność i warunki wejścia](REFACTORING/PERFORMANCE_EVOLUTION.md) — pomiary, etapy E-01–E-09 i granice planu.
 - [Kontrakt runtime i pakietu](REFACTORING/RUNTIME_PACKAGE_CONTRACT.md) — repo, paczka, proces, instancja i manifest.
