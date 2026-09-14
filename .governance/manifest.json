@@ -77,6 +77,7 @@
       },
       "integration": {
         "ownedPaths": [
+          "tests/context_snapshot_test.py",
           "gateway/handlers/health.py",
           "app/runtime_readiness.py",
           "tests/runtime_readiness_test.py",
