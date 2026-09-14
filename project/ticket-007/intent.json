@@ -1,0 +1,61 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-007",
+  "summary": "Unified resumable delivery controller for Taskand",
+  "workstream": "integration",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-007/**",
+    "project/TICKETS.md",
+    "bin/taskand",
+    "operations/delivery.mjs",
+    "operations/delivery_controller.test.mjs"
+  ],
+  "forbiddenPaths": ["project/ticket-*/user-*.md", ".env", "vault/**"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "293e17af0925276b52db0eda3f91b7ce57346143",
+    "targetBranch": "main",
+    "outcome": "Expose a resumable, idempotent delivery coordinator that delegates queue, PR and protected merge effects to Koru, Goal and Validator.",
+    "nonGoals": [
+      "Reimplementing Koru, Goal or Validator",
+      "Direct GitHub merge, branch-protection, CI or production deployment changes",
+      "Reading or distributing secrets"
+    ],
+    "complexity": "S",
+    "estimatedMinutes": 60,
+    "budgets": {
+      "maxImplementationFiles": 3,
+      "maxAffectedComponents": 2,
+      "maxPublicInterfaceChanges": 1,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Use a small Node adapter with an atomic, content-addressed state record outside Git. Default mode observes Git and emits the exact delegated command plan; explicit pull-request and merge flags advance the same state machine through Koru, Goal and the protected Validator.",
+      "components": [
+        {"name": "delivery-coordinator", "paths": ["operations/delivery.mjs", "bin/taskand", ".governance/manifest.json"]},
+        {"name": "verification", "paths": ["operations/delivery_controller.test.mjs"]}
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Additive taskand deliver CLI command"],
+      "dataChanges": ["Ignored recovery state under the configured XDG state directory"],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Remove the additive CLI route and delivery adapter; ignored state can be retained for forensic recovery."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["node --test tests/delivery_controller.test.mjs"], "evidence": "Plan-only and argument-safety tests"},
+      {"criterion": "AC-02", "commands": ["node --test tests/delivery_controller.test.mjs"], "evidence": "Injected runner verifies ordered, resumable phases"},
+      {"criterion": "AC-03", "commands": ["node --test tests/delivery_controller.test.mjs"], "evidence": "Protected Validator command and fail-closed merge guards"},
+      {"criterion": "AC-04", "commands": ["./project/governance-check.sh", "node --test tests/delivery_controller.test.mjs"], "evidence": "Managed governance and focused stack checks"}
+    ]
+  }
+}

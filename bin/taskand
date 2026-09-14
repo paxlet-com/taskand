@@ -5,6 +5,7 @@ import { readFileSync, realpathSync, existsSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { deliver as runDelivery, renderDelivery } from '../operations/delivery.mjs';
 
 const ROOT = dirname(dirname(realpathSync(fileURLToPath(import.meta.url))));
 const REGISTRY = join(ROOT, 'generated/registry/core/taskand.dev/v1/bin.mjs');
@@ -171,6 +172,9 @@ const COMMANDS = {
     if (verb === 'remove' || verb === 'rm') return print(await reg('peer_remove', { url }), o => (o.ok ? `✓ peer usunięty; pozostają: ${(o.peers || []).join(', ') || '—'}` : `✗ ${o.error}`));
     print({ ok: false, error: 'Użycie: taskand peer add|remove <http://host:8077>' });
   },
+  async deliver(rawArgs) {
+    print(runDelivery(rawArgs, { root: ROOT }), renderDelivery);
+  },
   // Powołanie węzła na innym hoście: kopia plików przez SSH + docker compose + rejestracja peera.
   // OPERATORSKIE i jawne: domyślnie tylko plan (dry-run); realne działanie wymaga --run i dostępu SSH operatora.
   // Organizmy tego NIE uruchamiają — mogą jedynie zaproponować (doctor: PEER_DOWN → człowiek).
@@ -277,6 +281,7 @@ const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
   taskand peers                    lista węzłów peer (genome.yaml)
   taskand peer add|remove <url>    dopisz/usuń węzeł peer
   taskand occupy <user@host> [--run]        powołanie węzła na innym hoście (SSH+docker); domyślnie plan
+  taskand deliver --ticket ticket-NNN      plan delivery; --pull-request enables Koru + Goal, --merge requires --wait and --key-file
   taskand status                   diagnoza usług i rejestru
   taskand heal [--plan]            samonaprawa: recepty organizmów wg policy.healing, reszta dla człowieka
   taskand log [n]                  dziennik zdarzeń (CloudEvents)
