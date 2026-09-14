@@ -89,6 +89,7 @@
           "gateway/handlers/mesh.py",
           "gateway/handlers/observers.py",
           "gateway/router.py",
+          "vms/browser/**",
           "index.html",
           "generated/planner/plan/taskand.dev/v1/bin.mjs",
           "generated/planner/registry.json",

@@ -56,11 +56,21 @@ services:
     ports: ["3010:3000", "127.0.0.1:9222:9223"]
     environment:
       # CDP dla browser/session/v1 (na hoście tylko 127.0.0.1:9222)
-      - CHROME_CLI=--remote-debugging-port=9222 --user-data-dir=/config/cdp-profile
+      - CHROME_CLI=--remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --user-data-dir=/config/taskand-cdp-profile
     volumes:
       # Chromium z oknem słucha CDP tylko na loopback kontenera → forwarder 9223 → 9222
       - ./vms/browser/cdp-forward:/custom-services.d/cdp-forward:ro
+      # Usuń wyłącznie nieaktualne blokady profilu przed startem Chromium.
+      - ./vms/browser/cdp-init:/custom-cont-init.d:ro
+      # Start Chromium dopiero po gotowości socketu Wayland.
+      - ./vms/browser/labwc-autostart:/config/.config/labwc/autostart:ro
     shm_size: "2gb"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9223/json/version >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
     restart: unless-stopped
     labels:
       org.taskand.device: "vm-test"
