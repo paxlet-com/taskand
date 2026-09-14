@@ -1,0 +1,39 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-009",
+  "summary": "Reproducible local gateway and UI deployment recovery",
+  "workstream": "infrastructure",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-009/**", "infra/local-recovery/**"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "68da36bf97e668695590cd575bb80bd732704d47",
+    "targetBranch": "main",
+    "outcome": "Restore local gateway/UI from exact merged source with reversible container replacement and external evidence.",
+    "nonGoals": ["Remote publication", "Auth policy changes or secret access", "Overwriting evolved packages", "Observer activation"],
+    "complexity": "S", "estimatedMinutes": 90,
+    "budgets": {"maxImplementationFiles": 5, "maxAffectedComponents": 2, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Stage exact source outside Git, reuse existing configuration mount references, qualify synthetic candidate and retain old containers for rollback.",
+      "components": [{"name": "local-deployment", "paths": ["infra/local-recovery/**"]}],
+      "responsibilityChanges": false, "interfaceChanges": [], "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Stop candidate and restart retained original containers with unchanged state."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["python3 infra/local-recovery/deploy.py --help"], "evidence": "External artifact manifest"},
+      {"criterion": "AC-02", "commands": ["bash tests/isolated_integration.sh 3"], "evidence": "Isolated regression results"},
+      {"criterion": "AC-05", "commands": ["./project/governance-check.sh"], "evidence": "Managed governance gate"}
+    ]
+  }
+}
