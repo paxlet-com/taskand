@@ -305,6 +305,25 @@ class BrowserPilotTests(unittest.TestCase):
                         held.pop().abort()
                         self.assertEqual(page.evaluate("pendingRequests.size"), 0)
                     behavior["kind"] = "gateway"
+                    with self.subTest("late previous submission cannot replace current graph or answer"):
+                        result = page.evaluate("""async () => {
+                            const original=request;let release;
+                            try{
+                                request=async (path, body)=>{
+                                    if(path.startsWith('/api/state'))return {graph:{state:new URL(api+path).searchParams.get('requestId'),events:[],nodes:[]}};
+                                    if(path==='/api/older')return new Promise(resolve=>{release=()=>resolve({reply:'older-response'});});
+                                    return {reply:'current-response'};
+                                };
+                                const older=submit('/api/older',{});
+                                await submit('/api/current',{});
+                                const currentId=document.querySelector('#request').textContent;
+                                release();await older;
+                                return {currentId,state:document.querySelector('#state').textContent,answer:document.querySelector('#out').textContent};
+                            }finally{request=original;}
+                        }""")
+                        self.assertEqual(result["state"], result["currentId"])
+                        self.assertIn("current-response", result["answer"])
+                        self.assertNotIn("older-response", result["answer"])
                     with self.subTest("actual gateway CORS preflight permits bearer header"):
                         preflight = context.request.fetch(
                             f"http://127.0.0.1:{server.server_port}/api/chat",

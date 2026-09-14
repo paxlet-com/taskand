@@ -18,8 +18,9 @@ disjoint from ticket-003 documentation and ticket-004 diagnostics. The user-supp
 AGENTS.md section 2 permits this second disjoint implementation under the manifest's
 four-ticket limit. The older allocator rejected the workstream name alone;
 --force-new was used under that explicit permission, not to waive path checks.
-Allocation reserved ticket-006 under the clone-wide lock after fetch/prune;
-the first rejected allocation reserved ticket-005, which is not reused.
+Allocation reserved ticket-006 under the clone-wide lock after fetch/prune.
+The rejected attempt created no ticket. Independently active ticket-005 owns
+browser/CDP infrastructure, not this panel, and its work is preserved.
 The generated directory was moved once into the managed canonical relative worktree.
 
 Keep PR #4 head immutable while OneDev provisioning waits. No shared CI security

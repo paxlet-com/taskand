@@ -70,6 +70,8 @@ const $ = id => document.getElementById(id);
 const api = location.protocol + '//' + location.hostname + ':8077';
 const lines = id => $(id).value.split('\n').map(x => x.trim()).filter(Boolean);
 let sessionEpoch=0;
+let visibleRequestId=null;
+const outputRequests=new Map();
 const pendingRequests=new Set();
 const failures={
   TOKEN_REQUIRED:'Podaj token API przed wysłaniem. Żądanie nie zostało wysłane.',
@@ -128,16 +130,19 @@ function render(graph) {
 async function submit(path, body, output='out') {
   try{headers();}catch(e){$(output).textContent=e.message;$('authStatus').textContent=e.message;$('token').focus();throw e;}
   const epoch=sessionEpoch, requestId='urn:uuid:' + crypto.randomUUID(); let failed=false,pollBusy=false;
+  visibleRequestId=requestId;outputRequests.set(output,requestId);
+  const visible=()=>currentSession(epoch)&&visibleRequestId===requestId;
+  const ownsOutput=()=>currentSession(epoch)&&outputRequests.get(output)===requestId;
   $('request').textContent=requestId; $('state').textContent='Wysyłanie…';$('graph').replaceChildren();
   $(output).textContent='Oczekiwanie…';
   const poll=async()=>{
-    if(pollBusy||failed||!currentSession(epoch))return;pollBusy=true;
-    try{const result=await request('/api/state?requestId='+encodeURIComponent(requestId));if(!failed&&currentSession(epoch))render(result.graph);}
+    if(pollBusy||failed||!visible())return;pollBusy=true;
+    try{const result=await request('/api/state?requestId='+encodeURIComponent(requestId));if(!failed&&visible())render(result.graph);}
     catch{}finally{pollBusy=false;}
   };
   const timer=setInterval(poll,500);
-  try { const result=await request(path,{...body,requestId});if(!currentSession(epoch))throw failure('SESSION_CHANGED');$(output).textContent=JSON.stringify(result,null,2);return result; }
-  catch(e){failed=true;if(currentSession(epoch)){$(output).textContent='Błąd: '+e.message;$('state').textContent=e.message;}throw e;}
+  try { const result=await request(path,{...body,requestId});if(!currentSession(epoch))throw failure('SESSION_CHANGED');if(ownsOutput())$(output).textContent=JSON.stringify(result,null,2);return result; }
+  catch(e){failed=true;if(ownsOutput())$(output).textContent='Błąd: '+e.message;if(visible())$('state').textContent=e.message;throw e;}
   finally{clearInterval(timer);if(!failed&&currentSession(epoch))await poll();}
 }
 $('send').onclick=async()=>{
@@ -215,6 +220,7 @@ $('observerNext').onclick=()=>{
 };
 function resetSession(clearInputs=false){
   sessionEpoch++;
+  visibleRequestId=null;outputRequests.clear();
   for(const controller of pendingRequests)controller.abort();
   pendingRequests.clear();meshBusy=false;observerReceipt=null;
   $('meshLive').checked=false;$('observerNext').disabled=true;
