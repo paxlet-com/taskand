@@ -1,0 +1,45 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-005",
+  "summary": "CDP reliability and operational performance baseline",
+  "workstream": "integration",
+  "classification": {"kind": "BUG", "priority": "P1", "origin": "requested"},
+  "allowedPaths": [
+    "project/ticket-005/**",
+    "docker-compose.yaml",
+    ".governance/manifest.json",
+    "vms/browser/cdp-forward",
+    "vms/browser/cdp-init/**",
+    "vms/browser/labwc-autostart"
+  ],
+  "forbiddenPaths": ["project/ticket-*/user-*.md", ".env", "vault/**"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "5ba9b33e1c934509eea756ff86e9c3efceae3a29",
+    "targetBranch": "main",
+    "outcome": "Make the local browser CDP endpoint observable and measure operational latency before and after a reversible Compose deployment.",
+    "nonGoals": ["Authentication changes", "Observer collection", "Production or remote-host deployment", "Taskand planner authority changes"],
+    "complexity": "S",
+    "estimatedMinutes": 30,
+    "budgets": {"maxImplementationFiles": 5, "maxAffectedComponents": 2, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Keep the existing forwarded CDP transport, register the browser runtime paths under the integration workstream, explicitly bind Chromium to all container interfaces, wait for Wayland readiness and add a forwarded-endpoint healthcheck.",
+      "components": [{"name": "browser-runtime", "paths": ["project/ticket-005/**", ".governance/manifest.json", "docker-compose.yaml", "vms/browser/cdp-forward", "vms/browser/cdp-init/**", "vms/browser/labwc-autostart"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Restore the prior docker-compose.yaml and recreate only vm-browser."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["docker compose config", "curl http://127.0.0.1:9222/json/version"], "evidence": "External deployment audit"},
+      {"criterion": "AC-02", "commands": ["make test", "taskand status --json", "taskand proc proc://taskand.dev/hw/monitor/v1 {}"], "evidence": "External benchmark audit"},
+      {"criterion": "AC-03", "commands": ["docker compose up -d --force-recreate vm-browser"], "evidence": "External deployment audit and container state"}
+    ]
+  }
+}

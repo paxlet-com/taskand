@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+# Chromium keeps Singleton* links in the persistent profile.  A container
+# restart can leave links pointing at a PID from the previous container,
+# which makes the GUI start without enabling its CDP listener.  This init
+# hook runs before the browser service and removes only those lock links.
+set -euo pipefail
+
+profile="${TASKAND_CDP_PROFILE:-/config/taskand-cdp-profile}"
+mkdir -p "$profile"
+for lock in SingletonLock SingletonSocket SingletonCookie; do
+  rm -f -- "$profile/$lock"
+done

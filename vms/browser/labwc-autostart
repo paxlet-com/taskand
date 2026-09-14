@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Wait until the graphical session is ready before starting Chromium.
+# LinuxServer's default autostart can race labwc, leaving a GUI browser
+# without its requested CDP listener.
+set -euo pipefail
+
+runtime="${XDG_RUNTIME_DIR:-/config/.XDG}"
+socket="${runtime}/${WAYLAND_DISPLAY:-wayland-1}"
+for _ in $(seq 1 60); do
+  [ -S "$socket" ] && break
+  sleep 1
+done
+[ -S "$socket" ]
+
+exec wrapped-chromium \
+  --enable-features=UseOzonePlatform \
+  --ozone-platform=wayland \
+  ${CHROME_CLI:-}

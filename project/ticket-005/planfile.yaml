@@ -1,0 +1,45 @@
+schema: taskand.planfile/v1
+planId: taskand-cdp-performance-20260914
+ticket: ticket-005
+repository: semcod/taskand-glm53
+branch: ticket/005-cdp-performance
+acceptedBase: 5ba9b33e1c934509eea756ff86e9c3efceae3a29
+state: WAITING_FOR_INTEGRATION
+priority: P1
+kind: BUG
+summary: Make the local Chromium CDP transport reliable after container restart
+goal:
+  - expose /json/version through 127.0.0.1:9222 after a clean vm-browser restart
+  - make container readiness fail when the forwarded CDP endpoint is unavailable
+  - retain fail-closed governance and a reversible deployment
+scope:
+  allowed:
+    - docker-compose.yaml
+    - .governance/manifest.json
+    - vms/browser/cdp-init/**
+    - vms/browser/labwc-autostart
+  forbidden:
+    - .env
+    - vault/**
+    - production-or-remote-hosts
+    - authentication-and-observer-collection
+blockedBy:
+  - ticket-004
+  - reason: active sibling worktree already owns an unintegrated .governance/manifest.json change
+evidence:
+  - cdpBefore: HTTP_000_Browser_CDP_UNAVAILABLE
+  - cdpAfter: HTTP_200_Chromium_152
+  - composeHealth: healthy
+  - taskandStatus: healthy_true
+  - tests: conformance_4_of_4_contracts_30_of_30_negative_17_of_17_twins_8_of_8
+  - benchmark: warm_status_2.46_to_2.88s_chat_0.67_to_0.79s
+publication:
+  provider: github
+  issue: https://github.com/semcod/taskand-glm53/issues/6
+  pullRequest: PENDING
+  rule: issue-before-commit-and-pr
+next:
+  - integrate-or-close-ticket-004
+  - rerun-governance-and-overlap-gates
+  - commit-and-push-ticket-005
+  - open-pull-request-and-request-independent-review
