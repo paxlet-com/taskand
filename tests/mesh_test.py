@@ -1,6 +1,8 @@
 import copy
 import json
+import os
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from gateway.handlers.mesh import MeshError, handle_mesh, peer_url, projection
@@ -146,6 +148,81 @@ class MeshTests(unittest.TestCase):
         self.assertNotIn("secret-sentinel", json.dumps(responses))
 
 
+def browser_executable():
+    """Use installed Chrome, including images without a distribution launcher."""
+    for executable in ("/opt/google/chrome/chrome", "/usr/bin/google-chrome"):
+        if Path(executable).is_file() and os.access(executable, os.X_OK):
+            return executable
+    raise FileNotFoundError("Isolated browser requires an installed executable Chrome")
+
+
+class BrowserExecutableTests(unittest.TestCase):
+    def test_canonical_binary_without_distribution_launcher(self):
+        with (
+            patch.object(
+                Path,
+                "is_file",
+                autospec=True,
+                side_effect=lambda p: str(p) == "/opt/google/chrome/chrome",
+            ),
+            patch("os.access", return_value=True),
+        ):
+            self.assertEqual(browser_executable(), "/opt/google/chrome/chrome")
+
+    def test_distribution_launcher_fallback(self):
+        with (
+            patch.object(
+                Path,
+                "is_file",
+                autospec=True,
+                side_effect=lambda p: str(p) == "/usr/bin/google-chrome",
+            ),
+            patch("os.access", return_value=True),
+        ):
+            self.assertEqual(browser_executable(), "/usr/bin/google-chrome")
+
+    def test_missing_binary_is_not_success(self):
+        with (
+            patch.object(Path, "is_file", return_value=False),
+            self.assertRaises(FileNotFoundError),
+        ):
+            browser_executable()
+
+    def test_nonexecutable_binary_is_rejected(self):
+        with (
+            patch.object(Path, "is_file", return_value=True),
+            patch("os.access", return_value=False),
+            self.assertRaises(FileNotFoundError),
+        ):
+            browser_executable()
+
+    def test_missing_browser_fails_in_ci(self):
+        with (
+            patch.object(Path, "is_file", return_value=False),
+            patch.dict(os.environ, {"CI": "true"}),
+            self.assertRaisesRegex(AssertionError, "executable Chrome"),
+        ):
+            BrowserPilotTests().test_dashboard_and_observer_flow_in_isolated_browser()
+
+    def test_missing_playwright_fails_in_ci(self):
+        with (
+            patch.object(Path, "is_file", return_value=True),
+            patch("os.access", return_value=True),
+            patch("importlib.util.find_spec", return_value=None),
+            patch.dict(os.environ, {"CI": "true"}),
+            self.assertRaisesRegex(AssertionError, "requires Playwright"),
+        ):
+            BrowserPilotTests().test_dashboard_and_observer_flow_in_isolated_browser()
+
+    def test_missing_browser_is_explicit_local_skip(self):
+        with (
+            patch.object(Path, "is_file", return_value=False),
+            patch.dict(os.environ, {"CI": ""}),
+            self.assertRaisesRegex(unittest.SkipTest, "executable Chrome"),
+        ):
+            BrowserPilotTests().test_dashboard_and_observer_flow_in_isolated_browser()
+
+
 class BrowserPilotTests(unittest.TestCase):
     def test_dashboard_and_observer_flow_in_isolated_browser(self):
         import importlib.util
@@ -156,11 +233,14 @@ class BrowserPilotTests(unittest.TestCase):
         from gateway import GatewayHTTPHandler, ThreadingHTTPServer
         from gateway.context import Store
 
-        if (
-            importlib.util.find_spec("playwright") is None
-            or not Path("/usr/bin/google-chrome").exists()
-        ):
-            self.skipTest("Isolated browser dependency unavailable")
+        try:
+            executable = browser_executable()
+            if importlib.util.find_spec("playwright") is None:
+                raise FileNotFoundError("Isolated browser requires Playwright")
+        except FileNotFoundError as error:
+            if os.environ.get("CI"):
+                self.fail(str(error))
+            self.skipTest(str(error))
         from playwright.sync_api import sync_playwright
 
         root = Path(__file__).resolve().parents[1]
@@ -212,7 +292,7 @@ class BrowserPilotTests(unittest.TestCase):
             stack.callback(server.shutdown)
             with sync_playwright() as runtime:
                 browser = runtime.chromium.launch(
-                    executable_path="/usr/bin/google-chrome",
+                    executable_path=executable,
                     headless=True,
                     chromium_sandbox=True,
                 )
