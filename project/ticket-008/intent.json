@@ -1,0 +1,39 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-008",
+  "summary": "Portable pinned lease backend for isolated verification",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-008/**", "project/lease-controller.py", "project/vendor/autonom/change_lease.py", "tests/lease_runtime_test.py", ".governance/manifest.json", "docs/information/portable-lease-runtime.md", "docs/README.md"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md", ".env", "vault/**"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "293e17af0925276b52db0eda3f91b7ce57346143", "targetBranch": "main",
+    "outcome": "Publish portable, digest-bound lease loading and reproduce the real lease test in a networkless container without developer files.",
+    "nonGoals": ["Changing lease semantics or approval authority", "Editing the concurrent delivery controller or panel", "Deploying shared OneDev services or weakening browser isolation"],
+    "complexity": "M", "estimatedMinutes": 60,
+    "budgets": {"maxImplementationFiles": 6, "maxAffectedComponents": 3, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Vendor the exact already-pinned dependency, with provenance and digest. Verify and execute one immutable byte buffer; reject symbolic links. Keep the external cooperative store and adopted transition policy unchanged.",
+      "components": [{"name": "lease-runtime", "paths": ["project/lease-controller.py", "project/vendor/autonom/change_lease.py"]}, {"name": "verification", "paths": ["tests/lease_runtime_test.py"]}, {"name": "adoption", "paths": [".governance/manifest.json", "docs/information/portable-lease-runtime.md", "docs/README.md"]}],
+      "responsibilityChanges": false, "interfaceChanges": [], "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Restore the previous adapter and dependency placement; external lease state is unchanged."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["python -m unittest discover -s tests -p context_test.py"], "evidence": "Networkless unprivileged container with clean HOME and no developer mounts"},
+      {"criterion": "AC-02", "commands": ["python -m unittest discover -s tests -p lease_runtime_test.py"], "evidence": "Digest, missing-file, symlink and verified-byte regressions"},
+      {"criterion": "AC-03", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Managed scope and adopted policy checks"},
+      {"criterion": "AC-04", "commands": ["./project/governance-check.sh"], "evidence": "Protected OneDev and Validator exact-head receipts; local tests do not grant approval"}
+    ]
+  }
+}

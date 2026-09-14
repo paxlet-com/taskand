@@ -9,10 +9,12 @@ import hashlib
 import importlib.util
 import json
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
-BACKEND = Path('/home/tom/.local/share/subactor/autonom-lease-keepalive/releases/4e7f1aa4e230de22281366c34a117df6afc3de16/autonom/change_lease.py')
+# ADOPT only: the unmodified backend remains owned by subactor/autonom.
+BACKEND_REVISION = '4e7f1aa4e230de22281366c34a117df6afc3de16'
+BACKEND = Path(__file__).absolute().parent / 'vendor/autonom/change_lease.py'
 BACKEND_SHA = '013c82127cb2d398e83479d82fd2d1008773cae08d322d391a6616427b614a37'
 ALLOWED_ACTIONS = {'begin-edit', 'begin-validation', 'heartbeat', 'cancel'}
 
@@ -21,24 +23,41 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def module(name, path):
+def module(name, path, source=None):
     spec = importlib.util.spec_from_file_location(name, path)
     result = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(result)
+    if source is None:
+        spec.loader.exec_module(result)
+    else:
+        # Import loaders reread source or a .pyc; execute only checked bytes.
+        exec(compile(source, str(path), 'exec'), result.__dict__)
     return result
 
 
+def runtime_bytes(path, label):
+    path = path.absolute()
+    if any(part.is_symlink() for part in (path, *path.parents)):
+        raise ValueError('LEASE_' + label + '_SYMLINK')
+    try:
+        return path.read_bytes()
+    except OSError as error:
+        raise ValueError('LEASE_' + label + '_UNAVAILABLE') from error
+
+
 def runtimes(root):
-    if hashlib.sha256(BACKEND.read_bytes()).hexdigest() != BACKEND_SHA:
+    backend_source = runtime_bytes(BACKEND, 'BACKEND')
+    if hashlib.sha256(backend_source).hexdigest() != BACKEND_SHA:
         raise ValueError('LEASE_BACKEND_DIGEST_MISMATCH')
     policy = root / '.governance/change_lease_check.py'
-    lock = json.loads((root / '.governance/manifest.lock.json').read_text())
+    lock = json.loads(runtime_bytes(root / '.governance/manifest.lock.json', 'POLICY_LOCK'))
     expected = lock['managedFiles']['.governance/change_lease_check.py']
     if isinstance(expected, dict):
         expected = expected.get('sha256')
-    if hashlib.sha256(policy.read_bytes()).hexdigest() != expected:
+    policy_source = runtime_bytes(policy, 'POLICY')
+    if hashlib.sha256(policy_source).hexdigest() != expected:
         raise ValueError('LEASE_POLICY_DIGEST_MISMATCH')
-    return module('taskand_lease_backend', BACKEND), module('taskand_lease_policy', policy)
+    return (module('taskand_lease_backend', BACKEND, backend_source),
+            module('taskand_lease_policy', policy, policy_source))
 
 
 def transition(store, policy, request, intent):
