@@ -8,6 +8,7 @@ at most four disposable probe processes sharing one deadline.
 """
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import http.client
 import json
@@ -19,6 +20,7 @@ import re
 import socket
 import subprocess
 import time
+import uuid
 
 SHA = re.compile(r"[0-9a-f]{40}")
 BODY_LIMIT = 2 * 1024 * 1024
@@ -102,6 +104,8 @@ def probe_all(gateway_port, ui_port, timeout=3.0, emit=None):
     active, processes, results = {}, [], {}
 
     def record(result):
+        result["endpoint"] = {"host": "127.0.0.1", "path": ROUTES[result["probe"]],
+                              "port": ui_port if result["probe"] == "panel" else gateway_port}
         results[result["probe"]] = result
         if emit:
             emit({"schema": "taskand.runtime-readiness-event/v1", "grantsAuthority": False, **result})
@@ -195,9 +199,13 @@ def main(argv=None):
     parser.add_argument("--stream", action="store_true", help="Emit completed probes as JSONL before the final report")
     args = parser.parse_args(argv)
     start = time.monotonic()
+    observation = {"observationId": uuid.uuid4().hex,
+                   "observedAt": datetime.now(timezone.utc).isoformat(),
+                   "probeDeadlineSeconds": args.timeout if math.isfinite(args.timeout) else None}
     try:
         source = source_identity(args.repo, args.expected_sha)
-        emit = (lambda event: print(json.dumps(event), flush=True)) if args.stream else None
+        emit = (lambda event: print(json.dumps({**event, **observation, "sourceSha": source["sha"]}),
+                                    flush=True)) if args.stream else None
         probes = probe_all(args.gateway_port, args.ui_port, args.timeout, emit)
         report = assess(source, probes)
     except (ValueError, OSError, subprocess.SubprocessError) as error:
@@ -206,6 +214,7 @@ def main(argv=None):
             "READINESS_SOURCE_OR_RUNTIME_UNAVAILABLE")
         report = {"schema": "taskand.runtime-readiness/v1", "grantsAuthority": False,
                   "runtimeVerified": False, "preflightPassed": False, "findings": [{"code": code}]}
+    report.update(observation)
     report["durationMs"] = round((time.monotonic() - start) * 1000)
     print(json.dumps(report, indent=None if args.stream else 2), flush=True)
     return 0 if report["preflightPassed"] else 1

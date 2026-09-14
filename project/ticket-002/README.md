@@ -37,6 +37,13 @@ missing gateway SHA, context and mesh 404. This is an observed readiness failure
 not a failed unit test and not authorization to deploy. Independent PR acceptance
 is still required; keep this implementation ticket IN_PROGRESS / PUBLICATION.
 
+Report-binding follow-up: the same 12 cases pass in 6.330 s with assertions for
+the exact loopback endpoint, observation ID/time, source SHA and probe deadline.
+The first protected CI run passed the new tests within 62 Python tests, but the
+aggregate failed the existing Chromium namespace case and two WWW cases. No
+test was skipped or waived. PR #10 carries this slice; CI and review must bind
+the latest head, not the earlier successful local checks.
+
 ### Preserved supervisor roadmap (outside this publication slice)
 
 The following historical proposal and AC-01..AC-08 remain future work. They do

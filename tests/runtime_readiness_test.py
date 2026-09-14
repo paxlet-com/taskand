@@ -89,6 +89,9 @@ class ReadinessTests(unittest.TestCase):
         self.assertEqual({path for path, _ in requests}, set(readiness.ROUTES.values()))
         self.assertTrue(all(auth is None for _, auth in requests))
         self.assertNotIn("private response", json.dumps(report))
+        for probe in report["probes"]:
+            self.assertEqual(probe["endpoint"], {"host": "127.0.0.1", "port": port,
+                                                 "path": readiness.ROUTES[probe["probe"]]})
 
     def test_old_runtime_has_explicit_findings_without_bodies(self):
         fixture = routes()
@@ -222,6 +225,11 @@ class SourceTests(unittest.TestCase):
         self.assertTrue(all(not line["grantsAuthority"] for line in lines))
         self.assertFalse(lines[-1]["runtimeVerified"])
         self.assertTrue(lines[-1]["preflightPassed"])
+        self.assertEqual(len({line["observationId"] for line in lines}), 1)
+        self.assertTrue(all(line["observedAt"] == lines[-1]["observedAt"] for line in lines))
+        self.assertTrue(all(line["sourceSha"] == self.sha for line in lines[:-1]))
+        self.assertTrue(all(line["endpoint"]["port"] == port for line in lines[:-1]))
+        self.assertEqual(lines[-1]["probeDeadlineSeconds"], 3.0)
 
 
 if __name__ == "__main__":
