@@ -1,0 +1,34 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-015",
+  "summary": "Resolve the installed Chrome binary in the mesh browser pilot",
+  "workstream": "application",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-015/**", "tests/mesh_test.py"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "c9fa3f47cb087122c49e70be97030ced9d88ef34",
+    "targetBranch": "main",
+    "outcome": "Publish portable isolated mesh browser coverage without changing the protected executor or weakening its sandbox.",
+    "nonGoals": ["Shared CI policy changes", "Production browser access", "Sandbox bypass", "Changes to snapshot ticket-011"],
+    "complexity": "XS", "estimatedMinutes": 10,
+    "budgets": {"maxImplementationFiles": 1, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted", "decision": "Resolve known installed Chrome executables deterministically inside the test; preserve existing real browser coverage and sandbox flag.",
+      "components": [{"name": "browser-verification", "paths": ["tests/mesh_test.py"]}],
+      "responsibilityChanges": false, "interfaceChanges": [], "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Revert the isolated test change; no running service or data is changed."
+    },
+    "runtimeDependencies": [],
+    "validation": [{"criterion":"AC-02","commands":["python3 -m unittest discover -s tests -p mesh_test.py"],"evidence":"Resolver regression and real isolated browser results"},{"criterion":"AC-03","commands":["./project/governance-check.sh","git diff --check"],"evidence":"Managed and protected publication checks"}]
+  }
+}
