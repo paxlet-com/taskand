@@ -1,18 +1,9 @@
 #!/usr/bin/env node
 // proc://taskand.dev/validator/resolve/v1
-// Deterministyczny walidator grafu, uprawnień i resolver URI z proc-catalog.json
+// Deterministyczny walidator grafu, sekretów i URI (przez registry/core)
 
-import { readFileSync, existsSync } from "node:fs";
-import { createHash } from "node:crypto";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve, join } from "node:path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-let ROOT = "/taskand";
-if (!existsSync("/taskand/generated")) {
-  ROOT = resolve(__dirname, "../../../../..");
-}
+import { readFileSync } from "node:fs";
+import { registry } from "./registry-client.mjs";
 
 let input = {};
 try {
@@ -25,6 +16,7 @@ try {
 const blueprint = input.blueprint || input;
 if (!blueprint || !Array.isArray(blueprint.steps)) {
   process.stdout.write(JSON.stringify({
+    ok: false,
     valid: false,
     status: "REJECTED",
     errors: ["Brak sekcji steps w blueprint"]
@@ -122,26 +114,24 @@ for (const s of steps) {
   }
 }
 
-// 5. Rozwiązanie procesów URI przez proc-catalog.json (BUG 7 & BUG 12)
-let catalog = { processes: [] };
-try {
-  const catPath = join(ROOT, "proc-catalog.json");
-  if (existsSync(catPath)) {
-    catalog = JSON.parse(readFileSync(catPath, "utf8"));
-  }
-} catch (e) {
-  errors.push(`Nie można załadować proc-catalog.json: ${e.message}`);
-}
-
-const catalogMap = new Map();
-(catalog.processes || []).forEach(p => {
-  catalogMap.set(p.uri, p);
-});
-
+// 5. Rozwiązanie procesów URI przez rejestr (status active + bindingHash weryfikuje registry/core)
 const resolvedSteps = [];
+const activeCatalog = registry('list', { status: 'active' });
 for (const s of steps) {
   const stepCopy = { ...s };
   if (s.process && s.process.startsWith("spawn:")) {
+    const match = /^spawn:(?:([a-z0-9-]+)\/)?([a-z0-9-]+)$/.exec(s.process);
+    const candidates = match ? (activeCatalog.processes || []).filter(p =>
+      p.uri.match(/^proc:\/\/taskand\.dev\/[^/]+\/([^/]+)\/v\d+$/)?.[1] === match[2] && (!match[1] || p.organism === match[1])) : [];
+    const owners = [...new Set(candidates.map(p => p.organism))];
+    if (owners.length === 1) {
+      const reused = registry('select', { organism: owners[0], capability: match[2] });
+      if (reused.ok) {
+        resolvedSteps.push({ ...stepCopy, process: reused.uri, hash: reused.entry.hash, kind: reused.entry.kind, reused: true });
+        continue;
+      }
+      errors.push(`Krok "${s.name}": istniejący proces nie przeszedł weryfikacji: ${reused.error}`);
+    }
     unresolvedCapabilities.push({
       stepId: s.id,
       name: s.name,
@@ -149,32 +139,12 @@ for (const s of steps) {
       description: s.description
     });
   } else if (s.process) {
-    const entry = catalogMap.get(s.process);
-    if (!entry) {
-      errors.push(`Krok "${s.name}": Proces URI nieznany w proc-catalog.json: ${s.process}`);
+    const res = registry("resolve", { uri: s.process });
+    if (!res.ok) {
+      errors.push(`Krok "${s.name}": ${res.errorType === "NOT_FOUND" ? "Proces URI nieznany w rejestrze" : "Proces odrzucony przez rejestr"}: ${res.error}`);
     } else {
-      const fullPath = join(ROOT, entry.path);
-      if (!existsSync(fullPath)) {
-        errors.push(`Krok "${s.name}": Plik wykonywalny nie istnieje na dysku: ${entry.path}`);
-      } else {
-        stepCopy.resolvedPath = entry.path;
-        stepCopy.kind = entry.kind || "task";
-        stepCopy.release = entry.release || "1.0.0";
-        stepCopy.bindingHash = entry.bindingHash || null;
-
-        // Weryfikacja integralności bindingHash (jeśli zdefiniowany)
-        if (entry.bindingHash && entry.bindingHash.startsWith("sha256:")) {
-          try {
-            const expected = entry.bindingHash.replace("sha256:", "");
-            const actual = createHash("sha256").update(readFileSync(fullPath)).digest("hex");
-            if (expected !== actual) {
-              errors.push(`Krok "${s.name}": Naruszenie integralności bindingHash dla ${entry.path} (oczekiwano ${expected.slice(0, 8)}..., otrzymano ${actual.slice(0, 8)}...)`);
-            }
-          } catch (hashErr) {
-            errors.push(`Krok "${s.name}": Błąd obliczania sumy kontrolnej: ${hashErr.message}`);
-          }
-        }
-      }
+      stepCopy.kind = res.entry.kind || "task";
+      stepCopy.hash = res.entry.hash;
     }
   } else {
     errors.push(`Krok "${s.name}" nie definiuje procesu (pole process)`);
@@ -204,6 +174,7 @@ const status = !isValid
     : "APPROVED";
 
 const response = {
+  ok: isValid,
   valid: isValid,
   status,
   errors: errors.length > 0 ? errors : undefined,

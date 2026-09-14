@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/file/ops/v1
+organism: file
+kind: task
+origin: builtin
+desc: "Operacje tylko do odczytu na plikach węzła: list, stat, read, exists"

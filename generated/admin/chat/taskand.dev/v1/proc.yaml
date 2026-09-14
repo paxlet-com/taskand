@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/admin/chat/v1
+organism: admin
+kind: interface
+origin: builtin
+desc: "Interfejs konwersacyjny organizmu admin (deleguje do dev/act)"

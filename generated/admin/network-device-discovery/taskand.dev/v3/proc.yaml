@@ -1,0 +1,7 @@
+uri: proc://taskand.dev/admin/network-device-discovery/v3
+organism: admin
+kind: task
+origin: evolved
+desc: "Pakiet skanuje sieć lokalną (ARP, ping sweep, mDNS/SSDP, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem OUI, z odpornym scalaniem wyników (brak regresji)."
+capability: "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI."
+supersedes: proc://taskand.dev/admin/network-device-discovery/v1

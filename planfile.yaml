@@ -1,0 +1,604 @@
+name: Code Quality Improvement
+project_name: ''
+project_type: prefactoring
+domain: dev-tools
+goal: Improve code quality using prefact
+goals:
+- Fix all prefact-detected issues
+- Improve code maintainability
+- Ensure consistent code style
+quality_gates:
+- metric: Prefact Issues
+  threshold: '0'
+sprints:
+- id: sprint-1
+  name: Code Quality Improvements
+  duration: 2 weeks
+  objectives:
+  - Fix code quality issues
+  task_patterns:
+  - id: ticket-417670b9
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in gateway/handlers/doctor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/doctor.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-76552210
+    name: Fix import-optimization issues
+    description: Resolve 2 import-optimization issues in gateway/handlers/doctor.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/doctor.py
+    rule_id: import-optimization
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7010d414
+    name: Fix magic-numbers issues
+    description: Resolve 13 magic-numbers issues in gateway/handlers/chat.py
+    task_type: prefactor
+    priority: high
+    estimate: 3d
+    files:
+    - gateway/handlers/chat.py
+    rule_id: magic-numbers
+    count: 13
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c2d1f9ec
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway/handlers/chat.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/chat.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-3ddf3ca9
+    name: Fix ast-unused-imports issues
+    description: Resolve 3 ast-unused-imports issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ast-unused-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2ab2b50e
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fab23633
+    name: Fix ast-print-statements issues
+    description: Resolve 2 ast-print-statements issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ast-print-statements
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-40d562ae
+    name: Fix ast-missing-return-type issues
+    description: Resolve 1 ast-missing-return-type issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ast-missing-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7f6ea4f4
+    name: Fix ruff-unused-imports issues
+    description: Resolve 1 ruff-unused-imports issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ruff-unused-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d4819018
+    name: Fix ruff-print-statements issues
+    description: Resolve 2 ruff-print-statements issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ruff-print-statements
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-44fcda40
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-54ee205b
+    name: Fix smart-return-type issues
+    description: Resolve 1 smart-return-type issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: smart-return-type
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c466783d
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b6809962
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1add9241
+    name: Fix import-optimization issues
+    description: Resolve 2 import-optimization issues in gateway/__init__.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/__init__.py
+    rule_id: import-optimization
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7e1263c1
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in gateway/auth.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/auth.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2aa4579b
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in gateway/auth.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/auth.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8ab98003
+    name: Fix magic-numbers issues
+    description: Resolve 2 magic-numbers issues in gateway/handlers/federation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/federation.py
+    rule_id: magic-numbers
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d226c4f3
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway/handlers/federation.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/federation.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-2efeb2a7
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in gateway/handlers/health.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/health.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-290da211
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in gateway/handlers/orchestrator.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - gateway/handlers/orchestrator.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-1badb2db
+    name: Fix import-optimization issues
+    description: Resolve 4 import-optimization issues in gateway/handlers/orchestrator.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - gateway/handlers/orchestrator.py
+    rule_id: import-optimization
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-061ba0bc
+    name: Fix magic-numbers issues
+    description: Resolve 3 magic-numbers issues in gateway/handlers/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/planner.py
+    rule_id: magic-numbers
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-b7f61a9d
+    name: Fix import-optimization issues
+    description: Resolve 3 import-optimization issues in gateway/handlers/planner.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/planner.py
+    rule_id: import-optimization
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-86d125c4
+    name: Fix magic-numbers issues
+    description: Resolve 10 magic-numbers issues in gateway/handlers/proc.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - gateway/handlers/proc.py
+    rule_id: magic-numbers
+    count: 10
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-09ede8fd
+    name: Fix import-optimization issues
+    description: Resolve 3 import-optimization issues in gateway/handlers/proc.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/proc.py
+    rule_id: import-optimization
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-5324b0c6
+    name: Fix ast-string-concat issues
+    description: Resolve 1 ast-string-concat issues in gateway/middleware/logging.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/middleware/logging.py
+    rule_id: ast-string-concat
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-47fe35f0
+    name: Fix string-concat-fstring issues
+    description: Resolve 2 string-concat-fstring issues in gateway/middleware/logging.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/middleware/logging.py
+    rule_id: string-concat-fstring
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9ef37d2b
+    name: Fix string-formatting issues
+    description: Resolve 1 string-formatting issues in gateway/middleware/logging.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/middleware/logging.py
+    rule_id: string-formatting
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0008c9ce
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway/middleware/logging.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/middleware/logging.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-f5e57079
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in gateway/router.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/router.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-d97ef4f8
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in gateway/router.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/router.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-0a8ab495
+    name: Fix magic-numbers issues
+    description: Resolve 1 magic-numbers issues in gateway/router.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/router.py
+    rule_id: magic-numbers
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-9c6b01be
+    name: Fix import-optimization issues
+    description: Resolve 8 import-optimization issues in gateway/router.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - gateway/router.py
+    rule_id: import-optimization
+    count: 8
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-08ca7f50
+    name: Fix ast-unused-imports issues
+    description: Resolve 3 ast-unused-imports issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: ast-unused-imports
+    count: 3
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-c88d6e99
+    name: Fix ast-sorted-imports issues
+    description: Resolve 1 ast-sorted-imports issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: ast-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-e4e2e719
+    name: Fix ruff-unused-imports issues
+    description: Resolve 1 ruff-unused-imports issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: ruff-unused-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-fbbe0c7d
+    name: Fix ruff-sorted-imports issues
+    description: Resolve 1 ruff-sorted-imports issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: ruff-sorted-imports
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-eed5a986
+    name: Fix unused-imports issues
+    description: Resolve 2 unused-imports issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: unused-imports
+    count: 2
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-7e73e316
+    name: Fix ai-boilerplate issues
+    description: Resolve 1 ai-boilerplate issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: ai-boilerplate
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-4d088f66
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-dc5ab9ab
+    name: Fix string-concat-fstring issues
+    description: Resolve 4 string-concat-fstring issues in gateway/utils.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - gateway/utils.py
+    rule_id: string-concat-fstring
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-970d9128
+    name: Fix magic-numbers issues
+    description: Resolve 4 magic-numbers issues in gateway/auth.py
+    task_type: prefactor
+    priority: medium
+    estimate: 2d
+    files:
+    - gateway/auth.py
+    rule_id: magic-numbers
+    count: 4
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-38e0e0d7
+    name: Fix magic-numbers issues
+    description: Resolve 7 magic-numbers issues in gateway/utils.py
+    task_type: prefactor
+    priority: high
+    estimate: 2d
+    files:
+    - gateway/utils.py
+    rule_id: magic-numbers
+    count: 7
+    model_hints:
+      planning: balanced
+      implementation: balanced
+  - id: ticket-8bb69b3f
+    name: Fix import-optimization issues
+    description: Resolve 1 import-optimization issues in gateway/handlers/health.py
+    task_type: prefactor
+    priority: medium
+    estimate: 1d
+    files:
+    - gateway/handlers/health.py
+    rule_id: import-optimization
+    count: 1
+    model_hints:
+      planning: balanced
+      implementation: balanced

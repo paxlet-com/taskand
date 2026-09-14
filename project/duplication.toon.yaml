@@ -1,0 +1,89 @@
+# redup/duplication | 5 groups | 96f 5598L | 2026-09-13
+
+SUMMARY:
+  files_scanned: 96
+  total_lines:   5598
+  dup_groups:    5
+  actionable:    5
+  review:        0
+  generated:     0
+  actionable_L:  206
+  review_L:      0
+  generated_L:   0
+  dup_fragments: 24
+  saved_lines:   206
+  scan_ms:       787
+
+HOTSPOTS[7] (files with most duplication):
+  generated/admin/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/cluster/monitor/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/act/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/codegen/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/composite/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/dev/evolve/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+
+DUPLICATES[5] (ranked by impact):
+  [0e718323cab5c7af] !! EXAC  registry  L=14 N=14 saved=182 sim=1.00
+      generated/admin/chat/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/cluster/monitor/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/act/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/chat/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/codegen/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/composite/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/evolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/dev/spawn/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/doctor/heal/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/doctor/prescribe/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/orchestrator/execute/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/planner/plan/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+      generated/validator/resolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
+  [cfe7db247084402d]   EXAC  arrow_function  L=4 N=4 saved=12 sim=1.00
+      generated/dev/act/taskand.dev/v1/bin.mjs:19-22  (arrow_function)
+      generated/dev/codegen/taskand.dev/v1/bin.mjs:16-19  (arrow_function)
+      generated/dev/evolve/taskand.dev/v1/bin.mjs:22-25  (arrow_function)
+      generated/dev/spawn/taskand.dev/v1/bin.mjs:18-21  (arrow_function)
+  [7f7e2d64ce928e6c]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
+      generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:37-40  (arrow_function)
+      generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:17-20  (arrow_function)
+  [7c0aeed798d564b9]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
+      generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs:14-17  (arrow_function)
+      generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs:14-17  (arrow_function)
+  [831e87a319dbea5b]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
+      generated/dev/file-router/taskand.dev/v1/bin.mjs:13-16  (arrow_function)
+      generated/dev/llm/taskand.dev/v1/bin.mjs:14-17  (arrow_function)
+
+REFACTOR[5] (ranked by priority):
+  [1] ○ extract_function   → generated/utils/registry.py
+      WHY: 14 occurrences of 14-line block across 14 files — saves 182 lines
+      FILES: generated/admin/chat/taskand.dev/v1/registry-client.mjs, generated/cluster/monitor/taskand.dev/v1/registry-client.mjs, generated/dev/act/taskand.dev/v1/registry-client.mjs, generated/dev/chat/taskand.dev/v1/registry-client.mjs, generated/dev/codegen/taskand.dev/v1/registry-client.mjs +9 more
+  [2] ○ extract_function   → generated/dev/utils/arrow_function.py
+      WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
+      FILES: generated/dev/act/taskand.dev/v1/bin.mjs, generated/dev/codegen/taskand.dev/v1/bin.mjs, generated/dev/evolve/taskand.dev/v1/bin.mjs, generated/dev/spawn/taskand.dev/v1/bin.mjs
+  [3] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v2/utils/arrow_function.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs, generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs
+  [4] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v3/utils/arrow_function.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs, generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs
+  [5] ○ extract_function   → generated/dev/utils/arrow_function.py
+      WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
+      FILES: generated/dev/file-router/taskand.dev/v1/bin.mjs, generated/dev/llm/taskand.dev/v1/bin.mjs
+
+QUICK_WINS[2] (low risk, high savings — do first):
+  [1] extract_function   saved=182L  → generated/utils/registry.py
+      FILES: registry-client.mjs, registry-client.mjs, registry-client.mjs +11
+  [2] extract_function   saved=12L  → generated/dev/utils/arrow_function.py
+      FILES: bin.mjs, bin.mjs, bin.mjs +1
+
+EFFORT_ESTIMATE (total ≈ 6.9h):
+  hard   registry                            saved=182L  ~364min
+  easy   arrow_function                      saved=12L  ~24min
+  easy   arrow_function                      saved=4L  ~8min
+  easy   arrow_function                      saved=4L  ~8min
+  easy   arrow_function                      saved=4L  ~8min
+
+METRICS-TARGET:
+  dup_groups:  5 → 0
+  saved_lines: 206 lines recoverable

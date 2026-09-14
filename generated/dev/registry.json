@@ -1,0 +1,165 @@
+{
+  "organism": "dev",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/dev/act/v1": {
+      "uri": "proc://taskand.dev/dev/act/v1",
+      "organism": "dev",
+      "path": "generated/dev/act/taskand.dev/v1",
+      "desc": "Wykonuje zadanie: wybiera aktywny proces z rejestru lub ewoluuje nowy",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:1982eadcab94e90f9d230e548620783f73b08e71eb4cbc6ffef6f99ea62180cc",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.960Z",
+      "capability": "Wykonuje zadanie: wybiera aktywny proces z rejestru lub ewoluuje nowy",
+      "refreshedAt": "2026-09-13T07:06:47.263Z"
+    },
+    "proc://taskand.dev/dev/chat/v1": {
+      "uri": "proc://taskand.dev/dev/chat/v1",
+      "organism": "dev",
+      "path": "generated/dev/chat/taskand.dev/v1",
+      "desc": "Jedyne wejście konwersacyjne: organizm/intencja → proces przez rejestr",
+      "kind": "interface",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "dispatch.mjs",
+        "intent.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:34215a2414fa92aab908eb4681b3d7324867322fb274af94d25b96cb01f467db",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.961Z",
+      "capability": "Jedyne wejście konwersacyjne: organizm/intencja → proces przez rejestr",
+      "refreshedAt": "2026-09-13T07:28:34.946Z"
+    },
+    "proc://taskand.dev/dev/codegen/v1": {
+      "uri": "proc://taskand.dev/dev/codegen/v1",
+      "organism": "dev",
+      "path": "generated/dev/codegen/taskand.dev/v1",
+      "desc": "Generuje kod pakietu przez LLM (bez zapisu na dysk)",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:d91b4874e4a877d1fce8b6d3183e20dbee727e1acd80617c36751939943dd9cc",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.962Z"
+    },
+    "proc://taskand.dev/dev/composite/v1": {
+      "uri": "proc://taskand.dev/dev/composite/v1",
+      "organism": "dev",
+      "path": "generated/dev/composite/taskand.dev/v1",
+      "desc": "Zadania złożone: planner → validator → evolve → orchestrator",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:521487f45ba3d207ee422b0c9e1ae57d47fb0d7f1c8ab91a55c17722c1cfd7de",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.963Z"
+    },
+    "proc://taskand.dev/dev/file-router/v1": {
+      "uri": "proc://taskand.dev/dev/file-router/v1",
+      "organism": "dev",
+      "path": "generated/dev/file-router/taskand.dev/v1",
+      "desc": "Pytania o pliki: istnienie i rozmiar ścieżki z promptu",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:6a2c372f73b3f93c00cf2772ec73121db85a4851bbbf38663a45104c0eb25065",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.965Z"
+    },
+    "proc://taskand.dev/dev/llm/v1": {
+      "uri": "proc://taskand.dev/dev/llm/v1",
+      "organism": "dev",
+      "path": "generated/dev/llm/taskand.dev/v1",
+      "desc": "Jedyny klient LLM (Z.ai/OpenAI-compatible), tryb tekst/JSON",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [
+        "TASKAND_LLM_API_KEY",
+        "TASKAND_LLM_MODEL",
+        "TASKAND_LLM_ENDPOINT",
+        "TASKAND_LLM_REASONING"
+      ],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:687d075f1d4e2975256c4880ce4f60ebb8da8fa25caae8b668a351a94fd7d29f",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.967Z",
+      "refreshedAt": "2026-09-12T19:27:54.202Z"
+    },
+    "proc://taskand.dev/dev/spawn/v1": {
+      "uri": "proc://taskand.dev/dev/spawn/v1",
+      "organism": "dev",
+      "path": "generated/dev/spawn/taskand.dev/v1",
+      "desc": "Powołuje organizm: pakiet <org>/chat + rejestracja",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:b2375fe3fd2388e09fe92db722ca9c540881697c5afd34552eb07a870822f920",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.969Z"
+    },
+    "proc://taskand.dev/dev/evolve/v1": {
+      "uri": "proc://taskand.dev/dev/evolve/v1",
+      "organism": "dev",
+      "path": "generated/dev/evolve/taskand.dev/v1",
+      "desc": "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "contract.mjs",
+        "gate.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:07bd3e73d853d07ee9d19734a0f423007bf3026b68fd5cea417d34be38af0eba",
+      "status": "active",
+      "registered": "2026-09-12T19:09:43.331Z",
+      "refreshedAt": "2026-09-13T06:52:46.329Z",
+      "capability": "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)"
+    }
+  },
+  "updated": "2026-09-13T07:28:34.946Z"
+}

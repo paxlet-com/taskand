@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/registry/core/v1
+organism: registry
+kind: service
+origin: builtin
+desc: "Rejestr węzła: wywołania przez URI (broker env/sekretów), cykl życia pakietów, wymiana rejestrów z peerami"

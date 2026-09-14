@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/evolve/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)"

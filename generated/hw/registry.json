@@ -1,0 +1,24 @@
+{
+  "organism": "hw",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/hw/monitor/v1": {
+      "uri": "proc://taskand.dev/hw/monitor/v1",
+      "organism": "hw",
+      "path": "generated/hw/monitor/taskand.dev/v1",
+      "desc": "Telemetria sprzętu: temperatury czujników, obciążenie CPU, dysk, GPIO",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:df671b2d3478ce02f1de7ca404120688332951d2d245f758d164f786064d4c5b",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.973Z"
+    }
+  },
+  "updated": "2026-09-12T19:09:04.973Z"
+}

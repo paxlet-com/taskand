@@ -1,10 +1,10 @@
 import os
 import sys
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from gateway.router import dispatch
 from gateway.middleware.cors import add_cors_headers
-from gateway.utils import GENERATED
+from gateway.auth import bind_address, is_loopback_bind
 
 class GatewayHTTPHandler(BaseHTTPRequestHandler):
     def _send(self, code: int, body: dict) -> None:
@@ -40,8 +40,11 @@ class GatewayHTTPHandler(BaseHTTPRequestHandler):
 
 def main() -> None:
     port = int(os.environ.get("PORT", 8077))
-    print(f"Taskand v2.2 Modular Gateway listening on 0.0.0.0:{port} (active processes: {len(list(GENERATED.rglob('bin.mjs')))})")
-    server = HTTPServer(("0.0.0.0", port), GatewayHTTPHandler)
+    bind = bind_address()
+    print(f"Taskand Gateway listening on {bind}:{port}")
+    if not is_loopback_bind():
+        print("UWAGA: bind poza loopback — domyślne tokeny z grants.yaml są odrzucane; ustaw własne tokeny.")
+    server = ThreadingHTTPServer((bind, port), GatewayHTTPHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

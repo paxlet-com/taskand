@@ -1,0 +1,6 @@
+uri: proc://taskand.dev/browser/session/v1
+organism: browser
+kind: task
+origin: builtin
+desc: "Sterowanie przeglądarką digital twin przez CDP: status, open, list, close"
+env: [TASKAND_BROWSER_CDP, TASKAND_BROWSER_NOVNC]

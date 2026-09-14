@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/act/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Wykonuje zadanie: wybiera aktywny proces z rejestru lub ewoluuje nowy"

@@ -1,0 +1,66 @@
+{
+  "organism": "doctor",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/doctor/diagnose/v1": {
+      "uri": "proc://taskand.dev/doctor/diagnose/v1",
+      "organism": "doctor",
+      "path": "generated/doctor/diagnose/taskand.dev/v1",
+      "desc": "Diagnoza: sondy HTTP usług i integralność rejestru",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:2e9a2a709dc4348b04d7a39d1f07d06582269e5e3d966e1b0367d2b40dadbc20",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.970Z",
+      "refreshedAt": "2026-09-13T06:38:40.923Z",
+      "capability": "Diagnoza: sondy HTTP usług i integralność rejestru"
+    },
+    "proc://taskand.dev/doctor/prescribe/v1": {
+      "uri": "proc://taskand.dev/doctor/prescribe/v1",
+      "organism": "doctor",
+      "path": "generated/doctor/prescribe/taskand.dev/v1",
+      "desc": "Recepty naprawcze wyliczane z bieżącej diagnozy",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:4b743fc34f579ae7e347c517631456884e93cf30802c6079fcbf2069132c6151",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.970Z",
+      "capability": "Recepty naprawcze wyliczane z bieżącej diagnozy",
+      "refreshedAt": "2026-09-13T06:38:40.925Z"
+    },
+    "proc://taskand.dev/doctor/heal/v1": {
+      "uri": "proc://taskand.dev/doctor/heal/v1",
+      "organism": "doctor",
+      "path": "generated/doctor/heal/taskand.dev/v1",
+      "desc": "Samonaprawa: wykonuje recepty organizmów (kwarantanna, ponowna ewolucja) wg policy.healing; resztę zwraca człowiekowi",
+      "capability": "Samonaprawa: wykonuje recepty organizmów (kwarantanna, ponowna ewolucja) wg policy.healing; resztę zwraca człowiekowi",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:07a34a366b1fa736157149ec339cf6f88f800bf4d170f1b167e69bbc6837e8e4",
+      "status": "active",
+      "registered": "2026-09-13T05:42:54.873Z"
+    }
+  },
+  "updated": "2026-09-13T06:38:40.925Z"
+}

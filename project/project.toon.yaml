@@ -1,0 +1,52 @@
+# glm53 | 733 func | 79f | 6313L | javascript | 2026-09-13
+# generated in 0.09s
+
+HEALTH:
+  CC̄=3.3  critical=35 (limit:10)  dup=0  cycles=0
+
+ALERTS[20]:
+  !!! cc_exceeded      scan = 30 (limit:15)
+  !!! cc_exceeded      mergeDevices = 25 (limit:15)
+  !!! high_fan_out     scan = 20 (limit:10)
+  !!  cc_exceeded      readArp = 20 (limit:15)
+  !!  high_fan_out     probeMdns = 19 (limit:10)
+  !!  high_fan_out     probeMdns = 19 (limit:10)
+  !!  high_fan_out     mdnsProbe = 18 (limit:10)
+  !!  high_fan_out     call = 18 (limit:10)
+  !!  high_fan_out     updateRegistry = 17 (limit:10)
+  !!  high_fan_out     sleep = 16 (limit:10)
+
+MODULES[134] (top by size):
+  M[planfile.yaml] 591L C:0 F:0 CC↑0 D:0 (yaml)
+  M[generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs] 292L C:0 F:61 CC↑20 D:0 (javascript)
+  M[generated/validator/resolve/taskand.dev/v1/bin.mjs] 178L C:0 F:17 CC↑7 D:0 (javascript)
+  M[generated/orchestrator/execute/taskand.dev/v1/bin.mjs] 168L C:0 F:17 CC↑7 D:0 (javascript)
+  M[generated/registry/core/taskand.dev/v1/store.mjs] 166L C:0 F:39 CC↑7 D:0 (javascript)
+  M[generated/dev/registry.json] 163L C:0 F:0 CC↑0 D:0 (json)
+  M[generated/planner/plan/taskand.dev/v1/bin.mjs] 148L C:0 F:9 CC↑8 D:0 (javascript)
+  M[gateway/auth.py] 142L C:0 F:7 CC↑14 D:7 (python)
+  M[generated/doctor/diagnose/taskand.dev/v1/bin.mjs] 126L C:0 F:24 CC↑13 D:0 (javascript)
+  M[generated/registry/core/taskand.dev/v1/lifecycle.mjs] 121L C:0 F:25 CC↑16 D:0 (javascript)
+  M[generated/hw/monitor/taskand.dev/v1/bin.mjs] 112L C:0 F:24 CC↑4 D:0 (javascript)
+  M[generated/doctor/heal/taskand.dev/v1/bin.mjs] 101L C:0 F:20 CC↑11 D:0 (javascript)
+  M[generated/dev/composite/taskand.dev/v1/bin.mjs] 101L C:0 F:17 CC↑10 D:0 (javascript)
+  M[generated/admin/registry.json] 101L C:0 F:0 CC↑0 D:0 (json)
+  M[generated/registry/core/taskand.dev/v1/exec.mjs] 94L C:0 F:22 CC↑13 D:0 (javascript)
+  LANGS: javascript:66/yaml:36/json:15/python:13/other:3/shell:1
+
+HOTSPOTS[10]:
+  ★ scan fan=20  // Orchestrates 20 calls
+  ★ probeMdns fan=19  // Orchestrates 19 calls
+  ★ probeMdns fan=19  // Orchestrates 19 calls
+  ★ mdnsProbe fan=18  // Orchestrates 18 calls
+  ★ call fan=18  // Orchestrates 18 calls
+
+REFACTOR[13]:
+  [1] H/L Split scan (CC=30)
+  [2] H/L Split mergeDevices (CC=25)
+  [3] H/H Split god module planfile.yaml (591L, 0 classes)
+  [4] M/L Split listLocalNetworks (CC=15)
+  [5] M/L Split readArp (CC=20)
+
+EVOLUTION:
+  2026-09-13 CC̄=3.3 crit=35 6313L // Automated analysis

@@ -1,5 +1,6 @@
+SHELL := /bin/bash
 # taskand v2.0 Makefile — Minimalny, auto-mnożący się system
-.PHONY: all up down status test gateway bootstrap clean
+.PHONY: all up down status test conformance test-contracts test-negative test-twin test-web-twin twin-example web-twin-example integration catalog gateway bootstrap clean
 
 all: test
 
@@ -13,25 +14,35 @@ status:
 	docker compose ps
 	@./bin/taskand status
 
-test: test-contracts test-negative
+test: conformance test-contracts test-negative test-twin test-web-twin
+
+test-web-twin:
+	@node --test tests/web_twin.test.mjs
+
+web-twin-example:
+	@node examples/web-twin-task.mjs
+
+test-twin:
+	@node --test tests/digital_twin.test.mjs
+
+twin-example:
+	@node examples/network-scan-task.mjs
+
+conformance:
+	@node tests/conformance.mjs
 
 test-contracts:
-	@echo "=== Weryfikacja kontraktów procesów taskand v2.2 (fail-closed) ==="
-	@passed=0; total=0; \
-	for bin in $$(find generated -name "bin.mjs" | sort); do \
-		total=$$((total + 1)); \
-		if echo '{}' | node "$$bin" >/dev/null 2>&1; then \
-			echo "  $$bin: PASS ✓"; \
-			passed=$$((passed + 1)); \
-		else \
-			echo "  $$bin: FAIL ✗"; \
-			fi \
-	done; \
-	echo "Wynik kontraktów: $$passed/$$total PASS ✓"; \
-	[ "$$passed" -eq "$$total" ]
+	@node tests/contract_tests.mjs
 
 test-negative:
 	@node tests/negative_tests.mjs
+
+integration:
+	@node tests/integration_test.mjs
+
+# Po ręcznej zmianie pakietu wbudowanego (origin: builtin) — przelicza bindingHash w rejestrach organizmów
+catalog:
+	@node generated/registry/core/taskand.dev/v1/bin.mjs <<< '{"action":"refresh"}'
 
 bootstrap:
 	docker compose run --rm bootstrap

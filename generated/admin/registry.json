@@ -1,0 +1,121 @@
+{
+  "organism": "admin",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/admin/network-device-discovery/v1": {
+      "uri": "proc://taskand.dev/admin/network-device-discovery/v1",
+      "organism": "admin",
+      "path": "generated/admin/network-device-discovery/taskand.dev/v1",
+      "desc": "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI.",
+      "kind": "task",
+      "origin": "evolved",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "test.mjs"
+      ],
+      "hash": "sha256:0920e0963226c4e62c4c72b8419ba27a98fcbe6c55edb2f540a34c2412640419",
+      "status": "deprecated",
+      "registered": "2026-09-12T19:09:04.950Z",
+      "deprecatedAt": "2026-09-13T05:52:00.955Z"
+    },
+    "proc://taskand.dev/admin/chat/v1": {
+      "uri": "proc://taskand.dev/admin/chat/v1",
+      "organism": "admin",
+      "path": "generated/admin/chat/taskand.dev/v1",
+      "desc": "Interfejs konwersacyjny organizmu admin (deleguje do dev/act)",
+      "kind": "interface",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:6c4ac839bcd5efedaf826c7d3cc55eaa785e28fa00643c2f0d5d7f463b87b3d7",
+      "status": "active",
+      "registered": "2026-09-12T19:09:54.867Z"
+    },
+    "proc://taskand.dev/admin/network-device-discovery/v2": {
+      "uri": "proc://taskand.dev/admin/network-device-discovery/v2",
+      "organism": "admin",
+      "path": "generated/admin/network-device-discovery/taskand.dev/v2",
+      "desc": "Pakiet wykrywa urządzenia w sieciach lokalnych przez tabelę ARP, sondy mDNS/SSDP, skan TCP wybranych portów, reverse DNS i bazę OUI, pomijając sieci dockerowe.",
+      "kind": "task",
+      "origin": "evolved",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "merge.mjs",
+        "networks.mjs",
+        "probe-arp.mjs",
+        "probe-dns.mjs",
+        "probe-mdns.mjs",
+        "probe-ssdp.mjs",
+        "probe-tcp.mjs",
+        "proc.yaml",
+        "stdin.mjs",
+        "test.mjs",
+        "vendor.mjs"
+      ],
+      "hash": "sha256:de71044c6e5fcd5ae91f53c0cbe8b3f90abd57865e7757bb9709192466d1fa1a",
+      "status": "deprecated",
+      "registered": "2026-09-12T19:24:03.606Z",
+      "deprecatedAt": "2026-09-12T19:24:49.765Z"
+    },
+    "proc://taskand.dev/admin/network-device-discovery/v3": {
+      "uri": "proc://taskand.dev/admin/network-device-discovery/v3",
+      "organism": "admin",
+      "path": "generated/admin/network-device-discovery/taskand.dev/v3",
+      "desc": "Pakiet skanuje sieć lokalną (ARP, ping sweep, mDNS/SSDP, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem OUI, z odpornym scalaniem wyników (brak regresji).",
+      "capability": "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI.",
+      "kind": "task",
+      "origin": "evolved",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "exec.mjs",
+        "merge.mjs",
+        "network.mjs",
+        "oui.mjs",
+        "probe-arp.mjs",
+        "probe-dns.mjs",
+        "probe-mdns.mjs",
+        "probe-ping.mjs",
+        "probe-ssdp.mjs",
+        "proc.yaml",
+        "stdin.mjs",
+        "test.mjs"
+      ],
+      "hash": "sha256:8de90487775c5389ca5b8ff399b8fab213a7ca8860b7e07468ede59eeb0eea1f",
+      "status": "active",
+      "registered": "2026-09-13T05:52:00.890Z"
+    },
+    "proc://taskand.dev/admin/network-device-discovery/v4": {
+      "uri": "proc://taskand.dev/admin/network-device-discovery/v4",
+      "organism": "admin",
+      "path": "generated/admin/network-device-discovery/taskand.dev/v4",
+      "desc": "Inwentaryzacja wszystkich interfejsów, podsieci i zakresów IPv4/IPv6; ograniczony skan LAN przez nmap. mode: inventory|scan, scope: lan|all. Bez parametrów: instrukcja.",
+      "capability": "network-device-discovery",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "address.mjs",
+        "bin.mjs",
+        "inventory.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:b58e007e79ce26397b76ca5d9ea2713896c13b68e8f327976365fc1b3a9f5b59",
+      "status": "active",
+      "registered": "2026-09-13T07:02:41.315Z"
+    }
+  },
+  "updated": "2026-09-13T07:02:41.317Z"
+}

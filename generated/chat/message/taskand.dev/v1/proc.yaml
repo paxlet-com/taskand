@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/chat/message/v1
+organism: chat
+kind: task
+origin: builtin
+desc: "Publiczny punkt wiadomości (guest): potwierdza przyjęcie, nie wykonuje zadań"

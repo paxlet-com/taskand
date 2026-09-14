@@ -1,0 +1,27 @@
+{
+  "organism": "alert",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/alert/telegram/v1": {
+      "uri": "proc://taskand.dev/alert/telegram/v1",
+      "organism": "alert",
+      "path": "generated/alert/telegram/taskand.dev/v1",
+      "desc": "Alert CPU na Telegram przez Bot API (token z vault przez credentialRef)",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [
+        "vault://telegram/*"
+      ],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:d48015842f64303e273a8a29175bff8deb2562641c8efc645bd8df966f30ebf3",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.954Z",
+      "refreshedAt": "2026-09-12T19:27:54.197Z"
+    }
+  },
+  "updated": "2026-09-12T19:27:54.197Z"
+}

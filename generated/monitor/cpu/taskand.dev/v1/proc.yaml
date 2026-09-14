@@ -1,6 +1,5 @@
 uri: proc://taskand.dev/monitor/cpu/v1
-interface:
-  stdin: { device?: string, mock_cpu?: number }
-  stdout: { ok: boolean, metric: string, cpu_pct: number, device: string }
-  exit: { 0: ok, 1: fail-closed, 2: kontrakt }
-runtimes: [{ kind: node, bin: bin.mjs }]
+organism: monitor
+kind: task
+origin: builtin
+desc: "Bieżące obciążenie CPU (próbka 500 ms)"

@@ -1,207 +1,277 @@
-#!/bin/sh
-# taskand v2.0 — uniwersalne CLI
-GATEWAY="${TASKAND_GATEWAY:-http://localhost:8077}"
+#!/usr/bin/env node
+// taskand — CLI. Transport: gateway (gdy /healthz odpowiada) albo lokalnie registry/core. Flaga --json: surowa odpowiedź.
+import { spawnSync, execFileSync } from 'node:child_process';
+import { readFileSync, realpathSync, existsSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-# Resolve symlink to real directory
-REAL_SCRIPT="$(readlink -f "$0" 2>/dev/null || realpath "$0" 2>/dev/null || echo "$0")"
-DIR="$(cd "$(dirname "$REAL_SCRIPT")/.." && pwd)"
+const ROOT = dirname(dirname(realpathSync(fileURLToPath(import.meta.url))));
+const REGISTRY = join(ROOT, 'generated/registry/core/taskand.dev/v1/bin.mjs');
+const GATEWAY = process.env.TASKAND_GATEWAY || 'http://127.0.0.1:8077';
+const argv = process.argv.slice(2);
+const asJson = argv.includes('--json');
+const [cmd, ...args] = argv.filter(a => a !== '--json');
 
-# Load .env if present
-if [ -f "$DIR/.env" ]; then
-  while IFS='=' read -r key val || [ -n "$key" ]; do
-    case "$key" in
-      \#*|"") continue ;;
-      *)
-        key=$(echo "$key" | tr -d ' \t')
-        val=$(echo "$val" | tr -d '\r')
-        if [ -n "$key" ] && [ -z "$(eval "echo \${$key:-}")" ]; then
-          export "$key=$val"
-        fi
-        ;;
-    esac
-  done < "$DIR/.env"
-fi
+function loadEnv() {
+  const file = join(ROOT, '.env');
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
+  }
+}
+loadEnv();
+const TOKEN = process.env.TASKAND_AUTH_TOKEN || 'taskand-admin-key';
 
-is_gateway_up() {
-  curl -s --connect-timeout 1 "$GATEWAY/healthz" >/dev/null 2>&1
+async function gatewayUp() {
+  try {
+    return (await fetch(`${GATEWAY}/healthz`, { signal: AbortSignal.timeout(1000) })).ok;
+  } catch {
+    return false;
+  }
 }
 
-case "$1" in
-  dev|developer|doc|doctor|sec|vault|chat|browser|file|hw)
-    ORG=$(case "$1" in
-      dev|developer) echo dev;;
-      doc|doctor) echo doc;;
-      sec|vault) echo sec;;
-      chat) echo chat;;
-      browser) echo browser;;
-      file) echo file;;
-      hw) echo hw;;
-    esac)
-    shift
-    PROMPT="$*"
-    if [ -z "$PROMPT" ]; then
-      case "$ORG" in
-        dev) PROMPT="cześć, co potrafisz?";;
-        doc) PROMPT="sprawdź czy wszystko działa";;
-        sec) PROMPT="status";;
-        browser) PROMPT="status";;
-        file) PROMPT="pokaż pliki";;
-        hw) PROMPT="stan sprzętu";;
-        *) PROMPT="status";;
-      esac
-    fi
+async function post(path, body) {
+  const r = await fetch(`${GATEWAY}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+    body: JSON.stringify(body)
+  });
+  return r.json();
+}
 
-    if is_gateway_up; then
-      RESP=$(curl -s -X POST "$GATEWAY/api/chat" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
-        -d "{\"message\": \"$PROMPT\", \"organism\": \"$ORG\"}")
-      REPLY=$(echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply',''))" 2>/dev/null)
-      if [ -n "$REPLY" ]; then
-        echo "$REPLY"
-      else
-        echo "$RESP"
-      fi
-    else
-      # Direct standalone execution via Node/Python with loaded .env
-      case "$ORG" in
-        dev)
-          if [ -f "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" ]; then
-            RESP=$(node "$DIR/generated/dev/chat/taskand.dev/v1/bin.mjs" <<JSON
-{"message": "$PROMPT"}
-JSON
-)
-            echo "$RESP" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('reply', ''))" 2>/dev/null || echo "$RESP"
-          else
-            node "$DIR/generated/developer/spawn/taskand.dev/v1/bin.mjs" <<JSON
-{"organism": "$PROMPT"}
-JSON
-          fi
-          ;;
-        doc)
-          node "$DIR/generated/doctor/diagnose/taskand.dev/v1/bin.mjs" <<JSON
-{}
-JSON
-          ;;
-        sec)
-          node "$DIR/generated/vault/secrets/taskand.dev/v1/bin.mjs" <<JSON
-{"action": "status"}
-JSON
-          ;;
-        browser)
-          node "$DIR/generated/browser/session/taskand.dev/v1/bin.mjs" <<JSON
-{"action": "open", "url": "$PROMPT"}
-JSON
-          ;;
-        file)
-          node "$DIR/generated/file/ops/taskand.dev/v1/bin.mjs" <<JSON
-{"op": "list"}
-JSON
-          ;;
-        hw)
-          node "$DIR/generated/hw/monitor/taskand.dev/v1/bin.mjs" <<JSON
-{}
-JSON
-          ;;
-        *)
-          node "$DIR/generated/chat/message/taskand.dev/v1/bin.mjs" <<JSON
-{"message": "$PROMPT"}
-JSON
-          ;;
-      esac
-    fi
-    ;;
+function local(action, payload) {
+  const r = spawnSync('node', [REGISTRY], { input: JSON.stringify({ action, ...payload }), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  try {
+    return JSON.parse(r.stdout);
+  } catch {
+    return { ok: false, error: r.stderr || 'registry/core: brak odpowiedzi' };
+  }
+}
 
-  proc)
-    URI="$2"
-    DATA="$3"
-    if [ -z "$DATA" ]; then DATA="{}"; fi
-    if is_gateway_up; then
-      curl -s -X POST "$GATEWAY/api/proc/call" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer ${TASKAND_AUTH_TOKEN:-taskand-admin-key}" \
-        -d "{\"uri\":\"$URI\",\"data\":$DATA}"
-      echo ""
-    else
-      CLEAN=$(echo "$URI" | sed 's|proc://taskand.dev/||')
-      DIRNAME=$(dirname "$CLEAN")
-      VER=$(basename "$CLEAN")
-      FOUND=$(find "$DIR/generated" -path "*/$DIRNAME/*/$VER/bin.mjs" -o -path "*/$CLEAN/bin.mjs" | head -n 1)
-      if [ -n "$FOUND" ] && [ -f "$FOUND" ]; then
-        echo "$DATA" | node "$FOUND"
-      else
-        echo "{\"error\": \"URI not found: $URI\"}"
-      fi
-    fi
-    ;;
+// Akcja rejestru: przez gateway (z autoryzacją) lub lokalnie
+async function reg(action, payload = {}) {
+  if (!(await gatewayUp())) return local(action, payload);
+  if (action === 'call') return (await post('/api/proc/call', { uri: payload.uri, data: payload.input, timeout: 900 })).result;
+  const r = await post('/api/registry', { action, ...payload });
+  return r.result || r;
+}
 
-  status|health)
-    if is_gateway_up; then
-      curl -s "$GATEWAY/healthz" | python3 -m json.tool
-    else
-      echo "=== taskand v2.0 (standalone) ==="
-      PROCS=$(find "$DIR/generated" -name "bin.mjs" | wc -l)
-      echo "Procesy: $PROCS w generated/"
-      echo "Gateway ($GATEWAY): OFFLINE (uruchom: make up lub make gateway)"
-      if [ -n "$TASKAND_LLM_API_KEY" ]; then
-        echo "LLM: Skonfigurowany (GLM-5.3) ✓"
-      else
-        echo "LLM: Brak klucza w .env (tryb szablonów fallback)"
-      fi
-    fi
-    ;;
+async function chat(organism, message) {
+  if (await gatewayUp()) return post('/api/chat', { message, organism });
+  return local('call', { uri: 'proc://taskand.dev/dev/chat/v1', input: { message, organism }, timeout_ms: 900000 });
+}
 
-  fed|federation)
-    if is_gateway_up; then
-      curl -s "$GATEWAY/api/federation" | python3 -m json.tool
-    else
-      echo "=== taskand v2.0 procesy w federacji ==="
-      for p in $(find "$DIR/generated" -name "bin.mjs" | sort); do
-        REL=$(echo "$p" | sed "s|$DIR/generated/||" | sed "s|/taskand.dev||" | sed "s|/bin.mjs||")
-        echo "proc://taskand.dev/$REL"
-      done
-    fi
-    ;;
+const print = (out, human) => {
+  console.log(asJson || !human ? JSON.stringify(out, null, 2) : human(out));
+  process.exitCode = out?.ok === false ? 1 : 0;
+};
 
-  boot)
-    shift
-    HOST="$1"
-    if [ -z "$HOST" ]; then
-      echo "Użycie: taskand boot <user@host>"
-      exit 1
-    fi
-    echo "╔═══════════════════════════════════════════════╗"
-    echo "║  taskand v2.0 — cross-bootstrap spawn         ║"
-    echo "╚═══════════════════════════════════════════════╝"
-    echo "[boot] Powołuję węzeł taskand na $HOST..."
-    echo "[boot] Kopiuję 5 plików bazowych (Dockerfile, compose, .env, genome, bin)..."
-    echo "[boot] ✓ Węzeł $HOST powołany pomyślnie w sieci mesh."
-    ;;
+// ── Powoływanie węzłów (occupy): replikacja operatorska przez SSH, nigdy autonomiczna ──
+// Manifest = jedno źródło prawdy o plikach węzła; @secret pomijane bez --with-secrets.
+function readManifest(withSecrets) {
+  const paths = [];
+  for (const line of readFileSync(join(ROOT, 'bin/bootstrap.manifest'), 'utf8').split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) continue;
+    if (t.startsWith('@secret ')) { if (withSecrets) paths.push(t.slice(8).trim()); }
+    else paths.push(t);
+  }
+  return paths;
+}
 
-  log)
-    LINES="${2:-20}"
-    LOG_FILE="$DIR/log/events.jsonl"
-    if [ -f "$LOG_FILE" ]; then
-      tail -n "$LINES" "$LOG_FILE"
-    else
-      echo "Brak zdarzeń w $LOG_FILE."
-    fi
-    ;;
+// Prawdopodobny adres LAN mastera (pomija mosty docker/libvirt) — podpowiedź do handshake; nadpisywalny --master
+function localLanIp() {
+  try {
+    const ips = execFileSync('hostname', ['-I'], { encoding: 'utf8' }).trim().split(/\s+/);
+    const bridge = /^(172\.(1[6-9]|2\d|3[01])\.|192\.168\.(122|144|192|208|240)\.|10\.(42|64|201|240|250)\.)/;
+    return ips.find(ip => /^\d+\.\d+\.\d+\.\d+$/.test(ip) && !bridge.test(ip)) || ips[0] || 'MASTER_IP';
+  } catch { return 'MASTER_IP'; }
+}
 
-  *)
-    echo "taskand v2.0 — Minimalny, auto-mnożący się system"
-    echo ""
-    echo "Użycie:"
-    echo "  taskand dev \"<prompt>\"     rozmowa z developerem (ewolucja/LLM)"
-    echo "  taskand doc \"<prompt>\"     rozmowa ze strażnikiem zdrowia (doctor)"
-    echo "  taskand sec \"<prompt>\"     zarządzanie sejfem i sekretami (vault)"
-    echo "  taskand browser \"<prompt>\" sterowanie przeglądarką noVNC"
-    echo "  taskand file \"<prompt>\"    operacje na plikach na węźle"
-    echo "  taskand hw \"<prompt>\"      telemetria sprzętu i GPIO"
-    echo "  taskand proc <uri> [json]  bezpośrednie wywołanie procesu proc://"
-    echo "  taskand status             stan systemu i usług"
-    echo "  taskand fed                lista procesów w federacji"
-    echo "  taskand boot <host>        cross-device bootstrap na zdalnym węźle"
-    echo "  taskand log [n]            podgląd dziennika zdarzeń"
-    ;;
-esac
+async function waitHealthz(url, ms = 45000) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < ms) {
+    try {
+      const r = await fetch(`${url}/healthz`, { signal: AbortSignal.timeout(2000) });
+      if (r.ok) return await r.json();
+    } catch { /* jeszcze nie wstał */ }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  return null;
+}
+
+const COMMANDS = {
+  // Twin needs the operator host's network inventory and user namespaces.
+  // Explicit local transport also avoids mistaking a container's network for the host.
+  async twin([action = 'run', id]) {
+    if (action === 'web') {
+      const input = /^https?:\/\//.test(id || '')
+        ? { action: 'run', urls: [id], steps: [{ action: 'goto', url: id }, { action: 'assert', selector: 'body', visible: true }] }
+        : JSON.parse(readFileSync(id, 'utf8'));
+      return print(local('call', { uri: 'proc://taskand.dev/twin/web/v1', input, timeout_ms: 330000 }));
+    }
+    print(local('call', { uri: 'proc://taskand.dev/twin/environment/v1',
+      input: { action, ...(action === 'status' ? { id } : { taskId: id, scan: { scope: 'lan' } }) }, timeout_ms: 180000 }));
+  },
+  async proc([uri, data = '{}']) {
+    print(await reg('call', { uri, input: JSON.parse(data) }));
+  },
+  async status() {
+    const up = await gatewayUp();
+    const d = await reg('call', { uri: 'proc://taskand.dev/doctor/diagnose/v1', input: {} });
+    print(d, o => [`gateway: ${up ? GATEWAY : 'OFFLINE (tryb lokalny)'}`, ...(o.details || [o.error])].join('\n'));
+  },
+  async procs([organism]) {
+    print(await reg('list', { organism }), o => (o.processes || []).map(p => `${p.status.padEnd(10)} ${p.uri}  ${p.desc}`).join('\n') || o.error);
+  },
+  async approve([uri]) {
+    print(await reg('approve', { uri }), o => (o.ok ? `✓ ${uri} → active` : `✗ ${o.error}`));
+  },
+  async deprecate([uri]) {
+    print(await reg('deprecate', { uri }), o => (o.ok ? `✓ ${uri} → deprecated` : `✗ ${o.error}`));
+  },
+  async verify() {
+    print(await reg('verify'), o => (o.ok ? `✓ ${o.checked} pakietów zgodnych z bindingHash` : `✗ zmienione: ${(o.broken || []).join(', ') || o.error}`));
+  },
+  async pull([peer, token]) {
+    print(await reg('pull', { peer, token }), o => (o.ok ? [`${o.remoteNode}: ${o.offered} oferowanych, ${o.imported} zaimportowanych (candidate)`, ...o.report.filter(r => r.result !== 'same').map(r => `  ${r.result} ${r.uri} ${r.reason || ''}`)].join('\n') : `✗ ${o.error}`));
+  },
+  async heal([flag]) {
+    const out = await reg('call', { uri: 'proc://taskand.dev/doctor/heal/v1', input: { run: flag !== '--plan' } });
+    print(out, o => o.reply || `✗ ${o.error}`);
+  },
+  async peers() {
+    print(await reg('peers'), o => (o.peers?.length ? o.peers.map(p => `  ${p}`).join('\n') : 'Brak peerów (genome.yaml: peers).'));
+  },
+  async peer([verb, url]) {
+    if (verb === 'add') return print(await reg('peer_add', { url }), o => (o.ok ? `✓ peer: ${(o.peers || []).join(', ')}` : `✗ ${o.error}`));
+    if (verb === 'remove' || verb === 'rm') return print(await reg('peer_remove', { url }), o => (o.ok ? `✓ peer usunięty; pozostają: ${(o.peers || []).join(', ') || '—'}` : `✗ ${o.error}`));
+    print({ ok: false, error: 'Użycie: taskand peer add|remove <http://host:8077>' });
+  },
+  // Powołanie węzła na innym hoście: kopia plików przez SSH + docker compose + rejestracja peera.
+  // OPERATORSKIE i jawne: domyślnie tylko plan (dry-run); realne działanie wymaga --run i dostępu SSH operatora.
+  // Organizmy tego NIE uruchamiają — mogą jedynie zaproponować (doctor: PEER_DOWN → człowiek).
+  async occupy(rawArgs) {
+    const o = { run: false, withSecrets: false, dir: '/opt/taskand', master: null, token: null, port: 8077 };
+    const pos = [];
+    for (let i = 0; i < rawArgs.length; i++) {
+      const a = rawArgs[i];
+      if (a === '--run') o.run = true;
+      else if (a === '--dry-run') o.run = false;
+      else if (a === '--with-secrets') o.withSecrets = true;
+      else if (a === '--dir') o.dir = rawArgs[++i];
+      else if (a === '--master') o.master = rawArgs[++i];
+      else if (a === '--token') o.token = rawArgs[++i];
+      else if (a === '--port') o.port = Number(rawArgs[++i]) || 8077;
+      else pos.push(a);
+    }
+    const m = (pos[0] || '').match(/^(?:([\w.-]+)@)?([\w.-]+)(?::(\d+))?$/);
+    if (!m) return print({ ok: false, error: 'Użycie: taskand occupy <user@host[:ssh_port]> [--dir /opt/taskand] [--with-secrets] [--master http://ip:8077] [--token TOKEN] [--run]' });
+    const [, user, host, sshPort] = m;
+    const dest = user ? `${user}@${host}` : host;
+    const sshOpts = sshPort ? ['-p', sshPort] : [];
+    const rsyncSsh = sshPort ? `ssh -p ${sshPort}` : 'ssh';
+    const files = readManifest(o.withSecrets);
+    const master = o.master || `http://${localLanIp()}:${o.port}`;
+    const nodeUrl = `http://${host}:${o.port}`;
+    const vaultKey = randomBytes(32).toString('hex');
+    const envContent = `TASKAND_LLM_API_KEY=\nTASKAND_LLM_MODEL=glm-5.3\nTASKAND_BIND=0.0.0.0\nTASKAND_VAULT_KEY=${vaultKey}\n`;
+
+    const plan = [
+      { label: `Preflight: docker na ${host}`, argv: ['ssh', ...sshOpts, dest, 'docker --version && docker compose version'] },
+      { label: `Katalog ${o.dir}`, argv: ['ssh', ...sshOpts, dest, `mkdir -p ${o.dir}`] },
+      { label: `Kopiuj ${files.length} ścieżek → ${dest}:${o.dir}/`, argv: ['rsync', '-az', '--exclude=__pycache__', '--exclude=*.pyc', '-e', rsyncSsh, ...files, `${dest}:${o.dir}/`], cwd: ROOT },
+      ...(o.withSecrets ? [] : [{ label: 'Zapisz świeży .env (bind 0.0.0.0, nowy klucz sejfu; klucz LLM pusty → szablony)', argv: ['ssh', ...sshOpts, dest, `cat > ${o.dir}/.env`], input: envContent, secret: true }]),
+      { label: 'Start: docker compose up -d --build', argv: ['ssh', ...sshOpts, dest, `cd ${o.dir} && docker compose up -d --build`] }
+    ];
+    const post = [
+      `czekaj na ${nodeUrl}/healthz`,
+      `taskand peer add ${nodeUrl}   (master monitoruje nowy węzeł)`,
+      o.token
+        ? `ssh ${dest} 'cd ${o.dir} && node bin/taskand pull ${master} ${o.token}'   (nowy węzeł pobiera pakiety mastera jako candidate)`
+        : `handshake pominięty — podaj --token <token-mastera z grants.yaml>, by nowy węzeł pobrał pakiety mastera`
+    ];
+
+    if (!o.run) {
+      const show = s => (s.secret ? `${s.argv.slice(0, -1).join(' ')} '…' <<'.env'` : s.argv.map(x => (/\s/.test(x) ? `'${x}'` : x)).join(' '));
+      return print(
+        { ok: true, mode: 'dry-run', target: dest, node: nodeUrl, dir: o.dir, files, secrets: o.withSecrets, master, handshake: !!o.token, plan: plan.map(show), post },
+        () => [
+          `PLAN (dry-run) — powołanie węzła ${dest} → ${nodeUrl}`,
+          `  pliki (${files.length}): ${files.join(', ')}${o.withSecrets ? '  [+sekrety]' : '  (bez .env/vault — federacja i tak wymaga własnych tokenów)'}`,
+          '',
+          ...plan.map((s, i) => `  ${i + 1}. ${s.label}\n     $ ${show(s)}`),
+          '  ── po starcie ──',
+          ...post.map((p, i) => `  ${plan.length + i + 1}. ${p}`),
+          '',
+          'To jest operacja operatorska (SSH). Uruchom realnie:  taskand occupy ' + pos[0] + ' --run' + (o.token ? '' : ' --token <token>')
+        ].join('\n')
+      );
+    }
+
+    const report = [];
+    for (const s of plan) {
+      try {
+        const out = execFileSync(s.argv[0], s.argv.slice(1), { cwd: s.cwd, input: s.input, encoding: 'utf8', stdio: s.input ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'pipe', 'pipe'], timeout: 600000 });
+        report.push({ step: s.label, ok: true, out: (out || '').trim().slice(0, 200) });
+      } catch (err) {
+        report.push({ step: s.label, ok: false, error: (err.stderr || err.message || '').toString().trim().slice(0, 400) });
+        return print({ ok: false, error: `Krok nieudany: ${s.label}`, report }, r => [...r.report.map(x => `${x.ok ? '✓' : '✗'} ${x.step}${x.ok ? '' : `\n   ${x.error}`}`), `\n✗ Przerwano na: ${s.label}`].join('\n'));
+      }
+    }
+    const health = await waitHealthz(nodeUrl);
+    report.push({ step: 'healthz', ok: !!health, out: health ? `node=${health.node} procesy=${health.processes}` : 'brak odpowiedzi w 45 s' });
+    const added = await reg('peer_add', { url: nodeUrl });
+    report.push({ step: 'peer_add', ok: added.ok, out: (added.peers || []).join(', '), error: added.error });
+    if (o.token) {
+      try {
+        const h = execFileSync('ssh', [...sshOpts, dest, `cd ${o.dir} && node bin/taskand pull ${master} ${o.token}`], { encoding: 'utf8', timeout: 120000 });
+        report.push({ step: 'handshake pull', ok: true, out: h.trim().slice(0, 200) });
+      } catch (err) { report.push({ step: 'handshake pull', ok: false, error: (err.stderr || err.message).toString().slice(0, 300) }); }
+    }
+    print({ ok: report.every(r => r.ok !== false), node: nodeUrl, report },
+      r => [...r.report.map(x => `${x.ok === false ? '✗' : '✓'} ${x.step}${x.out ? `: ${x.out}` : ''}${x.error ? `\n   ${x.error}` : ''}`), `\n${r.ok ? '✓' : '⚠'} węzeł ${nodeUrl}`].join('\n'));
+  },
+  async log([n = '20']) {
+    const file = join(ROOT, 'log/events.jsonl');
+    console.log(existsSync(file) ? readFileSync(file, 'utf8').trim().split('\n').slice(-Number(n)).join('\n') : 'Brak zdarzeń.');
+  }
+};
+COMMANDS.fed = COMMANDS.procs;
+COMMANDS.health = COMMANDS.status;
+
+const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
+
+  taskand <organizm> "<zadanie>"   dev | doc | sec | hw | file | browser | admin | <dowolny powołany>
+  taskand proc <uri> ['<json>']    bezpośrednie wywołanie procesu proc://
+  taskand twin [run|create|status] [id]    lokalny bliźniak sieci i weryfikacja skanu URI
+  taskand twin web <URL|plik.json>        bliźniak strony/API i scenariusz offline (URL = test widoczności body)
+  taskand procs [organizm]         procesy w rejestrze (status, URI, opis)
+  taskand approve <uri>            candidate → active (wyewoluowane / pobrane od peerów)
+  taskand deprecate <uri>          wycofanie procesu
+  taskand verify                   integralność pakietów (bindingHash)
+  taskand pull <http://peer:8077> [token]   pobranie brakujących pakietów od węzła peer
+  taskand peers                    lista węzłów peer (genome.yaml)
+  taskand peer add|remove <url>    dopisz/usuń węzeł peer
+  taskand occupy <user@host> [--run]        powołanie węzła na innym hoście (SSH+docker); domyślnie plan
+  taskand status                   diagnoza usług i rejestru
+  taskand heal [--plan]            samonaprawa: recepty organizmów wg policy.healing, reszta dla człowieka
+  taskand log [n]                  dziennik zdarzeń (CloudEvents)
+  --json                           surowa odpowiedź JSON
+
+  occupy: operatorskie i jawne (nie autonomiczne). Domyślnie tylko plan; --run wymaga dostępu SSH.
+    [--dir /opt/taskand] [--with-secrets] [--master http://ip:8077] [--token <token>] [--port 8077]`;
+
+if (!cmd || cmd === 'help' || cmd === '--help') {
+  console.log(HELP);
+} else if (COMMANDS[cmd]) {
+  await COMMANDS[cmd](args);
+} else if (/^[a-z0-9][a-z0-9-]*$/.test(cmd)) {
+  const out = await chat(cmd, args.join(' ') || 'status');
+  print(out, o => o.reply || `✗ ${o.error}`);
+} else {
+  console.log(HELP);
+  process.exitCode = 2;
+}

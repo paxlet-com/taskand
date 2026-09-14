@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/dev/composite/v1
+organism: dev
+kind: task
+origin: builtin
+desc: "Zadania złożone: planner → validator → evolve → orchestrator"

@@ -17,20 +17,26 @@ services:
   gateway:
     image: python:3.12-alpine
     command: sh -c "apk add --no-cache nodejs curl && python3 /app/server.py"
+    # host: skanowanie LAN i sondy usług widzą sieć hosta; port 8077 bez mapowania
+    network_mode: host
     environment:
       - TASKAND_LLM_API_KEY=${TASKAND_LLM_API_KEY:-}
       - TASKAND_LLM_MODEL=${TASKAND_LLM_MODEL:-glm-5.3}
       - TASKAND_LLM_ENDPOINT=${TASKAND_LLM_ENDPOINT:-https://api.z.ai/api/paas/v4/chat/completions}
+      # 127.0.0.1 = tylko ten host; 0.0.0.0 = LAN/federacja (wymaga własnych tokenów w grants.yaml)
+      - TASKAND_BIND=${TASKAND_BIND:-127.0.0.1}
+      - TASKAND_BROWSER_CDP=${TASKAND_BROWSER_CDP:-http://127.0.0.1:9222}
     volumes:
       - ./generated:/taskand/generated
-      - ./proc-catalog.json:/taskand/proc-catalog.json
+      - ./genome.yaml:/taskand/genome.yaml
       - ./grants.yaml:/taskand/grants.yaml:ro
+      - ./.env:/taskand/.env:ro
+      - ./vault:/taskand/vault
       - ./web-root:/taskand/web-root
       - ./index.html:/taskand/index.html
       - ./gateway.py:/app/server.py:ro
       - ./gateway:/app/gateway:ro
       - ./log:/taskand/log
-    ports: ["8077:8077"]
     restart: unless-stopped
 
   # ── LANDING (Web Cockpit) ──
@@ -44,7 +50,13 @@ services:
   # ── VM BROWSER (digital twin — test przeglądarki noVNC) ──
   vm-browser:
     image: lscr.io/linuxserver/chromium:latest
-    ports: ["3010:3000"]
+    ports: ["3010:3000", "127.0.0.1:9222:9223"]
+    environment:
+      # CDP dla browser/session/v1 (na hoście tylko 127.0.0.1:9222)
+      - CHROME_CLI=--remote-debugging-port=9222 --user-data-dir=/config/cdp-profile
+    volumes:
+      # Chromium z oknem słucha CDP tylko na loopback kontenera → forwarder 9223 → 9222
+      - ./vms/browser/cdp-forward:/custom-services.d/cdp-forward:ro
     shm_size: "2gb"
     restart: unless-stopped
     labels:

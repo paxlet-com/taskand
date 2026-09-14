@@ -1,0 +1,27 @@
+{
+  "organism": "planner",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/planner/plan/v1": {
+      "uri": "proc://taskand.dev/planner/plan/v1",
+      "organism": "planner",
+      "path": "generated/planner/plan/taskand.dev/v1",
+      "desc": "Dekomponuje złożone zadanie na kandydat Blueprint (LLM, bez wykonania)",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:1ac7117ed6624da552b98a64f451fadcf234ed5db93fa90b9af249d56bdb1682",
+      "status": "active",
+      "registered": "2026-09-12T19:09:04.976Z",
+      "refreshedAt": "2026-09-13T07:28:35.011Z",
+      "capability": "Dekomponuje złożone zadanie na kandydat Blueprint (LLM, bez wykonania)"
+    }
+  },
+  "updated": "2026-09-13T07:28:35.011Z"
+}

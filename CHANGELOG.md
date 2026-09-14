@@ -1,5 +1,223 @@
 # Changelog
 
+## [Unreleased] - 2026-09-13
+
+### Fixed
+- Fix import-optimization issues (ticket-8bb69b3f)
+
+## [Unreleased] - 2026-09-13
+
+### Added — klaster węzłów i powoływanie (occupy)
+- `cluster/monitor/v1`: monitoring peerów (sonda `/healthz` + katalog), `findings` `PEER_DOWN` / `PEER_DEGRADED` / `PEER_NEW_PACKAGES`, `{"pull":true}` pobiera brakujące pakiety jako candidate; wpięte w `doctor/diagnose`
+- Rejestr: akcje `peers`, `peer_add`, `peer_remove`; `readPeers/addPeer/removePeer` w `store.mjs` (blok `peers:` w `genome.yaml`); grantowane w gateway (`read`/`admin`)
+- `/healthz`: identyfikator węzła (`node`) dla federacji i monitoringu klastra
+- `doctor/prescribe`: recepty dla `PEER_*` (pull → organizm; `PEER_DOWN`/`PEER_DEGRADED` → człowiek)
+- CLI: `taskand peers`, `taskand peer add|remove <url>`, `taskand occupy <user@host>` (kopia plików przez SSH + `docker compose up` + rejestracja peera + handshake pull)
+- `bin/bootstrap.manifest`: jedno źródło prawdy o plikach węzła; `.env`/`vault` oznaczone `@secret` (kopiowane tylko z `--with-secrets`)
+- Testy integracyjne +8 (39/39): integralność manifestu, plan `occupy` (dry-run), bramka handshake, roundtrip peerów
+
+### Changed — bramka regresji rozstrzyga deterministycznie przed LLM
+- `dev/evolve/gate.mjs`: nowe `compareCounts` — regresja liczności (mniej elementów w tablicy, brak tablicy = 0) daje `worse` **bez udziału LLM**; więcej i nigdzie mniej = `better`; LLM ocenia dopiero remis. Werdykt niesie `deterministic: true|false`
+- Skutek: bramka działa bez klucza LLM i nie zależy od tego, czy model dobrze policzy elementy (wcześniej trafny werdykt bywał uzasadniany błędnie)
+
+### Granica bezpieczeństwa — replikacja operatorska, nie autonomiczna
+- `occupy` jest jawne i operatorskie: domyślnie tylko plan (dry-run), realne działanie wymaga `--run` i SSH operatora; organizmy jej nie uruchamiają (mogą tylko zaproponować przez `doctor`). Wykrywanie hostów daje kandydatów do przeglądu, nie do automatycznego zajęcia.
+
+### Fixed
+- Konformacja: `bindingHash` builtin odświeżony po edycjach z poprzedniej sesji (doctor/diagnose, doctor/prescribe, registry/core)
+- `genome.yaml`: usunięty błędny wpis peera `http://127.0.0.1:9`
+- Fix magic-numbers issues (ticket-970d9128)
+- Fix magic-numbers issues (ticket-38e0e0d7)
+
+## [3.0.0-dev] - 2026-09-12
+
+### Added — samonaprawa organizmów
+- `doctor/diagnose`: ustrukturyzowane `findings` (SERVICE_DOWN, PACKAGE_TAMPERED, PROCESS_FAILING z dziennika wywołań, CANDIDATE_PENDING, VAULT_UNINITIALIZED, BROWSER_CDP_UNAVAILABLE)
+- `doctor/prescribe`: recepty `organism` (kroki proc://) albo `human` (polecenie + powód)
+- `doctor/heal/v1`: wykonuje recepty organizmów wg `policy.healing`, limity i odstęp, audyt; `taskand heal [--plan]`, `taskand doc "napraw"`
+- `dev/evolve`: `supersedes` + `failure`, bramka regresji (`gate.mjs`), historia odrzuceń (`rejections`), wycofanie poprzedniej wersji tylko po werdykcie better/equal
+- Rejestr: `capability` we wpisie, `approve` z `deprecated` (rollback), `register {hold}`, akcje `policy` i `audit` (`organism.*`)
+- Zweryfikowane end-to-end: zawodzący proces evolved → v2 (18 s); zmieniony pakiet → kwarantanna + v3 (12 s); `admin/network-device-discovery` v3 zastąpiła v1 po odrzuceniu próby z regresją (8/8 urządzeń LAN z tabeli ARP)
+
+### Changed — registry jako organizm, pakiety jako samodzielne byty
+- `registry/core/v1`: jedyna droga wywołań między procesami (URI + JSON): rejestr → status `active` → `bindingHash` → izolowane env → spawn; audyt CloudEvents w `log/events.jsonl`
+- Rejestr per organizm `generated/<organizm>/registry.json` (zapis pod blokadą O_EXCL, atomowy rename) zamiast wspólnego `proc-catalog.json`
+- Pakiet = katalog z `proc.yaml` (uri, organism, kind, origin, desc, `env: [...]`, `credentials: [...]`); `bindingHash` obejmuje wszystkie pliki pakietu; importy tylko `node:*` i `./moduł.mjs` (rejestracja odrzuca inne)
+- Cykl życia: `register` (builtin → active, evolved wg `policy.evolution`, peer → candidate) → `approve` → `deprecate`; `refresh` tylko dla builtin; wersje evolved/peer niezmienne (ewolucja tworzy v2, v3…)
+- Federacja: `GET /.well-known/catalog.json`, `POST /api/registry {action: package}` (auth), `registry pull` weryfikuje hash i instaluje jako candidate
+- Broker sekretów: procesy dostają tylko zmienne z `env:` w `proc.yaml`; `credentialRef: vault://…` odszyfrowuje wyłącznie registry/core dla procesów deklarujących `credentials`
+- Usunięto `generated/_lib`, `developer/spawn`, `dev/execute`, `dev/llm/context.mjs`; nowe `dev/spawn`, `dev/codegen` (LLM → pliki), `dev/evolve` (pakiety wielomodułowe, limit 180 linii/moduł)
+- Gateway: jedna ścieżka `/api/chat` → `dev/chat` (trasuje organizmy), wszystkie handlery przez registry; `network_mode: host`, bind `TASKAND_BIND` (domyślnie 127.0.0.1), domyślne tokeny odrzucane poza loopback
+- Orkiestrator wykonuje kroki przez registry (ignoruje `resolvedPath` z wejścia); walidator i planner korzystają z registry
+- CLI przepisane na Node.js: `procs`, `approve`, `deprecate`, `verify`, `pull`, `--json`; usunięto pozorne `boot`
+- Testy: `make conformance` (4), kontrakty przez registry (24), negatywne 17 (m.in. manipulacja pakietem, import spoza pakietu, candidate, niezmienność, auth `/api/chat`), integracyjne 26 (anty-atrapy)
+
+### Fixed
+- `/api/chat`, `/api/doctor`, `/api/planner` działały bez autoryzacji (wykonanie i ewolucja kodu dla każdego klienta)
+- Orkiestrator uruchamiał dowolny plik wskazany w `resolvedPath` planu
+- Atrapy zwracające stały sukces: `file/ops` (stała lista plików), `vault/secrets`, `browser/session`, `doctor/prescribe`, `chat/message` („Zlecam…”), `web/serve`, `monitor/cpu` (średnia od startu + wartości domyślne), `alert/telegram` (`ALERT_DISPATCHED` bez wysyłki)
+- Test negatywny nr 6 był `assert(true)`
+- Obcinanie dużych odpowiedzi registry na potoku (`process.exit` przed opróżnieniem stdout)
+
+### Changed (Faza A — refaktor dev/chat + realna ewolucja)
+- `dev/chat` rozbity: `bin.mjs` + `intent.mjs` (tabela INTENTS) + `dispatch.mjs`
+- Planner korzysta z `dev/llm` (jeden klient LLM, `reasoning_effort` dla GLM-5.x)
+- Gateway: `ThreadingHTTPServer` (długie żądanie nie blokuje API)
+
+### Fixed (Faza A)
+- Brak generowania procesów: zadania spoza tabeli intencji trafiały do szablonu z odpowiedzią na sztywno; `dev/act` wybiera proces z rejestru albo ewoluuje nowy i go wykonuje
+- `EVOLVE_CREATE` zwracał fałszywe „Utworzono proces… PASS ✓”
+- `hw/monitor`: temperatura CPU z `acpitz` zamiast `x86_pkg_temp`/`Package id`; stałe `cpu_usage_pct: 14.2` i fikcyjne GPIO
+- `doctor/diagnose`: wynik na sztywno (`healthy: true`) zastąpiony sondami HTTP i weryfikacją rejestru
+- `dev/composite`: usunięte stałe „Alerty Telegram ✓ / Dashboard ✓”; kroki `spawn:` są ewoluowane
+- CLI: `echo` w `/bin/sh` psuł JSON; pliki tworzone przez kontener należały do roota
+
+## [Unreleased] - 2026-09-12
+
+### Fixed
+- Fix ruff-sorted-imports issues (ticket-6b1d726f)
+- Fix magic-numbers issues (ticket-417670b9)
+- Fix import-optimization issues (ticket-76552210)
+- Fix ast-sorted-imports issues (ticket-b0fae0bb)
+- Fix ruff-sorted-imports issues (ticket-1f5433f9)
+- Fix magic-numbers issues (ticket-7010d414)
+- Fix string-formatting issues (ticket-1669b9bd)
+- Fix import-optimization issues (ticket-c2d1f9ec)
+- Fix ast-unused-imports issues (ticket-3ddf3ca9)
+- Fix ast-sorted-imports issues (ticket-2ab2b50e)
+- Fix ast-print-statements issues (ticket-fab23633)
+- Fix ast-missing-return-type issues (ticket-40d562ae)
+- Fix ruff-unused-imports issues (ticket-7f6ea4f4)
+- Fix ruff-print-statements issues (ticket-d4819018)
+- Fix ruff-sorted-imports issues (ticket-44fcda40)
+- Fix smart-return-type issues (ticket-54ee205b)
+- Fix unused-imports issues (ticket-c466783d)
+- Fix magic-numbers issues (ticket-b6809962)
+- Fix import-optimization issues (ticket-1add9241)
+- Fix ast-sorted-imports issues (ticket-7e1263c1)
+- Fix ruff-sorted-imports issues (ticket-2aa4579b)
+- Fix import-optimization issues (ticket-081f6e3d)
+- Fix ruff-sorted-imports issues (ticket-b08b0b49)
+- Fix magic-numbers issues (ticket-8ab98003)
+- Fix import-optimization issues (ticket-d226c4f3)
+- Fix ruff-sorted-imports issues (ticket-6bf78b59)
+- Fix magic-numbers issues (ticket-2efeb2a7)
+- Fix import-optimization issues (ticket-8bb69b3f)
+- Fix ast-sorted-imports issues (ticket-42567390)
+- Fix ruff-sorted-imports issues (ticket-d16e971c)
+- Fix magic-numbers issues (ticket-290da211)
+- Fix import-optimization issues (ticket-1badb2db)
+- Fix ast-sorted-imports issues (ticket-d74846c3)
+- Fix ruff-sorted-imports issues (ticket-482c5324)
+- Fix magic-numbers issues (ticket-061ba0bc)
+- Fix import-optimization issues (ticket-b7f61a9d)
+- Fix ast-sorted-imports issues (ticket-b1b3c675)
+- Fix ruff-sorted-imports issues (ticket-aa913c78)
+- Fix magic-numbers issues (ticket-86d125c4)
+- Fix import-optimization issues (ticket-09ede8fd)
+- Fix ast-sorted-imports issues (ticket-8c499c8a)
+- Fix ast-string-concat issues (ticket-5324b0c6)
+- Fix ruff-sorted-imports issues (ticket-8a072d16)
+- Fix string-concat-fstring issues (ticket-47fe35f0)
+- Fix string-formatting issues (ticket-9ef37d2b)
+- Fix import-optimization issues (ticket-0008c9ce)
+- Fix ast-sorted-imports issues (ticket-f5e57079)
+- Fix ruff-sorted-imports issues (ticket-d97ef4f8)
+- Fix magic-numbers issues (ticket-0a8ab495)
+- Fix import-optimization issues (ticket-9c6b01be)
+- Fix ast-unused-imports issues (ticket-08ca7f50)
+- Fix ast-sorted-imports issues (ticket-c88d6e99)
+- Fix ruff-unused-imports issues (ticket-e4e2e719)
+- Fix ruff-sorted-imports issues (ticket-fbbe0c7d)
+- Fix unused-imports issues (ticket-eed5a986)
+- Fix ai-boilerplate issues (ticket-7e73e316)
+- Fix import-optimization issues (ticket-4d088f66)
+- Fix ast-sorted-imports issues (ticket-b3eb38e7)
+- Fix ast-string-concat issues (ticket-284bb441)
+- Fix ast-missing-return-type issues (ticket-81838d32)
+- Fix ruff-sorted-imports issues (ticket-e813135c)
+- Fix smart-return-type issues (ticket-2026bbf6)
+- Fix string-concat-fstring issues (ticket-dc5ab9ab)
+- Fix import-optimization issues (ticket-f2c601ab)
+
+## [Unreleased] - 2026-09-12
+
+### Changed (Faza A — refaktor dev/chat + realna ewolucja)
+- `dev/chat` rozbity: `bin.mjs` (17 linii) + `intent.mjs` (tabela INTENTS) + `dispatch.mjs`; logika przeniesiona do procesów `dev/llm`, `dev/act`, `dev/evolve`, `dev/composite`, `dev/file-router`
+- Wspólny runtime `generated/_lib/` (`proc.mjs`: I/O kontraktu i `callProc`; `catalog.mjs`: `bindingHash`, rejestracja, `make catalog`)
+- `bindingHash` obejmuje wszystkie moduły procesu (bez `test.mjs`); ten sam algorytm w JS (`procHash`) i Pythonie (`proc_hash`)
+- `find_proc_bin` rozwiązuje URI wyłącznie przez katalog z weryfikacją hasha (bez heurystyk ścieżek)
+- Planner korzysta z `dev/llm` (jeden klient LLM, `reasoning_effort` dla GLM-5.x)
+- Gateway: `ThreadingHTTPServer` (długie żądanie nie blokuje API); organizmy dynamiczne → `<org>/chat` lub `dev/act`
+
+### Fixed
+- Brak generowania procesów: zadania spoza tabeli intencji trafiały do szablonu z odpowiedzią na sztywno; `dev/act` wybiera proces z katalogu albo ewoluuje nowy (LLM → guard → test kontraktu → rejestracja) i go wykonuje
+- `EVOLVE_CREATE` zwracał fałszywe „Utworzono proces… PASS ✓” bez tworzenia czegokolwiek
+- `hw/monitor`: temperatura CPU z `acpitz` zamiast `x86_pkg_temp`/`Package id`; stałe `cpu_usage_pct: 14.2` i fikcyjne GPIO zastąpione odczytami
+- `doctor/diagnose`: wynik zapisany na sztywno (`healthy: true`) zastąpiony sondami HTTP i weryfikacją katalogu
+- `dev/composite`: usunięte stałe „Alerty Telegram ✓ / Dashboard ✓”; kroki `spawn:` są ewoluowane zamiast kończyć się FAILED
+- CLI: `echo` w `/bin/sh` rozwijał `\n` w JSON, przez co wypisywał surowy JSON zamiast odpowiedzi
+- Pliki tworzone przez kontener gateway należały do roota
+- Fix ruff-sorted-imports issues (ticket-6b1d726f)
+- Fix magic-numbers issues (ticket-417670b9)
+- Fix import-optimization issues (ticket-76552210)
+- Fix ast-sorted-imports issues (ticket-b0fae0bb)
+- Fix ruff-sorted-imports issues (ticket-1f5433f9)
+- Fix magic-numbers issues (ticket-7010d414)
+- Fix string-formatting issues (ticket-1669b9bd)
+- Fix import-optimization issues (ticket-c2d1f9ec)
+- Fix ast-unused-imports issues (ticket-3ddf3ca9)
+- Fix ast-sorted-imports issues (ticket-2ab2b50e)
+- Fix ast-print-statements issues (ticket-fab23633)
+- Fix ast-missing-return-type issues (ticket-40d562ae)
+- Fix ruff-unused-imports issues (ticket-7f6ea4f4)
+- Fix ruff-print-statements issues (ticket-d4819018)
+- Fix ruff-sorted-imports issues (ticket-44fcda40)
+- Fix smart-return-type issues (ticket-54ee205b)
+- Fix unused-imports issues (ticket-c466783d)
+- Fix magic-numbers issues (ticket-b6809962)
+- Fix import-optimization issues (ticket-1add9241)
+- Fix ast-sorted-imports issues (ticket-7e1263c1)
+- Fix ruff-sorted-imports issues (ticket-2aa4579b)
+- Fix import-optimization issues (ticket-081f6e3d)
+- Fix ruff-sorted-imports issues (ticket-b08b0b49)
+- Fix magic-numbers issues (ticket-8ab98003)
+- Fix import-optimization issues (ticket-d226c4f3)
+- Fix ruff-sorted-imports issues (ticket-6bf78b59)
+- Fix magic-numbers issues (ticket-2efeb2a7)
+- Fix import-optimization issues (ticket-8bb69b3f)
+- Fix ast-sorted-imports issues (ticket-42567390)
+- Fix ruff-sorted-imports issues (ticket-d16e971c)
+- Fix magic-numbers issues (ticket-290da211)
+- Fix import-optimization issues (ticket-1badb2db)
+- Fix ast-sorted-imports issues (ticket-d74846c3)
+- Fix ruff-sorted-imports issues (ticket-482c5324)
+- Fix magic-numbers issues (ticket-061ba0bc)
+- Fix import-optimization issues (ticket-b7f61a9d)
+- Fix ast-sorted-imports issues (ticket-b1b3c675)
+- Fix ruff-sorted-imports issues (ticket-aa913c78)
+- Fix magic-numbers issues (ticket-86d125c4)
+- Fix import-optimization issues (ticket-09ede8fd)
+- Fix ast-sorted-imports issues (ticket-8c499c8a)
+- Fix ast-string-concat issues (ticket-5324b0c6)
+- Fix ruff-sorted-imports issues (ticket-8a072d16)
+- Fix string-concat-fstring issues (ticket-47fe35f0)
+- Fix string-formatting issues (ticket-9ef37d2b)
+- Fix import-optimization issues (ticket-0008c9ce)
+- Fix ast-sorted-imports issues (ticket-f5e57079)
+- Fix ruff-sorted-imports issues (ticket-d97ef4f8)
+- Fix magic-numbers issues (ticket-0a8ab495)
+- Fix import-optimization issues (ticket-9c6b01be)
+- Fix ast-unused-imports issues (ticket-08ca7f50)
+- Fix ast-sorted-imports issues (ticket-c88d6e99)
+- Fix ruff-unused-imports issues (ticket-e4e2e719)
+- Fix ruff-sorted-imports issues (ticket-fbbe0c7d)
+- Fix unused-imports issues (ticket-eed5a986)
+- Fix ai-boilerplate issues (ticket-7e73e316)
+- Fix import-optimization issues (ticket-4d088f66)
+- Fix ast-sorted-imports issues (ticket-b3eb38e7)
+- Fix ruff-sorted-imports issues (ticket-e813135c)
+
 ## [2.2.0] - 2026-09-12
 
 ### Added
@@ -16,6 +234,10 @@
 - Error taxonomy: `DEPENDENCY_BLOCKED`, `RETRYABLE`, `DENIED`, `VALIDATION_FAILED`, `FATAL`, `EXEC_ERROR`
 - Release pinning and SHA-256 `bindingHash` integrity verification in `proc-catalog.json` and validator
 - Automated negative test suite (`tests/negative_tests.mjs` running 10 edge case scenarios)
+- Real hardware telemetry sensor reading in `hw/monitor` (CPU thermal zones, core temperatures, disk free)
+- Real autonomous organism creation in `dev/chat` (`SPAWN_ORGANISM`) with contract test verification, catalog and genome registration
+- Dynamic organism routing in CLI (`bin/taskand`) and Gateway (`gateway/handlers/chat.py`) supporting newly spawned organisms (e.g. `taskand admin`)
+- Fix developer LLM assistant hallucination on hardware queries by directly invoking telemetry tools
 
 ## [Unreleased] - 2026-09-12
 

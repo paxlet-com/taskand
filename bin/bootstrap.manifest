@@ -1,0 +1,21 @@
+# taskand — manifest powołania węzła (używany przez `taskand occupy`).
+# Jedno źródło prawdy: które ścieżki repo tworzą działający węzeł na nowym hoście.
+# Składnia: jedna ścieżka w wierszu; `#` = komentarz; `@secret ` = kopiowane tylko z --with-secrets.
+#
+# Kod i konfiguracja węzła (kopiowane zawsze):
+Dockerfile
+docker-compose.yaml
+genome.yaml
+grants.yaml
+index.html
+gateway.py
+gateway
+bin
+generated
+vms
+web-root
+#
+# Sekrety węzła — domyślnie NIE kopiowane (patrz gateway/auth.py: domyślne tokeny działają tylko na
+# loopback, więc federacyjny węzeł i tak wymaga własnych tokenów/kluczy). Z flagą --with-secrets:
+@secret .env
+@secret vault

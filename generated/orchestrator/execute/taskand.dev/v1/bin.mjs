@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 // proc://taskand.dev/orchestrator/execute/v1
-// Trwały, asynchroniczny orkiestrator z izolacją środowiska i przepływem danych
+// Trwały orkiestrator: kroki wykonywane przez registry/core (izolacja env, bindingHash), resume, przepływ danych
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { spawnSync, execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve, join } from "node:path";
+import { join } from "node:path";
+import { call } from "./registry-client.mjs";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-let ROOT = "/taskand";
-if (!existsSync("/taskand/generated")) {
-  ROOT = resolve(__dirname, "../../../../..");
-}
+const ROOT = fileURLToPath(new URL("../../../../..", import.meta.url));
+const STEP_TIMEOUT_MS = 180000;
 
 let input = {};
 try {
@@ -24,11 +20,15 @@ try {
 
 const plan = input.approvedPlan || input.plan || input;
 if (!plan || !Array.isArray(plan.steps)) {
-  process.stdout.write(JSON.stringify({ ok: true, status: "READY", message: "Orchestrator v2.2 gotowy do wykonania" }) + "\n");
+  process.stdout.write(JSON.stringify({ ok: true, status: "READY", message: "Orchestrator gotowy do wykonania" }) + "\n");
   process.exit(0);
 }
 
 const runId = input.runId || `orch-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+if (!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,119}$/.test(runId)) {
+  process.stdout.write(JSON.stringify({ ok: false, errorType: 'VALIDATION_FAILED', error: 'Niepoprawne runId' }) + '\n');
+  process.exit(0);
+}
 const orchDir = join(ROOT, "log/orchestrations");
 mkdirSync(orchDir, { recursive: true });
 const stateFile = join(orchDir, `${runId}.json`);
@@ -125,87 +125,20 @@ for (const step of plan.steps) {
     }
   }
 
-  // BUG 8 FIX: Izolacja środowiska (child NIE dziedziczy sekretów TASKAND_LLM_API_KEY)
-  const childEnv = {
-    NODE_ENV: "production",
-    PATH: process.env.PATH || "/usr/local/bin:/usr/bin:/bin",
-    HOME: process.env.HOME || "/tmp",
-    TASKAND_RUN_ID: runId,
-    TASKAND_STEP: step.name
-  };
-
-  // BUG 4 FIX: Rozróżnienie task vs service (długotrwałe usługi nie blokują synchronicznie)
-  if (step.kind === "service") {
-    const port = (step.params && step.params.port) || 8090;
-    try {
-      // Weryfikacja czy serwis już nasłuchuje
-      const isUp = spawnSync("curl", ["-sf", `http://localhost:${port}`]).status === 0;
-      if (isUp) {
-        stepRecord.status = "SUCCEEDED";
-        stepRecord.output = { status: "running", port, message: `Usługa na porcie :${port} jest aktywna` };
-      } else {
-        // Uruchomienie tła
-        execSync(`nohup python3 -m http.server ${port} > /dev/null 2>&1 &`, { stdio: "ignore" });
-        stepRecord.status = "SUCCEEDED";
-        stepRecord.output = { status: "spawned", port, message: `Uruchomiono usługę w tle na :${port}` };
-      }
-    } catch (e) {
-      stepRecord.status = "FAILED";
-      stepRecord.error = e.message;
-    }
+  // Wykonanie przez rejestr: URI → status active → bindingHash → izolowane env (granty, credentialRef) → spawn.
+  // resolvedPath z wejścia jest ignorowany — plan nie może wskazać dowolnego pliku.
+  const requiresTwin = /^proc:\/\/taskand\.dev\/admin\/network-device-discovery\/v\d+$/.test(step.process);
+  const result = requiresTwin
+    ? call('proc://taskand.dev/twin/environment/v1', { action: 'run', taskId: `${runId}`.slice(0, 80), process: step.process, scan: step.params || {} }, STEP_TIMEOUT_MS)
+    : call(step.process, stepInput, STEP_TIMEOUT_MS);
+  if (result.errorType || result.ok === false) {
+    stepRecord.status = "FAILED";
+    stepRecord.errorType = result.errorType || "VALIDATION_FAILED";
+    stepRecord.error = result.error || "Proces zwrócił błąd w kontrakcie (ok: false)";
   } else {
-    // Normalne zadanie ("task")
-    const binPath = step.resolvedPath ? join(ROOT, step.resolvedPath) : null;
-    if (!binPath || !existsSync(binPath)) {
-      stepRecord.status = "FAILED";
-      stepRecord.errorType = "FATAL";
-      stepRecord.error = `Nie znaleziono pliku wykonywalnego: ${step.resolvedPath || step.process}`;
-    } else {
-      try {
-        const r = spawnSync("node", [binPath], {
-          input: JSON.stringify(stepInput),
-          env: childEnv,
-          timeout: 30000,
-          encoding: "utf8"
-        });
-
-        stepRecord.exit = r.status;
-        if (r.status !== 0) {
-          stepRecord.status = "FAILED";
-          const errText = r.stderr?.trim() || `Proces zakończył się kodem ${r.status}`;
-          stepRecord.error = errText;
-          if (errText.includes("timed out") || errText.includes("ETIMEDOUT") || r.status === 124) {
-            stepRecord.errorType = "RETRYABLE";
-          } else if (errText.includes("EACCES") || errText.includes("Permission denied") || errText.includes("Forbidden")) {
-            stepRecord.errorType = "DENIED";
-          } else {
-            stepRecord.errorType = "EXEC_ERROR";
-          }
-        } else {
-          // BUG 5 & 6 FIX: Bezpieczne parsowanie pełnego JSON i check {"ok":false}
-          try {
-            const parsed = JSON.parse(r.stdout.trim());
-            if (parsed.ok === false || parsed.status === "error" || parsed.status === "fail") {
-              stepRecord.status = "FAILED";
-              stepRecord.errorType = "VALIDATION_FAILED";
-              stepRecord.error = parsed.error || "Proces zwrócił błąd w kontrakcie (ok: false)";
-              stepRecord.output = parsed;
-            } else {
-              stepRecord.status = "SUCCEEDED";
-              stepRecord.output = parsed;
-            }
-          } catch (jsonErr) {
-            stepRecord.status = "SUCCEEDED";
-            stepRecord.output = { raw: r.stdout.trim() };
-          }
-        }
-      } catch (execErr) {
-        stepRecord.status = "FAILED";
-        stepRecord.error = execErr.message;
-        stepRecord.errorType = execErr.message?.includes("timed out") ? "RETRYABLE" : "EXEC_ERROR";
-      }
-    }
+    stepRecord.status = "SUCCEEDED";
   }
+  stepRecord.output = result;
 
   stepRecord.finishedAt = new Date().toISOString();
   state.steps[step.name] = stepRecord;
@@ -226,6 +159,7 @@ state.finishedAt = new Date().toISOString();
 saveState();
 
 const response = {
+  ok: state.status === 'SUCCEEDED',
   runId,
   status: state.status,
   goal: state.goal,

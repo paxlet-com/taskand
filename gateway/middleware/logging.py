@@ -1,22 +1,28 @@
 import json
-import time
+import os
+import socket
 import sys
-import pathlib
+import time
+import uuid
 
-BASE = pathlib.Path("/taskand") if pathlib.Path("/taskand/log").exists() else pathlib.Path(__file__).resolve().parent.parent.parent
-LOG_DIR = BASE / "log"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-EVENT_LOG = LOG_DIR / "events.jsonl"
+from gateway.utils import BASE
+
+EVENT_LOG = BASE / "log" / "events.jsonl"
+NODE = os.environ.get("TASKAND_NODE", socket.gethostname())
+
 
 def log_event(event_type: str, payload: dict) -> None:
+    """Zdarzenie w formacie CloudEvents 1.0 (append-only), wspólny dziennik z registry/core."""
+    rec = {
+        "specversion": "1.0",
+        "id": str(uuid.uuid4()),
+        "source": f"taskand://{NODE}/gateway",
+        "type": f"dev.taskand.{event_type}",
+        "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "data": payload,
+    }
     try:
-        rec = {
-            "type": event_type,
-            "ts": time.time(),
-            "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "payload": payload
-        }
         with open(EVENT_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    except Exception as e:
+    except OSError as e:
         sys.stderr.write(f"Log error: {e}\n")

@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/doctor/diagnose/v1
+organism: doctor
+kind: task
+origin: builtin
+desc: "Diagnoza: sondy HTTP usług i integralność rejestru"

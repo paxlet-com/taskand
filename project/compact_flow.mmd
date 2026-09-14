@@ -1,0 +1,20 @@
+flowchart TD
+%% generated in 0.01s
+    gateway["gateway<br/>1 funcs"]
+    gateway__GatewayHTTPHandler["gateway.GatewayHTTPHandler<br/>5 funcs"]
+    gateway__auth["gateway.auth<br/>7 funcs"]
+    gateway__handlers["gateway.handlers<br/>9 funcs"]
+    gateway__middleware["gateway.middleware<br/>2 funcs"]
+    gateway__router["gateway.router<br/>1 funcs"]
+    gateway__utils["gateway.utils<br/>3 funcs"]
+    generated__admin["generated.admin<br/>243 funcs"]
+    generated__validator["generated.validator<br/>21 funcs"]
+    gateway__handlers ==>|12| gateway__utils
+    gateway__handlers ==>|6| gateway__auth
+    gateway__handlers ==>|4| generated__validator
+    gateway__handlers -->|3| gateway__middleware
+    gateway__GatewayHTTPHandler -->|2| gateway__middleware
+    gateway__GatewayHTTPHandler -->|2| gateway__router
+    gateway -->|2| gateway__auth
+    gateway__GatewayHTTPHandler -->|1| generated__admin
+    gateway__handlers -->|1| generated__admin

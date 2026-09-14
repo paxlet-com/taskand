@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/twin/environment/v1
+organism: twin
+kind: task
+origin: builtin
+desc: "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}."

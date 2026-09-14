@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/doctor/heal/v1
+organism: doctor
+kind: task
+origin: builtin
+desc: "Samonaprawa: wykonuje recepty organizmów (kwarantanna, ponowna ewolucja) wg policy.healing; resztę zwraca człowiekowi"

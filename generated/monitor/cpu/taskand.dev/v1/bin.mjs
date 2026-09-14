@@ -1,48 +1,40 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
-import os from "node:os";
+// proc://taskand.dev/monitor/cpu/v1 — bieżące obciążenie CPU (próbka 500 ms z os.cpus), bez wartości domyślnych
+import { readFileSync } from 'node:fs';
+import os from 'node:os';
 
-let input = {};
+let input;
 try {
-  const raw = readFileSync(0, "utf8").trim();
-  if (raw) input = JSON.parse(raw);
+  const raw = readFileSync(0, 'utf8').trim();
+  input = raw ? JSON.parse(raw) : {};
 } catch {
   process.exit(2);
 }
 
-// Compute CPU utilization
-let cpuPct = 15.4;
-try {
-  const cpus = os.cpus();
-  if (cpus && cpus.length > 0) {
-    let totalIdle = 0, totalTick = 0;
-    cpus.forEach(cpu => {
-      for (const type in cpu.times) {
-        totalTick += cpu.times[type];
-      }
-      totalIdle += cpu.times.idle;
-    });
-    const idlePct = (totalIdle / totalTick) * 100;
-    cpuPct = Math.round((100 - idlePct) * 10) / 10;
-  }
-} catch {
-  cpuPct = 18.2;
-}
+const SAMPLE_MS = 500;
+const times = () => os.cpus().reduce((acc, c) => {
+  const t = c.times;
+  acc.idle += t.idle;
+  acc.total += t.user + t.nice + t.sys + t.idle + t.irq;
+  return acc;
+}, { idle: 0, total: 0 });
 
-// If specific threshold test mock requested
-if (typeof input.mock_cpu === "number") {
-  cpuPct = input.mock_cpu;
-}
+const a = times();
+await new Promise(r => setTimeout(r, SAMPLE_MS));
+const b = times();
+const total = b.total - a.total;
+const cpuPct = total > 0 ? Math.round((1 - (b.idle - a.idle) / total) * 1000) / 10 : null;
 
-const result = {
-  ok: true,
-  device: input.device || "localhost",
-  metric: "cpu_usage",
+process.stdout.write(JSON.stringify({
+  ok: cpuPct !== null,
+  device: os.hostname(),
+  metric: 'cpu_usage',
   cpu_pct: cpuPct,
-  cores: os.cpus()?.length || 4,
+  sample_ms: SAMPLE_MS,
+  cores: os.cpus().length,
+  load_avg: os.loadavg(),
   mem_free_mb: Math.round(os.freemem() / 1024 / 1024),
+  summary: cpuPct === null ? 'Brak odczytu CPU' : `CPU ${cpuPct}% (${os.cpus().length} rdzeni)`,
   ts: new Date().toISOString()
-};
-
-process.stdout.write(JSON.stringify(result) + "\n");
+}) + '\n');
 process.exit(0);

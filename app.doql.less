@@ -1,0 +1,94 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: glm53;
+  version: 0.1.0;
+}
+
+interface[type="web"] {
+  type: spa;
+  framework: static;
+}
+
+workflow[name="up"] {
+  trigger: manual;
+  step-1: run cmd=docker compose up -d;
+}
+
+workflow[name="down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose down;
+}
+
+workflow[name="status"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=./bin/taskand status;
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: depend target=conformance;
+  step-2: depend target=test-contracts;
+  step-3: depend target=test-negative;
+}
+
+workflow[name="conformance"] {
+  trigger: manual;
+  step-1: run cmd=node tests/conformance.mjs;
+}
+
+workflow[name="test-contracts"] {
+  trigger: manual;
+  step-1: run cmd=node tests/contract_tests.mjs;
+}
+
+workflow[name="test-negative"] {
+  trigger: manual;
+  step-1: run cmd=node tests/negative_tests.mjs;
+}
+
+workflow[name="integration"] {
+  trigger: manual;
+  step-1: run cmd=node tests/integration_test.mjs;
+}
+
+workflow[name="catalog"] {
+  trigger: manual;
+  step-1: run cmd=node generated/registry/core/taskand.dev/v1/bin.mjs <<< '{"action":"refresh"}';
+}
+
+workflow[name="bootstrap"] {
+  trigger: manual;
+  step-1: run cmd=docker compose run --rm bootstrap;
+}
+
+workflow[name="gateway"] {
+  trigger: manual;
+  step-1: run cmd=python3 gateway.py;
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=rm -rf log/events.jsonl;
+}
+
+tests {
+  import: testql-scenarios/**/*.testql.toon.yaml;
+}
+
+env_vars {
+  keys: TASKAND_LLM_API_KEY, TASKAND_LLM_ENDPOINT, TASKAND_LLM_MODEL, TASKAND_HOST_DIR;
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker-compose.yaml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: .env;
+  template_file: .env.example;
+  vars: TASKAND_HOST_DIR, TASKAND_LLM_API_KEY, TASKAND_LLM_ENDPOINT, TASKAND_LLM_MODEL;
+}

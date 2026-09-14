@@ -1,0 +1,33 @@
+{
+  "organism": "registry",
+  "node": "nvidia",
+  "processes": {
+    "proc://taskand.dev/registry/core/v1": {
+      "uri": "proc://taskand.dev/registry/core/v1",
+      "organism": "registry",
+      "path": "generated/registry/core/taskand.dev/v1",
+      "desc": "Rejestr węzła: wywołania przez URI (broker env/sekretów), cykl życia pakietów, wymiana rejestrów z peerami",
+      "kind": "service",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "exec.mjs",
+        "federation.mjs",
+        "lifecycle.mjs",
+        "package.mjs",
+        "proc.yaml",
+        "select.mjs",
+        "store.mjs",
+        "vault.mjs"
+      ],
+      "hash": "sha256:b62cc9bd58d213ddac6e2f8e4376e39fb57b3b75acfb244476d37c9c333a942d",
+      "status": "active",
+      "registered": "2026-09-12T19:09:43.334Z",
+      "refreshedAt": "2026-09-13T07:02:41.464Z",
+      "capability": "Rejestr węzła: wywołania przez URI (broker env/sekretów), cykl życia pakietów, wymiana rejestrów z peerami"
+    }
+  },
+  "updated": "2026-09-13T07:02:41.464Z"
+}

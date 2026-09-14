@@ -1,0 +1,5 @@
+uri: proc://taskand.dev/twin/web/v1
+organism: twin
+kind: task
+origin: builtin
+desc: "Bliźniak stron i API przed implementacją: wybór browser/web-model z rejestru, publiczna migawka GET, scenariusz offline, bramka kompletności. action: run|capture, urls?, modelId?, steps?, mocks?."

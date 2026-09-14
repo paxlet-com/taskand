@@ -1,56 +1,93 @@
+# taskand — genom węzła (DNA). Sekcja organisms: jest ostatnia; registry/core dopisuje aktywne procesy.
+policy:
+  evolution: auto   # auto: wyewoluowany pakiet po teście kontraktu od razu active; manual: candidate → taskand approve
+  peers: manual     # pakiety pobrane od innych węzłów zawsze jako candidate, dopóki nie zmienisz na auto
+  healing: auto     # doctor/heal: auto wykonuje recepty organizmów (evolved/peer); manual: tylko plan; off: nic
+
+peers:
+  - http://127.0.0.1:8077
+
 organisms:
-  - name: chat
-    processes:
-      - { uri: proc://taskand.dev/chat/message/v1, desc: "odpowiada na wiadomości" }
 
-  - name: doctor
+  - name: admin
     processes:
-      - { uri: proc://taskand.dev/doctor/diagnose/v1, desc: "sprawdza stan usług" }
-      - { uri: proc://taskand.dev/doctor/prescribe/v1, desc: "wystawia recepty" }
-
-  - name: developer
-    processes:
-      - { uri: proc://taskand.dev/dev/chat/v1, desc: "interfejs konwersacyjny developera (WYKONUJE, nie wyjaśnia)" }
-      - { uri: proc://taskand.dev/dev/execute/v1, desc: "silnik bezpośredniego wykonywania intencji i zadań" }
-      - { uri: proc://taskand.dev/dev/codegen/v1, desc: "generuje kod przez LLM" }
-      - { uri: proc://taskand.dev/developer/spawn/v1, desc: "powołuje nowe organizmy" }
-
-  - name: planner
-    processes:
-      - { uri: proc://taskand.dev/planner/plan/v1, desc: "dekomponuje złożone zadania na Blueprint" }
-
-  - name: validator
-    processes:
-      - { uri: proc://taskand.dev/validator/resolve/v1, desc: "waliduje graf, cykle i rozwiązuje URI z katalogu" }
-
-  - name: orchestrator
-    processes:
-      - { uri: proc://taskand.dev/orchestrator/execute/v1, desc: "trwały silnik asynchronicznej orkiestracji" }
-
-  - name: monitor
-    processes:
-      - { uri: proc://taskand.dev/monitor/cpu/v1, desc: "monitor obciążenia procesora CPU" }
+      - { uri: proc://taskand.dev/admin/network-device-discovery/v1, desc: "Skanuje sieć lokalną (ARP tabela, /proc/net/arp, ping sweep, mDNS/SSDP multicast, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem na podstawie OUI." }
+      - { uri: proc://taskand.dev/admin/chat/v1, desc: "Interfejs konwersacyjny organizmu admin (deleguje do dev/act)" }
+      - { uri: proc://taskand.dev/admin/network-device-discovery/v2, desc: "Pakiet wykrywa urządzenia w sieciach lokalnych przez tabelę ARP, sondy mDNS/SSDP, skan TCP wybranych portów, reverse DNS i bazę OUI, pomijając sieci dockerowe." }
+      - { uri: proc://taskand.dev/admin/network-device-discovery/v3, desc: "Pakiet skanuje sieć lokalną (ARP, ping sweep, mDNS/SSDP, reverse DNS) i zwraca wykryte urządzenia z IP, MAC, nazwą hosta i producentem OUI, z odpornym scalaniem wyników (brak regresji)." }
+      - { uri: proc://taskand.dev/admin/network-device-discovery/v4, desc: "Inwentaryzacja wszystkich interfejsów, podsieci i zakresów IPv4/IPv6; ograniczony skan LAN przez nmap. mode: inventory|scan, scope: lan|all. Bez parametrów: instrukcja." }
 
   - name: alert
     processes:
-      - { uri: proc://taskand.dev/alert/telegram/v1, desc: "adapter powiadomień Telegram z ochroną sekretów" }
-
-  - name: web
-    processes:
-      - { uri: proc://taskand.dev/web/serve/v1, desc: "serwuje interfejs Web Cockpit na :8090" }
+      - { uri: proc://taskand.dev/alert/telegram/v1, desc: "Alert CPU na Telegram przez Bot API (token z vault przez credentialRef)" }
 
   - name: browser
     processes:
-      - { uri: proc://taskand.dev/browser/session/v1, desc: "steruje przeglądarką (noVNC :3010)" }
+      - { uri: proc://taskand.dev/browser/session/v1, desc: "Sterowanie przeglądarką digital twin przez CDP: status, open, list, close" }
+      - { uri: proc://taskand.dev/browser/web-model/v1, desc: "Model stron i API: capture zapisuje publiczne GET przez kontrolowany transport, replay sprawdza scenariusz Chromium bez dostępu do sieci/plików hosta. action: capture|replay|status." }
+
+  - name: chat
+    processes:
+      - { uri: proc://taskand.dev/chat/message/v1, desc: "Publiczny punkt wiadomości (guest): potwierdza przyjęcie, nie wykonuje zadań" }
+
+  - name: dev
+    processes:
+      - { uri: proc://taskand.dev/dev/act/v1, desc: "Wykonuje zadanie: wybiera aktywny proces z rejestru lub ewoluuje nowy" }
+      - { uri: proc://taskand.dev/dev/chat/v1, desc: "Jedyne wejście konwersacyjne: organizm/intencja → proces przez rejestr" }
+      - { uri: proc://taskand.dev/dev/codegen/v1, desc: "Generuje kod pakietu przez LLM (bez zapisu na dysk)" }
+      - { uri: proc://taskand.dev/dev/composite/v1, desc: "Zadania złożone: planner → validator → evolve → orchestrator" }
+      - { uri: proc://taskand.dev/dev/file-router/v1, desc: "Pytania o pliki: istnienie i rozmiar ścieżki z promptu" }
+      - { uri: proc://taskand.dev/dev/llm/v1, desc: "Jedyny klient LLM (Z.ai/OpenAI-compatible), tryb tekst/JSON" }
+      - { uri: proc://taskand.dev/dev/spawn/v1, desc: "Powołuje organizm: pakiet <org>/chat + rejestracja" }
+      - { uri: proc://taskand.dev/dev/evolve/v1, desc: "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)" }
+
+  - name: doctor
+    processes:
+      - { uri: proc://taskand.dev/doctor/diagnose/v1, desc: "Diagnoza: sondy HTTP usług i integralność rejestru" }
+      - { uri: proc://taskand.dev/doctor/prescribe/v1, desc: "Recepty naprawcze wyliczane z bieżącej diagnozy" }
+      - { uri: proc://taskand.dev/doctor/heal/v1, desc: "Samonaprawa: wykonuje recepty organizmów (kwarantanna, ponowna ewolucja) wg policy.healing; resztę zwraca człowiekowi" }
+
+  - name: file
+    processes:
+      - { uri: proc://taskand.dev/file/ops/v1, desc: "Operacje tylko do odczytu na plikach węzła: list, stat, read, exists" }
+
+  - name: hw
+    processes:
+      - { uri: proc://taskand.dev/hw/monitor/v1, desc: "Telemetria sprzętu: temperatury czujników, obciążenie CPU, dysk, GPIO" }
+
+  - name: monitor
+    processes:
+      - { uri: proc://taskand.dev/monitor/cpu/v1, desc: "Bieżące obciążenie CPU (próbka 500 ms)" }
+
+  - name: orchestrator
+    processes:
+      - { uri: proc://taskand.dev/orchestrator/execute/v1, desc: "Trwały orkiestrator: kroki przez rejestr, blokady zależności, resume" }
+
+  - name: planner
+    processes:
+      - { uri: proc://taskand.dev/planner/plan/v1, desc: "Dekomponuje złożone zadanie na kandydat Blueprint (LLM, bez wykonania)" }
+
+  - name: validator
+    processes:
+      - { uri: proc://taskand.dev/validator/resolve/v1, desc: "Deterministyczny walidator: graf DAG, ID, sekrety vault://, URI w rejestrze" }
 
   - name: vault
     processes:
-      - { uri: proc://taskand.dev/vault/secrets/v1, desc: "zarządza sekretami (AES-256-GCM)" }
+      - { uri: proc://taskand.dev/vault/secrets/v1, desc: "Sejf sekretów AES-256-GCM: status, list, exists, set, delete (bez odczytu wartości)" }
 
-  - name: file-ops
+  - name: web
     processes:
-      - { uri: proc://taskand.dev/file/ops/v1, desc: "zarządza plikami na węzłach" }
+      - { uri: proc://taskand.dev/web/serve/v1, desc: "Stan Web Cockpit: sonda HTTP portu 8090" }
 
-  - name: hw-monitor
+  - name: registry
     processes:
-      - { uri: proc://taskand.dev/hw/monitor/v1, desc: "telemetria sprzętu i GPIO" }
+      - { uri: proc://taskand.dev/registry/core/v1, desc: "Rejestr węzła: wywołania przez URI (broker env/sekretów), cykl życia pakietów, wymiana rejestrów z peerami" }
+
+  - name: cluster
+    processes:
+      - { uri: proc://taskand.dev/cluster/monitor/v1, desc: "Monitoring węzłów: sonda /healthz każdego peera z genome, liczność procesów, opcjonalny pull nowych pakietów jako candidate" }
+
+  - name: twin
+    processes:
+      - { uri: proc://taskand.dev/twin/environment/v1, desc: "Tworzy cyfrowy bliźniak adresacji całej lokalnej infrastruktury z rejestru organizmów; uruchamia i weryfikuje skan URI w izolowanej sieci. action: run|create|status, taskId?, scan: {scope: lan}." }
+      - { uri: proc://taskand.dev/twin/web/v1, desc: "Bliźniak stron i API przed implementacją: wybór browser/web-model z rejestru, publiczna migawka GET, scenariusz offline, bramka kompletności. action: run|capture, urls?, modelId?, steps?, mocks?." }

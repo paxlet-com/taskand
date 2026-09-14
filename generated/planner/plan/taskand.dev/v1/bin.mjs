@@ -2,16 +2,8 @@
 // proc://taskand.dev/planner/plan/v1
 // Rozkłada złożone zadanie na kandydat Blueprint (z dynamicznym kontekstem zdolności)
 
-import { readFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, resolve, join } from "node:path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-let ROOT = "/taskand";
-if (!existsSync("/taskand/generated")) {
-  ROOT = resolve(__dirname, "../../../../..");
-}
+import { readFileSync } from "node:fs";
+import { registry, call } from "./registry-client.mjs";
 
 let input = {};
 try {
@@ -21,21 +13,16 @@ try {
   process.exit(2);
 }
 
-const task = input.task || input.message || "stan systemu";
+const task = String(input.task || input.message || "").trim();
+if (!task) {
+  process.stdout.write(JSON.stringify({ ok: true, valid: false, status: "READY", usage: '{"task": "<złożone zadanie>"}' }) + "\n");
+  process.exit(0);
+}
 
-const KEY = process.env.TASKAND_LLM_API_KEY;
-const MODEL = process.env.TASKAND_LLM_MODEL || "glm-5.3";
-const URL = process.env.TASKAND_LLM_ENDPOINT || "https://api.z.ai/api/paas/v4/chat/completions";
 
-// Dynamic Capability Context z proc-catalog.json
-let catalogProcs = [];
-try {
-  const catPath = join(ROOT, "proc-catalog.json");
-  if (existsSync(catPath)) {
-    const cat = JSON.parse(readFileSync(catPath, "utf8"));
-    catalogProcs = cat.processes || [];
-  }
-} catch {}
+// Dynamiczny kontekst zdolności: aktywne procesy z rejestru (bez infrastruktury)
+const INTERNAL = /\/(registry|dev|planner|validator|orchestrator)\//;
+const catalogProcs = (registry("list", { status: "active" }).processes || []).filter(p => !INTERNAL.test(p.uri));
 
 const capabilityLines = catalogProcs.map(p => `  - ${p.uri} (${p.desc || p.kind})`).join("\n");
 
@@ -46,6 +33,11 @@ Dostępne procesy w katalogu federacji:
 ${capabilityLines}
 
 ZASADY:
+0a. Przed implementacją zadania na stronie/API użyj twin/web z konkretnymi urls i steps zawierającymi asercje wyniku.
+    Nieznane operacje backendu to brak pokrycia, nie sukces. Samo capture ani widoczność body nie weryfikują całego zadania.
+    POST/PUT/DELETE testuj wyłącznie na jawnych modelach odpowiedzi offline; nie generuj połączenia do produkcji jako obejścia braku modelu.
+0. Dla skanowania sieci używaj najnowszego aktywnego admin/network-device-discovery z listy (reuse URI, nigdy spawn gdy zdolność istnieje).
+   Orkiestrator automatycznie tworzy i weryfikuje cyfrowy bliźniak dla takiego kroku; porażka bliźniaka blokuje zależne kroki.
 1. Każdy krok to operacja:
    - id: unikalny int (1, 2, 3...)
    - name: unikalna nazwa (np. "monitor_cpu", "alert_telegram", "dashboard_ui")
@@ -70,28 +62,8 @@ Zwróć WYŁĄCZNIE poprawny JSON o strukturze:
 }`;
 
 let plan = null;
-if (KEY) {
-  try {
-    const resp = await fetch(URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${KEY}` },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: "system", content: SYSTEM }, { role: "user", content: task }],
-        temperature: 0.1,
-        max_tokens: 1000
-      })
-    });
-    const data = await resp.json();
-    const raw = data.choices?.[0]?.message?.content || "";
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      plan = JSON.parse(jsonMatch[0]);
-    }
-  } catch (err) {
-    // Network or LLM error
-  }
-}
+const llm = call("proc://taskand.dev/dev/llm/v1", { system: SYSTEM, prompt: task, json: true, temperature: 0.1, max_tokens: 4000 }, 120000);
+if (llm.ok) plan = llm.json;
 
 // Sanitization: obrona w głąb przed przypadkowymi jawnymi kluczami w wyjściu LLM
 if (plan && plan.blueprint && Array.isArray(plan.blueprint.steps)) {
@@ -157,6 +129,7 @@ if (!plan || !plan.blueprint || !Array.isArray(plan.blueprint.steps)) {
   } else {
     // BUG 1: Zwróć PLANNING_UNAVAILABLE z zachowaniem celu!
     process.stdout.write(JSON.stringify({
+      ok: false,
       valid: false,
       status: "PLANNING_UNAVAILABLE",
       goalPreserved: true,
@@ -168,6 +141,7 @@ if (!plan || !plan.blueprint || !Array.isArray(plan.blueprint.steps)) {
 }
 
 const result = {
+  ok: true,
   valid: true,
   status: "PROPOSED",
   blueprint: plan.blueprint,

@@ -1,27 +1,32 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><title>taskand · Web Cockpit</title>
 <style>body{font:16px Georgia;max-width:600px;margin:40px auto;padding:0 20px;background:#F2ECDD;color:#221D12}
-input{width:100%;padding:10px;font:16px Georgia;border:1px solid #999;border-radius:3px;box-sizing:border-box}
+input{width:100%;padding:10px;font:16px Georgia;border:1px solid #999;border-radius:3px;box-sizing:border-box;margin-top:8px}
 #out{padding:10px;border:1px solid #ccc;margin-top:10px;min-height:100px;white-space:pre-wrap;border-radius:3px;background:#EBE4D1}
 h1{font-style:italic;color:#B03A10;font-weight:500}</style></head><body>
 <h1>taskand.</h1>
+<input id="token" type="password" placeholder="token (Authorization: Bearer …)">
+<input id="organism" placeholder="organizm (puste = dev), np. admin">
 <input id="msg" placeholder='np. "sprawdź czy wszystko działa"'>
 <div id="out">...</div>
 <script>
-document.querySelector("input").addEventListener("keydown", async e => {
- if (e.key === "Enter") {
-  const msg = e.target.value; e.target.value = "";
-  document.getElementById("out").textContent = "...";
+const $ = id => document.getElementById(id);
+try { $("token").value = localStorage.getItem("taskand-token") || ""; } catch {}
+$("msg").addEventListener("keydown", async e => {
+  if (e.key !== "Enter") return;
+  const message = e.target.value; e.target.value = "";
+  try { localStorage.setItem("taskand-token", $("token").value); } catch {}
+  $("out").textContent = "...";
   try {
     const r = await fetch("http://localhost:8077/api/chat", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg })
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + $("token").value },
+      body: JSON.stringify({ message, organism: $("organism").value })
     });
     const j = await r.json();
-    document.getElementById("out").textContent = j.reply || JSON.stringify(j);
-  } catch(err) {
-    document.getElementById("out").textContent = "Błąd: " + err.message;
+    $("out").textContent = j.reply || j.error || JSON.stringify(j);
+  } catch (err) {
+    $("out").textContent = "Błąd: " + err.message;
   }
- }
 });
 </script></body></html>
