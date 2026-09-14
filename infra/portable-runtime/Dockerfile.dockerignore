@@ -1,0 +1,12 @@
+**
+!gateway.py
+!gateway/
+!gateway/**
+!generated/
+!generated/**
+**/__pycache__
+**/*.pyc
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

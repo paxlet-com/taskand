@@ -1,0 +1,89 @@
+{
+  "services": {
+    "gateway": {
+      "image": "${TASKAND_GATEWAY_IMAGE:?Set the reviewed gateway image digest}",
+      "pull_policy": "never",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 64,
+      "mem_limit": "512m",
+      "cpus": 1,
+      "environment": {
+        "TASKAND_BIND": "0.0.0.0",
+        "PORT": "8077"
+      },
+      "networks": [
+        "api"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,mode=1777"
+      ],
+      "volumes": [
+        {
+          "type": "volume",
+          "source": "context",
+          "target": "/taskand/log"
+        },
+        {
+          "type": "bind",
+          "source": "${TASKAND_GRANTS_FILE:?Set an absolute private grants file path}",
+          "target": "/taskand/grants.yaml",
+          "read_only": true,
+          "bind": {
+            "create_host_path": false
+          }
+        }
+      ],
+      "restart": "no"
+    },
+    "ingress": {
+      "image": "nginx:alpine@sha256:1d13701a5f9f3fb01aaa88cef2344d65b6b5bf6b7d9fa4cf0dca557a8d7702ba",
+      "pull_policy": "never",
+      "user": "10001:10001",
+      "read_only": true,
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "pids_limit": 32,
+      "mem_limit": "64m",
+      "cpus": 0.5,
+      "entrypoint": [
+        "/bin/sh",
+        "-c",
+        "printf '%s' 'pid /tmp/nginx.pid;\nerror_log /dev/stderr warn;\nworker_processes 1;\nevents { worker_connections 64; }\nhttp {\n  access_log off;\n  client_body_temp_path /tmp/client;\n  proxy_temp_path /tmp/proxy;\n  fastcgi_temp_path /tmp/fastcgi;\n  uwsgi_temp_path /tmp/uwsgi;\n  scgi_temp_path /tmp/scgi;\n  client_max_body_size 256k;\n  server {\n    listen 8080;\n    location / {\n      proxy_pass http://gateway:8077;\n      proxy_set_header Host $$host;\n      proxy_set_header Authorization $$http_authorization;\n      proxy_connect_timeout 3s;\n      proxy_read_timeout 30s;\n    }\n  }\n}\n' > /tmp/nginx.conf && exec nginx -c /tmp/nginx.conf -g 'daemon off;'"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=16m,mode=1777"
+      ],
+      "networks": [
+        "api",
+        "ingress"
+      ],
+      "ports": [
+        "127.0.0.1:18077:8080"
+      ],
+      "depends_on": [
+        "gateway"
+      ],
+      "restart": "no"
+    }
+  },
+  "volumes": {
+    "context": {}
+  },
+  "networks": {
+    "api": {
+      "internal": true
+    },
+    "ingress": {}
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-016",
+  "summary": "Portable opt-in gateway container profile",
+  "workstream": "infrastructure",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-016/**", "infra/portable-runtime/**"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "0f9df49f33d6cd85006fe4e41378f06b7347d7dd",
+    "targetBranch": "main",
+    "outcome": "Publish an opt-in portable gateway container pilot through protected OneDev and independent Validator, without production deployment.",
+    "nonGoals": ["Production changes", "Secret access", "Browser or LLM qualification", "ARM64 certification", "Self-update or registry mutation"],
+    "complexity": "S",
+    "estimatedMinutes": 60,
+    "budgets": {"maxImplementationFiles": 5, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Separate opt-in gateway image on an internal bridge with a loopback ingress proxy; immutable source files, read-only private grants mount, persistent context volume and explicit qualification limits.",
+      "components": [{"name": "portable-gateway", "paths": ["infra/portable-runtime/**"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Stop only the opt-in pilot, retain its context volume and previous image; existing deployment is untouched."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-02", "commands": ["python3 -m unittest discover -s infra/portable-runtime -p 'test_*.py'"], "evidence": "Offline profile regression tests and Compose configuration validation"},
+      {"criterion": "AC-03", "commands": ["docker build -f infra/portable-runtime/Dockerfile ."], "evidence": "Private isolated image-build and synthetic runtime observation"},
+      {"criterion": "AC-04", "commands": ["./project/governance-check.sh"], "evidence": "Managed governance report"}
+    ]
+  }
+}
