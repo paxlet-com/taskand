@@ -1,0 +1,25 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-013",
+  "summary": "Authenticated local runtime canary",
+  "workstream": "application",
+  "classification": {"kind": "SERVICE", "priority": "P2", "origin": "health"},
+  "allowedPaths": ["project/ticket-013/**", "app/runtime_canary.py", "tests/runtime_canary_test.py"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "6cc16a32fe97e16f5e5f597b5d48e22d5c304680",
+    "targetBranch": "main",
+    "outcome": "Provide a bounded read-only authenticated local canary without observer activation or external effects.",
+    "nonGoals": ["Remote peer probing", "Observer activation", "Chat or LLM execution", "Writing context, registry or grants", "Changing trust roots"],
+    "complexity": "M",
+    "estimatedMinutes": 75,
+    "budgets": {"maxImplementationFiles": 3, "maxAffectedComponents": 2, "maxPublicInterfaceChanges": 1, "maxRuntimeDependencies": 0},
+    "architecture": {"status": "accepted", "decision": "Use Python standard-library HTTP probes with a runtime-only token environment variable; emit only bounded status and count projections.", "components": [{"name": "canary", "paths": ["app/runtime_canary.py", "tests/runtime_canary_test.py"]}], "responsibilityChanges": false, "interfaceChanges": ["Additive CLI only"], "dataChanges": [], "ui": {"impact": "none", "states": [], "evidence": []}, "rollback": "Remove the additive CLI; runtime services are not mutated."},
+    "runtimeDependencies": [],
+    "validation": [{"criterion": "AC-02", "commands": ["python3 -m unittest discover -s tests -p runtime_canary_test.py"], "evidence": "Read-only endpoint and schema probes"}, {"criterion": "AC-05", "commands": ["./project/governance-check.sh --actor agent --format text", "make test"], "evidence": "Governance and full repository suite"}]
+  }
+}
