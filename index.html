@@ -87,9 +87,9 @@ const failures={
 const failure=code=>Object.assign(new Error(failures[code]),{code});
 const currentSession=epoch=>epoch===sessionEpoch;
 function headers(){
-  const token=$('token').value.trim();
-  if(!token)throw failure('TOKEN_REQUIRED');
-  return {'Content-Type':'application/json',Authorization:'Bearer '+token};
+  const apiToken=$('token').value.trim();
+  if(!apiToken)throw failure('TOKEN_REQUIRED');
+  return {'Content-Type':'application/json',Authorization:'Bearer '+apiToken};
 }
 async function request(path, body, timeoutMs=body?180000:15000) {
   const epoch=sessionEpoch, auth=headers(), controller=new AbortController();
