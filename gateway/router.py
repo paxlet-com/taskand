@@ -6,8 +6,17 @@ from gateway.handlers.chat import handle_chat
 from gateway.handlers.doctor import handle_doctor
 from gateway.handlers.planner import handle_planner
 from gateway.handlers.orchestrator import handle_orchestrator
+from gateway.handlers.context import handle_context, handle_state
+from gateway.handlers.mesh import handle_mesh
+from gateway.handlers.observers import handle_pilot
+from urllib.parse import urlsplit
 
 ROUTES: Dict[Tuple[str, str], Callable] = {
+    ('GET', '/api/mesh/state'): handle_mesh,
+    ('POST', '/api/observers/pilot'): handle_pilot,
+    ('GET', '/api/context'): handle_context,
+    ('POST', '/api/context'): handle_context,
+    ('GET', '/api/state'): handle_state,
     ("GET", "/healthz"): handle_healthz,
     ("GET", "/api/federation"): handle_federation,
     ("GET", "/.well-known/catalog.json"): handle_well_known_catalog,
@@ -21,7 +30,8 @@ ROUTES: Dict[Tuple[str, str], Callable] = {
 
 def dispatch(method: str, path: str, request_handler, body: dict) -> None:
     # Normalize path (remove trailing slash except root)
-    norm_path = path.rstrip("/") if path != "/" else "/"
+    route_path = urlsplit(path).path
+    norm_path = route_path.rstrip('/') if route_path != '/' else '/'
     handler = ROUTES.get((method, norm_path))
     if handler:
         handler(request_handler, body)

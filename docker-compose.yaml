@@ -15,7 +15,7 @@ services:
 
   # ── GATEWAY (jeden punkt wejścia REST API) ──
   gateway:
-    image: python:3.12-alpine
+    image: python:3.12-alpine@sha256:b64631e04e4920160c50fbe8d8df828f7f35f06f425cb44aa09bca53e708a35a
     command: sh -c "apk add --no-cache nodejs curl && python3 /app/server.py"
     # host: skanowanie LAN i sondy usług widzą sieć hosta; port 8077 bez mapowania
     network_mode: host
@@ -27,21 +27,24 @@ services:
       - TASKAND_BIND=${TASKAND_BIND:-127.0.0.1}
       - TASKAND_BROWSER_CDP=${TASKAND_BROWSER_CDP:-http://127.0.0.1:9222}
     volumes:
-      - ./generated:/taskand/generated
-      - ./genome.yaml:/taskand/genome.yaml
-      - ./grants.yaml:/taskand/grants.yaml:ro
-      - ./.env:/taskand/.env:ro
-      - ./vault:/taskand/vault
-      - ./web-root:/taskand/web-root
+      # A local preview can retain the primary runtime's complete package registry.
+      - ${TASKAND_GENERATED_ROOT:-./generated}:/taskand/generated
+      - ./generated/planner/plan/taskand.dev/v1:/taskand/generated/planner/plan/taskand.dev/v1:ro
+      - ./generated/planner/registry.json:/taskand/generated/planner/registry.json:ro
+      - ${TASKAND_DATA_ROOT:-.}/genome.yaml:/taskand/genome.yaml
+      - ${TASKAND_DATA_ROOT:-.}/grants.yaml:/taskand/grants.yaml:ro
+      - ${TASKAND_DATA_ROOT:-.}/.env:/taskand/.env:ro
+      - ${TASKAND_DATA_ROOT:-.}/vault:/taskand/vault
+      - ${TASKAND_DATA_ROOT:-.}/web-root:/taskand/web-root
       - ./index.html:/taskand/index.html
       - ./gateway.py:/app/server.py:ro
       - ./gateway:/app/gateway:ro
-      - ./log:/taskand/log
+      - ${TASKAND_DATA_ROOT:-.}/log:/taskand/log
     restart: unless-stopped
 
   # ── LANDING (Web Cockpit) ──
   landing:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:1d13701a5f9f3fb01aaa88cef2344d65b6b5bf6b7d9fa4cf0dca557a8d7702ba
     volumes:
       - ./index.html:/usr/share/nginx/html/index.html:ro
     ports: ["8090:80"]
@@ -49,7 +52,7 @@ services:
 
   # ── VM BROWSER (digital twin — test przeglądarki noVNC) ──
   vm-browser:
-    image: lscr.io/linuxserver/chromium:latest
+    image: lscr.io/linuxserver/chromium:latest@sha256:54a61718733c82ac041e7c84543283419b06ab0d6439eef5c20b1f6a53b8dcd0
     ports: ["3010:3000", "127.0.0.1:9222:9223"]
     environment:
       # CDP dla browser/session/v1 (na hoście tylko 127.0.0.1:9222)

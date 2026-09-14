@@ -3,7 +3,7 @@
 # Jeśli masz TASKAND_LLM_API_KEY → LLM generuje wszystkie organizmy.
 # Jeśli nie → wbudowane szablony. Zero pre-existing packages.
 
-FROM docker:27-cli
+FROM docker:27-cli@sha256:851f91d241214e7c6db86513b270d58776379aacc5eb9c4a87e5b47115e3065c
 RUN apk add --no-cache nodejs npm git curl python3
 
 LABEL org.taskand.version="2.0.0"

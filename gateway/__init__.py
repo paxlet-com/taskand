@@ -1,37 +1,93 @@
 import os
 import sys
 import json
+import sqlite3
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from gateway.router import dispatch
-from gateway.middleware.cors import add_cors_headers
 from gateway.auth import bind_address, is_loopback_bind
+from gateway.auth import check_auth
+from gateway.context import ACTIVE, ContextError, default_store
 
 class GatewayHTTPHandler(BaseHTTPRequestHandler):
+    def _cors(self):
+        origin = self.headers.get('Origin')
+        allowed = {'http://localhost:8090', 'http://127.0.0.1:8090'}
+        if origin in allowed:
+            self.send_header('Access-Control-Allow-Origin', origin)
+            self.send_header('Vary', 'Origin')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Taskand-Key')
+
     def _send(self, code: int, body: dict) -> None:
+        context = ACTIVE.get()
+        if context and not getattr(self, '_context_finished', False):
+            try:
+                refs = context['store'].finish(context['owner'], context['requestId'], body, code)
+                body = {**body, **refs}
+            except (OSError, ValueError, sqlite3.Error):
+                code, body = 503, {'ok': False, 'error': 'AUDIT_COMMIT_FAILED',
+                                   'outcomeUnknown': True, 'requestId': context['requestId']}
+            self._context_finished = True
         b = json.dumps(body, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        add_cors_headers(self)
+        self.send_header('Cache-Control', 'no-store')
+        self._cors()
         self.send_header("Content-Length", str(len(b)))
         self.end_headers()
         self.wfile.write(b)
 
     def do_OPTIONS(self) -> None:
         self.send_response(204)
-        add_cors_headers(self)
+        self._cors()
         self.end_headers()
 
     def do_GET(self) -> None:
-        dispatch("GET", self.path, self, {})
+        try:
+            dispatch('GET', self.path, self, {})
+        except (OSError, sqlite3.Error):
+            self._send(503, {'ok': False, 'error': 'CONTEXT_STORE_UNAVAILABLE'})
 
     def do_POST(self) -> None:
-        n = int(self.headers.get("Content-Length", 0))
-        raw = self.rfile.read(n) if n > 0 else b"{}"
         try:
+            n = int(self.headers.get('Content-Length', 0))
+            if n < 0 or n > 262144:
+                self._send(413, {'ok': False, 'error': 'REQUEST_TOO_LARGE'})
+                return
+            raw = self.rfile.read(n) if n > 0 else b'{}'
             body = json.loads(raw.decode("utf-8") or "{}")
-        except Exception:
-            body = {}
-        dispatch("POST", self.path, self, body)
+            if not isinstance(body, dict):
+                raise ValueError('object required')
+        except (ValueError, UnicodeError, RecursionError):
+            self._send(400, {'ok': False, 'error': 'JSON_OBJECT_REQUIRED'})
+            return
+        authenticated, user = check_auth(self.headers)
+        if not authenticated:
+            self._send(401, {'ok': False, 'error': 'Unauthorized'})
+            return
+        token = None
+        self._context_finished = False
+        try:
+            request_id = body.pop('requestId', None)
+            retain = body.pop('retainPrompt', False)
+            refs = body.pop('contextRefs', [])
+            if not isinstance(retain, bool):
+                raise ContextError('CONTEXT_RETENTION_INVALID')
+            body.pop('_context', None)
+            store = default_store()
+            context = store.begin(user['name'], self.path, body, request_id, retain, refs)
+            context['refs'] = refs
+            token = ACTIVE.set(context)
+            dispatch('POST', self.path, self, body)
+        except ContextError as error:
+            self._send(409, {'ok': False, 'error': str(error)})
+        except (OSError, sqlite3.Error):
+            self._send(503, {'ok': False, 'error': 'CONTEXT_STORE_UNAVAILABLE'})
+        except (ValueError, TypeError, KeyError):
+            self._send(400, {'ok': False, 'error': 'REQUEST_CONTRACT_INVALID'})
+        finally:
+            if token is not None:
+                ACTIVE.reset(token)
 
     def log_message(self, format, *args):
         # Silence default stderr spam during normal testing

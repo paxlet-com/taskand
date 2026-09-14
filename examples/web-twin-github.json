@@ -1,0 +1,14 @@
+{
+  "action": "run",
+  "urls": ["https://github.com/", "https://github.com/login"],
+  "allowedOrigins": ["https://github.githubassets.com", "https://avatars.githubusercontent.com", "https://images.ctfassets.net"],
+  "steps": [
+    {"action": "goto", "url": "https://github.com/"},
+    {"action": "assert", "selector": "body", "visible": true},
+    {"action": "click", "selector": "a[href=\"/login\"]"},
+    {"action": "assert", "selector": "#login_field", "visible": true},
+    {"action": "assert", "selector": "#login_field", "valid": false},
+    {"action": "fill", "selector": "#login_field", "value": "twin-demo@example.invalid"},
+    {"action": "assert", "selector": "#login_field", "value": "twin-demo@example.invalid"}
+  ]
+}

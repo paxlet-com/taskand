@@ -2,6 +2,8 @@ import json
 import os
 import pathlib
 import subprocess
+import uuid
+from gateway.context import ACTIVE
 
 BASE = pathlib.Path("/taskand") if pathlib.Path("/taskand/generated").exists() else pathlib.Path(__file__).resolve().parent.parent
 GENERATED = BASE / "generated"
@@ -40,7 +42,20 @@ def registry(action: str, payload: dict, timeout: int = 900) -> dict:
 
 
 def call_process(uri: str, data: dict, timeout: int = 900) -> dict:
-    return registry("call", {"uri": uri, "input": data, "timeout_ms": timeout * 1000}, timeout)
+    context = ACTIVE.get()
+    node = 'call:' + str(uuid.uuid4())
+    if context:
+        context['store'].event(context['owner'], context['requestId'], node, 'CALLING', uri)
+        if uri == 'proc://taskand.dev/planner/plan/v1':
+            refs = list(dict.fromkeys([*context.get('refs', []), *data.get('contextRefs', [])]))
+            objects = [context['store'].get(context['owner'], ref) for ref in refs]
+            data = {**data, '_context': {'promptRef': context['promptRef'],
+                    'objects': [{'urn': obj['urn'], 'kind': obj['kind'], 'digest': obj['digest']} for obj in objects]}}
+    result = registry('call', {'uri': uri, 'input': data, 'timeout_ms': timeout * 1000}, timeout)
+    if context:
+        context['store'].event(context['owner'], context['requestId'], node,
+                               'FAILED' if result.get('ok') is False else 'RETURNED', uri)
+    return result
 
 
 def status_for(result: dict) -> int:

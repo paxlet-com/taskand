@@ -1,32 +1,165 @@
 <!doctype html>
-<html lang="pl"><head><meta charset="utf-8"><title>taskand · Web Cockpit</title>
-<style>body{font:16px Georgia;max-width:600px;margin:40px auto;padding:0 20px;background:#F2ECDD;color:#221D12}
-input{width:100%;padding:10px;font:16px Georgia;border:1px solid #999;border-radius:3px;box-sizing:border-box;margin-top:8px}
-#out{padding:10px;border:1px solid #ccc;margin-top:10px;min-height:100px;white-space:pre-wrap;border-radius:3px;background:#EBE4D1}
-h1{font-style:italic;color:#B03A10;font-weight:500}</style></head><body>
-<h1>taskand.</h1>
-<input id="token" type="password" placeholder="token (Authorization: Bearer …)">
-<input id="organism" placeholder="organizm (puste = dev), np. admin">
-<input id="msg" placeholder='np. "sprawdź czy wszystko działa"'>
-<div id="out">...</div>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>taskand · kontekst i stan live</title>
+<style>
+:root{font:16px system-ui;color:#e8edf4;background:#101820;color-scheme:dark}body{max-width:1150px;margin:32px auto;padding:0 20px}
+h1{font-size:2rem}h2{font-size:1.1rem;color:#91d6ce}label{display:block;margin:12px 0 4px}
+input,textarea,select,button{font:inherit;padding:10px;border:1px solid #526275;border-radius:6px;background:#182633;color:inherit;box-sizing:border-box}
+input:not([type=checkbox]),textarea,select{width:100%}button{cursor:pointer;margin:12px 8px 0 0;background:#245b57}button:disabled{opacity:.5;cursor:wait}
+small,.muted{color:#adbacb}main{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{background:#14212d;padding:20px;border-radius:12px;min-width:0}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;font-size:.85rem}#graph{display:flex;align-items:center;gap:8px;overflow:auto;min-height:110px}
+.node{min-width:145px;max-width:230px;border:1px solid #58768f;border-radius:8px;padding:12px;overflow-wrap:anywhere}
+.node[data-state=CALLING]{border-color:#ebc274}.node[data-state=FAILED]{border-color:#f49797}.arrow{color:#89b6cf}
+.wide{grid-column:1/-1}a{color:#a1cce9}#state{font-weight:bold}summary{cursor:pointer}
+.visuals{display:grid;grid-template-columns:2fr 1fr;gap:16px}.visuals svg{width:100%;height:auto;min-height:240px;background:#101820;border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:8px;border-bottom:1px solid #385064}caption{text-align:left;margin:12px 0}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+@media(max-width:760px){.visuals{grid-template-columns:1fr}}
+</style></head><body>
+<h1>taskand. <small>kontekst · bliźniaki · live</small></h1>
+<p class="muted">Plan jest propozycją, model jest przybliżeniem, a odpowiedź HTTP nie dowodzi wykonania zadania.</p>
+<main><section class="wide">
+<h2>Sieć instancji i rejestr procesów</h2>
+<p>Widok tylko do odczytu. Peer wpisany do konfiguracji nie oznacza wykrytej, zaufanej ani dostępnej maszyny.</p>
+<button id="meshRefresh">Odczytaj stan</button><label><input id="meshLive" type="checkbox"> Odświeżaj co 5 sekund (gdy karta jest widoczna)</label>
+<p id="meshStatus" role="status">Brak obserwacji. Podaj token API poniżej.</p>
+<div class="visuals"><svg id="network" viewBox="0 0 680 420" role="img" aria-label="Lokalne organizmy, procesy i skonfigurowane peery"></svg>
+<svg id="radar" viewBox="0 0 340 340" role="img" aria-label="Radar deklaracji rejestru; brak pomiaru nie jest zerem"></svg></div>
+<p class="muted">Pełny kontur radaru pojawia się tylko przy komplecie pomiarów. Brak pomiaru = „nieznane”, nie 0%. Hash w rejestrze jest deklaracją, nie dowodem integralności.</p>
+<table><caption>Wartości i pokrycie pomiarów</caption><thead><tr><th>Parametr</th><th>Wynik</th><th>Podstawa</th></tr></thead><tbody id="metricRows"></tbody></table>
+<details><summary>Węzły i relacje (wersjonowany JSON)</summary><pre id="meshDetails">Brak obserwacji.</pre></details>
+</section><section>
+<h2>Nowe żądanie</h2>
+<label for="token">Token API (tylko w pamięci tej strony)</label><input id="token" type="password" autocomplete="off">
+<label for="mode">Tryb</label><select id="mode"><option value="compile">DSL bez LLM i bez wykonania</option value="plan">Propozycja planisty — bez wykonania</option value="chat">Rozmowa — istniejący dispatcher taskand</option></select>
+<label for="msg">Prompt</label><textarea id="msg" rows="5" placeholder="Opisz zadanie i kryteria sprawdzenia"></textarea>
+<label><input id="retain" type="checkbox"> Zapisz również zredagowaną treść promptu</label>
+<small>Domyślnie zapisujemy identyfikatory, relacje i HMAC, bez treści. Redakcja nie wykrywa wszystkich sekretów — nie wpisuj ich do promptów.</small>
+<label for="refs">Istniejące URN kontekstu (po jednym w wierszu)</label><textarea id="refs" rows="2"></textarea>
+<button id="send">Wyślij</button>
+<pre id="out" aria-live="polite">Brak odpowiedzi.</pre>
+</section><section>
+<h2>Jawne profile testowe użytkowników</h2>
+<p class="muted">To syntetyczne scenariusze zachowania aplikacji, nie kopie osobowości ani uprawnień ludzi.</p>
+<label for="label">Nazwa profilu</label><input id="label" placeholder="Użytkownik sprawdzający stan">
+<label for="fixtures">Prompty testowe (po jednym w wierszu)</label><textarea id="fixtures" rows="4" placeholder="Pokaż stan systemu"></textarea>
+<label for="parent">Poprzednia wersja URN (opcjonalnie)</label><input id="parent" placeholder="urn:uuid:…">
+<label for="components">Składowe profile URN (opcjonalnie, po jednym wierszu)</label><textarea id="components" rows="2"></textarea>
+<label><input id="synthetic" type="checkbox"> Potwierdzam: jawne, syntetyczne dane bez sekretów</label>
+<button id="save">Zapisz wersję</button><button id="refresh">Odśwież rejestr</button>
+<label for="profiles">Wersja do symulacji</label><select id="profiles"><option value="">Brak załadowanych profili</option></select>
+<button id="simulate">Generuj i sprawdź DSL testów</button>
+<pre id="profileOut">Symulacja kompiluje prompty i sprawdza referencje. Nie wykonuje operacji produkcyjnych.</pre>
+</section><section class="wide">
+<h2>Stan bieżącego żądania</h2><p id="state" role="status">Brak aktywnego żądania</p><small id="request"></small>
+<div id="graph" aria-label="Graf obserwowanych zdarzeń żądania"></div>
+<p class="muted">Pokrycie: granice gateway → proces. Brak zdarzenia wewnętrznego oznacza brak obserwacji, nie sukces. Strzałki oznaczają kolejność obserwacji.</p>
+<details><summary>Zdarzenia i referencje</summary><pre id="events">[]</pre></details>
+</section><section class="wide">
+<h2>Pilotaż obserwatorów: plan → bliźniak → decyzja człowieka</h2>
+<p>Trzy adaptery normalizacji: Taskand/Git/testy, CLI/IDE i przeglądarka. Test obejmuje wyłącznie syntetyczne pliki zdarzeń — nie prawdziwe sesje, urządzenia ani działające rozszerzenie przeglądarki.</p>
+<button id="observerPilot">Zaplanuj i przetestuj trzy źródła w bliźniaku danych</button>
+<button id="observerNext" disabled>Przygotuj pytanie o następny etap</button>
+<pre id="observerOut" aria-live="polite">Obserwatory rzeczywistych danych są wyłączone. Kolejny etap wymaga wskazania źródeł, zakresu, retencji i czasu pracy oraz osobnego testu adapterów live.</pre>
+<p class="muted">Wynik symulacji nie jest zgodą. Nie zbieramy haseł, schowka, klawiszy ani historii istniejących sesji. Nie synchronizujemy profilu człowieka między urządzeniami bez potwierdzonego powiązania tożsamości.</p>
+</section></main>
 <script>
 const $ = id => document.getElementById(id);
-try { $("token").value = localStorage.getItem("taskand-token") || ""; } catch {}
-$("msg").addEventListener("keydown", async e => {
-  if (e.key !== "Enter") return;
-  const message = e.target.value; e.target.value = "";
-  try { localStorage.setItem("taskand-token", $("token").value); } catch {}
-  $("out").textContent = "...";
-  try {
-    const r = await fetch("http://localhost:8077/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + $("token").value },
-      body: JSON.stringify({ message, organism: $("organism").value })
-    });
-    const j = await r.json();
-    $("out").textContent = j.reply || j.error || JSON.stringify(j);
-  } catch (err) {
-    $("out").textContent = "Błąd: " + err.message;
+const api = location.protocol + '//' + location.hostname + ':8077';
+const lines = id => $(id).value.split('\n').map(x => x.trim()).filter(Boolean);
+const headers = () => ({'Content-Type':'application/json', Authorization:'Bearer ' + $('token').value});
+async function request(path, body) {
+  const r = await fetch(api + path, {method:body ? 'POST':'GET', headers:headers(), ...(body ? {body:JSON.stringify(body)}:{})});
+  const result = await r.json(); if (!r.ok) throw Error(result.error || 'HTTP ' + r.status); return result;
+}
+function render(graph) {
+  $('state').textContent = graph.state; $('events').textContent = JSON.stringify(graph.events, null, 2);
+  $('graph').replaceChildren();
+  graph.nodes.forEach((n,i) => {
+    if(i){const a=document.createElement('span');a.className='arrow';a.textContent='→';$('graph').append(a);}
+    const box=document.createElement('div');box.className='node';box.dataset.state=n.state;
+    const title=document.createElement('strong');title.textContent=n.state;
+    const text=document.createElement('p');text.textContent=n.uri || n.id;
+    box.append(title,text);$('graph').append(box);
+  });
+}
+async function submit(path, body, output='out') {
+  const requestId='urn:uuid:' + crypto.randomUUID(); let stopped=false;
+  $('request').textContent=requestId; $('state').textContent='Wysyłanie…';$('graph').replaceChildren();
+  $(output).textContent='Oczekiwanie…';
+  const poll=async()=>{try{render((await request('/api/state?requestId='+encodeURIComponent(requestId))).graph);}catch(e){if(stopped)$('state').textContent='Brak zapisanego stanu: '+e.message;}};
+  const timer=setInterval(poll,500);
+  try { const result=await request(path,{...body,requestId});$(output).textContent=JSON.stringify(result,null,2);return result; }
+  catch(e){$(output).textContent='Błąd: '+e.message;throw e;}
+  finally{stopped=true;clearInterval(timer);await poll();}
+}
+$('send').onclick=async()=>{
+  const message=$('msg').value.trim();if(!message)return;
+  $('send').disabled=true;
+  try{const mode=$('mode').value;await submit(mode==='chat'?'/api/chat':'/api/planner',{
+    ...(mode==='chat'?{message}:{task:message,action:mode}),retainPrompt:$('retain').checked,contextRefs:lines('refs')});}
+  catch{}finally{$('send').disabled=false;}
+};
+async function refresh(){
+  const list=await request('/api/context?kind=user_twin');$('profiles').replaceChildren();
+  for(const obj of list.objects){const option=document.createElement('option');option.value=obj.urn;option.textContent=obj.payload.label+' · v'+obj.revision+' · '+obj.urn;$('profiles').append(option);}
+}
+$('refresh').onclick=()=>refresh().catch(e=>$('profileOut').textContent=e.message);
+$('save').onclick=async()=>{
+  if(!$('synthetic').checked){$('profileOut').textContent='Potwierdź syntetyczne pochodzenie danych.';return;}
+  try{await submit('/api/context',{action:'create_user_twin',payload:{label:$('label').value,prompts:lines('fixtures'),synthetic:true},
+    refs:lines('components'),...($('parent').value?{parent:$('parent').value.trim()}:{})},'profileOut');await refresh();}catch{}
+};
+$('simulate').onclick=async()=>{try{await submit('/api/context',{action:'simulate',urn:$('profiles').value},'profileOut');}catch{}};
+const svgNS='http://www.w3.org/2000/svg';
+function svgElement(tag,attrs,text){const e=document.createElementNS(svgNS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==undefined)e.textContent=text;return e;}
+function drawNetwork(report){
+  const svg=$('network');svg.replaceChildren();const positions=new Map([['local',[340,205]]]);
+  const groups=report.nodes.filter(n=>n.kind==='organism'||n.kind==='peer');
+  groups.forEach((n,i)=>{const a=2*Math.PI*i/Math.max(groups.length,1);positions.set(n.id,[340+240*Math.cos(a),205+160*Math.sin(a)]);});
+  for(const e of report.edges){const from=positions.get(e.source),to=positions.get(e.target);if(from&&to)svg.append(svgElement('line',{x1:from[0],y1:from[1],x2:to[0],y2:to[1],stroke:'#59798c','stroke-dasharray':e.relation==='configured-not-verified'?'5 5':'none'}));}
+  for(const n of report.nodes){const p=positions.get(n.id);if(!p)continue;const group=svgElement('g',{tabindex:'0'});const count=report.edges.filter(e=>e.source===n.id&&e.target.startsWith('process:')).length;
+    group.append(svgElement('circle',{cx:p[0],cy:p[1],r:n.kind==='instance'?22:14,fill:n.kind==='peer'?'#8b7146':'#245b57',stroke:'#a1cce9'}));
+    group.append(svgElement('title',{},n.label+' · '+n.state+(count?' · '+count+' procesów':'')));
+    group.append(svgElement('text',{x:p[0],y:p[1]+30,fill:'#e8edf4','text-anchor':'middle','font-size':11},n.label.length>22?n.label.slice(0,19)+'…':n.label));
+    group.addEventListener('focus',()=>{$('meshDetails').textContent=JSON.stringify({node:n,children:report.nodes.filter(c=>report.edges.some(e=>e.source===n.id&&e.target===c.id))},null,2);});svg.append(group);
   }
-});
+}
+function drawRadar(metrics){
+  const svg=$('radar');svg.replaceChildren();const point=(i,r)=>[170+r*Math.cos(i*2*Math.PI/metrics.length-Math.PI/2),170+r*Math.sin(i*2*Math.PI/metrics.length-Math.PI/2)];
+  for(const r of [25,50,75,100])svg.append(svgElement('polygon',{points:metrics.map((_,i)=>point(i,r).join(',')).join(' '),fill:'none',stroke:'#385064'}));
+  const known=[];
+  metrics.forEach((m,i)=>{const end=point(i,100),label=point(i,137);svg.append(svgElement('line',{x1:170,y1:170,x2:end[0],y2:end[1],stroke:'#59798c'}));
+    svg.append(svgElement('text',{x:label[0],y:label[1],fill:'#adbacb','font-size':11,'text-anchor':'middle'},m.value===null?'?':m.value+'%'));
+    svg.append(svgElement('text',{x:label[0],y:label[1]+14,fill:'#adbacb','font-size':9,'text-anchor':'middle'},m.id));
+    if(m.value!==null){const p=point(i,m.value);known.push(p);svg.append(svgElement('circle',{cx:p[0],cy:p[1],r:4,fill:'#91d6ce'}));}
+  });
+  if(known.length===metrics.length)svg.prepend(svgElement('polygon',{points:known.map(p=>p.join(',')).join(' '),fill:'#245b5755',stroke:'#91d6ce'}));
+}
+let meshBusy=false;
+async function refreshMesh(){
+  if(meshBusy)return;meshBusy=true;$('meshRefresh').disabled=true;
+  try{
+    const response=await fetch(api+'/api/mesh/state',{headers:headers(),signal:AbortSignal.timeout(15000)});const report=await response.json();
+    if(!response.ok||report.schema!=='taskand.mesh-observation/v1')throw Error(report.error||'Niezgodny model obserwacji');
+    drawNetwork(report);drawRadar(report.metrics);$('meshDetails').textContent=JSON.stringify(report,null,2);$('metricRows').replaceChildren();
+    for(const m of report.metrics){const row=document.createElement('tr');for(const text of [m.label,m.value===null?'nieznane':m.value+'%',m.numerator===null||m.denominator===null?'brak pomiaru':m.numerator+' / '+m.denominator]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}$('metricRows').append(row);}
+    $('meshStatus').textContent=report.observedAt+' · '+report.counts.organisms+' organizmów · '+report.counts.processes+' procesów · '+report.counts.configuredPeers+' peerów w konfiguracji (dostępność nieznana)';
+  }catch(e){$('meshStatus').textContent='Brak aktualnej obserwacji: '+e.message+' — wcześniejszy wykres, jeśli jest, pozostaje nieaktualny.';}
+  finally{meshBusy=false;$('meshRefresh').disabled=false;}
+}
+$('meshRefresh').onclick=refreshMesh;
+setInterval(()=>{if($('meshLive').checked&&!document.hidden&&$('token').value)refreshMesh();},5000);
+let observerReceipt=null;
+$('observerPilot').onclick=async()=>{
+  $('observerPilot').disabled=true;$('observerNext').disabled=true;observerReceipt=null;
+  try{const response=await submit('/api/observers/pilot',{action:'simulate'},'observerOut');observerReceipt=response.receiptRef;$('observerNext').disabled=false;}
+  catch{}finally{$('observerPilot').disabled=false;}
+};
+$('observerNext').onclick=()=>{
+  if(!observerReceipt)return;
+  $('refs').value=observerReceipt;$('mode').value='compile';
+  $('msg').value='Na podstawie wyniku pilotażu przygotuj kolejny plan obserwacji. Wskaż brakujące adaptery oraz zapytaj mnie o dokładne źródła, zakres danych, czas działania i retencję. Nie uruchamiaj zbierania danych bez decyzji po teście bliźniaka.';
+  $('msg').focus();
+};
 </script></body></html>
