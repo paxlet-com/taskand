@@ -1,0 +1,36 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-011",
+  "summary": "Fail-closed local snapshot and restore adapter",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-011/**", "infra/local-recovery/context_snapshot.py", "tests/context_snapshot_test.py", "infra/local-recovery/README.md", ".governance/manifest.json"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "6cc16a32fe97e16f5e5f597b5d48e22d5c304680",
+    "targetBranch": "main",
+    "outcome": "Publish fail-closed stopped-container context snapshot and fresh-directory restore with synthetic recovery evidence.",
+    "nonGoals": ["Production data backup", "Overwriting existing data", "Service activation", "Shared executor changes", "Schema migrations"],
+    "complexity": "S", "estimatedMinutes": 60,
+    "budgets": {"maxImplementationFiles": 4,"maxAffectedComponents": 2,"maxPublicInterfaceChanges": 1,"maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Bounded Docker tar capture from an exact stopped container; strict single SQLite file inventory, readonly integrity verification and exclusive publication. Restore prepares a fresh private directory only and never activates services.",
+      "components": [{"name":"local-recovery","paths":["infra/local-recovery/**"]},{"name":"verification","paths":["tests/context_snapshot_test.py",".governance/manifest.json"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Operator-only snapshot/restore CLI"],
+      "dataChanges": [], "ui": {"impact":"none","states":[],"evidence":[]},
+      "rollback": "No existing source data or runtime is changed. Preserve failed diagnostic evidence; discard only exact operator-owned outputs separately."
+    },
+    "runtimeDependencies": [],
+    "validation": [{"criterion":"AC-01","commands":["python3 -m unittest discover -s tests -p context_snapshot_test.py"],"evidence":"Bounded copy, identity, tar and integrity negative tests"},{"criterion":"AC-02","commands":["python3 -m unittest discover -s tests -p context_snapshot_test.py"],"evidence":"Synthetic snapshot/restore round-trip and no-overwrite tests"},{"criterion":"AC-03","commands":["./project/governance-check.sh","git diff --check"],"evidence":"Managed gate and protected publication receipt"}]
+  }
+}
