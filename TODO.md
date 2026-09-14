@@ -1,3 +1,7 @@
+## Governed documentation pilot
+
+- [ ] [ticket-014](project/ticket-014/README.md): compact evolution guides and stable legacy links; local validation, no remote publication.
+
 <!-- PREFACT:BEGIN — generated block, edits inside will be overwritten -->
 # TODO
 
