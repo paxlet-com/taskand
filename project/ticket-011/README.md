@@ -26,7 +26,7 @@ inspection is authorized by this slice. Publication uses the protected process.
 
 ## Tracking boundary
 
-Local evidence: 15 snapshot/restore regressions plus 8 existing deployment tests
+Local evidence: 17 snapshot/restore regressions plus 8 existing deployment tests
 pass, including descendant cleanup after parent exit. Real Docker export and
 restore of a synthetic Store passed with the original profile URN preserved.
 The required OneDev discovery now includes tests/context_snapshot_test.py; the

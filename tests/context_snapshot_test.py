@@ -23,12 +23,12 @@ class ContextRecoveryTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='context-recovery-test-')
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        self.source = self.root / 'synthetic.sqlite3'
-        with sqlite3.connect(self.source) as db:
-            for table in ('meta', 'objects', 'requests', 'events'):
-                db.execute(f'CREATE TABLE {table} (value TEXT)')
-            db.execute("INSERT INTO objects VALUES ('synthetic-profile')")
-        db.close()
+        spec = importlib.util.spec_from_file_location('fixture_context', SOURCE.parents[2] / 'gateway/context.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        store = module.Store(self.root / 'seed')
+        store.profile('admin', {'label':'fixture','prompts':['synthetic prompt'],'synthetic':True})
+        self.source = store.path
         self.content = self.source.read_bytes()
         self.sha = hashlib.sha256(self.content).hexdigest()
         self.identity = 'a' * 64
@@ -176,6 +176,22 @@ class ContextRecoveryTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 recovery.restore(self.source, self.sha, target, True)
         self.assertEqual((target / 'owned-by-other').read_text(), 'keep')
+
+    def test_same_table_names_with_wrong_columns_rejected(self):
+        with sqlite3.connect(self.source) as db:
+            db.execute('ALTER TABLE objects ADD COLUMN unsupported TEXT')
+        db.close()
+        digest = hashlib.sha256(self.source.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(recovery.RecoveryError, 'SCHEMA_UNSUPPORTED'):
+            recovery.restore(self.source, digest, self.root / 'out', True)
+
+    def test_missing_integrity_key_rejected(self):
+        with sqlite3.connect(self.source) as db:
+            db.execute("DELETE FROM meta WHERE key='audit-key'")
+        db.close()
+        digest = hashlib.sha256(self.source.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(recovery.RecoveryError, 'INTEGRITY_KEY_INVALID'):
+            recovery.restore(self.source, digest, self.root / 'out', True)
 
     def test_output_limit_deadline_and_command_failure(self):
         command = [sys.executable, '-c']

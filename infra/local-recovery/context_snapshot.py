@@ -20,6 +20,12 @@ import time
 MAX_DATABASE = 64 * 1024 * 1024
 COMMAND_SECONDS = 30
 HEX = re.compile(r'[0-9a-f]{64}')
+CONTEXT_COLUMNS = {
+    'meta': {'key', 'value'},
+    'objects': {'urn', 'owner', 'kind', 'family', 'revision', 'parent', 'payload', 'refs', 'digest', 'created'},
+    'requests': {'id', 'owner', 'prompt', 'path', 'state', 'retain', 'created', 'updated'},
+    'events': {'seq', 'request', 'node', 'stage', 'uri', 'at'},
+}
 
 
 class RecoveryError(ValueError):
@@ -126,8 +132,14 @@ def validate_database(path):
             if database.execute('PRAGMA quick_check(1)').fetchone() != ('ok',):
                 raise RecoveryError('DATABASE_INTEGRITY_FAILED')
             tables = {row[0] for row in database.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-            if not {'meta', 'objects', 'requests', 'events'} <= tables:
+            if tables - {'sqlite_sequence'} != set(CONTEXT_COLUMNS):
                 raise RecoveryError('CONTEXT_SCHEMA_UNSUPPORTED')
+            for table, expected in CONTEXT_COLUMNS.items():
+                columns = {row[1] for row in database.execute(f'PRAGMA table_info({table})')}
+                if columns != expected:
+                    raise RecoveryError('CONTEXT_SCHEMA_UNSUPPORTED')
+            if database.execute("SELECT length(value) FROM meta WHERE key='audit-key'").fetchall() != [(32,)]:
+                raise RecoveryError('CONTEXT_INTEGRITY_KEY_INVALID')
     except sqlite3.Error as error:
         raise RecoveryError('DATABASE_INTEGRITY_FAILED') from error
 

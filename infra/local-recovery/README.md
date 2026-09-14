@@ -93,6 +93,8 @@ registry, podpisem autora ani zgodą na wykonanie.
 Limit bazy: 64 MiB; każda komenda Docker: 30 s plus do 2 s na sprzątnięcie
 procesu; weryfikacja SQLite ma budżet instrukcji kontrolowany czasem 5 s.
 Obsługiwany jest wyłącznie czysty pojedynczy `context.sqlite3` obecnego Store.
+Sprawdzane są tabele, kolumny i obecność klucza integralności, nie semantyka
+wszystkich rekordów ani autentyczność historii na podstawie samego hasha.
 WAL, journal, symlinki, dodatkowe pliki i nieznany schemat są odrzucane.
 Nie usuwać sidecarów, aby obejść odmowę: przygotować osobny plan odzyskania
 SQLite. Narzędzie nie wykonuje migracji, nie dowodzi kompletnego backupu
