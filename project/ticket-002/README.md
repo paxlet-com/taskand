@@ -2,11 +2,45 @@
 
 - **ID**: ticket-002
 - **Owner**: unresolved:human
-- **Status**: BACKLOG
-- **Workflow state**: BACKLOG
+- **Status**: IN_PROGRESS
+- **Workflow state**: PUBLICATION
 - **Created**: 2026-09-13
 
 ## Goal and scope
+
+SESSION_EXECUTION_AUTHORIZATION (2026-09-14): the user requested continued
+functional recovery and fast, standards-respecting diagnostic delivery.
+Reuse this allocated application ticket for a bounded F-04 readiness slice:
+`app/runtime_readiness.py` and `tests/runtime_readiness_test.py`. Work only in
+the canonical `ticket-002--runtime-readiness` checkout. No shared manifest,
+delivery controller, lease adapter, token, service configuration or deployment
+is changed. Original supervisor roadmap below is retained, not claimed done.
+
+Run `python app/runtime_readiness.py --expected-sha <full-commit-sha> --stream`.
+The result distinguishes immutable source from observed loopback HTTP behavior,
+streams bounded probe results and never grants deployment/merge authority.
+
+Current slice acceptance:
+
+- [x] AC-09: Compare served HTML with the exact committed blob, not dirty files.
+- [x] AC-10: Classify health, absent/protected API and unknown gateway identity
+  without sending credentials, following redirects or exposing response bodies.
+- [x] AC-11: Parallel probes share one deadline, bound bytes, stop stalled/drip
+  responses and stream completed results without awaiting the slowest probe.
+- [x] AC-12: Regression tests and managed gate pass; no runtime is mutated and
+  local readiness is never described as authenticated functional verification.
+
+Verification: 12 unittest cases PASS (5.900 s), Ruff 0.15.11 PASS, managed
+governance PASS (zero findings). The read-only live probe against source
+`557a386aaa9f8cea881c4069b681a951191f1c22` completed in 868 ms: old served HTML,
+missing gateway SHA, context and mesh 404. This is an observed readiness failure,
+not a failed unit test and not authorization to deploy. Independent PR acceptance
+is still required; keep this implementation ticket IN_PROGRESS / PUBLICATION.
+
+### Preserved supervisor roadmap (outside this publication slice)
+
+The following historical proposal and AC-01..AC-08 remain future work. They do
+not expand this slice's allowedPaths or imply that the full supervisor is done.
 
 Propozycja użytkownika: operacyjny nadzór nad dostawą i trudnymi incydentami
 podczas pracy Taskand nad powierzonym projektem. Przydzielono przez zarządzany
