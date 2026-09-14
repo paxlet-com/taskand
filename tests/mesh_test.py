@@ -157,6 +157,13 @@ def browser_executable():
 
 
 class BrowserExecutableTests(unittest.TestCase):
+    def test_canonical_binary_precedes_distribution_launcher(self):
+        with (
+            patch.object(Path, "is_file", return_value=True),
+            patch("os.access", return_value=True),
+        ):
+            self.assertEqual(browser_executable(), "/opt/google/chrome/chrome")
+
     def test_canonical_binary_without_distribution_launcher(self):
         with (
             patch.object(

@@ -19,7 +19,7 @@
     "targetBranch": "main",
     "outcome": "Publish portable isolated mesh browser coverage without changing the protected executor or weakening its sandbox.",
     "nonGoals": ["Shared CI policy changes", "Production browser access", "Sandbox bypass", "Changes to snapshot ticket-011"],
-    "complexity": "XS", "estimatedMinutes": 30,
+    "complexity": "XS", "estimatedMinutes": 10,
     "budgets": {"maxImplementationFiles": 1, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
     "architecture": {
       "status": "accepted", "decision": "Resolve known installed Chrome executables deterministically inside the test; preserve existing real browser coverage and sandbox flag.",
