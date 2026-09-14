@@ -1,5 +1,7 @@
 # Dokumentacja taskand
 
+- [Przenośny, przypięty runtime lease](information/portable-lease-runtime.md) — izolowane testy bez zależności od katalogu developera.
+
 - [Krótsza diagnostyka, elastyczne budżety i rzeczywisty stan dostawy](analysis/diagnostic-recovery.md) — F-02, pomiary i pozostała blokada lokalnego CI.
 
 - [Aktualny stan instancji, dashboard, obserwatory i decyzja po teście bliźniaka](information/instance-network.md) — lokalna implementacja/projekt; nie oznacza wdrożenia na 8090.

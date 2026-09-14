@@ -82,6 +82,8 @@
           "tests/isolated_integration.sh",
           ".gitignore",
           "project/lease-controller.py",
+          "project/vendor/autonom/change_lease.py",
+          "tests/lease_runtime_test.py",
           "gateway/context.py",
           "gateway/__init__.py",
           "gateway/utils.py",
