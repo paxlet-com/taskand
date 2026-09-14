@@ -270,7 +270,13 @@ class BrowserPilotTests(unittest.TestCase):
                             page.wait_for_function("text => document.querySelector('#out').textContent.includes(text)", arg=message)
                             self.assertIn(message, page.locator("#authStatus").inner_text())
                             self.assertEqual(chat.call_count, 0)
-                            self.assertEqual([r["url"] for r in requests[before:]], ["http://127.0.0.1:8077/api/chat"])
+                            attempted = requests[before:]
+                            self.assertEqual(
+                                [r["url"] for r in attempted if r["url"].endswith("/api/chat")],
+                                ["http://127.0.0.1:8077/api/chat"],
+                            )
+                            state_requests = [r for r in attempted if r["url"].split("?", 1)[0].endswith("/api/state")]
+                            self.assertTrue(all(r["method"] == "GET" for r in state_requests))
                             self.assertNotIn(token, page.locator("body").inner_text())
                     page.fill("#token", "synthetic-pilot")
                     with self.subTest("real form sends grant-bound request and reads result"):
