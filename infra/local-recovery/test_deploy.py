@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import deploy
 
@@ -51,6 +52,40 @@ class DeploymentTests(unittest.TestCase):
     def test_digest_is_stable(self):
         self.assertEqual(deploy.digest(b"taskand"), deploy.digest(b"taskand"))
         self.assertNotEqual(deploy.digest(b"taskand"), deploy.digest(b"Taskand"))
+
+    def test_predecessor_binds_exact_service_name_and_id(self):
+        manifest = {'gateway': {'name': 'glm53-gateway-recovery-009', 'id': 'previous-id'}}
+        with patch.object(deploy, 'metadata', return_value={'id': 'previous-id'}) as observe:
+            self.assertEqual(deploy.predecessor(manifest, 'gateway'), 'glm53-gateway-recovery-009')
+            observe.assert_called_once_with('glm53-gateway-recovery-009')
+        with patch.object(deploy, 'metadata', return_value={'id': 'replacement-id'}):
+            with self.assertRaisesRegex(ValueError, 'changed'):
+                deploy.predecessor(manifest, 'gateway')
+        manifest['gateway']['name'] = 'glm53-landing-recovery-009'
+        with self.assertRaisesRegex(ValueError, 'mismatch'):
+            deploy.predecessor(manifest, 'gateway')
+
+    def test_canary_pins_manifest_without_mounting_production_secrets(self):
+        self.manifest['gateway'] = {'hostname': 'test-node', 'image': 'sha256:' + 'b' * 64}
+        (self.stage / 'manifest.json').write_text(json.dumps(self.manifest))
+        with patch.object(deploy, 'run') as execute:
+            deploy.create(self.stage, 'test-canary', 18077, canary=True)
+        command = execute.call_args.args
+        self.assertIn('TASKAND_RELEASE_SHA256=' + deploy.digest((self.stage / 'manifest.json').read_bytes()), command)
+        self.assertIn('TASKAND_RELEASE_MANIFEST=/app/release.json', command)
+        self.assertTrue(any('/app/release.json,readonly' in arg for arg in command))
+        self.assertNotIn('--env-file', command)
+        self.assertFalse(any('/taskand/.env' in arg or 'docker.sock' in arg for arg in command))
+
+    def test_rollback_uses_observed_predecessors_when_candidate_files_are_bad(self):
+        self.manifest.update({name: {'name': f'glm53-{name}-previous', 'id': name}
+                              for name in ('gateway', 'landing')})
+        (self.stage / 'manifest.json').write_text(json.dumps(self.manifest))
+        (self.stage / 'source/index.html').write_text('broken')
+        with patch.object(deploy, 'metadata', side_effect=lambda name: {'id': name.split('-')[1]}), \
+                patch.object(deploy.subprocess, 'run'), patch.object(deploy, 'run') as execute:
+            deploy.rollback(self.stage, 'test-candidate')
+        execute.assert_called_once_with('docker', 'start', 'glm53-gateway-previous', 'glm53-landing-previous')
 
 
 if __name__ == "__main__":

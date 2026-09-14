@@ -227,9 +227,27 @@ class SourceTests(unittest.TestCase):
         self.assertTrue(lines[-1]["preflightPassed"])
         self.assertEqual(len({line["observationId"] for line in lines}), 1)
         self.assertTrue(all(line["observedAt"] == lines[-1]["observedAt"] for line in lines))
-        self.assertTrue(all(line["sourceSha"] == self.sha for line in lines[:-1]))
+        self.assertTrue(all(line['schema'] == 'taskand.runtime-readiness-event/v2' for line in lines[:-1]))
+        self.assertTrue(all(line["expectedSourceSha"] == self.sha for line in lines[:-1]))
+        self.assertEqual(next(line for line in lines[:-1] if line['probe'] == 'health')['sourceSha'], self.sha)
         self.assertTrue(all(line["endpoint"]["port"] == port for line in lines[:-1]))
         self.assertEqual(lines[-1]["probeDeadlineSeconds"], 3.0)
+
+    def test_stream_never_substitutes_expected_sha_for_missing_or_different_health(self):
+        for actual in (None, 'b' * 40):
+            fixture = routes()
+            fixture['/healthz'] = (200, json.dumps({'ok': True, 'commit': actual}).encode())
+            with server(fixture) as (port, _):
+                result = subprocess.run([sys.executable, str(ROOT / 'app/runtime_readiness.py'),
+                                         '--repo', str(self.repo), '--expected-sha', self.sha,
+                                         '--gateway-port', str(port), '--ui-port', str(port), '--stream'],
+                                        capture_output=True, text=True, timeout=8)
+            self.assertEqual(result.returncode, 1)
+            lines = [json.loads(line) for line in result.stdout.splitlines()]
+            health = next(line for line in lines[:-1] if line['probe'] == 'health')
+            self.assertEqual(health['sourceSha'], actual)
+            self.assertEqual(health['expectedSourceSha'], self.sha)
+            self.assertFalse(lines[-1]['preflightPassed'])
 
 
 if __name__ == "__main__":

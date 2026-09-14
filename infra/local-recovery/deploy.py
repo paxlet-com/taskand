@@ -31,23 +31,27 @@ def safe(path):
 
 
 def metadata(name):
+    if not re.fullmatch(r'glm53-(gateway|landing)-[a-z0-9-]+', name):
+        raise ValueError('Expected explicit local gateway/landing container name')
     # Explicit projection: never fetch Config.Env or container logs.
     template = ('{"id":{{json .Id}},"image":{{json .Image}},'
                 '"mounts":{{json .Mounts}},"hostname":{{json .Config.Hostname}},'
                 '"network":{{json .HostConfig.NetworkMode}},'
                 '"running":{{json .State.Running}}}')
-    return json.loads(run('docker', 'inspect', '--format', template, name))
+    return {**json.loads(run('docker', 'inspect', '--format', template, name)), 'name': name}
 
 
-def stage(repo, revision, destination):
+def stage(repo, revision, destination, gateway_name='glm53-gateway-1', landing_name='glm53-landing-1'):
     if not re.fullmatch('[0-9a-f]{40}', revision):
         raise ValueError('Full source SHA required')
     run('git', '-C', str(repo), 'merge-base', '--is-ancestor', revision, 'origin/main')
     destination = safe(destination)
     if destination.exists():
         raise ValueError('Stage destination must not exist')
-    gateway = metadata('glm53-gateway-1')
-    landing = metadata('glm53-landing-1')
+    gateway = metadata(gateway_name)
+    landing = metadata(landing_name)
+    if not gateway['running'] or not landing['running']:
+        raise ValueError('Select the running predecessor containers explicitly')
     mounts = {m['Destination']: m for m in gateway['mounts']}
     generated = safe(mounts['/taskand/generated']['Source'])
     # Refuse unknown local package changes; never overwrite evolved files.
@@ -101,6 +105,16 @@ def load_stage(destination):
     return manifest, source
 
 
+def predecessor(manifest, service):
+    observed = manifest[service]
+    name = observed.get('name', f'glm53-{service}-1')
+    if not re.fullmatch(f'glm53-{service}-[a-z0-9-]+', name):
+        raise ValueError('Predecessor service/name mismatch')
+    if metadata(name)['id'] != observed['id']:
+        raise ValueError('Predecessor container changed; restage')
+    return name
+
+
 def create(destination, suffix, port, canary=False):
     if not re.fullmatch('[a-z0-9-]{1,40}', suffix):
         raise ValueError('Invalid candidate suffix')
@@ -121,8 +135,7 @@ def create(destination, suffix, port, canary=False):
                   for folder in ('log', 'vault', 'web-root')}
         mounts['/taskand/genome.yaml'] = (source / 'genome.yaml', True)
     else:
-        if metadata('glm53-gateway-1')['id'] != manifest['gateway']['id']:
-            raise ValueError('Original gateway changed; restage')
+        predecessor(manifest, 'gateway')
         mounts = {}
         for mount in manifest['gateway']['mounts']:
             if mount['Type'] != 'bind':
@@ -138,8 +151,12 @@ def create(destination, suffix, port, canary=False):
         args += ['--restart', 'unless-stopped']
     mounts.update({'/app/server.py': (source / 'gateway.py', True),
                    '/app/gateway': (source / 'gateway', True),
+                   '/app/release.json': (safe(destination) / 'manifest.json', True),
                    '/taskand/index.html': (source / 'index.html', True),
                    '/taskand/generated': (source / 'generated', True)})
+    args += ['--env', 'PYTHONDONTWRITEBYTECODE=1',
+             '--env', 'TASKAND_RELEASE_MANIFEST=/app/release.json',
+             '--env', 'TASKAND_RELEASE_SHA256=' + digest((safe(destination) / 'manifest.json').read_bytes())]
     for target, (origin, readonly) in mounts.items():
         args += ['--mount', f'type=bind,src={origin},dst={target}' + (',readonly' if readonly else '')]
     args += [manifest['gateway']['image'], 'python3', '/app/server.py']
@@ -149,13 +166,13 @@ def create(destination, suffix, port, canary=False):
 
 def switch(destination, suffix):
     manifest, source = load_stage(destination)
-    for service in ('gateway', 'landing'):
-        if metadata(f'glm53-{service}-1')['id'] != manifest[service]['id']:
-            raise ValueError('Original container changed; restage')
+    originals = [predecessor(manifest, service) for service in ('gateway', 'landing')]
     candidate = 'glm53-gateway-' + suffix
     info = metadata(candidate)
     mounted = {m['Destination']: m['Source'] for m in info['mounts']}
-    if mounted.get('/app/gateway') != str(source / 'gateway') or info['running']:
+    if (mounted.get('/app/gateway') != str(source / 'gateway') or info['running']
+            or mounted.get('/app/release.json') != str(safe(destination) / 'manifest.json')
+            or info['image'] != manifest['gateway']['image']):
         raise ValueError('Expected stopped qualified candidate')
     run('docker', 'create', '--name', 'glm53-landing-' + suffix,
         '--restart', 'unless-stopped', '-p', '8090:80',
@@ -164,19 +181,23 @@ def switch(destination, suffix):
     # Old containers are retained under their original names, so recovery needs
     # no reconstruction of credentials, mounts or writable container layers.
     try:
-        run('docker', 'stop', '--time', '30', 'glm53-gateway-1', 'glm53-landing-1')
+        run('docker', 'stop', '--timeout', '30', *originals)
         run('docker', 'start', candidate, 'glm53-landing-' + suffix)
     except subprocess.CalledProcessError:
-        rollback(suffix)
+        rollback(destination, suffix)
         raise
-    print(json.dumps({'switched': True, 'rollback': f'rollback --suffix {suffix}',
+    print(json.dumps({'switched': True, 'rollback': f'rollback --destination {destination} --suffix {suffix}',
                       'healthVerified': False}))
 
 
-def rollback(suffix):
+def rollback(destination, suffix):
+    if not re.fullmatch('[a-z0-9-]{1,40}', suffix):
+        raise ValueError('Invalid candidate suffix')
+    manifest = json.loads((safe(destination) / 'manifest.json').read_text())
+    originals = [predecessor(manifest, service) for service in ('gateway', 'landing')]
     for name in ('glm53-gateway-' + suffix, 'glm53-landing-' + suffix):
-        subprocess.run(['docker', 'stop', '--time', '30', name], check=False, capture_output=True)
-    run('docker', 'start', 'glm53-gateway-1', 'glm53-landing-1')
+        subprocess.run(['docker', 'stop', '--timeout', '30', name], check=False, capture_output=True)
+    run('docker', 'start', *originals)
     print(json.dumps({'originalContainersRestarted': True}))
 
 
@@ -189,17 +210,19 @@ def main():
     parser.add_argument('--suffix', default='recovery-009')
     parser.add_argument('--port', type=int, default=8077)
     parser.add_argument('--canary', action='store_true')
+    parser.add_argument('--gateway-container', default='glm53-gateway-1')
+    parser.add_argument('--landing-container', default='glm53-landing-1')
     args = parser.parse_args()
     if not 1024 <= args.port <= 65535:
         parser.error('Port must be 1024..65535')
     if args.action == 'stage':
-        stage(args.repo, args.source_sha or '', args.destination)
+        stage(args.repo, args.source_sha or '', args.destination, args.gateway_container, args.landing_container)
     elif args.action == 'create':
         create(args.destination, args.suffix, args.port, args.canary)
     elif args.action == 'switch':
         switch(args.destination, args.suffix)
     elif args.action == 'rollback':
-        rollback(args.suffix)
+        rollback(args.destination, args.suffix)
     else:
         manifest, _ = load_stage(args.destination)
         print(json.dumps({'verified': True, 'sourceSha': manifest['sourceSha']}))

@@ -1,0 +1,36 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-010",
+  "summary": "Verified gateway identity and remaining local acceptance",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-010/**", ".governance/manifest.json", "gateway/handlers/health.py", "infra/local-recovery/deploy.py", "infra/local-recovery/test_deploy.py", "infra/local-recovery/README.md", "app/runtime_readiness.py", "tests/runtime_readiness_test.py", "tests/health_identity_test.py", "docs/analysis/local-acceptance.md", "docs/README.md"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "aa0f5634cefc7a33df96ef43ceae0c1dad543fdf",
+    "targetBranch": "main",
+    "outcome": "Publish and locally deploy verified gateway source identity, correct observation binding and document scoped remaining acceptance work.",
+    "nonGoals": ["Remote peer deployment", "Observer activation", "Reading secrets", "Changing trusted checks", "Claiming full federation or autonomous evolution readiness"],
+    "complexity": "L", "estimatedMinutes": 110,
+    "budgets": {"maxImplementationFiles": 12, "maxAffectedComponents": 3, "maxPublicInterfaceChanges": 2, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Use the existing pinned release manifest and immutable mounts; expose bounded local gateway/UI integrity observation without claiming attestation. Keep expected source separate from observed identity and select predecessor containers explicitly.",
+      "components": [{"name":"runtime-identity","paths":["gateway/handlers/health.py","app/runtime_readiness.py","tests/health_identity_test.py","tests/runtime_readiness_test.py"]},{"name":"deployment","paths":["infra/local-recovery/**"]},{"name":"acceptance","paths":[".governance/manifest.json","docs/**"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Additive health identity fields", "Version 2 readiness stream event"],
+      "dataChanges": [], "ui": {"impact":"none","states":[],"evidence":[]},
+      "rollback": "Restart exact preserved predecessor containers; never overwrite application data or prior artifact."
+    },
+    "runtimeDependencies": [],
+    "validation": [{"criterion":"AC-01","commands":["python3 -m unittest discover -s tests -p health_identity_test.py"],"evidence":"Identity tamper and malformed-input regressions"},{"criterion":"AC-02","commands":["python3 -m unittest discover -s tests -p runtime_readiness_test.py"],"evidence":"Source binding regression"},{"criterion":"AC-03","commands":["python3 -m unittest discover -s infra/local-recovery -p 'test_*.py'"],"evidence":"Predecessor and manifest command tests"},{"criterion":"AC-04","commands":["./project/governance-check.sh","bash tests/isolated_integration.sh 3"],"evidence":"Local and protected CI receipts"}]
+  }
+}

@@ -204,7 +204,9 @@ def main(argv=None):
                    "probeDeadlineSeconds": args.timeout if math.isfinite(args.timeout) else None}
     try:
         source = source_identity(args.repo, args.expected_sha)
-        emit = (lambda event: print(json.dumps({**event, **observation, "sourceSha": source["sha"]}),
+        emit = (lambda event: print(json.dumps({**event, **observation,
+                                    "schema": "taskand.runtime-readiness-event/v2",
+                                    "expectedSourceSha": source["sha"]}),
                                     flush=True)) if args.stream else None
         probes = probe_all(args.gateway_port, args.ui_port, args.timeout, emit)
         report = assess(source, probes)
