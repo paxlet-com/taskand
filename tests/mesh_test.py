@@ -47,9 +47,9 @@ class MeshTests(unittest.TestCase):
 
     def test_private_fields_are_not_projected(self):
         source = catalog()
-        source["processes"][0].update(token="do-not-project", prompt="private-prompt")
+        source["processes"][0].update(token="test-only-private-token", prompt="private-prompt")
         result = json.dumps(projection(source, {"ok": True, "peers": []}))
-        self.assertNotIn("do-not-project", result)
+        self.assertNotIn("test-only-private-token", result)
         self.assertNotIn("private-prompt", result)
 
     def test_does_not_mutate_input(self):
@@ -171,6 +171,8 @@ class BrowserPilotTests(unittest.TestCase):
             store = Store(Path(directory) / "context")
 
             def auth(headers):
+                if headers.get("Authorization") == "Bearer synthetic-denied":
+                    return True, {"name": "denied", "role": "test", "allowed_uris": [], "allowed_actions": []}
                 if headers.get("Authorization") != "Bearer synthetic-pilot":
                     return False, None
                 return True, {
@@ -202,6 +204,8 @@ class BrowserPilotTests(unittest.TestCase):
                     ),
                 )
             )
+            chat = stack.enter_context(patch("gateway.utils.registry", return_value={"ok": True, "reply": "synthetic-answer"}))
+            stack.enter_context(patch("gateway.handlers.chat.log_event"))
             server = ThreadingHTTPServer(("127.0.0.1", 0), GatewayHTTPHandler)
             threading.Thread(target=server.serve_forever, daemon=True).start()
             stack.callback(server.server_close)
@@ -217,6 +221,9 @@ class BrowserPilotTests(unittest.TestCase):
                         viewport={"width": 1200, "height": 900}
                     )
                     errors = []
+                    requests = []
+                    held = []
+                    behavior = {"kind": "gateway"}
 
                     def route(request):
                         url = request.request.url
@@ -226,6 +233,14 @@ class BrowserPilotTests(unittest.TestCase):
                                 content_type="text/html",
                             )
                         if url.startswith("http://127.0.0.1:8077/api/"):
+                            requests.append({"url": url, "headers": request.request.headers, "method": request.request.method})
+                            if behavior["kind"] == "network":
+                                return request.abort()
+                            if behavior["kind"] == "hold":
+                                held.append(request)
+                                return
+                            if behavior["kind"] == "response":
+                                return request.fulfill(status=behavior["status"], body=behavior["body"], content_type="application/json")
                             response = request.fetch(
                                 url=url.replace(
                                     ":8077/", ":" + str(server.server_port) + "/", 1
@@ -238,7 +253,94 @@ class BrowserPilotTests(unittest.TestCase):
                     page = context.new_page()
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     page.goto("http://127.0.0.1:8090/")
+                    self.assertEqual(page.locator('#mode option').evaluate_all('(options) => options.map(o => o.value)'), ['compile', 'plan', 'chat'])
+                    with self.subTest("missing token is a local failure with no API call"):
+                        page.fill("#msg", "synthetic status")
+                        page.select_option("#mode", "chat")
+                        page.click("#send")
+                        self.assertIn("Podaj token API", page.locator("#out").inner_text())
+                        page.wait_for_timeout(600)
+                        self.assertEqual(requests, [])
+                        self.assertEqual(chat.call_count, 0)
+                    for token, message in (("synthetic-invalid", "401:"), ("synthetic-denied", "403:")):
+                        with self.subTest("real gateway rejects token or grant", credential_case=token):
+                            page.fill("#token", token)
+                            before = len(requests)
+                            page.click("#send")
+                            page.wait_for_function("text => document.querySelector('#out').textContent.includes(text)", arg=message)
+                            self.assertIn(message, page.locator("#authStatus").inner_text())
+                            self.assertEqual(chat.call_count, 0)
+                            attempted = requests[before:]
+                            self.assertEqual(
+                                [r["url"] for r in attempted if r["url"].endswith("/api/chat")],
+                                ["http://127.0.0.1:8077/api/chat"],
+                            )
+                            state_requests = [r for r in attempted if r["url"].split("?", 1)[0].endswith("/api/state")]
+                            self.assertTrue(all(r["method"] == "GET" for r in state_requests))
+                            self.assertNotIn(token, page.locator("body").inner_text())
                     page.fill("#token", "synthetic-pilot")
+                    with self.subTest("real form sends grant-bound request and reads result"):
+                        page.click("#send")
+                        page.wait_for_function("document.querySelector('#out').textContent.includes('synthetic-answer')")
+                        page.wait_for_function("!document.querySelector('#send').disabled")
+                        self.assertEqual(chat.call_count, 1)
+                        sent = next(r for r in requests if r["url"].endswith("/api/chat") and r["headers"].get("authorization") == "Bearer synthetic-pilot")
+                        self.assertEqual(sent["method"], "POST")
+                        self.assertNotIn("synthetic-pilot", sent["url"])
+                        self.assertTrue(page.locator("#request").inner_text().startswith("urn:uuid:"))
+
+                    for status, body, code in (
+                        (401, '{"error":"private-error-sentinel"}', "UNAUTHORIZED"),
+                        (403, '{"error":"private-error-sentinel"}', "FORBIDDEN"),
+                        (503, '{"error":"private-error-sentinel"}', "SERVER"),
+                        (504, '{"error":"private-error-sentinel"}', "TIMEOUT"),
+                        (400, '{"error":"private-error-sentinel"}', "HTTP"),
+                        (200, "not JSON: private-error-sentinel", "RESPONSE"),
+                        (200, "null", "RESPONSE"),
+                    ):
+                        with self.subTest("bounded safe failure classification", status=status, code=code):
+                            behavior.update(kind="response", status=status, body=body)
+                            result = page.evaluate("request('/api/context').catch(e => ({code:e.code,message:e.message}))")
+                            self.assertEqual(result["code"], code)
+                            self.assertNotIn("private-error-sentinel", result["message"])
+                    with self.subTest("network error and timeout are not authentication failures"):
+                        behavior["kind"] = "network"
+                        self.assertEqual(page.evaluate("request('/api/context').catch(e => e.code)"), "NETWORK")
+                        behavior["kind"] = "hold"
+                        self.assertEqual(page.evaluate("request('/api/context', undefined, 30).catch(e => e.code)"), "TIMEOUT")
+                        held.pop().abort()
+                        self.assertEqual(page.evaluate("pendingRequests.size"), 0)
+                    behavior["kind"] = "gateway"
+                    with self.subTest("late previous submission cannot replace current graph or answer"):
+                        result = page.evaluate("""async () => {
+                            const original=request;let release;
+                            try{
+                                request=async (path, body)=>{
+                                    if(path.startsWith('/api/state'))return {graph:{state:new URL(api+path).searchParams.get('requestId'),events:[],nodes:[]}};
+                                    if(path==='/api/older')return new Promise(resolve=>{release=()=>resolve({reply:'older-response'});});
+                                    return {reply:'current-response'};
+                                };
+                                const older=submit('/api/older',{});
+                                await submit('/api/current',{});
+                                const currentId=document.querySelector('#request').textContent;
+                                release();await older;
+                                return {currentId,state:document.querySelector('#state').textContent,answer:document.querySelector('#out').textContent};
+                            }finally{request=original;}
+                        }""")
+                        self.assertEqual(result["state"], result["currentId"])
+                        self.assertIn("current-response", result["answer"])
+                        self.assertNotIn("older-response", result["answer"])
+                    with self.subTest("actual gateway CORS preflight permits bearer header"):
+                        preflight = context.request.fetch(
+                            f"http://127.0.0.1:{server.server_port}/api/chat",
+                            method="OPTIONS",
+                            headers={"Origin": "http://127.0.0.1:8090", "Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "authorization,content-type"},
+                        )
+                        self.assertEqual(preflight.status, 204)
+                        self.assertEqual(preflight.headers.get("access-control-allow-origin"), "http://127.0.0.1:8090")
+                        self.assertIn("Authorization", preflight.headers["access-control-allow-headers"])
+                        denied_origin = context.request.fetch(f"http://127.0.0.1:{server.server_port}/api/chat", method="OPTIONS", headers={"Origin": "http://untrusted.invalid"})
+                        self.assertNotIn("access-control-allow-origin", denied_origin.headers)
                     page.click("#meshRefresh")
                     page.wait_for_function(
                         "document.querySelector('#metricRows').children.length === 5"
@@ -256,6 +358,58 @@ class BrowserPilotTests(unittest.TestCase):
                     self.assertEqual(page.input_value("#mode"), "compile")
                     self.assertTrue(page.input_value("#refs").startswith("urn:uuid:"))
                     self.assertEqual(page.evaluate("localStorage.length"), 0)
+                    self.assertEqual(page.evaluate("sessionStorage.length"), 0)
+                    with self.subTest("logout clears private state and aborts pending transport"):
+                        page.check("#meshLive")
+                        # Deliberately non-cooperative transport: a late success must
+                        # be rejected even when it ignores the abort signal.
+                        page.evaluate("""() => {
+                            window.originalFetch=window.fetch;
+                            window.fetch=(_url, options)=>new Promise(resolve=>{
+                                window.lateSignal=options.signal;window.lateResolve=resolve;
+                            });
+                        }""")
+                        page.evaluate("() => { window.lateMesh=refreshMesh(); }")
+                        page.wait_for_function("Boolean(window.lateResolve)")
+                        page.click("#logout")
+                        self.assertTrue(page.evaluate("window.lateSignal.aborted"))
+                        self.assertEqual(page.input_value("#token"), "")
+                        self.assertEqual(page.input_value("#msg"), "")
+                        self.assertEqual(page.input_value("#refs"), "")
+                        self.assertFalse(page.is_checked("#meshLive"))
+                        self.assertTrue(page.is_disabled("#observerNext"))
+                        self.assertEqual(page.locator("#network circle").count(), 0)
+                        self.assertEqual(page.locator("#metricRows tr").count(), 0)
+                        self.assertEqual(page.locator("#request").inner_text(), "")
+                        page.evaluate("""() => {
+                            window.lateResolve(new Response(JSON.stringify({private:'late-private-sentinel'})));
+                            window.fetch=window.originalFetch;
+                        }""")
+                        page.evaluate("window.lateMesh")
+                        self.assertIn("Wylogowano lokalnie", page.locator("#authStatus").inner_text())
+                        self.assertNotIn("late-private-sentinel", page.locator("body").inner_text())
+                        self.assertEqual(page.locator("#meshStatus").inner_text(), "Brak obserwacji w bieżącej sesji.")
+                        self.assertEqual(page.evaluate("localStorage.length + sessionStorage.length"), 0)
+                    with self.subTest("state polling does not overlap and logout does not retry POST"):
+                        page.fill("#token", "synthetic-pilot")
+                        page.evaluate("""() => {
+                            window.pollCalls=[];
+                            window.fetch=(url, options)=>new Promise((_resolve,reject)=>{
+                                window.pollCalls.push(url);
+                                options.signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')),{once:true});
+                            });
+                            window.pendingSubmit=submit('/api/chat',{message:'synthetic-delayed'}).catch(e=>e.code);
+                        }""")
+                        page.wait_for_timeout(1700)
+                        calls = page.evaluate("window.pollCalls")
+                        self.assertEqual(sum('/api/chat' in url for url in calls), 1)
+                        self.assertEqual(sum('/api/state?' in url for url in calls), 1)
+                        page.click("#logout")
+                        self.assertEqual(page.evaluate("window.pendingSubmit"), "SESSION_CHANGED")
+                        self.assertEqual(page.locator("#out").inner_text(), "Brak danych w bieżącej sesji.")
+                        self.assertEqual(page.locator("#state").inner_text(), "Brak aktywnego żądania")
+                        self.assertEqual(page.evaluate("window.pollCalls.length"), 2)
+                        page.evaluate("() => { window.fetch=window.originalFetch; }")
                     page.set_viewport_size({"width": 390, "height": 844})
                     self.assertLessEqual(
                         page.evaluate("document.documentElement.scrollWidth"), 390
