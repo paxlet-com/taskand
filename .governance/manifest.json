@@ -77,6 +77,11 @@
       },
       "integration": {
         "ownedPaths": [
+          "gateway/handlers/health.py",
+          "app/runtime_readiness.py",
+          "tests/runtime_readiness_test.py",
+          "tests/health_identity_test.py",
+          "infra/local-recovery/**",
           "generated/doctor/**",
           "tests/doctor_diagnostics.test.mjs",
           "tests/isolated_integration.sh",
