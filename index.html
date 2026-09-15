@@ -237,4 +237,26 @@ function resetSession(clearInputs=false){
 }
 $('token').addEventListener('input',()=>resetSession());
 $('logout').onclick=()=>resetSession(true);
+function isLoopbackHost(){
+  return ['localhost','127.0.0.1','::1'].includes(location.hostname);
+}
+function consumeDeveloperToken(){
+  const url=new URL(location.href), dev=url.searchParams.get('taskand_dev'), raw=url.searchParams.get('taskand_dev_token');
+  if(dev===null&&raw===null)return;
+  const hadToken=typeof raw==='string'&&raw.length>0;
+  // Remove the bootstrap material before accepting it. The token is never
+  // written to storage and is not forwarded as a query parameter to the API.
+  url.searchParams.delete('taskand_dev');url.searchParams.delete('taskand_dev_token');
+  let scrubbed=false;
+  try{history.replaceState(null,'',url.pathname+(url.search?url.search:'')+url.hash);scrubbed=true;}catch{}
+  if(dev==='1'&&hadToken&&isLoopbackHost()&&scrubbed){
+    $('token').value=raw;
+    $('authStatus').textContent='Token developerski załadowany tylko w pamięci strony (loopback).';
+    return;
+  }
+  $('authStatus').textContent=hadToken
+    ? 'Parametr developerski odrzucony: wymagane taskand=1, loopback i jednorazowe użycie.'
+    : 'Parametr developerski bez tokenu został pominięty.';
+}
+consumeDeveloperToken();
 </script></body></html>

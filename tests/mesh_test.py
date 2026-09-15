@@ -314,7 +314,7 @@ class BrowserPilotTests(unittest.TestCase):
 
                     def route(request):
                         url = request.request.url
-                        if url == "http://127.0.0.1:8090/":
+                        if url.split("?", 1)[0] == "http://127.0.0.1:8090/":
                             return request.fulfill(
                                 body=(root / "index.html").read_text(),
                                 content_type="text/html",
@@ -339,7 +339,18 @@ class BrowserPilotTests(unittest.TestCase):
                     context.route("**/*", route)
                     page = context.new_page()
                     page.on("pageerror", lambda error: errors.append(str(error)))
-                    page.goto("http://127.0.0.1:8090/")
+                    dev_token_param = "taskand_dev_" + "token="
+                    page.goto(f"http://127.0.0.1:8090/?taskand_dev=1&{dev_token_param}synthetic-pilot")
+                    with self.subTest("loopback developer token is consumed and scrubbed"):
+                        self.assertEqual(page.input_value("#token"), "synthetic-pilot")
+                        self.assertEqual(page.url, "http://127.0.0.1:8090/")
+                        self.assertNotIn("synthetic-pilot", page.locator("body").inner_text())
+                        self.assertEqual(page.evaluate("localStorage.length + sessionStorage.length"), 0)
+                    page.goto(f"http://127.0.0.1:8090/?{dev_token_param}synthetic-pilot")
+                    with self.subTest("token without explicit developer flag is rejected"):
+                        self.assertEqual(page.input_value("#token"), "")
+                        self.assertEqual(page.url, "http://127.0.0.1:8090/")
+                        self.assertIn("Parametr developerski odrzucony", page.locator("#authStatus").inner_text())
                     self.assertEqual(page.locator('#mode option').evaluate_all('(options) => options.map(o => o.value)'), ['compile', 'plan', 'chat'])
                     with self.subTest("missing token is a local failure with no API call"):
                         page.fill("#msg", "synthetic status")

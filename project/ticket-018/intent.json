@@ -1,0 +1,38 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-018",
+  "summary": "Developer panel token bootstrap via loopback URL",
+  "workstream": "integration",
+  "classification": {"kind": "FEATURE", "priority": "P2", "origin": "requested"},
+  "allowedPaths": ["project/ticket-018/**", "project/TICKETS.md", "index.html", "tests/mesh_test.py", "docs/information/complementary-runtime.md"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "bc7d54d0ca92a9e2a832ab3b73d709a116302dd3",
+    "targetBranch": "main",
+    "outcome": "Add an explicit loopback-only developer token bootstrap without changing gateway authority or production defaults.",
+    "nonGoals": ["URL token support outside loopback", "token persistence", "gateway authentication changes", "secret generation"],
+    "complexity": "S",
+    "estimatedMinutes": 45,
+    "budgets": {"maxImplementationFiles": 3, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 1, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Keep Authorization Bearer as the only gateway transport; bootstrap the existing UI field from a scrubbed loopback URL once.",
+      "components": [{"name": "web-cockpit", "paths": ["index.html", "tests/mesh_test.py", "docs/information/complementary-runtime.md"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["opt-in loopback-only taskand_dev/taskand_dev_token bootstrap"],
+      "dataChanges": [],
+      "ui": {"impact": "multi-state", "states": ["loading", "error", "success"], "evidence": ["tests/mesh_test.py: loopback bootstrap and rejected URL cases"]},
+      "rollback": "Revert the panel bootstrap block and its regression coverage; gateway authority remains unchanged."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-02", "commands": ["python3 -m unittest tests/mesh_test.py"], "evidence": "Browser fixture confirms URL scrubbing and in-memory token bootstrap"},
+      {"criterion": "AC-04", "commands": ["python3 -m unittest tests/mesh_test.py"], "evidence": "Existing panel auth and logout regression suite"},
+      {"criterion": "AC-05", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Managed governance and whitespace checks"}
+    ]
+  }
+}
