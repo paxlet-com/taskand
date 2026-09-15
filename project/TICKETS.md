@@ -18,4 +18,5 @@
 | **ticket-010** | [`README.md`](./ticket-010/README.md) | - | - | - | - | - |
 | **ticket-013** | [`README.md`](./ticket-013/README.md) | - | - | - | - | - |
 | **ticket-014** | [`README.md`](./ticket-014/README.md) | - | - |  [`ai-codex.md`](./ticket-014/ai-codex.md) | - | - |
+| **ticket-019** | [`README.md`](./ticket-019/README.md) | - | - | - | - | - |
 <!-- AUTO:TICKET_INDEX:END -->
