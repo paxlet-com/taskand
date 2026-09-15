@@ -1,0 +1,58 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-019",
+  "summary": "Publish the durable LLM development optimization plan",
+  "workstream": "integration",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-019/**",
+    "docs/refactoring/llm-development-optimization-plan.md",
+    "docs/README.md",
+    "project/TICKETS.md"
+  ],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "825cc7ec712378cfbb47f54726af0f5e5ab2b978",
+    "targetBranch": "main",
+    "outcome": "Publish the durable optimization plan in canonical docs/refactoring and link it from the project documentation index.",
+    "nonGoals": [
+      "Creating a competing wellmanifest/docs or wellmanifest/report standard",
+      "Moving raw logs, credentials, private receipts or full transcripts into the repository",
+      "Claiming external package publication, runtime deployment or fleet readiness",
+      "Changing active Taskand runtime behavior or the existing ticket-018 panel feature"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 60,
+    "budgets": {
+      "maxImplementationFiles": 4,
+      "maxAffectedComponents": 2,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Keep the durable plan and index in Taskand while retaining private evidence outside checkout; leave Docs policy adoption to the dedicated governance ticket.",
+      "components": [
+        {"name": "documentation", "paths": ["docs/refactoring/llm-development-optimization-plan.md", "docs/README.md"]}
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Revert the documentation/adoption commit while retaining the private content-addressed handoff; do not delete recovery evidence."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["pinned Docs check --deliverable docs/refactoring/llm-development-optimization-plan.md"], "evidence": "Docs checker JSON and digest"},
+      {"criterion": "AC-02", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Managed governance and documentation index"}
+    ]
+  }
+}
