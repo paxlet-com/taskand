@@ -1,5 +1,10 @@
 # Dokumentacja taskand
 
+## Co pozostało do zrobienia
+
+- [Podsumowanie pozostałych prac](refactoring/remaining-work.md) — stan po PR #17,
+  kolejność, kryteria odbioru i zależności; scalenie nie oznacza wdrożenia.
+
 ## Zwięzłe plany ewolucji
 
 Pilotaż kompaktowego formatu wellmanifest/docs: jeden temat na plik,

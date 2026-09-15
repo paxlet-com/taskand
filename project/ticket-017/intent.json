@@ -1,0 +1,38 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-017",
+  "summary": "Remaining work summary after recovery deliveries",
+  "workstream": "integration",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-017/**", "docs/refactoring/remaining-work.md", "docs/README.md"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "0f9df49f33d6cd85006fe4e41378f06b7347d7dd",
+    "targetBranch": "main",
+    "outcome": "Publish and merge the evidence-backed remaining-work summary through protected local OneDev and independent Validator review",
+    "nonGoals": ["Runtime implementation or deployment", "Changing standards or protected policy", "Editing another ticket's work"],
+    "complexity": "S",
+    "estimatedMinutes": 30,
+    "budgets": {"maxImplementationFiles": 2, "maxAffectedComponents": 1, "maxPublicInterfaceChanges": 0, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Use published wellmanifest.docs/document/v1 at its canonical lowercase path; keep detailed existing plans and add one dated status summary",
+      "components": [{"name": "documentation", "paths": ["docs/**"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Revert only this documentation change; preserve historical plans and other tickets."
+    },
+    "runtimeDependencies": [],
+    "validation": [{"criterion": "AC-03", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Local docs, governance and link-check results"}]
+  }
+}
