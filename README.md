@@ -18,7 +18,7 @@ W wersji v2.0 repozytorium nie zawiera setek zduplikowanych procesów ani preins
 taskand/
 ├── Dockerfile              ← bootstrap (zygota) — generuje i testuje procesy
 ├── docker-compose.yaml     ← gateway + Web Cockpit + VM browser (digital twin)
-├── .env                    ← TASKAND_LLM_API_KEY=... (jedyny potrzebny sekret)
+├── .env                    ← lokalny kontrakt runtime (auth + opcjonalne sekrety)
 ├── bin/
 │   └── taskand            ← uniwersalne CLI (~150 linii, direct/gateway)
 └── genome.yaml             ← deklaracja organizmów do wygenerowania
@@ -83,6 +83,11 @@ taskand occupy deploy@rpi5 --run --token <token-mastera>
 ## 🚀 Szybki start
 
 ```bash
+# Konfiguracja (bez ujawniania pliku w Git):
+cp .env.example .env
+# ustaw TASKAND_LLM_API_KEY; na loopback pusty TASKAND_AUTH_TOKEN korzysta
+# z lokalnego grantu taskand-admin-key. Dla LAN/VPS wpisz własny losowy token.
+
 # 1. Sprawdź testy kontraktów wszystkich procesów (fail-closed)
 make test
 
@@ -95,6 +100,22 @@ make status
 # 4. Zreplikuj system na zdalne urządzenie (np. Raspberry Pi 5)
 ./bin/taskand boot user@192.168.1.50
 ```
+
+### Kontrakt `.env` i autoryzacja
+
+`TASKAND_AUTH_TOKEN` jest tokenem panelu HTTP oraz klienta CLI — nie jest nim
+`TASKAND_LLM_API_KEY`. Compose przekazuje auth do gatewaya jako zmienną procesu;
+sam montowany plik `.env` nie wystarcza do autoryzacji kontenera. Na
+`TASKAND_BIND=127.0.0.1` działają także publiczne tokeny z `grants.yaml`, w tym
+`taskand-admin-key`. Po ustawieniu własnego tokena środowiskowego zastępuje on
+grant administratora. Przy nasłuchu innym niż loopback domyślne tokeny są
+odrzucane.
+
+`.env.example` wymienia również opcjonalne zmienne transportu przeglądarki,
+sejfu (`TASKAND_VAULT_KEY`), modelu, ścieżek Compose i identyfikacji węzła.
+Zmienne wewnętrzne (`TASKAND_CALL_DEPTH`, `TASKAND_CALLER`,
+`TASKAND_CREDENTIAL` oraz znaczniki release) są przekazywane tylko przez
+broker rejestru i nie należą do pliku użytkownika.
 
 ---
 
