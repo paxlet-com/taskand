@@ -218,6 +218,15 @@ bliźniaków. Dockerfile opisuje runtime, nie pełny model urządzenia ani czło
 
 1. Otwórz lokalny Web Cockpit i podaj token. Nowy interfejs nie zapisuje tokenu
    w localStorage. CORS dopuszcza tylko lokalne pochodzenia portu 8090.
+   W wersji developerskiej można jednorazowo uruchomić panel adresem
+   `http://localhost:8090/?taskand_dev=1&taskand_dev_token=TOKEN`. Działa to
+   wyłącznie na `localhost`, `127.0.0.1` lub `::1`; panel usuwa oba parametry
+   przez `history.replaceState` przed użyciem tokenu i trzyma go tylko w polu
+   pamięci. Przykładowym lokalnym tokenem jest `taskand-admin-key` z
+   `grants.yaml`; jeżeli `.env` ustawia `TASKAND_AUTH_TOKEN`, użyj jego wartości.
+   Nie używaj tego trybu dla adresu LAN/VPS: URL może trafić do historii,
+   logów proxy lub zrzutu ekranu. Klucz `TASKAND_LLM_API_KEY` nie jest tokenem
+   panelu.
 2. Wybierz tryb `DSL bez LLM i bez wykonania`, wpisz zadanie i opcjonalne,
    istniejące URN kontekstu. Nieznana referencja blokuje przekazanie do procesu.
 3. Każde przyjęte, uwierzytelnione żądanie POST gateway otrzymuje requestId,
