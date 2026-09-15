@@ -190,6 +190,15 @@ Fallback do Git musi dowieść kompletnego zbioru zmian i dokładnego subjectu, 
 - Jeden indeks przekrojowy pozostaje w `subactor/docs`. Docs/Report określają miejsce i cykl dokumentu, Logs dowody surowe, New Project powiązanie z intentem. Nie tworzyć nowego standardu tylko dlatego, że trudno odnaleźć istniejący.
 - Trwały plan musi docelowo trafić do wersjonowanego miejsca. Ten draft nie omija publikującego się ticketu-014 Taskand ani nie rozszerza jego `allowedPaths`; właściciel `subactor/docs` ma go przyjąć w swoim zakresie i zaindeksować.
 
+### Granica adopcji tego planu
+
+Ten commit publikuje treść planu i jej lokalny indeks, ale nie deklaruje adopcji
+polityki Docs w `.governance`. Taka adopcja musi pozostać osobnym, przypiętym
+zakresem: najpierw odczyt źródłowej rewizji i digestu polityki, następnie
+walidacja zgodności oraz chroniony PR właściciela adopcji. Do czasu terminalnego
+receiptu brak wpisu adopcyjnego oznacza `UNADOPTED`, a nie błąd tego planu ani
+zgodę na używanie go jako runtime policy.
+
 <!-- docs:section validation -->
 ## 9. Mierniki i eksperyment
 

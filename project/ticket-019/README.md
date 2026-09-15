@@ -1,4 +1,4 @@
-# Ticket 019: Publish LLM development optimization plan and enforce report placement
+# Ticket 019: Publish the durable LLM development optimization plan
 
 - **ID**: ticket-019
 - **Owner**: codex
@@ -9,23 +9,23 @@
 ## Goal and scope
 
 Move the session's durable LLM/ecosystem optimization plan from its private
-handoff store into the Taskand repository, index it through the adopted Docs
-profile, and bind the repository to the immutable Docs policy. Keep raw logs,
-receipts and recovery snapshots private. The existing wellmanifest/docs and
-wellmanifest/report contracts remain the owners of placement semantics; this
-ticket does not create a competing standard.
+handoff store into the Taskand repository and index it through the canonical
+documentation tree. Keep raw logs, receipts and recovery snapshots private.
+The existing wellmanifest/docs and wellmanifest/report contracts remain the
+owners of placement semantics; adoption is handled by the dedicated governance
+ticket and this ticket does not create a competing standard.
 
 ## Acceptance criteria
 
 - [x] AC-01: The plan exists at `docs/refactoring/llm-development-optimization-plan.md` with document/v1 metadata and every required refactoring-plan section marker.
-- [x] AC-02: `docs/README.md` links the canonical plan and `.governance/docs.json` pins the published Docs policy by full source SHA and policy digest.
+- [x] AC-02: `docs/README.md` links the canonical plan under `docs/refactoring`.
 - [x] AC-03: The private source copy remains available, while the repository copy is the durable result and does not embed raw logs, credentials or private transcripts.
-- [ ] AC-04: Pinned Docs checker and managed governance checks pass on this exact ticket diff; external protected publication remains a separate lifecycle state.
+- [ ] AC-04: Managed governance and documentation checks pass on this exact ticket diff; Docs policy adoption and external protected publication remain separate lifecycle states.
 
 ## Validation evidence
 
 - Source copy: `private-recovery://taskand-ext-handoff-20260915/LLM_DEVELOPMENT_OPTIMIZATION_PLAN.md` (private recovery artifact; not a delivery location).
-- Published Docs source revision: `ebe7501063ef4f3e63ded610c2d3183010ca636e`, policy SHA-256: `f6ba9c011ea1d9260e7fac3a1638a767d5ebc9f7d9b32ed51cc3aea22fe95d8c`.
+- The immutable Docs source revision and policy digest are recorded for the dedicated governance adoption ticket, not asserted as adopted by this documentation-only ticket.
 - The plan records session observations, not a claim that all referenced implementations, packages or deployments are complete.
 
 ## Tracking boundary
