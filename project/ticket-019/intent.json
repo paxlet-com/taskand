@@ -20,7 +20,7 @@
   "conflictsWith": [],
   "integrationTicket": null,
   "delivery": {
-    "acceptedBaseSha": "bc7d54d0ca92a9e2a832ab3b73d709a116302dd3",
+    "acceptedBaseSha": "825cc7ec712378cfbb47f54726af0f5e5ab2b978",
     "targetBranch": "main",
     "outcome": "Publish the durable optimization plan in canonical docs/refactoring and link it from the project documentation index.",
     "nonGoals": [
