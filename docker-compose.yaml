@@ -23,9 +23,15 @@ services:
       - TASKAND_LLM_API_KEY=${TASKAND_LLM_API_KEY:-}
       - TASKAND_LLM_MODEL=${TASKAND_LLM_MODEL:-glm-5.3}
       - TASKAND_LLM_ENDPOINT=${TASKAND_LLM_ENDPOINT:-https://api.z.ai/api/paas/v4/chat/completions}
+      - TASKAND_AUTH_TOKEN=${TASKAND_AUTH_TOKEN:-}
+      - TASKAND_VAULT_KEY=${TASKAND_VAULT_KEY:-}
+      - TASKAND_LLM_REASONING=${TASKAND_LLM_REASONING:-}
       # 127.0.0.1 = tylko ten host; 0.0.0.0 = LAN/federacja (wymaga własnych tokenów w grants.yaml)
       - TASKAND_BIND=${TASKAND_BIND:-127.0.0.1}
       - TASKAND_BROWSER_CDP=${TASKAND_BROWSER_CDP:-http://127.0.0.1:9222}
+      - TASKAND_BROWSER_NOVNC=${TASKAND_BROWSER_NOVNC:-http://127.0.0.1:3010}
+      - TASKAND_NODE=${TASKAND_NODE:-}
+      - TASKAND_DEBUG=${TASKAND_DEBUG:-}
     volumes:
       # A local preview can retain the primary runtime's complete package registry.
       - ${TASKAND_GENERATED_ROOT:-./generated}:/taskand/generated
