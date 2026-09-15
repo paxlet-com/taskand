@@ -23,6 +23,7 @@ standardu w CI i nie stanowi odbioru opisywanej funkcjonalności.
 - [Intencja z historii](REFACTORING/HISTORY_INTENT_ANALYSIS.md) — dowody, hipotezy i brak automatycznej zgody.
 - [Polityka priorytetów SDLC](REFACTORING/SDLC_PRIORITY_POLICY.md) — klasyfikacja, koszty i właściciele standardów.
 - [Dawny plan ewolucji](refactoring/continuous-evolution-plan.md) — zachowane wejścia i nagłówki.
+- [Plan optymalizacji developmentu z LLM](refactoring/llm-development-optimization-plan.md) — propozycje redukcji narzutu operacyjnego, poprawy jakości i bezpiecznej automatyzacji.
 
 ## Pozostała dokumentacja
 
