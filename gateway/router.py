@@ -9,6 +9,7 @@ from gateway.handlers.orchestrator import handle_orchestrator
 from gateway.handlers.context import handle_context, handle_state
 from gateway.handlers.mesh import handle_mesh
 from gateway.handlers.observers import handle_pilot
+from gateway.handlers.monag_handler import handle_monag_status, handle_monag_resume, handle_notify
 from urllib.parse import urlsplit
 
 ROUTES: Dict[Tuple[str, str], Callable] = {
@@ -26,6 +27,9 @@ ROUTES: Dict[Tuple[str, str], Callable] = {
     ("POST", "/api/doctor"): handle_doctor,
     ("POST", "/api/planner"): handle_planner,
     ("POST", "/api/orchestrator"): handle_orchestrator,
+    ("GET", "/api/monag/status"): handle_monag_status,
+    ("GET", "/api/monag/resume"): handle_monag_resume,
+    ("POST", "/api/notify"): handle_notify,
 }
 
 def dispatch(method: str, path: str, request_handler, body: dict) -> None:

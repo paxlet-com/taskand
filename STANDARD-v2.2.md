@@ -275,3 +275,25 @@ Automatyczny pakiet testów weryfikuje odporność systemu na błędy brzegowe (
 9. **Brak grantu na gateway**: HTTP 403 Forbidden dla roli o ograniczonych uprawnieniach.
 10. **Poprawny token administratora**: HTTP 200 OK.
 
+
+---
+
+<a id="11-kapsula"></a>
+## 11 · Standard Pakowania Kapsuły Organizmu (Reużywalność i Konteneryzacja)
+
+W celu zachowania pełnej autonomii, replikowalności oraz możliwości reużycia procesów w zewnętrznych repozytoriach i innych organizmach, każdy generowany proces w ścieżce `generated/<organism>/<process>/<domain>/<version>/` **MUSI** stanowić autonomiczną kapsułę zawierającą kompletne metadane dystrybucyjne:
+
+1. **`package.json` (Node.js) / `pyproject.toml` (Python)**:
+   - Deklaracja unikalnej nazwy pakietu (np. `@taskand/<organism>-<process>-<version>`),
+   - Jawne zależności uruchomieniowe (bez zakładania obecności globalnych bibliotek hosta),
+   - Skrypty standardowe: `"start"` oraz `"test"`.
+2. **`Dockerfile`**:
+   - Samodzielny, lekki obraz kontenera OCI (np. `node:alpine` lub `python:alpine`),
+   - Etykiety metadanych: `org.taskand.uri`, `org.taskand.organism`, `org.taskand.kind`,
+   - Izolacja użytkownika i zdefiniowany `ENTRYPOINT` realizujący kontrakt stdin/stdout.
+3. **`README.md`**:
+   - Specyfikacja kontraktu URI, dozwolonych kodów wyjścia (`0`, `1`, `2`),
+   - Schemat JSON wejścia (stdin) oraz wyjścia (stdout),
+   - Przykłady wywołania standalone (CLI oraz `docker run`).
+4. **`test.mjs` / `test.py`**:
+   - Automatyczny test kontraktu weryfikujący determinizm JSON i kody błędów fail-closed.
