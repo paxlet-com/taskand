@@ -12,13 +12,17 @@
       "env": [],
       "credentials": [],
       "files": [
+        "Dockerfile",
+        "README.md",
         "bin.mjs",
-        "proc.yaml"
+        "package.json",
+        "proc.yaml",
+        "test.mjs"
       ],
-      "hash": "sha256:df671b2d3478ce02f1de7ca404120688332951d2d245f758d164f786064d4c5b",
+      "hash": "sha256:311f0acb4cfca8d684efb13ca9dff5ec2fd75e5af10d58e5ba10ee48f0191f64",
       "status": "active",
-      "registered": "2026-09-12T19:09:04.973Z"
+      "registered": "2026-09-15T12:15:00.000Z"
     }
   },
-  "updated": "2026-09-12T19:09:04.973Z"
+  "updated": "2026-09-15T12:15:00.000Z"
 }

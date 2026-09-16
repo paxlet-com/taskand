@@ -1,0 +1,120 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-026",
+  "summary": "Live monag telemetry and hardware capsule packaging",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-026/**",
+    "project/TICKETS.md",
+    ".governance/manifest.json",
+    "STANDARD-v2.2.md",
+    "gateway/router.py",
+    "gateway/handlers/monag_handler.py",
+    "index.html",
+    "generated/hw/registry.json",
+    "generated/hw/monitor/taskand.dev/v1/**",
+    "tests/monag_handler_test.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-025"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "bc5cbfbfa2037b32914a1c86acaf42f55c25d1da",
+    "targetBranch": "main",
+    "outcome": "Expose live monag telemetry, resume and desktop/web notifications on the gateway router and index panel, and package hw/monitor as a standardized organism capsule.",
+    "nonGoals": [
+      "Running external sync or background daemons",
+      "Mutating existing hardware discovery processes"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 60,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Route /api/monag/status, /api/monag/resume, and /api/notify in gateway/router.py to monag_handler.py; package generated/hw/monitor/taskand.dev/v1 with Dockerfile, README, package.json and contract tests per STANDARD-v2.2.md section 11.",
+      "components": [
+        {
+          "name": "gateway-monag",
+          "paths": [
+            "gateway/router.py",
+            "gateway/handlers/monag_handler.py",
+            "tests/monag_handler_test.py"
+          ]
+        },
+        {
+          "name": "ui-monag",
+          "paths": [
+            "index.html"
+          ]
+        },
+        {
+          "name": "hw-capsule",
+          "paths": [
+            "STANDARD-v2.2.md",
+            "generated/hw/**"
+          ]
+        },
+        {
+          "name": "governance",
+          "paths": [
+            ".governance/manifest.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "GET /api/monag/status",
+        "GET /api/monag/resume",
+        "POST /api/notify"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert gateway/router.py and index.html endpoints; remove monag_handler.py and hw capsule manifest entries."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "PYTHONPATH=. python3 -m unittest discover tests \"*monag*\""
+        ],
+        "evidence": "Gateway monag status, resume and notification unit tests pass"
+      },
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "node generated/hw/monitor/taskand.dev/v1/test.mjs",
+          "node tests/contract_tests.mjs"
+        ],
+        "evidence": "Hardware monitor capsule standalone test and organism registry contract tests pass"
+      },
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Managed governance gate passes cleanly"
+      }
+    ]
+  }
+}

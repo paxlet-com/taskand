@@ -1,0 +1,28 @@
+{
+  "name": "@taskand/hw-monitor-v1",
+  "version": "1.0.0",
+  "description": "Telemetria sprzętu: temperatury czujników, obciążenie CPU, dysk, GPIO",
+  "type": "module",
+  "main": "bin.mjs",
+  "bin": {
+    "taskand-hw-monitor": "./bin.mjs"
+  },
+  "scripts": {
+    "start": "node bin.mjs",
+    "test": "node test.mjs"
+  },
+  "keywords": [
+    "taskand",
+    "organism",
+    "hw",
+    "telemetry",
+    "proc-uri"
+  ],
+  "author": "taskand.dev",
+  "license": "Apache-2.0",
+  "taskand": {
+    "uri": "proc://taskand.dev/hw/monitor/v1",
+    "organism": "hw",
+    "kind": "task"
+  }
+}
