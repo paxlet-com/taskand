@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { capture } from './capture.mjs';
-import { digest } from './model.mjs';
+import { digest, sourceTopologyKey } from './model.mjs';
 import { registry, call } from './registry-client.mjs';
 
 const ROOT = fileURLToPath(new URL('../../../../..', import.meta.url));
@@ -44,8 +44,8 @@ function main(input) {
     if (r.error || r.status !== 0) runtime = { ...runtime, ok: false, errorType: 'TWIN_UNAVAILABLE', error: r.error?.message || r.stderr?.trim() || `exit ${r.status}` };
     write('runtime.json', runtime);
     const current = call(snapshot.scanner.uri, { mode: 'inventory' }, 10000);
-    const topologyKey = t => JSON.stringify({ interfaces: t?.interfaces, networks: t?.networks });
-    const sourceUnchanged = current.ok && topologyKey(current.topology) === topologyKey(snapshot.topology);
+    const scannedCidrs = (snapshot.live?.scanned_networks || []).map(n => n.cidr);
+    const sourceUnchanged = current.ok && sourceTopologyKey(current.topology, scannedCidrs) === sourceTopologyKey(snapshot.topology, scannedCidrs);
     receipt = { ...receipt, ok: runtime.ok === true && sourceUnchanged, state: runtime.ok && sourceUnchanged ? 'VERIFIED' : 'FAILED',
       sourceUnchanged, snapshotHash: digest(snapshot), catalogHash: snapshot.catalogHash,
       devices: snapshot.live.devices, scanned_networks: snapshot.live.scanned_networks,

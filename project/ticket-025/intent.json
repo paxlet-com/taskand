@@ -1,0 +1,101 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-025",
+  "summary": "Ignore ephemeral container interfaces in twin source-change check",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "regression"
+  },
+  "allowedPaths": [
+    "project/ticket-025/**",
+    ".governance/manifest.json",
+    "generated/twin/environment/taskand.dev/v1/bin.mjs",
+    "generated/twin/environment/taskand.dev/v1/model.mjs",
+    "generated/twin/registry.json",
+    "tests/digital_twin.test.mjs"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-024"
+  ],
+  "conflictsWith": [
+    "ticket-024"
+  ],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "63750de6784d77fc2b5bf3f0017c166e11aaf713",
+    "targetBranch": "main",
+    "outcome": "A twin run is not rejected with SOURCE_CHANGED when container interfaces (veth, bridges) appear or disappear during the scan, while LAN addressing changes and changes on scanned subnets still invalidate it.",
+    "nonGoals": [
+      "Changing scan scope, nmap limits or parity checks inside the isolated runtime",
+      "Stopping or reconfiguring host containers",
+      "Redeploying the running gateway stage"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 45,
+    "budgets": {
+      "maxImplementationFiles": 5,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Move the source-change key into model.mjs as a pure function next to parity so it is unit-tested; exclude ephemeral interfaces unless their subnet was part of the scan.",
+      "components": [
+        {
+          "name": "twin-environment",
+          "paths": [
+            "generated/twin/**"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/digital_twin.test.mjs"
+          ]
+        },
+        {
+          "name": "governance",
+          "paths": [
+            ".governance/manifest.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert the ticket commit; twin/environment returns to comparing the full interface and network lists."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "node --test tests/digital_twin.test.mjs"
+        ],
+        "evidence": "Container churn keeps the key; LAN address change and scanned bridge change alter it"
+      },
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "node bin/taskand verify",
+          "make test",
+          "./project/governance-check.sh",
+          "git diff --check"
+        ],
+        "evidence": "bindingHash, local suites and managed governance gate"
+      }
+    ]
+  }
+}

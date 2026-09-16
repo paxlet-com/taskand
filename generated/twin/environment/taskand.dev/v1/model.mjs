@@ -13,3 +13,13 @@ export function parity(expected, actual) {
     addresses: compareSets(addresses(expected), addresses(actual)), subnetsAndRanges: compareSets(networks(expected), networks(actual)) };
   return { ok: Object.values(checks).every(c => c.ok), checks };
 }
+// Klucz zmiany źródła: interfejsy efemeryczne (kontenery, mosty) nie unieważniają bliźniaka,
+// chyba że ich podsieć była skanowana — wtedy zmiana nadal oznacza SOURCE_CHANGED
+const EPHEMERAL = /^(veth|br-|docker|cni|flannel|virbr)/;
+export function sourceTopologyKey(topology, scannedCidrs = []) {
+  const scanned = new Set(scannedCidrs);
+  const networks = (topology?.networks || []).filter(n => !EPHEMERAL.test(n.interface || '') || scanned.has(n.cidr));
+  const kept = new Set(networks.map(n => n.interface));
+  const interfaces = (topology?.interfaces || []).filter(i => !EPHEMERAL.test(i.name || '') || kept.has(i.name));
+  return JSON.stringify({ interfaces, networks });
+}

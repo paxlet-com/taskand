@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readlinkSync } from 'node:fs';
 import { subnet, contains } from '../generated/admin/network-device-discovery/taskand.dev/v4/address.mjs';
-import { parity } from '../generated/twin/environment/taskand.dev/v1/model.mjs';
+import { parity, sourceTopologyKey } from '../generated/twin/environment/taskand.dev/v1/model.mjs';
 import { parseIntent } from '../generated/dev/chat/taskand.dev/v1/intent.mjs';
 
 const registryPath = 'generated/registry/core/taskand.dev/v1/bin.mjs';
@@ -40,6 +40,21 @@ test('parity rejects missing IPv6, altered prefix/range and unexpected subnet', 
   assert.equal(parity(expected, range).ok, false);
   const extra = structuredClone(expected); extra.networks.push({ ...subnet('10.9.0.1', 16), interface: 'br0' });
   assert.equal(parity(expected, extra).ok, false);
+});
+test('source-change key ignores container interface churn but not LAN or scanned bridge changes', () => {
+  const lan = { name: 'enp91s0', addresses: [{ family: 4, address: '192.168.188.212', prefix: 24 }] };
+  const bridge = { name: 'br-1a2b', addresses: [{ family: 4, address: '172.18.0.1', prefix: 16 }] };
+  const net = (iface, ip, prefix) => ({ ...subnet(ip, prefix), interface: iface });
+  const base = { interfaces: [lan, bridge], networks: [net('enp91s0', '192.168.188.212', 24), net('br-1a2b', '172.18.0.1', 16)] };
+  const churn = structuredClone(base);
+  churn.interfaces.push({ name: 'veth9f3c', addresses: [{ family: 6, address: 'fe80::1', prefix: 64 }] });
+  churn.interfaces = churn.interfaces.filter(i => i.name !== 'br-1a2b');
+  churn.networks = churn.networks.filter(n => n.interface !== 'br-1a2b');
+  assert.equal(sourceTopologyKey(churn), sourceTopologyKey(base));
+  const moved = structuredClone(base); moved.interfaces[0].addresses[0].address = '192.168.188.213';
+  assert.notEqual(sourceTopologyKey(moved), sourceTopologyKey(base));
+  const scanned = ['192.168.188.0/24', '172.18.0.0/16'];
+  assert.notEqual(sourceTopologyKey(churn, scanned), sourceTopologyKey(base, scanned));
 });
 test('registry selects active version and repeated reuse does not change binding', () => {
   const a = reg('select', { organism: 'admin', capability: 'network-device-discovery' });

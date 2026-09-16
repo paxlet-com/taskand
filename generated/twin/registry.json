@@ -20,10 +20,10 @@
         "registry-client.mjs",
         "runtime.mjs"
       ],
-      "hash": "sha256:781c00ab54181efac1ec7de8b237fe22748d0706ff258d9bea5c524fb936505b",
+      "hash": "sha256:187fbd2c55076602e41a7a7dcf565c0b587a96c8c2300e6ec23caa685e97a6cc",
       "status": "active",
       "registered": "2026-09-13T07:02:41.371Z",
-      "refreshedAt": "2026-09-13T07:05:51.074Z"
+      "refreshedAt": "2026-09-15T20:40:50.066Z"
     },
     "proc://taskand.dev/twin/web/v1": {
       "uri": "proc://taskand.dev/twin/web/v1",
@@ -45,5 +45,5 @@
       "registered": "2026-09-13T07:28:34.893Z"
     }
   },
-  "updated": "2026-09-13T07:28:34.893Z"
+  "updated": "2026-09-15T20:40:50.066Z"
 }
