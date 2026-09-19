@@ -3,14 +3,14 @@
   "schema": "wellmanifest.docs/document/v1",
   "id": "mcp-uri-catalog",
   "kind": "information",
-  "version": 1,
+  "version": 2,
   "title": "Lokalne MCP jako natywne procesy URI",
-  "status": "proposed",
+  "status": "implemented",
   "owner": "semcod/taskand-glm53",
   "created": "2026-09-19",
   "updated": "2026-09-19",
   "review_after": "2026-09-26",
-  "source_revision": "8804583ef82342ad7870659cf79e9ad8278e2369",
+  "source_revision": "8fa9d47b389a9c0ab4b7a12601fad1b8ac23b95b",
   "affected_repositories": [
     "semcod/taskand-glm53"
   ],
@@ -198,12 +198,18 @@ kontrolowanej aktualizacji. Pin profilu nie jest podpisem ani izolacją systemow
 ## Walidacja i uruchomiony pilot
 
 - Dotychczasowy adapter Taskand MCP: 9/9 testów; kontroler ticket-029: 11/11.
-- Pierwszy `make test` przeszedł: konformacja 4/4, kontrakty 30/30, negatywne 17/17,
-  twin 9, web twin 8, CLI 7, MCP Python 10 i rejestr MCP Node 1.
-  Końcowy `test-mcp` po rozszerzeniu CLI: Python 11 i Node 1, wszystkie przeszły.
-  Powtórny pełny test po rejestracji 422 kandydatów ujawnił 2 błędy kontraktów
-  doctor/prescribe i doctor/heal (28/30): duży JSON jest ucinany przez natychmiastowe
-  zakończenie procesu. Wymagana osobna naprawa ograniczona do tej regresji.
+- Końcowy `make test` z 422 zarejestrowanymi kandydatami: konformacja 4/4,
+  kontrakty 30/30, negatywne 17/17, twin 9, web twin 8, CLI 7,
+  MCP Python 11 i rejestr MCP Node 1; wszystkie przeszły.
+- `node --test tests/doctor_diagnostics.test.mjs`: 14/14. Nowy test najpierw
+  odtworzył ucięcie JSON na potoku; po poprawce oba rzeczywiste programy
+  zachowują wszystkie 1024 ustalenia, ostatni rekord i tryb planowania.
+- Integracja jest lokalnym commitem `9384699affb303d1ad31831eeea7181116e34680`.
+  Zależność ticket-031, commit `8fa9d47b389a9c0ab4b7a12601fad1b8ac23b95b`,
+  zastępuje asynchroniczny zapis stdout synchronicznym `writeFileSync(1, ...)`
+  przed istniejącym `process.exit`. Poprawka obejmuje doctor/prescribe i
+  doctor/heal oraz odświeża wyłącznie ich bindingHash. Dołączono ją lokalnie
+  do gałęzi ticket-030 przez fast-forward.
 - `./project/governance-check.sh`: zero błędów i ostrzeżeń.
 - Testy MCP uruchamiają prawdziwe serwery SDK stdio/HTTP i rzeczywisty rejestr;
   sprawdzają schematy, zmianę profilu/kontraktu, kandydaturę/dopuszczenie,
@@ -214,8 +220,13 @@ kontrolowanej aktualizacji. Pin profilu nie jest podpisem ani izolacją systemow
 - Import 45 serwerów zakończył się bez niedostępnych integracji i zarejestrował
   422 kandydatów w roboczym `mcp/`.
 - Pilot `http://127.0.0.1:8084`, jednostka użytkownika
-  `taskand-mcp030-pilot.service`, ma 7 dopuszczonych narzędzi i 415 kandydatów.
+  `taskand-mcp030-release.service`, ma 7 dopuszczonych narzędzi i 415 kandydatów.
   Profile, token i surowe odpowiedzi przechowuje prywatny magazyn hosta.
+  Po wdrożeniu powtórzono wszystkie siedem wywołań i test adaptera.
+  Health zgłasza `LOCAL_CODE_MATCH`; sprawdzono odciski 447 plików źródłowych
+  manifestu wydania. Doctor/prescribe zwraca pełny JSON 230708 bajtów,
+  a doctor/heal 217052 bajtów; oba zawierają 416 rekordów. Heal pozostaje
+  w trybie planowania bez wykonanych napraw.
 - Rzeczywiste wywołania URI: odczyt pliku filesystem, odczyt memory,
   status git, fetch publicznego README, konwersja lokalnego HTML MarkItDown,
   tillm health i analiza dwóch manifestów diff-dsl. Odpowiedzi sprawdzono
@@ -229,11 +240,13 @@ Powtarzalne dowody są w testach repozytorium. Lokalne obserwacje wdrożenia:
 - `final-import.json`: SHA-256 `f75187b4f538fcff8e529513e0242f03274330286b6aea61fc31438cac3d4b51`.
 - `gateway-canaries-verified.json`: SHA-256 `d4ab73a6998e2691636e36d72cb848a9434aae605c1218ffd3223e90ece28b93`.
 
+- `deployed-verification.json`: SHA-256 `75cd58a9263facf54284189e44fc9784ccfb388fe1b0272b7208e73f665ff915`.
+
 Magazyn operacyjny: `~/.local/state/taskand/mcp-local-import-20260919/`;
 instalacje i pilot: `~/.local/share/taskand/mcp-import/`.
 Te ścieżki pomagają operatorowi lokalnemu; nie zastępują dostępnego w repo kodu
-ani niezależnych dowodów publikacji. Rewizja w metadanych wskazuje bazę zmiany;
-implementację identyfikuje commit zawierający ten dokument.
+ani niezależnych dowodów publikacji. Rewizja w metadanych wskazuje wdrożony commit implementacji. Późniejszy
+commit odbioru aktualizuje wyłącznie ten dokument i kryteria ticket-030.
 
 <!-- docs:section limitations -->
 ## Ograniczenia odbioru
@@ -250,10 +263,14 @@ systemowym. Schemat MCP ani adnotacja readOnly nie przyznają uprawnień.
 Utrata odpowiedzi może pozostawić efekt i wymaga uzgodnienia stanu przed kolejnym
 wywołaniem. Hostowe profile mogą zawierać sekrety i nie trafiają do Git.
 
-Integracja nie jest scalona z main. Dotychczasowy PR #38 czeka na chronione
+Integracja jest lokalnie wdrożona, lecz nie jest scalona z main ani wypchnięta.
+Zachowany PR #38 ma HEAD `803771c0877ed7a2e21bdc049602efd4ad9a1fd8` i czeka na chronione
 lokalne CI: brak `/run/onedev-docker-gate/taskand-browser.socket`, zależność
 [onedev-agent #304](https://github.com/subactor/onedev-agent/issues/304).
-Nowa implementacja nie obchodzi tej kontroli. Audyt dokumentacji wykazuje
+Nowa implementacja nie obchodzi tej kontroli. Po ponownej decyzji użytkownika
+zatrzymano dokładną sesję dashboardu i zwolniono jej lease przez CAS. Jej czysty
+checkout, w tym ignorowane dane, zachowano w prywatnym archiwum przed zwolnieniem
+katalogu; gałąź, PR38 i wdrożenie na 8082 pozostały zachowane. Audyt dokumentacji wykazuje
 cztery istniejące wcześniej problemy metadanych/placeholderów w innych dokumentach;
 zapisano je w kolejce PLF-010. Nowy dokument nie dodaje takiego problemu.
 
@@ -262,10 +279,13 @@ zapisano je w kolejce PLF-010. Nowy dokument nie dodaje takiego problemu.
 
 Dodatkowe narzędzia dopuszczać indywidualnie po ocenie konkretnego działania;
 import sam zachowuje stan candidate. Zmiany konfiguracji importować jako nowe
-wersje z osobnym snapshotem profili. Pełna publikacja wymaga chronionego
+wersje z osobnym snapshotem profili. Wersja uruchomiona na 8084 pochodzi z `8fa9d47`; manifest plików wiąże ją
+z commitem. Poprzedni dziennik żądań skopiowano po zatrzymaniu starej jednostki
+pilota, zachowując również poprzedni katalog jako punkt odtworzenia.
+Pełna publikacja wymaga chronionego
 przeglądu i działającego lokalnego wykonawcy CI.
 
-Rollback pilota: `systemctl --user stop taskand-mcp030-pilot.service`.
+Rollback pilota: `systemctl --user stop taskand-mcp030-release.service`.
 Zachować katalog pilota, profile i receipts do uzgodnienia efektów; istniejące
 instancje 8077/8082 pozostają niezależne. Jednostka jest lokalnym pilotem sesji,
 nie deklaracją wdrożenia produkcyjnego ani konfiguracji startu po restarcie hosta.
