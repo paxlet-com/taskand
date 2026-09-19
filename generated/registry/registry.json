@@ -22,12 +22,12 @@
         "store.mjs",
         "vault.mjs"
       ],
-      "hash": "sha256:b62cc9bd58d213ddac6e2f8e4376e39fb57b3b75acfb244476d37c9c333a942d",
+      "hash": "sha256:257418b5bd5995e2fdbb4a6f41771a5a5af0d85d8f62a68601213ec8da71b93c",
       "status": "active",
       "registered": "2026-09-12T19:09:43.334Z",
-      "refreshedAt": "2026-09-13T07:02:41.464Z",
+      "refreshedAt": "2026-09-19T18:35:44.561Z",
       "capability": "Rejestr węzła: wywołania przez URI (broker env/sekretów), cykl życia pakietów, wymiana rejestrów z peerami"
     }
   },
-  "updated": "2026-09-13T07:02:41.464Z"
+  "updated": "2026-09-19T18:35:44.561Z"
 }

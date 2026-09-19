@@ -14,7 +14,12 @@ status:
 	docker compose ps
 	@./bin/taskand status
 
-test: conformance test-contracts test-negative test-twin test-web-twin test-cli
+test: conformance test-contracts test-negative test-twin test-web-twin test-cli test-mcp
+
+.PHONY: test-mcp
+test-mcp:
+	@uv run --frozen --project mcp python tests/mcp_catalog_test.py
+	@node --test tests/mcp_registry.test.mjs
 
 test-cli:
 	@node --test tests/cli_routing.test.mjs

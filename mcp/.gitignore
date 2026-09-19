@@ -1,0 +1,4 @@
+.venv/
+__pycache__/
+# Materialized host-specific packages belong to a deployment, not the source tree.
+mcp-*/

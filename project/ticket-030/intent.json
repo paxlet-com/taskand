@@ -1,0 +1,124 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-030",
+  "summary": "Import locally configured MCP servers and pinned GitHub implementations as native versioned URI packages under mcp/",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-030/**",
+    "mcp/**",
+    "generated/registry/registry.json",
+    "tests/mcp_catalog_test.py",
+    "tests/mcp_registry.test.mjs",
+    "docs/information/mcp-uri-catalog.md",
+    "docs/README.md",
+    ".governance/manifest.json",
+    "generated/registry/core/taskand.dev/v1/**",
+    "Makefile"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "targetBranch": "main",
+    "outcome": "Discover all local MCP configurations; build versioned process packages and native registry catalogs under mcp; invoke real tools through Taskand URI with pinned schemas and bounded SDK transport.",
+    "nonGoals": [
+      "Replacing or merging PR38 controller",
+      "Autonomous tool admission or arbitrary tool execution",
+      "Copying credentials into repository",
+      "Restarting the existing 8077/8082 gateways"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 120,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 2
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Native process package projection from official MCP tools/list with a reusable SDK bridge. Treat local MCP configs as trusted operator inputs, keep host profiles private, pin tool schemas and source versions; register mcp root through existing registry semantics. Generated per-tool packages are deployment artifacts, produced in an isolated release and never counted as handwritten source. Existing ticket029 controller remains an independent optional dashboard; this slice uses native gateway URI grants.",
+      "components": [
+        {
+          "name": "mcp-packages",
+          "paths": [
+            "mcp/**"
+          ]
+        },
+        {
+          "name": "registry",
+          "paths": [
+            "generated/registry/**"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/mcp_catalog_test.py",
+            "tests/mcp_registry.test.mjs",
+            "Makefile"
+          ]
+        },
+        {
+          "name": "docs",
+          "paths": [
+            "docs/information/mcp-uri-catalog.md",
+            "docs/README.md"
+          ]
+        },
+        {
+          "name": "ownership",
+          "paths": [
+            ".governance/manifest.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "mcp package catalog CLI",
+        "native URI resolution in mcp root"
+      ],
+      "dataChanges": [
+        "Candidate MCP process registry under mcp in deployment"
+      ],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Stop only the isolated integration pilot and retain its profiles and receipts; original gateways remain unchanged."
+    },
+    "runtimeDependencies": [
+      "mcp==2.2.0",
+      "jsonschema==4.26.0"
+    ],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "python tests/mcp_catalog_test.py"
+        ],
+        "evidence": "Real stdio and HTTP tool discovery, schema pinning, error and boundary tests"
+      },
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "node --test tests/mcp_registry.test.mjs",
+          "make test",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Native URI round trip in isolated release and managed repository gates"
+      }
+    ]
+  }
+}

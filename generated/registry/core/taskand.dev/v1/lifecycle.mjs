@@ -1,11 +1,12 @@
 // Cykl życia wpisu: register (candidate|active wg polityki) → approve → deprecate; verify i scan
-import { readdirSync, existsSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { ROOT, GEN, parseUri, organisms, allEntries, findEntry, updateRegistry, policy, addToGenome, audit } from './store.mjs';
+import { ROOT, organismDir, parseUri, organisms, allEntries, findEntry, updateRegistry, policy, addToGenome, audit } from './store.mjs';
 import { packageFiles, packageHash, readManifest, checkPackage } from './package.mjs';
 
 // builtin → active; evolved → wg policy.evolution (auto|manual); peer:* → wg policy.peers (domyślnie manual)
 function initialStatus(origin) {
+  if (origin === 'mcp') return 'candidate';
   if (origin.startsWith('peer:')) return policy('peers', 'manual') === 'auto' ? 'active' : 'candidate';
   if (origin === 'evolved') return policy('evolution', 'manual') === 'auto' ? 'active' : 'candidate';
   return 'active';
@@ -24,6 +25,10 @@ export function register({ uri, origin, hold = false }) {
   if (existing) return { ok: true, entry: existing, unchanged: true };
   const m = readManifest(loc.dir);
   const src = origin || m.origin || 'builtin';
+  const contract = src === 'mcp' ? JSON.parse(readFileSync(join(loc.dir, 'tool.json'), 'utf8')) : null;
+  if (contract && (contract.uri !== uri || !contract.tool?.inputSchema || typeof contract.tool.inputSchema !== 'object')) {
+    return { ok: false, error: 'Invalid MCP tool contract' };
+  }
   const entry = {
     uri,
     organism: loc.organism,
@@ -37,7 +42,10 @@ export function register({ uri, origin, hold = false }) {
     files: packageFiles(loc.dir),
     hash,
     status: hold ? 'candidate' : initialStatus(src),
-    registered: new Date().toISOString()
+    registered: new Date().toISOString(),
+    ...(contract ? { inputSchema: contract.tool.inputSchema,
+      ...(contract.tool.outputSchema ? { outputSchema: contract.tool.outputSchema } : {}),
+      mcp: { server: contract.server, tool: contract.tool.name, profilePin: contract.profilePin } } : {})
   };
   updateRegistry(loc.organism, reg => {
     reg.processes[uri] = entry;
@@ -110,8 +118,8 @@ export function verify() {
 // Pakiety na dysku bez wpisu w rejestrze; {adopt:true} rejestruje je (origin z proc.yaml)
 export function scan({ adopt = false } = {}) {
   const found = organisms().flatMap(org =>
-    readdirSync(join(GEN, org), { withFileTypes: true }).filter(d => d.isDirectory()).flatMap(cap => {
-      const base = join(GEN, org, cap.name, 'taskand.dev');
+    readdirSync(organismDir(org), { withFileTypes: true }).filter(d => d.isDirectory()).flatMap(cap => {
+      const base = join(organismDir(org), cap.name, 'taskand.dev');
       return existsSync(base) ? readdirSync(base).map(v => `proc://taskand.dev/${org}/${cap.name}/${v}`) : [];
     })
   );
