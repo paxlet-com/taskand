@@ -78,10 +78,30 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;
 <details><summary>Szczegóły projektów i worktree do wznowienia (monag resume)</summary>
   <pre id="monagResumeOut">Kliknij „Odśwież”, aby pobrać aktualny rejestr.</pre>
 </details>
+</section><section class="wide" id="mcpControl">
+<h2>Serwery MCP i wykonania</h2>
+<p>Wszystkie operacje korzystają z procesu <code>proc://taskand.dev/mcp/control/v1</code> i bieżącego konta API. Połączenie MCP jest otwierane na czas operacji, a następnie zamykane.</p>
+<button id="mcpRefresh">Odczytaj konfigurację</button>
+<label for="mcpProfile">Profil wdrożony na tym hoście</label><select id="mcpProfile"></select>
+<label for="mcpNewId">Identyfikator nowej instancji</label><input id="mcpNewId" placeholder="np. raporty">
+<button id="mcpRegister">Dodaj instancję</button>
+<label for="mcpServer">Instancja</label><select id="mcpServer"></select>
+<button id="mcpToggle">Włącz / wyłącz nowe operacje</button>
+<button id="mcpProfileApply">Zastosuj wybrany profil — wymaga ponownego dopuszczenia narzędzi</button>
+<button id="mcpDiscover">Odczytaj narzędzia</button>
+<label for="mcpTool">Narzędzie</label><select id="mcpTool"></select>
+<pre id="mcpSchema">Najpierw odczytaj narzędzia wybranej instancji.</pre>
+<button id="mcpAdmit">Dopuść tę wersję narzędzia</button>
+<label for="mcpArguments">Argumenty JSON</label><textarea id="mcpArguments" rows="4">{}</textarea>
+<button id="mcpExecute">Wykonaj operację</button>
+<label for="mcpRunId">Identyfikator wykonania — zachowaj go do odczytu po utracie połączenia</label><input id="mcpRunId" readonly>
+<button id="mcpRecover">Odczytaj wynik</button><button id="mcpRuns">Historia wykonań</button>
+<p id="mcpStatus" role="status">Brak obserwacji.</p>
+<pre id="mcpOut">Wynik narzędzia nie jest jeszcze niezależnym potwierdzeniem ukończenia zadania.</pre>
 </section></main>
 <script>
 const $ = id => document.getElementById(id);
-const api = location.protocol + '//' + location.hostname + ':8077';
+const api = location.port === '8090' ? location.protocol + '//' + location.hostname + ':8077' : location.origin;
 const lines = id => $(id).value.split('\n').map(x => x.trim()).filter(Boolean);
 let sessionEpoch=0;
 let visibleRequestId=null;
@@ -316,4 +336,39 @@ if ($('monagRefreshBtn')) {
 }
 consumeDeveloperToken();
 
+
+const mcpUri='proc://taskand.dev/mcp/control/v1';
+let mcpServers=[],mcpTools=[],mcpBusy=false;
+function mcpClearTools(){mcpTools=[];$('mcpTool').replaceChildren();$('mcpSchema').textContent='Odczytaj narzędzia wybranej instancji.';}
+function mcpOptions(id,rows,label){const select=$(id);select.replaceChildren();for(const row of rows){const o=document.createElement('option');o.value=row.id||row.name;o.textContent=label(row);select.append(o);}}
+async function mcpAction(action,data={}){
+  const response=await request('/api/proc/call',{uri:mcpUri,data:{action,data}},45000);
+  const value=response.result;
+  if(!value)throw new Error('Brak wyniku procesu');
+  return value;
+}
+async function mcpGuard(work){
+  if(mcpBusy)return; mcpBusy=true;const epoch=sessionEpoch;
+  $('mcpStatus').textContent='Trwa operacja…';
+  try{const result=await work();if(currentSession(epoch)){$('mcpOut').textContent=JSON.stringify(result,null,2);$('mcpStatus').textContent=result.state|| (result.ok?'Odczytano wynik.':result.errorType||'Operacja odrzucona.');}}
+  catch(e){if(currentSession(epoch)){$('mcpStatus').textContent=e.message;$('mcpOut').textContent='Jeżeli wysłano wykonanie, użyj Odczytaj wynik. Nie ponawiamy go automatycznie.';}}
+  finally{mcpBusy=false;}
+}
+async function mcpReload(){const result=await mcpAction('list');if(result.ok){mcpServers=result.servers;mcpClearTools();mcpOptions('mcpServer',mcpServers,r=>r.id+(r.enabled?' · włączona':' · wyłączona'));mcpOptions('mcpProfile',result.profiles,r=>r.id+' · '+r.transport);}return result;}
+$('mcpRefresh').onclick=()=>mcpGuard(mcpReload);
+$('mcpRegister').onclick=()=>mcpGuard(async()=>{const result=await mcpAction('register',{server:$('mcpNewId').value,profile:$('mcpProfile').value});if(result.ok)await mcpReload();return result;});
+$('mcpToggle').onclick=()=>mcpGuard(async()=>{const server=mcpServers.find(s=>s.id===$('mcpServer').value);if(!server)throw new Error('Wybierz instancję');const result=await mcpAction('configure',{server:server.id,enabled:!server.enabled,revision:server.revision});if(result.ok)await mcpReload();return result;});
+$('mcpServer').onchange=mcpClearTools;
+$('mcpProfileApply').onclick=()=>mcpGuard(async()=>{const server=mcpServers.find(s=>s.id===$('mcpServer').value);if(!server)throw new Error('Wybierz instancję');const result=await mcpAction('configure',{server:server.id,enabled:!!server.enabled,revision:server.revision,profile:$('mcpProfile').value});if(result.ok)await mcpReload();return result;});
+function mcpShowTool(){const tool=mcpTools.find(t=>t.name===$('mcpTool').value);$('mcpSchema').textContent=tool?JSON.stringify({description:tool.description,inputSchema:tool.inputSchema,admitted:tool.admitted},null,2):'Brak narzędzia';}
+$('mcpTool').onchange=mcpShowTool;
+async function mcpDiscover(){const result=await mcpAction('discover',{server:$('mcpServer').value});mcpClearTools();if(result.ok){mcpTools=result.tools;mcpOptions('mcpTool',mcpTools,t=>t.name+(t.admitted?' · dopuszczone':' · wymaga dopuszczenia'));mcpShowTool();}return result;}
+$('mcpDiscover').onclick=()=>mcpGuard(mcpDiscover);
+function mcpSelection(){const tool=mcpTools.find(t=>t.name===$('mcpTool').value);if(!tool)throw new Error('Odczytaj i wybierz narzędzie');return {server:$('mcpServer').value,tool:tool.name,schemaPin:tool.schemaPin};}
+$('mcpAdmit').onclick=()=>mcpGuard(async()=>{const result=await mcpAction('admit',mcpSelection());if(result.ok)await mcpDiscover();return result;});
+$('mcpExecute').onclick=()=>mcpGuard(async()=>{const selected=mcpSelection(),args=JSON.parse($('mcpArguments').value);const runId=crypto.randomUUID();$('mcpRunId').value=runId;return mcpAction('call',{...selected,arguments:args,runId});});
+$('mcpRecover').onclick=()=>mcpGuard(()=>mcpAction('runs',{runId:$('mcpRunId').value}));
+$('mcpRuns').onclick=()=>mcpGuard(()=>mcpAction('runs'));
+$('token').addEventListener('input',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Konto zmienione. Odczytaj konfigurację.';});
+$('logout').addEventListener('click',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Wylogowano lokalnie.';});
 </script></body></html>
