@@ -1,5 +1,6 @@
 import contextlib
 import hashlib
+import http.client
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import multiprocessing
@@ -15,6 +16,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from app import runtime_readiness as readiness  # noqa: E402
+from gateway import GatewayHTTPHandler  # noqa: E402
 
 PANEL = b"<title>readiness fixture</title>"
 COMMIT = "a" * 40
@@ -248,6 +250,36 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(health['sourceSha'], actual)
             self.assertEqual(health['expectedSourceSha'], self.sha)
             self.assertFalse(lines[-1]['preflightPassed'])
+
+
+class GatewayPanelTests(unittest.TestCase):
+    def test_real_gateway_serves_panel_without_exposing_other_files_or_api(self):
+        service = ThreadingHTTPServer(('127.0.0.1', 0), GatewayHTTPHandler)
+        thread = threading.Thread(target=service.serve_forever, kwargs={'poll_interval': 0.02}, daemon=True)
+        thread.start()
+        client = http.client.HTTPConnection('127.0.0.1', service.server_port, timeout=5)
+        try:
+            for path in ('/', '/index.html', '/?view=status', '/index.html?view=status'):
+                client.request('GET', path)
+                response = client.getresponse()
+                self.assertEqual(response.status, 200, path)
+                self.assertEqual(response.getheader('Content-Type'), 'text/html; charset=utf-8')
+                self.assertEqual(response.getheader('Referrer-Policy'), 'no-referrer')
+                self.assertEqual(response.read(), (ROOT / 'index.html').read_bytes())
+            for path in ('/grants.yaml', '/../grants.yaml', '/missing', '/api/context'):
+                client.request('GET', path)
+                response = client.getresponse()
+                self.assertEqual(response.status, 401 if path == '/api/context' else 404, path)
+                self.assertFalse(json.loads(response.read())['ok'])
+            client.request('POST', '/api/proc/call', body='{}', headers={'Content-Type': 'application/json'})
+            response = client.getresponse()
+            self.assertEqual(response.status, 401)
+            self.assertFalse(json.loads(response.read())['ok'])
+        finally:
+            client.close()
+            service.shutdown()
+            service.server_close()
+            thread.join(1)
 
 
 if __name__ == "__main__":

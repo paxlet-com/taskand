@@ -46,7 +46,11 @@ class GatewayHTTPHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if urlsplit(self.path).path in ('/', '/index.html'):
-            page = (Path(__file__).resolve().parent.parent / 'index.html').read_bytes()
+            try:
+                page = (Path(__file__).resolve().parent.parent / 'index.html').read_bytes()
+            except OSError:
+                self._send(503, {'ok': False, 'error': 'PANEL_UNAVAILABLE'})
+                return
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('Cache-Control', 'no-store')
