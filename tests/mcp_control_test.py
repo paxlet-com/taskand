@@ -164,4 +164,41 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
             proc.terminate();proc.wait(timeout=5)
 
 
+class DashboardBootstrapTests(unittest.TestCase):
+    def test_developer_get_serves_html_without_logging_token(self):
+        import http.client
+        import io
+        import threading
+        from contextlib import redirect_stderr
+        from http.server import ThreadingHTTPServer
+        from gateway import GatewayHTTPHandler
+
+        log = io.StringIO()
+        server = ThreadingHTTPServer(('127.0.0.1', 0), GatewayHTTPHandler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with patch.dict(os.environ, {'TASKAND_DEBUG': '1'}), redirect_stderr(log):
+                for path in ('/', '/index.html'):
+                    conn = http.client.HTTPConnection(*server.server_address, timeout=5)
+                    try:
+                        conn.request('GET', path + '?taskand_dev=1&taskand_dev_token=test-bootstrap-placeholder')
+                        response = conn.getresponse()
+                        body = response.read().decode()
+                        self.assertEqual(response.status, 200)
+                        self.assertIn('consumeDeveloperToken', body)
+                        self.assertNotIn('test-bootstrap-placeholder', body)
+                        self.assertEqual(response.getheader('Cache-Control'), 'no-store')
+                        self.assertEqual(response.getheader('Referrer-Policy'), 'no-referrer')
+                    finally:
+                        conn.close()
+            self.assertIn('GET /index.html HTTP', log.getvalue())
+            self.assertNotIn('test-bootstrap-placeholder', log.getvalue())
+            self.assertNotIn('taskand_dev_token', log.getvalue())
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=5)
+
+
 if __name__ == '__main__':unittest.main(verbosity=2)

@@ -286,10 +286,10 @@ function consumeDeveloperToken(){
   if(dev==='1'&&hadToken&&isLoopbackHost()&&scrubbed){
     $('token').value=raw;
     $('authStatus').textContent='Token developerski załadowany tylko w pamięci strony (loopback).';
-    return;
+    return true;
   }
   $('authStatus').textContent=hadToken
-    ? 'Parametr developerski odrzucony: wymagane taskand=1, loopback i jednorazowe użycie.'
+    ? 'Parametr developerski odrzucony: wymagane taskand_dev=1, loopback i jednorazowe użycie.'
     : 'Parametr developerski bez tokenu został pominięty.';
 }
 
@@ -334,7 +334,7 @@ async function refreshMonag() {
 if ($('monagRefreshBtn')) {
   $('monagRefreshBtn').onclick = refreshMonag;
 }
-consumeDeveloperToken();
+const developerSession=consumeDeveloperToken();
 
 
 const mcpUri='proc://taskand.dev/mcp/control/v1';
@@ -371,4 +371,5 @@ $('mcpRecover').onclick=()=>mcpGuard(()=>mcpAction('runs',{runId:$('mcpRunId').v
 $('mcpRuns').onclick=()=>mcpGuard(()=>mcpAction('runs'));
 $('token').addEventListener('input',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Konto zmienione. Odczytaj konfigurację.';});
 $('logout').addEventListener('click',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Wylogowano lokalnie.';});
+if(developerSession){refreshMesh();mcpGuard(mcpReload);}
 </script></body></html>

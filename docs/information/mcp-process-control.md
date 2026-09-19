@@ -3,14 +3,14 @@
   "schema": "wellmanifest.docs/document/v1",
   "id": "mcp-process-control",
   "kind": "information",
-  "version": 1,
+  "version": 2,
   "title": "Sterowanie serwerami MCP przez proces URI Taskand",
   "status": "proposed",
   "owner": "semcod/taskand-glm53",
   "created": "2026-09-19",
   "updated": "2026-09-19",
   "review_after": "2026-09-26",
-  "source_revision": "8804583ef82342ad7870659cf79e9ad8278e2369",
+  "source_revision": "c7ae019237f4f6ccd21eb31e0d2981761a75a2b8",
   "affected_repositories": ["semcod/taskand-glm53"],
   "evidence": ["repo://semcod/taskand-glm53/project/ticket-029/intent.json", "repo://semcod/taskand-glm53/packages/taskand-mcp-control/control.py", "repo://semcod/taskand-glm53/gateway/handlers/mcp_control.py", "repo://semcod/taskand-glm53/tests/mcp_control_test.py", "repo://semcod/taskand-glm53/index.html"]
 }
@@ -75,6 +75,15 @@ oraz struktury:
 Sekcja MCP istniejącego dashboardu udostępnia te operacje. Pole tokenu pozostaje
 w pamięci strony. Interfejs gateway jest także dostępny pod `/`, więc panel
 pilota nie potrzebuje osobnego proxy. Dawny panel na 8090 zachowuje API 8077.
+
+Sesja developerska na loopback może otrzymać token przez GET:
+`http://localhost:8082/?taskand_dev=1&taskand_dev_token=<TOKEN_LOKALNY>`.
+Wstaw lokalny token dostępu Taskand. Panel usuwa oba parametry z adresu, zachowuje
+token tylko w pamięci strony i automatycznie odczytuje sieć oraz instancje MCP.
+Wywołania API używają nagłówka Authorization. Odświeżenie oczyszczonego adresu
+rozpoczyna sesję bez tokenu; aby ponownie wejść w tryb developerski, użyj pełnego
+linku. Parametr bez flagi developerskiej albo poza loopback jest odrzucany.
+Odpowiedź HTML ma no-store/no-referrer, a log gateway nie zapisuje query.
 
 Gateway wymaga grantu `call` oraz `mcp:<action>` dla URI. Przypina aktora z
 uwierzytelnionego konta i podpisuje jednorazowe, krótkotrwałe żądanie. Sam proces
