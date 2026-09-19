@@ -523,5 +523,118 @@ class BrowserPilotTests(unittest.TestCase):
                     browser.close()
 
 
+
+class NativeMcpDashboardTests(unittest.TestCase):
+    def test_catalog_permissions_forms_execution_recovery_and_session_isolation(self):
+        import importlib.util
+        if importlib.util.find_spec('playwright') is None:
+            if os.environ.get('CI'):
+                self.fail('Native MCP browser test requires Playwright')
+            self.skipTest('Native MCP browser test requires Playwright')
+        from playwright.sync_api import sync_playwright
+        from urllib.parse import urlsplit
+        root = Path(__file__).resolve().parents[1]
+        uri = 'proc://taskand.dev/mcp-files/read/v1'
+        candidate = 'proc://taskand.dev/mcp-files/write/v1'
+        rows = [
+            {'uri': uri, 'server': 'files', 'name': 'read', 'description': 'Read a file', 'status': 'active', 'canCall': True, 'canApprove': False, 'inputSchema': {'type': 'object', 'properties': {'path': {'type': 'string'}}, 'required': ['path']}},
+            {'uri': candidate, 'server': 'files', 'name': 'write', 'description': '<img src=x onerror=alert(1)>', 'status': 'candidate', 'canCall': False, 'canApprove': True, 'inputSchema': {'type': 'object'}},
+            {'uri': 'proc://taskand.dev/mcp-memory/read/v1', 'server': 'memory', 'name': 'read', 'description': 'Requires permission', 'status': 'active', 'canCall': False, 'canApprove': False, 'inputSchema': {'type': 'object'}}]
+        seen, errors = [], []
+        behavior = {'fail_call': False}
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, executable_path=browser_executable())
+            try:
+                page = browser.new_page(viewport={'width': 1280, 'height': 1000})
+                page.on('pageerror', lambda e: errors.append(str(e)))
+                def route(request):
+                    path = urlsplit(request.request.url).path
+                    if path == '/':
+                        return request.fulfill(content_type='text/html', body=(root / 'index.html').read_text())
+                    seen.append((path, request.request.method, request.request.post_data_json if request.request.method == 'POST' else None))
+                    if request.request.headers.get('authorization') != 'Bearer dashboard-fixture':
+                        return request.fulfill(status=401, json={'ok': False})
+                    if path == '/api/mcp/catalog':
+                        return request.fulfill(json={'ok': True, 'tools': rows, 'counts': {'servers': 2, 'tools': 3, 'active': sum(t['status'] == 'active' for t in rows), 'candidate': sum(t['status'] == 'candidate' for t in rows)}})
+                    if path == '/api/proc/call':
+                        if behavior['fail_call']:
+                            return request.abort()
+                        return request.fulfill(json={'ok': True, 'result': {'content': 'known native result', 'taskSuccessVerified': False}})
+                    if path == '/api/registry':
+                        rows[1].update(status='active', canCall=True, canApprove=False)
+                        return request.fulfill(json={'ok': True})
+                    if path == '/api/state':
+                        return request.fulfill(json={'ok': True, 'graph': {'state': 'RESPONDED', 'taskSuccessVerified': False}})
+                    return request.fulfill(status=404, json={'ok': False})
+                page.route('**/*', route)
+                page.goto('http://127.0.0.1:18084/#uslugi')
+                self.assertTrue(page.locator('#mcpControl').is_visible())
+                self.assertEqual(page.locator('[data-view]').count(), 5)
+                page.click('#mcpRefresh')
+                self.assertIn('Podaj token', page.locator('#mcpStatus').inner_text())
+                self.assertEqual(seen, [])
+                page.fill('#token', 'dashboard-fixture')
+                page.click('#mcpRefresh')
+                page.wait_for_function('!mcpBusy && mcpLoaded')
+                self.assertEqual(page.locator('#mcpTool option').count(), 3)
+                page.select_option('#mcpTool', candidate)
+                self.assertTrue(page.is_disabled('#mcpExecute'))
+                self.assertEqual(page.locator('#mcpDescription img').count(), 0)
+                page.once('dialog', lambda d: d.dismiss())
+                page.click('#mcpAdmit')
+                page.wait_for_function('!mcpBusy')
+                self.assertFalse(any(x[0] == '/api/registry' for x in seen))
+                page.once('dialog', lambda d: d.accept())
+                page.click('#mcpAdmit')
+                page.wait_for_function('!mcpBusy')
+                approval = next(x[2] for x in seen if x[0] == '/api/registry')
+                self.assertEqual(approval, {'action': 'approve', 'uri': candidate})
+                page.select_option('#mcpServer', 'memory')
+                self.assertEqual(page.locator('#mcpTool option').count(), 1)
+                self.assertTrue(page.is_disabled('#mcpExecute'))
+                page.fill('#mcpSearch', 'no-match')
+                self.assertEqual(page.locator('#mcpTool option').count(), 0)
+                self.assertIn('brak wyników', page.locator('#mcpMatches').inner_text())
+                page.fill('#mcpSearch', '')
+                page.select_option('#mcpServer', 'files')
+                page.select_option('#mcpTool', uri)
+                page.locator('#mcpFields input').fill('/allowed/example.txt')
+                self.assertEqual(json.loads(page.input_value('#mcpArguments')), {'path': '/allowed/example.txt'})
+                page.click('#mcpExecute')
+                page.wait_for_function('!mcpBusy')
+                calls = [x[2] for x in seen if x[0] == '/api/proc/call']
+                self.assertEqual(len(calls), 1)
+                self.assertEqual(calls[0]['uri'], uri)
+                self.assertEqual(calls[0]['data'], {'path': '/allowed/example.txt'})
+                self.assertTrue(calls[0]['requestId'].startswith('urn:uuid:'))
+                self.assertIn('known native result', page.locator('#mcpOut').inner_text())
+                page.click('#mcpRecover')
+                page.wait_for_function('!mcpBusy')
+                self.assertIn('RESPONDED', page.locator('#mcpOut').inner_text())
+                self.assertEqual(len([x for x in seen if x[0] == '/api/proc/call']), 1)
+                behavior['fail_call'] = True
+                page.click('#mcpExecute')
+                page.wait_for_function('!mcpBusy')
+                self.assertIn('Wynik niepotwierdzony', page.locator('#mcpOut').inner_text())
+                page.wait_for_timeout(150)
+                self.assertEqual(len([x for x in seen if x[0] == '/api/proc/call']), 2)
+                page.evaluate("""() => { window.originalFetch=fetch;window.fetch=()=>new Promise(resolve=>{window.lateCatalog=resolve;}); }""")
+                page.click('#mcpRefresh')
+                page.wait_for_function('Boolean(window.lateCatalog)')
+                page.click('#logout')
+                page.evaluate("""() => { window.lateCatalog(new Response(JSON.stringify({ok:true,tools:[{name:'old-account-secret'}],counts:{}})));window.fetch=window.originalFetch; }""")
+                page.wait_for_timeout(80)
+                self.assertEqual(page.locator('#mcpTool option').count(), 0)
+                self.assertEqual(page.locator('#mcpHistory li').count(), 0)
+                self.assertEqual(page.input_value('#mcpRunId'), '')
+                self.assertNotIn('old-account-secret', page.locator('body').inner_text())
+                self.assertEqual(page.evaluate('localStorage.length+sessionStorage.length'), 0)
+                page.set_viewport_size({'width': 390, 'height': 844})
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'), 390)
+                self.assertEqual(errors, [])
+            finally:
+                browser.close()
+
+
 if __name__ == "__main__":
     unittest.main()

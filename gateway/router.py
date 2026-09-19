@@ -2,17 +2,19 @@ from typing import Callable, Dict, Tuple
 from gateway.handlers.health import handle_healthz
 from gateway.handlers.federation import handle_federation, handle_registry, handle_well_known_catalog
 from gateway.handlers.proc import handle_proc_call
-from gateway.handlers.chat import handle_chat
+from gateway.handlers.chat import handle_chat, handle_conversation
 from gateway.handlers.doctor import handle_doctor
 from gateway.handlers.planner import handle_planner
 from gateway.handlers.orchestrator import handle_orchestrator
-from gateway.handlers.context import handle_context, handle_state
+from gateway.handlers.context import handle_context, handle_state, handle_mcp_catalog
 from gateway.handlers.mesh import handle_mesh
 from gateway.handlers.observers import handle_pilot
 from gateway.handlers.monag_handler import handle_monag_status, handle_monag_resume, handle_notify
 from urllib.parse import urlsplit
 
 ROUTES: Dict[Tuple[str, str], Callable] = {
+    ('GET', '/api/mcp/catalog'): handle_mcp_catalog,
+    ('POST', '/api/conversation'): handle_conversation,
     ('GET', '/api/mesh/state'): handle_mesh,
     ('POST', '/api/observers/pilot'): handle_pilot,
     ('GET', '/api/context'): handle_context,
