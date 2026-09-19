@@ -2,7 +2,7 @@
 // proc://taskand.dev/doctor/heal/v1 — pętla samonaprawy: diagnose → prescribe → wykonanie recept "organism" → ponowna diagnoza.
 // in: { run?: true, max? }. Granice: policy.healing (auto|manual|off), max napraw na przebieg, odstęp między naprawami tego samego obiektu.
 // Recepty "human" (Docker, sekrety, kod builtin) są tylko raportowane.
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { registry, call } from './registry-client.mjs';
 
@@ -96,6 +96,7 @@ function report() {
 }
 
 function done(out) {
-  process.stdout.write(JSON.stringify(out) + '\n');
+  // A forced exit must not discard the tail of a large JSON response on a pipe.
+  writeFileSync(1, JSON.stringify(out) + '\n');
   process.exit(0);
 }

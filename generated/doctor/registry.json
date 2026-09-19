@@ -37,11 +37,11 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:4b743fc34f579ae7e347c517631456884e93cf30802c6079fcbf2069132c6151",
+      "hash": "sha256:107c79c5d68d62c99b99e533d24de3db5a9a1299682b6b3ecae40ca57581148f",
       "status": "active",
       "registered": "2026-09-12T19:09:04.970Z",
       "capability": "Recepty naprawcze wyliczane z bieżącej diagnozy",
-      "refreshedAt": "2026-09-13T06:38:40.925Z"
+      "refreshedAt": "2026-09-19T19:13:31.640Z"
     },
     "proc://taskand.dev/doctor/heal/v1": {
       "uri": "proc://taskand.dev/doctor/heal/v1",
@@ -58,10 +58,11 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:07a34a366b1fa736157149ec339cf6f88f800bf4d170f1b167e69bbc6837e8e4",
+      "hash": "sha256:97afd41978e9581c3e269802d38e4cbd91a477f04f959abe21102825d2b86f1d",
       "status": "active",
-      "registered": "2026-09-13T05:42:54.873Z"
+      "registered": "2026-09-13T05:42:54.873Z",
+      "refreshedAt": "2026-09-19T19:13:31.687Z"
     }
   },
-  "updated": "2026-09-14T09:48:53.622Z"
+  "updated": "2026-09-19T19:13:31.687Z"
 }
