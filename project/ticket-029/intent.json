@@ -32,7 +32,7 @@
   "delivery": {
     "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
     "targetBranch": "main",
-    "outcome": "Deploy a local unified Taskand interface controlling registered MCP instances and tool execution through a signed, authorized process URI, with durable receipts and real SDK verification.",
+    "outcome": "Deploy a local unified Taskand interface controlling registered MCP instances and tool execution through a signed, authorized process URI, with durable receipts and real SDK verification. User-authorized PLF-008 continuation: conversation-first dashboard, header navigation and truthful monag counters.",
     "nonGoals": [
       "Replacing the active Premesh checkout or other Taskand runtime",
       "Universal autonomous task solving",
@@ -49,7 +49,7 @@
     },
     "architecture": {
       "status": "accepted",
-      "decision": "One mcp/control URI backed by official SDK and persistent SQLite state. Existing authenticated process route signs actor-scoped envelopes; CLI process rejects unsigned execution. Trusted deployment profiles select executable/endpoint; UI registers instances, discovers and admits exact tool schema, executes with durable run ID, reads receipts. MCP sessions are bounded per operation and closed afterwards. Declare exact new MCP component paths in the target-owned integration registry before admission/publication; keep all pre-existing component ownership unchanged. Initial governance validation identified missing ownership declarations, and no source delivery has been admitted.",
+      "decision": "One mcp/control URI backed by official SDK and persistent SQLite state. Existing authenticated process route signs actor-scoped envelopes; CLI process rejects unsigned execution. Trusted deployment profiles select executable/endpoint; UI registers instances, discovers and admits exact tool schema, executes with durable run ID, reads receipts. MCP sessions are bounded per operation and closed afterwards. Declare exact new MCP component paths in the target-owned integration registry before admission/publication; keep all pre-existing component ownership unchanged. Initial governance validation identified missing ownership declarations, and no source delivery has been admitted. Following explicit ticket030 handoff, reuse this unified dashboard scope for conversation-only requests through a trusted loopback LLM gateway, bounded in-memory browser history, top navigation and schema-aware monag rendering. No autonomous tool calls from conversation. Ticket030 source is preserved in an exact stash/checkpoint pending shared-path integration.",
       "components": [
         {
           "name": "mcp-runtime",
@@ -91,7 +91,8 @@
       "responsibilityChanges": false,
       "interfaceChanges": [
         "mcp/control process URI",
-        "MCP section in existing dashboard"
+        "MCP section in existing dashboard",
+        "Conversation-only /api/conversation endpoint"
       ],
       "dataChanges": [
         "Private scoped MCP instance/tool registry and immutable execution receipts in SQLite"

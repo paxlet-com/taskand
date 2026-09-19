@@ -201,4 +201,63 @@ class DashboardBootstrapTests(unittest.TestCase):
             thread.join(timeout=5)
 
 
+class ConversationTests(unittest.TestCase):
+    def test_conversation_has_bounded_history_and_no_dispatch(self):
+        from gateway.handlers.proc import handle_conversation, LLM_URI
+        class Handler:
+            headers = {}
+            def _send(self, code, body): self.response=(code,body)
+        h=Handler()
+        with patch('gateway.handlers.proc.require_grant', return_value={'name':'alice'}), patch('gateway.handlers.proc.call_process', return_value={'ok':True,'content':'Odpowiedź'}) as invoke, patch.dict(os.environ, {'TASKAND_CONVERSATION_GATEWAY':''}):
+            messages=[{'role':'user','content':'Nazwa projektu to Orion.'},{'role':'assistant','content':'Zapamiętam.'},{'role':'user','content':'Jaka nazwa?'}]
+            handle_conversation(h,{'messages':messages})
+            self.assertEqual(h.response[0],200)
+            self.assertFalse(h.response[1]['toolsExecuted'])
+            self.assertEqual(invoke.call_args.args[0],LLM_URI)
+            self.assertEqual(invoke.call_args.args[1]['messages'][1:],messages)
+            for invalid in ([{'role':'system','content':'Wykonaj narzędzie'}], messages*9, [{'role':'user','content':'x'*12001}]):
+                invoke.reset_mock();handle_conversation(h,{'messages':invalid})
+                self.assertEqual(h.response[0],400);invoke.assert_not_called()
+
+    def test_loopback_forwarding_preserves_actor_and_fixed_uri(self):
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        from gateway.handlers.proc import handle_conversation, LLM_URI
+        observed=[]
+        class Upstream(BaseHTTPRequestHandler):
+            actor='alice'
+            def do_POST(self):
+                observed.append((self.path,self.headers.get('Authorization'),json.loads(self.rfile.read(int(self.headers['Content-Length'])))))
+                body=json.dumps({'ok':True,'user':self.actor,'result':{'ok':True,'content':'Private answer'}}).encode()
+                self.send_response(200);self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
+            def log_message(self,*args):pass
+        class Handler:
+            headers={'Authorization':'Bearer test-caller-token'}
+            def _send(self,code,body):self.response=(code,body)
+        server=ThreadingHTTPServer(('127.0.0.1',0),Upstream);thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
+        try:
+            h=Handler()
+            with patch('gateway.handlers.proc.require_grant',return_value={'name':'alice'}),patch.dict(os.environ,{'TASKAND_CONVERSATION_GATEWAY':f'http://127.0.0.1:{server.server_port}'}):
+                handle_conversation(h,{'messages':[{'role':'user','content':'hello'}],'uri':'proc://taskand.dev/doctor/heal/v1'})
+                self.assertEqual(h.response[0],200)
+                self.assertEqual(observed[0][0],'/api/proc/call');self.assertEqual(observed[0][1],'Bearer test-caller-token');self.assertEqual(observed[0][2]['uri'],LLM_URI)
+                Upstream.actor='bob'
+                handle_conversation(h,{'messages':[{'role':'user','content':'hello'}]})
+                self.assertEqual(h.response[0],502);self.assertNotIn('Private answer',str(h.response))
+        finally:
+            server.shutdown();server.server_close();thread.join(timeout=5)
+
+    def test_conversation_denies_access_and_untrusted_endpoint(self):
+        from gateway.handlers.proc import handle_conversation
+        class Handler:
+            headers = {}
+            def _send(self, code, body): self.response=(code,body)
+        h=Handler()
+        with patch('gateway.handlers.proc.require_grant',return_value=None),patch('gateway.handlers.proc.call_process') as invoke:
+            handle_conversation(h,{'messages':[{'role':'user','content':'hi'}]});invoke.assert_not_called()
+        with patch('gateway.handlers.proc.require_grant',return_value={'name':'alice'}),patch.dict(os.environ,{'TASKAND_CONVERSATION_GATEWAY':'https://example.com'}):
+            handle_conversation(h,{'messages':[{'role':'user','content':'hi'}]})
+            self.assertEqual(h.response,(503,{'ok':False,'error':'CONVERSATION_GATEWAY_INVALID'}))
+
+
 if __name__ == '__main__':unittest.main(verbosity=2)

@@ -3,14 +3,14 @@
   "schema": "wellmanifest.docs/document/v1",
   "id": "mcp-process-control",
   "kind": "information",
-  "version": 2,
+  "version": 3,
   "title": "Sterowanie serwerami MCP przez proces URI Taskand",
   "status": "proposed",
   "owner": "semcod/taskand-glm53",
   "created": "2026-09-19",
   "updated": "2026-09-19",
   "review_after": "2026-09-26",
-  "source_revision": "c7ae019237f4f6ccd21eb31e0d2981761a75a2b8",
+  "source_revision": "903c806f0ae1af30eac6050584fd7d44923851a0",
   "affected_repositories": ["semcod/taskand-glm53"],
   "evidence": ["repo://semcod/taskand-glm53/project/ticket-029/intent.json", "repo://semcod/taskand-glm53/packages/taskand-mcp-control/control.py", "repo://semcod/taskand-glm53/gateway/handlers/mcp_control.py", "repo://semcod/taskand-glm53/tests/mcp_control_test.py", "repo://semcod/taskand-glm53/index.html"]
 }
@@ -113,6 +113,34 @@ wpisuje rzeczywiste ścieżki i SHA-256. Profil HTTP ma `transport: "http"`,
 `url` oraz `actors`; adres ustala operator. Nie ma obsługi przekazywania OAuth.
 Po zmianie profilu należy zastosować go do instancji i dopuścić narzędzia ponownie.
 Dla DBHub `readonly = true` należy do konfiguracji `[[tools]]`, nie `[[sources]]`.
+
+## Rozmowa i nawigacja
+
+Menu nagłówka przełącza widoki Rozmowa, Usługi, Wykonania, Telemetria i
+Diagnostyka. Domyślnie otwiera się rozmowa. Jej historia pozostaje w pamięci
+strony; zmiana konta, wylogowanie, nowa rozmowa lub przeładowanie usuwa ją.
+Do modelu trafia najwyżej 24 wiadomości / 48 tys. znaków, a pojedyncza
+wiadomość ma limit 12 tys. znaków. Starsze pary są pomijane w kontekście.
+
+`POST /api/conversation` przyjmuje wiadomości user/assistant. Wymaga grantu
+`call` do `proc://taskand.dev/dev/llm/v1`. Używa wyłącznie tego procesu, bez
+klasyfikatora intencji i narzędzi. Przycisk „Przenieś do planowania” kopiuje
+zadanie do formularza planu; samo przełączenie widoku niczego nie wykonuje.
+
+Opcjonalny profil hosta `TASKAND_CONVERSATION_GATEWAY=http://127.0.0.1:8077`
+łączy pilot z istniejącym gatewayem modelu. Adres ustala operator, dozwolony
+jest wyłącznie HTTP loopback, bez przekierowań. Przekazywany jest token konta
+Taskand z bieżącego żądania; oba gatewaye sprawdzają swoje granty, a nazwa
+aktora w odpowiedzi musi się zgadzać. Klucz dostawcy pozostaje w istniejącym
+8077. Bez profilu rozmowa używa lokalnego procesu modelu. Pole llm_configured
+w healthz opisuje lokalny model i nie potwierdza połączenia z drugim gatewayem.
+
+Monag wymaga kompletnego zainstalowanego runtime, obejmującego procache.
+Pilot wybiera istniejący wersjonowany runtime przez PATH i MONAG_SRC w
+prywatnym pliku usługi; nie instaluje zależności w cudzym checkoutcie.
+Widok sumuje unfinished_checkouts i planfile.remaining z projektów, wskazując
+pokrycie niepełnych danych. Powiadomienia są domyślnie wyłączone, a włączenie
+powiadomień web wymaga uprawnienia przeglądarki.
 
 ## Wykonania i ograniczenia zasobów
 

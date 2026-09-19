@@ -90,7 +90,11 @@ class GatewayHTTPHandler(BaseHTTPRequestHandler):
             context = store.begin(user['name'], self.path, body, request_id, retain, refs)
             context['refs'] = refs
             token = ACTIVE.set(context)
-            dispatch('POST', self.path, self, body)
+            if self.path == '/api/conversation':
+                from gateway.handlers.proc import handle_conversation
+                handle_conversation(self, body)
+            else:
+                dispatch('POST', self.path, self, body)
         except ContextError as error:
             self._send(409, {'ok': False, 'error': str(error)})
         except (OSError, sqlite3.Error):
