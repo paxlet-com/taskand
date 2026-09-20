@@ -32,7 +32,7 @@ Nie jest to dowód, że dowolne polecenie językowe zostanie poprawnie wykonane.
 
 Oficjalny Python SDK `mcp==2.2.0` obsługuje stdio i Streamable HTTP;
 `jsonschema==4.26.0` sprawdza argumenty i deklarowany wynik strukturalny.
-Zależności są przypięte w `packages/taskand-mcp-control/uv.lock`.
+Zależności są przypięte dokładnymi wersjami w `packages/taskand-mcp-control/pyproject.toml`.
 
 Lokalny pilot używa serwera Filesystem
 `@modelcontextprotocol/server-filesystem@2026.8.31` dla wydzielonego katalogu
