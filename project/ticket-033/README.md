@@ -9,6 +9,10 @@
 SESSION_EXECUTION_AUTHORIZATION: user confirms joining the newer dashboard with the delivered native MCP catalog. PLF-012. Reuse preserved PR38 navigation without taking over its independent writer or deployment. Ticket030/032 source and acceptance remain preserved.
 
 - [ ] AC-01: Authenticated dashboard shows real MCP server/tool counts, filters, schemas and grants; active tools execute only by explicit action; candidates require admission; stale sessions cannot render results; request state is recoverable without retry. Real browser and deployed read-only MCP canary pass.
+- [x] AC-02: The conversation panel identifies the current local `grants.yaml`
+  source path, names the default loopback grant, distinguishes an optional
+  `TASKAND_AUTH_TOKEN` override from `TASKAND_LLM_API_KEY`, and preserves
+  in-memory-only token/logout behavior.
 
 Conversation uses only the fixed LLM URI and caller rights. No automatic tool admission, arbitrary calls, shared default administrator token or token persistence.
 
