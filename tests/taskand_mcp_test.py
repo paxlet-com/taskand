@@ -4,11 +4,16 @@ import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
+from pathlib import Path
 import sys
 import threading
 import time
 import unittest
 from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_SRC = ROOT / "packages" / "taskand-mcp" / "src"
+sys.path.insert(0, str(PACKAGE_SRC))
 
 from mcp import Client, StdioServerParameters
 
@@ -79,6 +84,7 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
     def client(self, token="test-only"):
         return Client(StdioServerParameters(command=sys.executable,
                       args=["-m", "taskand_mcp.server"], env={
+                          "PYTHONPATH": str(PACKAGE_SRC),
                           "TASKAND_MCP_GATEWAY_URL": self.url,
                           "TASKAND_MCP_TOKEN": token,
                           "TASKAND_AUTH_TOKEN": "must-not-be-used",
@@ -169,11 +175,11 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.requests), before)
 
     async def test_deadline_returns_unknown_without_retry(self):
-        self.delay = 0.2
+        self.delay = 0.5
         with self.assertRaises(GatewayError) as caught:
-            await self.gateway.request("/api/proc/call", {"uri": ECHO, "data": {}}, timeout=0.05)
+            await self.gateway.request("/api/proc/call", {"uri": ECHO, "data": {}}, timeout=0.25)
         self.assertEqual(caught.exception.code, "OUTCOME_UNKNOWN")
-        await asyncio.sleep(0.25)
+        await asyncio.sleep(0.6)
         self.assertEqual(len(self.requests), 1)
 
     async def test_catalog_rejects_duplicates_and_unavailable_results(self):
