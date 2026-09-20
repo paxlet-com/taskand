@@ -24,3 +24,5 @@ SESSION_EXECUTION_AUTHORIZATION: user explicitly requests applying and deploying
 New isolated integration slice. Prior ticket-028 lease is explicitly cancelled; no takeover. Existing foreign dirty generated/dev, genome and infra/gitea remain outside scope. Native controller scope/fencing receipt is external.
 
 SESSION_EXECUTION_AUTHORIZATION: user accepted chat/service integration, top menu and monag repair (PLF-008), and explicitly confirmed ticket030 session finished and hands access back. Preserve all ticket030 bytes and serialize its conflicting contract paths. This continuation stays in the original 15 implementation files and 3 interface budget.
+
+SESSION_EXECUTION_AUTHORIZATION: user explicitly authorized expanding this ticket's scope to `tests/mesh_test.py` so the pre-existing browser pilot tracks the intentional top-navigation views (`data-view` switching) introduced by this ticket's dashboard work; no behavior change to the assertions themselves.

@@ -341,6 +341,8 @@ class BrowserPilotTests(unittest.TestCase):
                     page.on("pageerror", lambda error: errors.append(str(error)))
                     dev_token_param = "taskand_dev_" + "token="
                     page.goto(f"http://127.0.0.1:8090/?taskand_dev=1&{dev_token_param}synthetic-pilot")
+                    page.wait_for_function("!mcpBusy && !meshBusy")
+                    requests.clear()
                     with self.subTest("loopback developer token is consumed and scrubbed"):
                         self.assertEqual(page.input_value("#token"), "synthetic-pilot")
                         self.assertEqual(page.url, "http://127.0.0.1:8090/")
@@ -352,6 +354,7 @@ class BrowserPilotTests(unittest.TestCase):
                         self.assertEqual(page.url, "http://127.0.0.1:8090/")
                         self.assertIn("Parametr developerski odrzucony", page.locator("#authStatus").inner_text())
                     self.assertEqual(page.locator('#mode option').evaluate_all('(options) => options.map(o => o.value)'), ['compile', 'plan', 'chat'])
+                    page.click("[data-view=wykonania]")
                     with self.subTest("missing token is a local failure with no API call"):
                         page.fill("#msg", "synthetic status")
                         page.select_option("#mode", "chat")
@@ -439,6 +442,7 @@ class BrowserPilotTests(unittest.TestCase):
                         self.assertIn("Authorization", preflight.headers["access-control-allow-headers"])
                         denied_origin = context.request.fetch(f"http://127.0.0.1:{server.server_port}/api/chat", method="OPTIONS", headers={"Origin": "http://untrusted.invalid"})
                         self.assertNotIn("access-control-allow-origin", denied_origin.headers)
+                    page.click("[data-view=telemetria]")
                     page.click("#meshRefresh")
                     page.wait_for_function(
                         "document.querySelector('#metricRows').children.length === 5"
@@ -446,6 +450,7 @@ class BrowserPilotTests(unittest.TestCase):
                     self.assertIn("nieznane", page.locator("#metricRows").inner_text())
                     self.assertEqual(page.locator("#network circle").count(), 3)
                     self.assertEqual(page.locator("#radar circle").count(), 3)
+                    page.click("[data-view=diagnostyka]")
                     page.click("#observerPilot")
                     page.wait_for_function(
                         "document.querySelector('#observerOut').textContent.includes('WAIT_FOR_HUMAN_DECISION')"
@@ -458,6 +463,7 @@ class BrowserPilotTests(unittest.TestCase):
                     self.assertEqual(page.evaluate("localStorage.length"), 0)
                     self.assertEqual(page.evaluate("sessionStorage.length"), 0)
                     with self.subTest("logout clears private state and aborts pending transport"):
+                        page.click("[data-view=telemetria]")
                         page.check("#meshLive")
                         # Deliberately non-cooperative transport: a late success must
                         # be rejected even when it ignores the abort signal.

@@ -17,6 +17,7 @@
     "gateway/handlers/mcp_control.py",
     "index.html",
     "tests/mcp_control_test.py",
+    "tests/mesh_test.py",
     "tests/fixtures/mcp_control_server.py",
     "docs/information/mcp-process-control.md",
     "docs/README.md",
@@ -71,6 +72,7 @@
           "name": "verification",
           "paths": [
             "tests/mcp_control_test.py",
+            "tests/mesh_test.py",
             "tests/fixtures/mcp_control_server.py"
           ]
         },
