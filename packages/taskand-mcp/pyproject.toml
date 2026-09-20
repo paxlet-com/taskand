@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "taskand-mcp"
+version = "0.1.0"
+description = "MCP stdio adapter for the Taskand process URI gateway"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["mcp==2.2.0", "httpx==0.28.1"]
+
+[project.scripts]
+taskand-mcp = "taskand_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/taskand_mcp"]

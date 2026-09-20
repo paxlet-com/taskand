@@ -1,0 +1,41 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-028",
+  "summary": "Taskand MCP stdio gateway adapter",
+  "workstream": "application",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": ["project/ticket-028/**", "packages/taskand-mcp/**", "tests/taskand_mcp_test.py"],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "targetBranch": "main",
+    "outcome": "Locally tested MCP stdio adapter exposing Taskand URI discovery and gateway invocation, with documented client registration and runtime canary.",
+    "nonGoals": ["Remote publication or production replacement", "Autonomous repository-writing workers", "Changing registry authorization semantics", "Accessing private credentials"],
+    "complexity": "M",
+    "estimatedMinutes": 90,
+    "budgets": {"maxImplementationFiles": 9, "maxAffectedComponents": 3, "maxPublicInterfaceChanges": 2, "maxRuntimeDependencies": 2},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Standalone Python package using the official MCP SDK over stdio and bounded HTTP requests to the existing gateway. No direct process execution or gateway imports.",
+      "components": [{"name": "mcp-adapter", "paths": ["packages/taskand-mcp/**"]}, {"name": "mcp-tests", "paths": ["tests/taskand_mcp_test.py"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Local Taskand MCP stdio server"],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Disable the local MCP registration and revert the adapter commit; gateway data and runtime are unchanged."
+    },
+    "runtimeDependencies": ["mcp==2.2.0", "httpx==0.28.1"],
+    "validation": [
+      {"criterion": "AC-01", "commands": ["uv run --project packages/taskand-mcp python tests/taskand_mcp_test.py"], "evidence": "Real stdio MCP integration and HTTP boundary tests"},
+      {"criterion": "AC-04", "commands": ["./project/governance-check.sh", "git diff --check"], "evidence": "Managed governance and whitespace checks"}
+    ]
+  }
+}
