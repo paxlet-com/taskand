@@ -12,6 +12,9 @@ SESSION_EXECUTION_AUTHORIZATION: user explicitly requests applying and deploying
 
 - Register multiple instances from trusted deployment profiles; list, discover, admit exact schemas, enable/disable, execute and read receipts through one registered process URI.
 - Same dashboard presents configuration and observed outcomes; authentication and per-action grants enforced at gateway and signed process boundary.
+- Conversation view identifies the local `grants.yaml` token source and
+  distinguishes `TASKAND_AUTH_TOKEN` from `TASKAND_LLM_API_KEY`; logout keeps
+  the token in page memory only and clears it locally.
 - No arbitrary executable/URL supplied by plan, no unscoped data, no blind retry after uncertain mutation; SDK transport and result handling tested.
 - Local isolated pilot reachable in browser, tested with real MCP and independent artifact readback. Existing production services unchanged.
 - Document verified capabilities and remaining work in docs/information/mcp-process-control.md. Run managed gate and repository tests; protected publication if available, report unavailable stages honestly.

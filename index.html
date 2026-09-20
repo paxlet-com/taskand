@@ -7,6 +7,7 @@ h1{font-size:2rem}h2{font-size:1.1rem;color:#91d6ce}label{display:block;margin:1
 input,textarea,select,button{font:inherit;padding:10px;border:1px solid #526275;border-radius:6px;background:#182633;color:inherit;box-sizing:border-box}
 input:not([type=checkbox]),textarea,select{width:100%}button{cursor:pointer;margin:12px 8px 0 0;background:#245b57}button:disabled{opacity:.5;cursor:wait}
 small,.muted{color:#adbacb}main{display:grid;grid-template-columns:1fr 1fr;gap:24px}section{background:#14212d;padding:20px;border-radius:12px;min-width:0}
+#tokenSource{display:block;overflow-wrap:anywhere}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:420px;overflow:auto;font-size:.85rem}#graph{display:flex;align-items:center;gap:8px;overflow:auto;min-height:110px}
 .node{min-width:145px;max-width:230px;border:1px solid #58768f;border-radius:8px;padding:12px;overflow-wrap:anywhere}
 .node[data-state=CALLING]{border-color:#ebc274}.node[data-state=FAILED]{border-color:#f49797}.arrow{color:#89b6cf}
@@ -23,6 +24,7 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;
 <a href="#rozmowa" data-view="rozmowa">Rozmowa</a><a href="#uslugi" data-view="uslugi">Usługi</a><a href="#wykonania" data-view="wykonania">Wykonania</a><a href="#telemetria" data-view="telemetria">Telemetria</a><a href="#diagnostyka" data-view="diagnostyka">Diagnostyka</a>
 </nav></header><div id="access" class="access"><label for="token">Token API (tylko w pamięci tej strony)</label><input id="token" type="password" autocomplete="off">
 <button id="logout">Wyloguj lokalnie</button><small>Usuwa token i widoczne dane z tej strony; nie unieważnia tokenu na serwerze ani nie cofa wysłanej operacji.</small>
+<small id="tokenSource">Bieżąca usługa 8084 nie ustawia <code>TASKAND_AUTH_TOKEN</code>; źródłem tokenu jest <code>/home/tom/.local/share/taskand/mcp-import/releases/3444d0d03ef2232eae0ca7cd82c06a2812724263-token-source/grants.yaml</code> (domyślny grant <code>taskand-admin-key</code>). Przy własnym override użyj wartości <code>TASKAND_AUTH_TOKEN</code> z pliku <code>.env</code> użytego przy starcie usługi; <code>TASKAND_LLM_API_KEY</code> nie jest tokenem panelu.</small>
 <p id="authStatus" role="status">Podaj token dostępu do Taskand, nie klucz dostawcy LLM.</p>
 </div>
 <main><section class="wide" id="conversation" data-panel="rozmowa">
