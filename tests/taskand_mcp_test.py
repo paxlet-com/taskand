@@ -81,12 +81,12 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.http.server_close()
         self.thread.join(timeout=2)
 
-    def client(self, token="test-only"):
+    def client(self, credential="test-only"):
         return Client(StdioServerParameters(command=sys.executable,
                       args=["-m", "taskand_mcp.server"], env={
                           "PYTHONPATH": str(PACKAGE_SRC),
                           "TASKAND_MCP_GATEWAY_URL": self.url,
-                          "TASKAND_MCP_TOKEN": token,
+                          "TASKAND_MCP_TOKEN": credential,
                           "TASKAND_AUTH_TOKEN": "must-not-be-used",
                       }), read_timeout_seconds=10)
 
@@ -135,7 +135,7 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.requests, [])
 
     async def test_missing_credential_never_uses_inherited_admin(self):
-        async with self.client(token="") as client:
+        async with self.client(credential="") as client:
             self.assertFalse((await client.call_tool("list_processes")).is_error)
             denied = await client.call_tool("call_process", {"uri": ECHO, "input_data": {}})
             self.assertEqual(denied.structured_content["errorType"], "AUTH_REQUIRED")
@@ -191,7 +191,7 @@ class BoundaryTests(unittest.IsolatedAsyncioTestCase):
 
     def test_configuration_and_credentials_are_bounded(self):
         for url in ("http://example.com", "file:///tmp/file", "http://user:pass@localhost",
-                    "http://localhost?token=foo", "http://localhost/#fragment", "http://localhost/path",
+                    "http://localhost?key=foo", "http://localhost/#fragment", "http://localhost/path",
                     "http://localhost:99999", "http://localhost\n", "http://localhost:0"):
             with self.assertRaises(ValueError, msg=url):
                 Settings(url)
