@@ -144,7 +144,7 @@ environment[name="local"] {
 | `mdnsProbe` *(in generated.admin.network-device-discovery.taskand.dev.v1.bin)* | 15 ⚠ | 0 | 18 | **18** |
 
 ```toon markpact:analysis path=project/calls.toon.yaml
-# code2llm call graph | /home/tom/github/paxlet-com/taskand
+# code2llm call graph | /home/tom/github/semcod/taskand/glm53
 # generated in 0.19s
 # nodes: 260 | edges: 242 | modules: 53
 # CC̄=3.3
@@ -553,7 +553,7 @@ EDGES:
 ### Call Graph & Complexity (`project/calls.toon.yaml`)
 
 ```toon markpact:analysis path=project/calls.toon.yaml
-# code2llm call graph | /home/tom/github/paxlet-com/taskand
+# code2llm call graph | /home/tom/github/semcod/taskand/glm53
 # generated in 0.19s
 # nodes: 260 | edges: 242 | modules: 53
 # CC̄=3.3

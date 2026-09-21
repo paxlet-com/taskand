@@ -1,5 +1,5 @@
 {
-  "repository": "paxlet-com/taskand",
+  "repository": "semcod/taskand-glm53",
   "requiredChecks": [
     {
       "name": "governance / remote lifecycle",

@@ -10,7 +10,7 @@
 
 The GitHub repository was transferred from `semcod/taskand-glm53` to
 `paxlet-com/taskand` and the local primary checkout moved to
-`/home/tom/github/paxlet-com/taskand`. Update tracked functional references so
+the registered primary checkout of `paxlet-com/taskand`. Update tracked functional references so
 protected delivery bindings, the docs adoption pin and the repository README
 resolve the new slug and checkout path. Historical documents under `docs/` and
 closed `project/ticket-*` records keep their original references as evidence.
