@@ -1,0 +1,73 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-041",
+  "summary": "Rebind protected required-checks repository pin to paxlet-com/taskand",
+  "workstream": "integration",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-041/**",
+    ".governance/required-checks.json"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "db85c3379c3162a37e5061fe64992b9095b53f10",
+    "targetBranch": "main",
+    "outcome": "Rebind the protected required-checks repository pin to paxlet-com/taskand after the GitHub transfer.",
+    "nonGoals": [
+      "Changing required check names or workflow files",
+      "Editing governance docs pins already handled by ticket-040",
+      "Modifying validator or OneDev deployments"
+    ],
+    "complexity": "S",
+    "estimatedMinutes": 15,
+    "budgets": {
+      "maxImplementationFiles": 3,
+      "maxAffectedComponents": 1,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Single-field rebind in the integration-owned protected check registry; no structural or behavioral change.",
+      "components": [
+        {
+          "name": "protected-checks",
+          "paths": [
+            ".governance/required-checks.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [
+        "Repository slug in protected required-checks binding"
+      ],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert the single-field change; no runtime or data migration involved."
+    },
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Managed governance gate passes with the rebound repository pin"
+      }
+    ],
+    "runtimeDependencies": []
+  }
+}

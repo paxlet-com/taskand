@@ -32,5 +32,12 @@
 | **ticket-025** | [`README.md`](./ticket-025/README.md) | - | - | - | - | - |
 | **ticket-026** | [`README.md`](./ticket-026/README.md) | - | - | - | - | - |
 | **ticket-027** | [`README.md`](./ticket-027/README.md) | - | - | - | - | - |
+| **ticket-028** | [`README.md`](./ticket-028/README.md) | - | - | - | - | - |
+| **ticket-029** | [`README.md`](./ticket-029/README.md) | - | - |  [`ai-2026-09-19.md`](./ticket-029/ai-2026-09-19.md) | - | - |
+| **ticket-030** | [`README.md`](./ticket-030/README.md) | - | - | - | - | - |
+| **ticket-031** | [`README.md`](./ticket-031/README.md) | - | - | - | - | - |
+| **ticket-032** | [`README.md`](./ticket-032/README.md) | - | - | - | - | - |
+| **ticket-033** | [`README.md`](./ticket-033/README.md) | - | - | - | - | - |
+| **ticket-039** | [`README.md`](./ticket-039/README.md) | - | - | - | - | - |
 | **ticket-040** | [`README.md`](./ticket-040/README.md) | - | - | - | - | - |
 <!-- AUTO:TICKET_INDEX:END -->
