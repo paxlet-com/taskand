@@ -1,0 +1,24 @@
+{
+    "schema": "new-project.intent/v3",
+    "ticket": "ticket-042",
+    "summary": "Track local Gitea registry module",
+    "workstream": "infrastructure",
+    "classification": {
+        "kind": "SERVICE",
+        "priority": "P2",
+        "origin": "health"
+    },
+    "allowedPaths": [
+        "project/ticket-042/**",
+        "TODO.md",
+        "project/TICKETS.md",
+        "infra/gitea/**"
+    ],
+    "forbiddenPaths": [
+        "project/ticket-*/user-*.md"
+    ],
+    "stacks": [],
+    "dependsOn": [],
+    "conflictsWith": [],
+    "integrationTicket": null
+}
