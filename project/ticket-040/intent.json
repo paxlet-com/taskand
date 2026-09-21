@@ -1,0 +1,28 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-040",
+  "summary": "Update repository slug references after transfer to paxlet-com/taskand",
+  "workstream": "governance",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-040/**",
+    "TODO.md",
+    "project/TICKETS.md",
+    ".governance/docs.json",
+    "README.md",
+    "project/context.md",
+    "project/calls.yaml",
+    "project/calls.toon.yaml",
+    "project/planfile-tickets.yaml",
+    "project/index.html"
+  ],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null
+}
