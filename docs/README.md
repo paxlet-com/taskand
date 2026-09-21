@@ -47,3 +47,4 @@ standardu w CI i nie stanowi odbioru opisywanej funkcjonalności.
 - [Sekrety](SECRETS.md).
 
 - [Sterowanie MCP przez URI Taskand](information/mcp-process-control.md) — profile serwerów, dopuszczenia narzędzi, trwałe wyniki i izolowany pilot.
+- [Lokalne MCP jako procesy URI](information/mcp-uri-catalog.md) — importer, katalog 45 serwerów, naprawione środowiska i testy pilota.

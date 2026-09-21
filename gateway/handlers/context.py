@@ -1,10 +1,55 @@
 """Context commands and read-only owner-filtered projections. No impersonation."""
 from urllib.parse import parse_qs, urlsplit
-from gateway.auth import check_auth, check_grant
+from gateway.auth import check_auth, check_grant, require_grant
 from gateway.context import ACTIVE, ContextError, default_store
-from gateway.utils import call_process
+from gateway.utils import call_process, registry, LLM_KEY
 
 PLANNER = 'proc://taskand.dev/planner/plan/v1'
+MCP_CATALOG = 'proc://taskand.dev/mcp/catalog/v1'
+
+
+def handle_mcp_catalog(handler, body):
+    """Authenticated metadata projection, with a read-only dashboard capability.
+
+    This capability grants no registry/core call, admission or tool execution.
+    Host profiles, commands, environment and credential references stay private.
+    """
+    user = require_grant(handler, MCP_CATALOG, 'read')
+    if not user:
+        return
+    source = registry('list', {}, timeout=30)
+    entries = source.get('processes') if isinstance(source, dict) else None
+    if not isinstance(source, dict) or not source.get('ok') or not isinstance(entries, list) or len(entries) > 5000:
+        handler._send(503, {'ok': False, 'error': 'MCP_CATALOG_UNAVAILABLE'})
+        return
+    tools = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            handler._send(503, {'ok': False, 'error': 'MCP_CATALOG_INVALID'})
+            return
+        if entry.get('origin') != 'mcp':
+            continue
+        mcp = entry.get('mcp', {})
+        uri, status = entry.get('uri'), entry.get('status')
+        if (not isinstance(mcp, dict) or not all(isinstance(mcp.get(k), str) and mcp[k] for k in ('server', 'tool'))
+                or not isinstance(uri, str) or not uri.startswith('proc://taskand.dev/mcp-')
+                or status not in {'candidate', 'active', 'deprecated'}
+                or not isinstance(entry.get('inputSchema'), dict)):
+            handler._send(503, {'ok': False, 'error': 'MCP_CATALOG_INVALID'})
+            return
+        tools.append({'uri': uri, 'server': mcp['server'], 'name': mcp['tool'],
+                      'description': entry.get('desc', ''), 'status': status,
+                      'inputSchema': entry['inputSchema'],
+                      **({'outputSchema': entry['outputSchema']} if isinstance(entry.get('outputSchema'), dict) else {}),
+                      'canCall': status == 'active' and check_grant(user, uri, 'call'),
+                      'canApprove': status != 'active' and check_grant(user, uri, 'admin')})
+    tools.sort(key=lambda t: (t['server'], t['name'], t['uri']))
+    handler._send(200, {'ok': True, 'tools': tools,
+                       'counts': {'servers': len({t['server'] for t in tools}), 'tools': len(tools),
+                                  'active': sum(t['status'] == 'active' for t in tools),
+                                  'candidate': sum(t['status'] == 'candidate' for t in tools)},
+                       'conversation': {'allowed': check_grant(user, 'proc://taskand.dev/dev/llm/v1', 'call'),
+                                        'configured': bool(LLM_KEY)}})
 
 
 def identity(handler):

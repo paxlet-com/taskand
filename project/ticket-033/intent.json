@@ -1,0 +1,107 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-033",
+  "summary": "Connect preserved dashboard navigation to authenticated native MCP catalog, admission and URI calls",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-033/**",
+    "index.html",
+    "gateway/router.py",
+    "gateway/handlers/context.py",
+    "gateway/handlers/chat.py",
+    "tests/mesh_test.py",
+    "tests/runtime_readiness_test.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-030",
+    "ticket-032"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "targetBranch": "main",
+    "outcome": "The8084 dashboard shows the422-tool native catalog grouped by45servers, filters and schemas, enforces per-tool admission/call grants and recovers request status; real browser read-only MCP canary succeeds.",
+    "nonGoals": [
+      "Merging PR38 or changing8082",
+      "Automatically admitting or running tools",
+      "Granting broad registry/admin permissions",
+      "Storing API tokens in browser storage"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 6,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 2,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Reuse the newer PR38 panel navigation and conversation view; replace its separate control process UI with native registry projection and existing registry approve/proc call APIs. Add a read-only catalog projection in context handler with dedicated read capability and per-row call/admin permissions; conversation remains a fixed LLM URI without tool dispatch.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/router.py",
+            "gateway/handlers/context.py",
+            "gateway/handlers/chat.py"
+          ]
+        },
+        {
+          "name": "panel",
+          "paths": [
+            "index.html"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/mesh_test.py",
+            "tests/runtime_readiness_test.py"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "GET /api/mcp/catalog",
+        "POST /api/conversation"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "multi-state",
+        "states": [
+          "loading",
+          "empty",
+          "error",
+          "success"
+        ],
+        "evidence": [
+          "real Chrome422toolcatalog andnativeURIread; filtered/denied/stale-session/unknown-outcome checks"
+        ]
+      },
+      "rollback": "Restart previous immutable8084 release with preserved request ledger and profiles;8082 remains untouched."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "PYTHONPATH=. python tests/runtime_readiness_test.py",
+          "PYTHONPATH=. python tests/mesh_test.py",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Authenticated projection and real browser loading, filters, schemas, admission/call denial, explicit execution and recovery."
+      }
+    ]
+  }
+}

@@ -8,7 +8,11 @@ import { register } from './lifecycle.mjs';
 export function exportCatalog() {
   const processes = allEntries()
     .filter(e => e.status === 'active')
-    .map(({ uri, organism, desc, kind, hash, origin, files }) => ({ uri, organism, desc, kind, hash, origin, files }));
+    .map(({ uri, organism, desc, kind, hash, origin, files, inputSchema, outputSchema, mcp }) => ({
+      uri, organism, desc, kind, hash, origin, files,
+      ...(inputSchema ? { inputSchema } : {}), ...(outputSchema ? { outputSchema } : {}),
+      ...(mcp ? { mcp } : {})
+    }));
   return { ok: true, standard: 'taskand-registry/1', node: NODE_ID, generated: new Date().toISOString(), processes };
 }
 

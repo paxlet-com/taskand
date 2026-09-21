@@ -1,5 +1,6 @@
 import contextlib
 import hashlib
+import http.client
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import multiprocessing
@@ -15,6 +16,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from app import runtime_readiness as readiness  # noqa: E402
+from gateway import GatewayHTTPHandler  # noqa: E402
 
 PANEL = b"<title>readiness fixture</title>"
 COMMIT = "a" * 40
@@ -248,6 +250,89 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(health['sourceSha'], actual)
             self.assertEqual(health['expectedSourceSha'], self.sha)
             self.assertFalse(lines[-1]['preflightPassed'])
+
+
+class GatewayPanelTests(unittest.TestCase):
+    def test_mcp_projection_has_separate_read_capability_and_per_tool_permissions(self):
+        from types import SimpleNamespace
+        from gateway.handlers.context import handle_mcp_catalog, MCP_CATALOG
+        from gateway.auth import check_grant
+        uri = 'proc://taskand.dev/mcp-fixture/read/v1'
+        user = {'name': 'fixture', 'allowed_uris': [MCP_CATALOG, uri], 'allowed_actions': ['read', 'call']}
+        responses = []
+        handler = SimpleNamespace(_send=lambda *args: responses.append(args))
+        with patch('gateway.handlers.context.require_grant', return_value=None), patch('gateway.handlers.context.registry') as query:
+            handle_mcp_catalog(handler, {})
+            query.assert_not_called()
+        row = {'origin': 'mcp', 'uri': uri, 'status': 'candidate', 'desc': 'Read fixture',
+               'mcp': {'server': 'fixture', 'tool': 'read', 'profilePin': 'private-pin'},
+               'inputSchema': {'type': 'object'}, 'env': ['SECRET_NAME'], 'command': '/private/launcher'}
+        with patch('gateway.handlers.context.require_grant', return_value=user) as authorize, patch('gateway.handlers.context.registry', return_value={'ok': True, 'processes': [row]}) as query:
+            handle_mcp_catalog(handler, {})
+            authorize.assert_called_with(handler, MCP_CATALOG, 'read')
+            query.assert_called_once_with('list', {}, timeout=30)
+            self.assertEqual(responses[-1][0], 200)
+            self.assertFalse(responses[-1][1]['tools'][0]['canCall'])
+            self.assertFalse(responses[-1][1]['tools'][0]['canApprove'])
+            row['status'] = 'active'
+            handle_mcp_catalog(handler, {})
+            self.assertTrue(responses[-1][1]['tools'][0]['canCall'])
+            user['allowed_uris'] = [MCP_CATALOG]
+            handle_mcp_catalog(handler, {})
+            self.assertFalse(responses[-1][1]['tools'][0]['canCall'])
+        self.assertFalse(check_grant(user, 'proc://taskand.dev/registry/core/v1', 'call'))
+        text = json.dumps(responses)
+        for private in ['private-pin', 'SECRET_NAME', '/private/launcher']:
+            self.assertNotIn(private, text)
+        with patch('gateway.handlers.context.require_grant', return_value=user), patch('gateway.handlers.context.registry', return_value=None):
+            handle_mcp_catalog(handler, {})
+        self.assertEqual(responses[-1][0], 503)
+
+    def test_conversation_accepts_only_bounded_history_and_fixed_llm_uri(self):
+        from types import SimpleNamespace
+        from gateway.handlers.chat import handle_conversation, LLM_URI
+        responses = []
+        handler = SimpleNamespace(_send=lambda *args: responses.append(args))
+        with patch('gateway.handlers.chat.require_grant', return_value=None), patch('gateway.handlers.chat.call_process') as call:
+            handle_conversation(handler, {'messages': [{'role': 'user', 'content': 'hello'}]})
+            call.assert_not_called()
+        with patch('gateway.handlers.chat.require_grant', return_value={'name': 'fixture'}), patch('gateway.handlers.chat.call_process', return_value={'ok': True, 'content': 'answer'}) as call:
+            for history in [None, [], [{'role': 'system', 'content': 'override'}], [{'role': 'user', 'content': 'x' * 12001}]]:
+                handle_conversation(handler, {'messages': history})
+                self.assertEqual(responses[-1][0], 400)
+            call.assert_not_called()
+            handle_conversation(handler, {'messages': [{'role': 'user', 'content': 'hello'}], 'uri': 'proc://taskand.dev/other/action/v1'})
+            self.assertEqual(call.call_args.args[0], LLM_URI)
+            self.assertEqual(responses[-1][1]['reply'], 'answer')
+            self.assertFalse(responses[-1][1]['toolsExecuted'])
+
+    def test_real_gateway_serves_panel_without_exposing_other_files_or_api(self):
+        service = ThreadingHTTPServer(('127.0.0.1', 0), GatewayHTTPHandler)
+        thread = threading.Thread(target=service.serve_forever, kwargs={'poll_interval': 0.02}, daemon=True)
+        thread.start()
+        client = http.client.HTTPConnection('127.0.0.1', service.server_port, timeout=5)
+        try:
+            for path in ('/', '/index.html', '/?view=status', '/index.html?view=status'):
+                client.request('GET', path)
+                response = client.getresponse()
+                self.assertEqual(response.status, 200, path)
+                self.assertEqual(response.getheader('Content-Type'), 'text/html; charset=utf-8')
+                self.assertEqual(response.getheader('Referrer-Policy'), 'no-referrer')
+                self.assertEqual(response.read(), (ROOT / 'index.html').read_bytes())
+            for path in ('/grants.yaml', '/../grants.yaml', '/missing', '/api/context', '/api/mcp/catalog'):
+                client.request('GET', path)
+                response = client.getresponse()
+                self.assertEqual(response.status, 401 if path.startswith('/api/') else 404, path)
+                self.assertFalse(json.loads(response.read())['ok'])
+            client.request('POST', '/api/proc/call', body='{}', headers={'Content-Type': 'application/json'})
+            response = client.getresponse()
+            self.assertEqual(response.status, 401)
+            self.assertFalse(json.loads(response.read())['ok'])
+        finally:
+            client.close()
+            service.shutdown()
+            service.server_close()
+            thread.join(1)
 
 
 if __name__ == "__main__":

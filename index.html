@@ -18,6 +18,8 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;
 @media(max-width:760px){.visuals{grid-template-columns:1fr}}
 
 [hidden]{display:none!important}.topbar{position:sticky;top:0;z-index:10;background:#101820f5;padding:10px 0;border-bottom:1px solid #385064}.topbar nav{display:flex;flex-wrap:wrap;gap:8px}.topbar a{padding:10px 14px;text-decoration:none;border-radius:6px}.topbar a[aria-current=page]{background:#245b57;color:white}.access{margin:12px 0}.access input{max-width:420px}.chat-message{padding:12px 16px;margin:12px 0;border-radius:10px;background:#182633;white-space:pre-wrap;overflow-wrap:anywhere}.chat-message[data-role=user]{border-left:3px solid #91d6ce}.chat-message[data-role=assistant]{border-left:3px solid #a1cce9}#conversationLog{max-height:55vh;overflow:auto;min-height:140px}.chat-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+.mcp-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border:1px solid #385064;border-radius:8px}.mcp-filters{display:grid;grid-template-columns:1fr 2fr 1fr;gap:16px}.mcp-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:24px}#mcpTool{min-height:300px;max-width:100%}#mcpFields small{display:block}#mcpSchema{max-height:300px}#mcpDescription{overflow-wrap:anywhere}h3{font-size:1rem}#mcpHistory button{max-width:100%;overflow-wrap:anywhere;font-size:.85rem}@media(max-width:760px){.mcp-filters,.mcp-workspace{grid-template-columns:1fr}.mcp-summary{align-items:flex-start;flex-direction:column}}
 </style></head><body>
 <h1>taskand. <small>kontekst · bliźniaki · live</small></h1>
 <header class="topbar"><nav aria-label="Główne menu">
@@ -90,25 +92,47 @@ table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;
   <pre id="monagResumeOut">Kliknij „Odśwież”, aby pobrać aktualny rejestr.</pre>
 </details>
 </section><section class="wide" id="mcpControl" data-panel="uslugi">
-<h2>Serwery MCP i wykonania</h2>
+<h2>Usługi MCP</h2>
+<p>Wybierz serwer i narzędzie. Katalog pokazuje stan dopuszczenia; wykonanie wymaga również uprawnienia Twojego konta.</p>
+<div class="mcp-summary" aria-live="polite"><span id="mcpCounts">Katalog nie został jeszcze odczytany.</span><button id="mcpRefresh">Odczytaj katalog</button></div>
+<p id="mcpStatus" role="status">Podaj token API powyżej, aby odczytać katalog.</p>
+<div class="mcp-filters"><div><label for="mcpServer">Serwer</label><select id="mcpServer"><option value="">Wszystkie serwery</option></select></div>
+<div><label for="mcpSearch">Szukaj narzędzia</label><input id="mcpSearch" type="search" placeholder="Nazwa, opis lub URI"></div>
+<div><label for="mcpFilter">Stan</label><select id="mcpFilter"><option value="">Wszystkie</option><option value="active">Dopuszczone</option><option value="candidate">Kandydaci</option><option value="callable">Mogę wykonać</option><option value="deprecated">Wycofane</option></select></div></div>
+<p id="mcpMatches" class="muted">Brak obserwacji.</p>
+<div class="mcp-workspace"><div><label for="mcpTool">Narzędzia</label><select id="mcpTool" size="12" aria-describedby="mcpMatches"></select></div>
+<div><h3 id="mcpTitle">Wybierz narzędzie</h3><p id="mcpDescription"></p><p id="mcpPermission" role="status"></p>
+<details><summary>URI i kontrakt narzędzia</summary><pre id="mcpSchema">Brak wybranego narzędzia.</pre></details>
+<button id="mcpAdmit" disabled>Dopuść wybrane narzędzie</button>
+<form id="mcpForm" onsubmit="return false"><div id="mcpFields"></div></form>
+<details id="mcpJson"><summary>Argumenty JSON — pełny edytor</summary><label for="mcpArguments">Argumenty</label><textarea id="mcpArguments" rows="7">{}</textarea></details>
+<button id="mcpExecute" disabled>Wykonaj narzędzie</button>
+<p class="muted">Wywołanie rozpocznie się dopiero po kliknięciu. Odpowiedź narzędzia nie potwierdza samodzielnie ukończenia zadania.</p></div></div>
+<h3>Wynik i stan wywołania</h3><pre id="mcpOut" aria-live="polite">Nie wykonano narzędzia.</pre>
+<label for="mcpRunId">Identyfikator żądania — zachowaj do późniejszego odczytu stanu</label><input id="mcpRunId" placeholder="urn:uuid:…">
+<button id="mcpRecover">Odczytaj stan</button>
+<p class="muted">Odczyt stanu nie uruchamia narzędzia ponownie. Po utracie odpowiedzi dziennik może nie zawierać pełnego wyniku narzędzia.</p>
+<details><summary>Wywołania z tej sesji strony</summary><ul id="mcpHistory"></ul></details>
+<details><summary>Zarządzanie instancjami MCP (proc:// control)</summary>
 <p>Wszystkie operacje korzystają z procesu <code>proc://taskand.dev/mcp/control/v1</code> i bieżącego konta API. Połączenie MCP jest otwierane na czas operacji, a następnie zamykane.</p>
-<button id="mcpRefresh">Odczytaj konfigurację</button>
-<label for="mcpProfile">Profil wdrożony na tym hoście</label><select id="mcpProfile"></select>
-<label for="mcpNewId">Identyfikator nowej instancji</label><input id="mcpNewId" placeholder="np. raporty">
-<button id="mcpRegister">Dodaj instancję</button>
-<label for="mcpServer">Instancja</label><select id="mcpServer"></select>
-<button id="mcpToggle">Włącz / wyłącz nowe operacje</button>
-<button id="mcpProfileApply">Zastosuj wybrany profil — wymaga ponownego dopuszczenia narzędzi</button>
-<button id="mcpDiscover">Odczytaj narzędzia</button>
-<label for="mcpTool">Narzędzie</label><select id="mcpTool"></select>
-<pre id="mcpSchema">Najpierw odczytaj narzędzia wybranej instancji.</pre>
-<button id="mcpAdmit">Dopuść tę wersję narzędzia</button>
-<label for="mcpArguments">Argumenty JSON</label><textarea id="mcpArguments" rows="4">{}</textarea>
-<button id="mcpExecute">Wykonaj operację</button>
-<label for="mcpRunId">Identyfikator wykonania — zachowaj go do odczytu po utracie połączenia</label><input id="mcpRunId" readonly>
-<button id="mcpRecover">Odczytaj wynik</button><button id="mcpRuns">Historia wykonań</button>
-<p id="mcpStatus" role="status">Brak obserwacji.</p>
-<pre id="mcpOut">Wynik narzędzia nie jest jeszcze niezależnym potwierdzeniem ukończenia zadania.</pre>
+<button id="ctlRefresh">Odczytaj konfigurację</button>
+<label for="ctlProfile">Profil wdrożony na tym hoście</label><select id="ctlProfile"></select>
+<label for="ctlNewId">Identyfikator nowej instancji</label><input id="ctlNewId" placeholder="np. raporty">
+<button id="ctlRegister">Dodaj instancję</button>
+<label for="ctlServer">Instancja</label><select id="ctlServer"></select>
+<button id="ctlToggle">Włącz / wyłącz nowe operacje</button>
+<button id="ctlProfileApply">Zastosuj wybrany profil — wymaga ponownego dopuszczenia narzędzi</button>
+<button id="ctlDiscover">Odczytaj narzędzia</button>
+<label for="ctlTool">Narzędzie</label><select id="ctlTool"></select>
+<pre id="ctlSchema">Najpierw odczytaj narzędzia wybranej instancji.</pre>
+<button id="ctlAdmit">Dopuść tę wersję narzędzia</button>
+<label for="ctlArguments">Argumenty JSON</label><textarea id="ctlArguments" rows="4">{}</textarea>
+<button id="ctlExecute">Wykonaj operację</button>
+<label for="ctlRunId">Identyfikator wykonania — zachowaj go do odczytu po utracie połączenia</label><input id="ctlRunId" readonly>
+<button id="ctlRecover">Odczytaj wynik</button><button id="ctlRuns">Historia wykonań</button>
+<p id="ctlStatus" role="status">Brak obserwacji.</p>
+<pre id="ctlOut">Wynik narzędzia nie jest jeszcze niezależnym potwierdzeniem ukończenia zadania.</pre>
+</details>
 </section></main>
 <script>
 const $ = id => document.getElementById(id);
@@ -261,7 +285,7 @@ $('observerNext').onclick=()=>{
   if(!observerReceipt)return;
   $('refs').value=observerReceipt;$('mode').value='compile';
   $('msg').value='Na podstawie wyniku pilotażu przygotuj kolejny plan obserwacji. Wskaż brakujące adaptery oraz zapytaj mnie o dokładne źródła, zakres danych, czas działania i retencję. Nie uruchamiaj zbierania danych bez decyzji po teście bliźniaka.';
-  $('msg').focus();
+  location.hash='wykonania';$('msg').focus();
 };
 function resetSession(clearInputs=false){
   sessionEpoch++;
@@ -345,41 +369,105 @@ if ($('monagRefreshBtn')) {
 const developerSession=consumeDeveloperToken();
 
 
-const mcpUri='proc://taskand.dev/mcp/control/v1';
-let mcpServers=[],mcpTools=[],mcpBusy=false;
-function mcpClearTools(){mcpTools=[];$('mcpTool').replaceChildren();$('mcpSchema').textContent='Odczytaj narzędzia wybranej instancji.';}
-function mcpOptions(id,rows,label){const select=$(id);select.replaceChildren();for(const row of rows){const o=document.createElement('option');o.value=row.id||row.name;o.textContent=label(row);select.append(o);}}
-async function mcpAction(action,data={}){
-  const response=await request('/api/proc/call',{uri:mcpUri,data:{action,data}},45000);
+const ctlUri='proc://taskand.dev/mcp/control/v1';
+let ctlServers=[],ctlTools=[],ctlBusy=false;
+function ctlClearTools(){ctlTools=[];$('ctlTool').replaceChildren();$('ctlSchema').textContent='Odczytaj narzędzia wybranej instancji.';}
+function ctlOptions(id,rows,label){const select=$(id);select.replaceChildren();for(const row of rows){const o=document.createElement('option');o.value=row.id||row.name;o.textContent=label(row);select.append(o);}}
+async function ctlAction(action,data={}){
+  const response=await request('/api/proc/call',{uri:ctlUri,data:{action,data}},45000);
   const value=response.result;
   if(!value)throw new Error('Brak wyniku procesu');
   return value;
 }
-async function mcpGuard(work){
-  if(mcpBusy)return; mcpBusy=true;const epoch=sessionEpoch;
-  $('mcpStatus').textContent='Trwa operacja…';
-  try{const result=await work();if(currentSession(epoch)){$('mcpOut').textContent=JSON.stringify(result,null,2);$('mcpStatus').textContent=result.state|| (result.ok?'Odczytano wynik.':result.errorType||'Operacja odrzucona.');}}
-  catch(e){if(currentSession(epoch)){$('mcpStatus').textContent=e.message;$('mcpOut').textContent='Jeżeli wysłano wykonanie, użyj Odczytaj wynik. Nie ponawiamy go automatycznie.';}}
-  finally{mcpBusy=false;}
+async function ctlGuard(work){
+  if(ctlBusy)return; ctlBusy=true;const epoch=sessionEpoch;
+  $('ctlStatus').textContent='Trwa operacja…';
+  try{const result=await work();if(currentSession(epoch)){$('ctlOut').textContent=JSON.stringify(result,null,2);$('ctlStatus').textContent=result.state|| (result.ok?'Odczytano wynik.':result.errorType||'Operacja odrzucona.');}}
+  catch(e){if(currentSession(epoch)){$('ctlStatus').textContent=e.message;$('ctlOut').textContent='Jeżeli wysłano wykonanie, użyj Odczytaj wynik. Nie ponawiamy go automatycznie.';}}
+  finally{ctlBusy=false;}
 }
-async function mcpReload(){const result=await mcpAction('list');if(result.ok){mcpServers=result.servers;mcpClearTools();mcpOptions('mcpServer',mcpServers,r=>r.id+(r.enabled?' · włączona':' · wyłączona'));mcpOptions('mcpProfile',result.profiles,r=>r.id+' · '+r.transport);}return result;}
-$('mcpRefresh').onclick=()=>mcpGuard(mcpReload);
-$('mcpRegister').onclick=()=>mcpGuard(async()=>{const result=await mcpAction('register',{server:$('mcpNewId').value,profile:$('mcpProfile').value});if(result.ok)await mcpReload();return result;});
-$('mcpToggle').onclick=()=>mcpGuard(async()=>{const server=mcpServers.find(s=>s.id===$('mcpServer').value);if(!server)throw new Error('Wybierz instancję');const result=await mcpAction('configure',{server:server.id,enabled:!server.enabled,revision:server.revision});if(result.ok)await mcpReload();return result;});
-$('mcpServer').onchange=mcpClearTools;
-$('mcpProfileApply').onclick=()=>mcpGuard(async()=>{const server=mcpServers.find(s=>s.id===$('mcpServer').value);if(!server)throw new Error('Wybierz instancję');const result=await mcpAction('configure',{server:server.id,enabled:!!server.enabled,revision:server.revision,profile:$('mcpProfile').value});if(result.ok)await mcpReload();return result;});
-function mcpShowTool(){const tool=mcpTools.find(t=>t.name===$('mcpTool').value);$('mcpSchema').textContent=tool?JSON.stringify({description:tool.description,inputSchema:tool.inputSchema,admitted:tool.admitted},null,2):'Brak narzędzia';}
-$('mcpTool').onchange=mcpShowTool;
-async function mcpDiscover(){const result=await mcpAction('discover',{server:$('mcpServer').value});mcpClearTools();if(result.ok){mcpTools=result.tools;mcpOptions('mcpTool',mcpTools,t=>t.name+(t.admitted?' · dopuszczone':' · wymaga dopuszczenia'));mcpShowTool();}return result;}
-$('mcpDiscover').onclick=()=>mcpGuard(mcpDiscover);
-function mcpSelection(){const tool=mcpTools.find(t=>t.name===$('mcpTool').value);if(!tool)throw new Error('Odczytaj i wybierz narzędzie');return {server:$('mcpServer').value,tool:tool.name,schemaPin:tool.schemaPin};}
-$('mcpAdmit').onclick=()=>mcpGuard(async()=>{const result=await mcpAction('admit',mcpSelection());if(result.ok)await mcpDiscover();return result;});
-$('mcpExecute').onclick=()=>mcpGuard(async()=>{const selected=mcpSelection(),args=JSON.parse($('mcpArguments').value);const runId=crypto.randomUUID();$('mcpRunId').value=runId;return mcpAction('call',{...selected,arguments:args,runId});});
-$('mcpRecover').onclick=()=>mcpGuard(()=>mcpAction('runs',{runId:$('mcpRunId').value}));
-$('mcpRuns').onclick=()=>mcpGuard(()=>mcpAction('runs'));
-$('token').addEventListener('input',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Konto zmienione. Odczytaj konfigurację.';});
-$('logout').addEventListener('click',()=>{mcpServers=[];mcpClearTools();$('mcpServer').replaceChildren();$('mcpProfile').replaceChildren();$('mcpRunId').value='';$('mcpOut').textContent='Wylogowano lokalnie.';});
-if(developerSession){refreshMesh();mcpGuard(mcpReload);}
+async function ctlReload(){const result=await ctlAction('list');if(result.ok){ctlServers=result.servers;ctlClearTools();ctlOptions('ctlServer',ctlServers,r=>r.id+(r.enabled?' · włączona':' · wyłączona'));ctlOptions('ctlProfile',result.profiles,r=>r.id+' · '+r.transport);}return result;}
+$('ctlRefresh').onclick=()=>ctlGuard(ctlReload);
+$('ctlRegister').onclick=()=>ctlGuard(async()=>{const result=await ctlAction('register',{server:$('ctlNewId').value,profile:$('ctlProfile').value});if(result.ok)await ctlReload();return result;});
+$('ctlToggle').onclick=()=>ctlGuard(async()=>{const server=ctlServers.find(s=>s.id===$('ctlServer').value);if(!server)throw new Error('Wybierz instancję');const result=await ctlAction('configure',{server:server.id,enabled:!server.enabled,revision:server.revision});if(result.ok)await ctlReload();return result;});
+$('ctlServer').onchange=ctlClearTools;
+$('ctlProfileApply').onclick=()=>ctlGuard(async()=>{const server=ctlServers.find(s=>s.id===$('ctlServer').value);if(!server)throw new Error('Wybierz instancję');const result=await ctlAction('configure',{server:server.id,enabled:!!server.enabled,revision:server.revision,profile:$('ctlProfile').value});if(result.ok)await ctlReload();return result;});
+function ctlShowTool(){const tool=ctlTools.find(t=>t.name===$('ctlTool').value);$('ctlSchema').textContent=tool?JSON.stringify({description:tool.description,inputSchema:tool.inputSchema,admitted:tool.admitted},null,2):'Brak narzędzia';}
+$('ctlTool').onchange=ctlShowTool;
+async function ctlDiscover(){const result=await ctlAction('discover',{server:$('ctlServer').value});ctlClearTools();if(result.ok){ctlTools=result.tools;ctlOptions('ctlTool',ctlTools,t=>t.name+(t.admitted?' · dopuszczone':' · wymaga dopuszczenia'));ctlShowTool();}return result;}
+$('ctlDiscover').onclick=()=>ctlGuard(ctlDiscover);
+function ctlSelection(){const tool=ctlTools.find(t=>t.name===$('ctlTool').value);if(!tool)throw new Error('Odczytaj i wybierz narzędzie');return {server:$('ctlServer').value,tool:tool.name,schemaPin:tool.schemaPin};}
+$('ctlAdmit').onclick=()=>ctlGuard(async()=>{const result=await ctlAction('admit',ctlSelection());if(result.ok)await ctlDiscover();return result;});
+$('ctlExecute').onclick=()=>ctlGuard(async()=>{const selected=ctlSelection(),args=JSON.parse($('ctlArguments').value);const runId=crypto.randomUUID();$('ctlRunId').value=runId;return ctlAction('call',{...selected,arguments:args,runId});});
+$('ctlRecover').onclick=()=>ctlGuard(()=>ctlAction('runs',{runId:$('ctlRunId').value}));
+$('ctlRuns').onclick=()=>ctlGuard(()=>ctlAction('runs'));
+$('token').addEventListener('input',()=>{ctlServers=[];ctlClearTools();$('ctlServer').replaceChildren();$('ctlProfile').replaceChildren();$('ctlRunId').value='';$('ctlOut').textContent='Konto zmienione. Odczytaj konfigurację.';});
+$('logout').addEventListener('click',()=>{ctlServers=[];ctlClearTools();$('ctlServer').replaceChildren();$('ctlProfile').replaceChildren();$('ctlRunId').value='';$('ctlOut').textContent='Wylogowano lokalnie.';});
+
+let mcpTools=[],mcpBusy=false,mcpOperation=0,mcpLoaded=false;
+const mcpStates={active:'dopuszczone',candidate:'kandydat',deprecated:'wycofane'};
+function mcpSelected(){return mcpTools.find(t=>t.uri===$('mcpTool').value);}
+function mcpButtons(){const t=mcpSelected();$('mcpExecute').disabled=mcpBusy||!t?.canCall;$('mcpAdmit').disabled=mcpBusy||!t?.canApprove;
+ for(const id of ['mcpRefresh','mcpServer','mcpSearch','mcpFilter','mcpTool','mcpRecover'])$(id).disabled=mcpBusy;}
+function mcpFieldSync(){let args;try{args=JSON.parse($('mcpArguments').value);}catch{return;}if(!args||typeof args!=='object'||Array.isArray(args))return;
+ for(const input of $('mcpFields').querySelectorAll('[data-key]')){const value=args[input.dataset.key];if(input.type==='checkbox')input.checked=value===true;else input.value=value===undefined?'':String(value);}}
+function mcpShowTool(){const tool=mcpSelected();$('mcpFields').replaceChildren();$('mcpArguments').value='{}';
+ $('mcpTitle').textContent=tool?tool.server+' / '+tool.name:'Wybierz narzędzie';$('mcpDescription').textContent=tool?.description||'';
+ $('mcpSchema').textContent=tool?JSON.stringify({uri:tool.uri,inputSchema:tool.inputSchema,...(tool.outputSchema?{outputSchema:tool.outputSchema}:{})},null,2):'Brak wybranego narzędzia.';
+ $('mcpPermission').textContent=!tool?'':tool.status!=='active'?'Stan: '+mcpStates[tool.status]+'. Wykonanie wymaga dopuszczenia.':tool.canCall?'Dopuszczone. Twoje konto może wykonać to narzędzie.':'Dopuszczone. Twoje konto nie ma uprawnienia do wykonania.';
+ if(tool){const schema=tool.inputSchema;let complex=false;const defaults=Object.create(null);
+  for(const [key,property] of Object.entries(schema.properties||{})){if(!property||typeof property!=='object')continue;const required=(schema.required||[]).includes(key);
+   if(!['string','number','integer','boolean'].includes(property.type)){complex=true;continue;}
+   const label=document.createElement('label'),input=document.createElement(property.enum?'select':'input');input.id='mcpArg'+$('mcpFields').children.length;input.dataset.key=key;label.htmlFor=input.id;label.textContent=key+(required?' *':'');
+   if(property.enum){const blank=document.createElement('option');blank.value='';blank.textContent='Wybierz wartość';input.append(blank);for(const value of property.enum){const option=document.createElement('option');option.value=String(value);option.textContent=String(value);input.append(option);}}
+   else input.type=property.type==='boolean'?'checkbox':['integer','number'].includes(property.type)?'number':'text';
+   if(input.type==='number')input.step=property.type==='integer'?'1':'any';
+   if(input.type!=='checkbox')input.required=required;
+   input.addEventListener('input',()=>{let args;try{args=JSON.parse($('mcpArguments').value);if(!args||typeof args!=='object'||Array.isArray(args))throw Error();}catch{$('mcpStatus').textContent='Popraw JSON w pełnym edytorze przed zmianą pól.';return;}
+    if(input.type!=='checkbox'&&input.value==='')delete args[key];else args[key]=property.type==='boolean'?(input.type==='checkbox'?input.checked:input.value==='true'):['integer','number'].includes(property.type)?Number(input.value):input.value;
+    $('mcpArguments').value=JSON.stringify(args,null,2);});
+   $('mcpFields').append(label,input);if(property.description){const hint=document.createElement('small');hint.textContent=property.description;$('mcpFields').append(hint);}
+   if(Object.hasOwn(property,'default'))defaults[key]=property.default;else if(required&&property.type==='boolean')defaults[key]=false;
+  }
+  $('mcpArguments').value=JSON.stringify(defaults,null,2);$('mcpJson').open=complex;mcpFieldSync();
+ }
+ mcpButtons();}
+function mcpFilterTools(){const selected=$('mcpTool').value,server=$('mcpServer').value,filter=$('mcpFilter').value,search=$('mcpSearch').value.trim().toLocaleLowerCase();
+ const rows=mcpTools.filter(t=>(!server||t.server===server)&&(!filter||(filter==='callable'?t.canCall:t.status===filter))&&(!search||[t.server,t.name,t.description,t.uri].join(' ').toLocaleLowerCase().includes(search)));
+ $('mcpTool').replaceChildren();for(const t of rows){const option=document.createElement('option');option.value=t.uri;option.textContent=t.server+' / '+t.name+' · '+mcpStates[t.status];$('mcpTool').append(option);}
+ if(rows.some(t=>t.uri===selected))$('mcpTool').value=selected;
+ $('mcpMatches').textContent=rows.length+' z '+mcpTools.length+' narzędzi'+(mcpLoaded&&!rows.length?' — brak wyników dla tych filtrów.':'');mcpShowTool();}
+async function mcpLoad(){const epoch=sessionEpoch,report=await request('/api/mcp/catalog',undefined,40000);if(!currentSession(epoch))throw failure('SESSION_CHANGED');
+ if(!report.ok||!Array.isArray(report.tools)||!report.counts)throw failure('RESPONSE');
+ const server=$('mcpServer').value;mcpTools=report.tools;mcpLoaded=true;$('mcpServer').replaceChildren();
+ const all=document.createElement('option');all.value='';all.textContent='Wszystkie serwery';$('mcpServer').append(all);
+ for(const name of [...new Set(mcpTools.map(t=>t.server))].sort()){const option=document.createElement('option');option.value=name;option.textContent=name+' ('+mcpTools.filter(t=>t.server===name).length+')';$('mcpServer').append(option);}
+ if(mcpTools.some(t=>t.server===server))$('mcpServer').value=server;
+ $('mcpCounts').textContent='Serwery: '+report.counts.servers+' · Narzędzia: '+report.counts.tools+' · Dopuszczone: '+report.counts.active+' · Kandydaci: '+report.counts.candidate;
+ mcpFilterTools();
+ if(report.conversation&&!report.conversation.configured)$('conversationStatus').textContent='Model rozmowy nie jest skonfigurowany w tej instancji. Katalog MCP działa niezależnie.';
+ return report.counts;}
+async function mcpGuard(work){if(mcpBusy)return;const epoch=sessionEpoch,operation=++mcpOperation;mcpBusy=true;mcpButtons();$('mcpStatus').textContent='Trwa operacja…';
+ try{const result=await work();if(currentSession(epoch)){$('mcpStatus').textContent='Odczyt zakończony.';return result;}}
+ catch(e){if(currentSession(epoch))$('mcpStatus').textContent=e.message;}
+ finally{if(currentSession(epoch)&&mcpOperation===operation){mcpBusy=false;mcpButtons();}}}
+$('mcpRefresh').onclick=()=>mcpGuard(mcpLoad);
+$('mcpServer').onchange=mcpFilterTools;$('mcpFilter').onchange=mcpFilterTools;$('mcpSearch').oninput=mcpFilterTools;$('mcpTool').onchange=mcpShowTool;$('mcpArguments').oninput=mcpFieldSync;
+$('mcpAdmit').onclick=()=>mcpGuard(async()=>{const tool=mcpSelected();if(!tool?.canApprove)throw Error('Brak uprawnienia do dopuszczenia narzędzia.');if(!confirm('Dopuścić narzędzie '+tool.server+' / '+tool.name+'?'))return;
+ const epoch=sessionEpoch,response=await request('/api/registry',{action:'approve',uri:tool.uri});if(!currentSession(epoch))throw failure('SESSION_CHANGED');if(!response.ok)throw Error('Dopuszczenie zostało odrzucone.');$('mcpOut').textContent='Dopuszczono '+tool.uri;await mcpLoad();});
+$('mcpExecute').onclick=()=>mcpGuard(async()=>{const tool=mcpSelected();if(!tool?.canCall)throw Error('Narzędzie nie jest dopuszczone lub brak uprawnienia.');if(!$('mcpForm').reportValidity())return;
+ const args=JSON.parse($('mcpArguments').value);if(!args||typeof args!=='object'||Array.isArray(args))throw Error('Argumenty muszą być obiektem JSON.');
+ const epoch=sessionEpoch,requestId='urn:uuid:'+crypto.randomUUID();$('mcpRunId').value=requestId;
+ const row=document.createElement('li'),button=document.createElement('button');button.textContent=tool.server+' / '+tool.name+' · '+requestId;button.onclick=()=>{$('mcpRunId').value=requestId;};row.append(button);$('mcpHistory').prepend(row);
+ $('mcpOut').textContent='Oczekiwanie na odpowiedź…';
+ try{const result=await request('/api/proc/call',{uri:tool.uri,data:args,timeout:35,requestId},40000);if(!currentSession(epoch))throw failure('SESSION_CHANGED');$('mcpOut').textContent=JSON.stringify(result,null,2);}
+ catch(e){if(currentSession(epoch))$('mcpOut').textContent=['UNAUTHORIZED','FORBIDDEN','HTTP'].includes(e.code)?'Żądanie odrzucone: '+e.message:'Wynik niepotwierdzony. Zachowaj identyfikator i odczytaj stan przed kolejnym wywołaniem. Nie ponowiono automatycznie.';throw e;}
+});
+$('mcpRecover').onclick=()=>mcpGuard(async()=>{const id=$('mcpRunId').value.trim();if(!/^urn:uuid:[0-9a-f-]{36}$/i.test(id))throw Error('Podaj identyfikator żądania urn:uuid.');const epoch=sessionEpoch,result=await request('/api/state?requestId='+encodeURIComponent(id));if(!currentSession(epoch))throw failure('SESSION_CHANGED');$('mcpOut').textContent=JSON.stringify(result,null,2);});
+function mcpReset(){mcpOperation++;mcpBusy=false;mcpLoaded=false;mcpTools=[];$('mcpServer').replaceChildren();const all=document.createElement('option');all.value='';all.textContent='Wszystkie serwery';$('mcpServer').append(all);$('mcpSearch').value='';$('mcpFilter').value='';$('mcpRunId').value='';$('mcpHistory').replaceChildren();$('mcpCounts').textContent='Katalog nie został jeszcze odczytany.';$('mcpOut').textContent='Brak wyników w tej sesji.';$('mcpStatus').textContent='Odczytaj katalog dla bieżącego konta.';mcpFilterTools();}
+$('token').addEventListener('input',mcpReset);$('logout').addEventListener('click',mcpReset);
+mcpButtons();
+if(developerSession){refreshMesh();mcpGuard(mcpLoad);ctlGuard(ctlReload);}
 
 const views=new Set(['rozmowa','uslugi','wykonania','telemetria','diagnostyka']);
 function showView(){const requested=location.hash.slice(1);const view=views.has(requested)?requested:(requested==='mode'?'wykonania':'rozmowa');for(const section of document.querySelectorAll('[data-panel]'))section.hidden=section.dataset.panel!==view;for(const link of document.querySelectorAll('[data-view]')){if(link.dataset.view===view)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}}

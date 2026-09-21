@@ -1,0 +1,83 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-031",
+  "summary": "Preserve complete doctor JSON on pipes when large MCP catalogs produce hundreds of findings",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-031/**",
+    "generated/doctor/prescribe/taskand.dev/v1/bin.mjs",
+    "generated/doctor/heal/taskand.dev/v1/bin.mjs",
+    "generated/doctor/registry.json",
+    "tests/doctor_diagnostics.test.mjs"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-030"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "targetBranch": "main",
+    "outcome": "Doctor prescribe and heal emit valid, complete JSON for a 422-tool MCP catalog; regression captures pipe output and confirms last record.",
+    "nonGoals": [
+      "Changing diagnostic findings or healing authority",
+      "Editing MCP bridge, dashboard, shared manifests or documentation index"
+    ],
+    "complexity": "S",
+    "estimatedMinutes": 20,
+    "budgets": {
+      "maxImplementationFiles": 5,
+      "maxAffectedComponents": 2,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Synchronous stdout writes complete the JSON before existing process exits. Exercise real CLI programs via pipes against a deterministic diagnostic fixture and run the actual full MCP inventory. This is a serialized follow-up to ticket030, not a concurrent writer.",
+      "components": [
+        {
+          "name": "doctor",
+          "paths": [
+            "generated/doctor/**"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/doctor_diagnostics.test.mjs"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert only doctor output changes; preserve imported MCP packages and existing runtime receipts."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "node --test tests/doctor_diagnostics.test.mjs",
+          "make test",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Real CLI pipe output for large diagnostic payloads; full 422-candidate catalog contract checks."
+      }
+    ]
+  }
+}

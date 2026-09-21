@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // proc://taskand.dev/doctor/prescribe/v1 — recepty z ustaleń diagnozy (deterministyczne reguły).
 // Każda recepta: executor "organism" (remedies: kroki proc:// dla doctor/heal) albo "human" (polecenie + powód).
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { call } from './registry-client.mjs';
 
 let input;
@@ -58,13 +58,14 @@ const RULES = {
 
 const diag = input.diagnosis || call('proc://taskand.dev/doctor/diagnose/v1', {}, 90000);
 if (!Array.isArray(diag.findings)) {
-  process.stdout.write(JSON.stringify({ ok: false, error: `Brak diagnozy: ${diag.error}` }) + '\n');
+  writeFileSync(1, JSON.stringify({ ok: false, error: `Brak diagnozy: ${diag.error}` }) + '\n');
   process.exit(0);
 }
 
 const prescriptions = diag.findings.map(f => ({ finding: f, ...(RULES[f.code]?.(f) || human('brak reguły', `Nieznany kod ${f.code}`)) }));
 const byOrganism = prescriptions.filter(p => p.executor === 'organism').length;
-process.stdout.write(JSON.stringify({
+// Complete pipe output before process.exit; large candidate catalogs exceed pipe capacity.
+writeFileSync(1, JSON.stringify({
   ok: true,
   healthy: diag.healthy,
   prescriptions,

@@ -1,0 +1,95 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-032",
+  "summary": "Serve the existing panel from the MCP gateway root and keep browser API calls on the selected pilot",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-032/**",
+    "gateway/__init__.py",
+    "index.html",
+    "tests/runtime_readiness_test.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-030"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "targetBranch": "main",
+    "outcome": "Opening the delivered 8084 URL returns the existing Taskand panel; browser API requests target that origin and 8090 compatibility remains.",
+    "nonGoals": [
+      "Dashboard redesign or merging PR38",
+      "New tool admission or changes to API authorization",
+      "Changing existing 8077 or 8082 deployments"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 35,
+    "budgets": {
+      "maxImplementationFiles": 3,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 1,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Serve only the fixed bundled index.html path for GET / and /index.html. Use the current browser origin except the established standalone 8090 frontend. Reuse minimal root-serving behavior from preserved PR38 with bounded error handling and query-safe logging.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/__init__.py"
+          ]
+        },
+        {
+          "name": "panel",
+          "paths": [
+            "index.html"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/runtime_readiness_test.py"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "GET / and /index.html serve bundled panel"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "single-state",
+        "states": [
+          "success"
+        ],
+        "evidence": [
+          "real HTTP root and browser API-origin smoke checks"
+        ]
+      },
+      "rollback": "Restart the previous immutable 8084 release, preserving request history."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "python tests/runtime_readiness_test.py",
+          "python tests/health_identity_test.py",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Actual gateway HTTP root aliases, API isolation and unchanged authorization; browser origin checks and deployed MCP canary."
+      }
+    ]
+  }
+}

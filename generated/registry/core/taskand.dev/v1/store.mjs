@@ -1,11 +1,12 @@
 // Rejestry organizmów: generated/<organism>/registry.json (jedyny zapisujący: registry/core, z blokadą)
-import { readFileSync, writeFileSync, readdirSync, existsSync, openSync, closeSync, unlinkSync, statSync, renameSync, appendFileSync, chownSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, openSync, closeSync, unlinkSync, statSync, lstatSync, renameSync, appendFileSync, chownSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { hostname } from 'node:os';
 
 export const ROOT = fileURLToPath(new URL('../../../../..', import.meta.url)).replace(/\/$/, '');
 export const GEN = join(ROOT, 'generated');
+export const MCP = join(ROOT, 'mcp');
 export const NODE_ID = process.env.TASKAND_NODE || hostname();
 const GENOME = join(ROOT, 'genome.yaml');
 const URI_RE = /^proc:\/\/taskand\.dev\/([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)\/(v[0-9]+)$/;
@@ -17,10 +18,31 @@ export function parseUri(uri) {
   const m = URI_RE.exec(String(uri || ''));
   if (!m) return null;
   const [, organism, capability, version] = m;
-  return { uri, organism, capability, version, dir: join(GEN, organism, capability, 'taskand.dev', version) };
+  const root = organismDir(organism);
+  const dir = join(root, capability, 'taskand.dev', version);
+  for (const path of [join(root, capability), join(root, capability, 'taskand.dev'), dir]) rejectSymlink(path);
+  return { uri, organism, capability, version, dir };
 }
 
-const registryFile = organism => join(GEN, organism, 'registry.json');
+function rejectSymlink(path) {
+  try {
+    if (lstatSync(path).isSymbolicLink()) throw new Error('REGISTRY_SYMLINK');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+}
+
+// The reserved mcp-* namespace has one canonical root, never a fallback path.
+export function organismDir(organism) {
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(organism)) throw new Error('INVALID_ORGANISM');
+  const root = organism.startsWith('mcp-') ? MCP : GEN;
+  const dir = join(root, organism);
+  for (const path of [root, dir]) rejectSymlink(path);
+  if (organism.startsWith('mcp-') && existsSync(join(GEN, organism))) throw new Error('MCP_NAMESPACE_COLLISION');
+  return dir;
+}
+
+const registryFile = organism => join(organismDir(organism), 'registry.json');
 
 export function readRegistry(organism) {
   try {
@@ -31,10 +53,16 @@ export function readRegistry(organism) {
 }
 
 export function organisms() {
-  return readdirSync(GEN, { withFileTypes: true })
-    .filter(d => d.isDirectory() && /^[a-z0-9]/.test(d.name))
-    .map(d => d.name)
-    .sort();
+  const names = [GEN, MCP].flatMap(root => {
+    if (!existsSync(root)) return [];
+    if (lstatSync(root).isSymbolicLink()) throw new Error('REGISTRY_SYMLINK');
+    return readdirSync(root, { withFileTypes: true })
+      .filter(d => d.isDirectory() && /^[a-z0-9][a-z0-9-]*$/.test(d.name)
+        && (root === MCP ? d.name.startsWith('mcp-') : true))
+      .map(d => d.name);
+  });
+  for (const name of names) organismDir(name);
+  return names.sort();
 }
 
 export function allEntries() {
@@ -61,7 +89,7 @@ const sleep = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0,
 
 // Zapis rejestru organizmu pod blokadą O_EXCL (równoległe ewolucje nie nadpisują się nawzajem)
 export function updateRegistry(organism, mutate) {
-  const lock = join(GEN, organism, '.registry.lock');
+  const lock = join(organismDir(organism), '.registry.lock');
   const deadline = Date.now() + LOCK_WAIT_MS;
   let fd;
   while (fd === undefined) {
@@ -84,7 +112,7 @@ export function updateRegistry(organism, mutate) {
     const tmp = `${registryFile(organism)}.${process.pid}.tmp`;
     writeFileSync(tmp, JSON.stringify(reg, null, 2) + '\n');
     renameSync(tmp, registryFile(organism));
-    adoptOwnership(join(GEN, organism));
+    adoptOwnership(organismDir(organism));
     return result;
   } finally {
     closeSync(fd);
