@@ -4,7 +4,7 @@
 
 > **taskand v2.2** wprowadza deterministyczną dekompozycję złożonych celów biznesowych na grafy zależności (DAG Blueprint), trójkolorową walidację cykli i uprawnień oraz izolowany silnik orkiestracji. System zachowuje minimalistyczną architekturę v2.0, wzbogacając ją o trójwarstwowy pipeline: **Planner → Validator → Orchestrator**, wspierany przez model **GLM-5.3** oraz odporne kontrakty procesów (fail-closed JSON).
 
-* **Oficjalne repozytorium**: https://github.com/semcod/taskand-glm53
+* **Oficjalne repozytorium**: https://github.com/paxlet-com/taskand
 * **Pełna specyfikacja Standardu v2.2**: [STANDARD-v2.2.md](STANDARD-v2.2.md) oraz [docs/standard-v2.2.md](docs/standard-v2.2.md)
 * **Wcześniejsze wersje standardu**: [v2.0](docs/standard-v2.0.md) | [v1.6](docs/standard-v1.6.md) | [v1.5](docs/standard-v1.5.md) | [v1.4](docs/standard-v1.4.md) | [v1.1](docs/standard-v1.1.md)
 

@@ -3,7 +3,7 @@
 
 ## Overview
 
-- **Project**: /home/tom/github/semcod/taskand/glm53
+- **Project**: /home/tom/github/paxlet-com/taskand
 - **Primary Language**: javascript
 - **Languages**: javascript: 66, yaml: 36, json: 15, python: 13, shell: 1
 - **Analysis Mode**: static

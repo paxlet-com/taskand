@@ -1,4 +1,4 @@
-project: /home/tom/github/semcod/taskand/glm53
+project: /home/tom/github/paxlet-com/taskand
 generated_from: code2llm call graph analysis
 stats:
   total_nodes: 260
