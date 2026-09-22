@@ -1,354 +1,444 @@
 # System Architecture Analysis
-<!-- generated in 0.00s -->
+<!-- generated in 0.01s -->
 
 ## Overview
 
 - **Project**: /home/tom/github/paxlet-com/taskand
-- **Primary Language**: javascript
-- **Languages**: javascript: 66, yaml: 36, json: 15, python: 13, shell: 1
+- **Primary Language**: md
+- **Languages**: md: 44, python: 33, yaml: 9, shell: 5, javascript: 4
 - **Analysis Mode**: static
-- **Total Functions**: 733
-- **Total Classes**: 1
-- **Modules**: 134
-- **Entry Points**: 624
+- **Total Functions**: 276
+- **Total Classes**: 13
+- **Modules**: 105
+- **Entry Points**: 162
 
 ## Architecture by Module
 
-### generated.admin.network-device-discovery.taskand.dev.v1.bin
-- **Functions**: 65
-- **File**: `bin.mjs`
+### operations.delivery
+- **Functions**: 49
+- **File**: `delivery.mjs`
 
-### generated.registry.core.taskand.dev.v1.store
-- **Functions**: 44
-- **File**: `store.mjs`
-
-### generated.registry.core.taskand.dev.v1.lifecycle
-- **Functions**: 29
-- **File**: `lifecycle.mjs`
-
-### generated.doctor.diagnose.taskand.dev.v1.bin
-- **Functions**: 25
-- **File**: `bin.mjs`
-
-### generated.hw.monitor.taskand.dev.v1.bin
+### scripts.runtime
 - **Functions**: 24
-- **File**: `bin.mjs`
+- **File**: `runtime.sh`
 
-### generated.registry.core.taskand.dev.v1.exec
-- **Functions**: 23
-- **File**: `exec.mjs`
-
-### generated.admin.network-device-discovery.taskand.dev.v2.networks
+### packages.taskand-mcp-control.control
 - **Functions**: 21
-- **File**: `networks.mjs`
+- **Classes**: 2
+- **File**: `control.py`
 
-### generated.registry.core.taskand.dev.v1.federation
-- **Functions**: 21
-- **File**: `federation.mjs`
-
-### generated.doctor.heal.taskand.dev.v1.bin
-- **Functions**: 21
-- **File**: `bin.mjs`
-
-### generated.dev.evolve.taskand.dev.v1.bin
-- **Functions**: 21
-- **File**: `bin.mjs`
-
-### generated.dev.act.taskand.dev.v1.bin
+### operations.delivery_controller.test
 - **Functions**: 19
-- **File**: `bin.mjs`
+- **File**: `delivery_controller.test.mjs`
 
-### generated.dev.evolve.taskand.dev.v1.gate
-- **Functions**: 18
-- **File**: `gate.mjs`
-
-### generated.dev.chat.taskand.dev.v1.dispatch
-- **Functions**: 18
-- **File**: `dispatch.mjs`
-
-### generated.validator.resolve.taskand.dev.v1.bin
-- **Functions**: 17
-- **File**: `bin.mjs`
-
-### generated.orchestrator.execute.taskand.dev.v1.bin
-- **Functions**: 17
-- **File**: `bin.mjs`
-
-### generated.dev.composite.taskand.dev.v1.bin
-- **Functions**: 17
-- **File**: `bin.mjs`
-
-### generated.dev.llm.taskand.dev.v1.bin
-- **Functions**: 16
-- **File**: `bin.mjs`
-
-### generated.admin.network-device-discovery.taskand.dev.v3.network
+### gateway.context
 - **Functions**: 15
-- **File**: `network.mjs`
+- **Classes**: 2
+- **File**: `context.py`
 
-### generated.admin.network-device-discovery.taskand.dev.v4.address
+### examples.web-twin-task
 - **Functions**: 13
-- **File**: `address.mjs`
+- **File**: `web-twin-task.mjs`
 
-### generated.admin.network-device-discovery.taskand.dev.v2.bin
+### examples.network-scan-task
 - **Functions**: 12
-- **File**: `bin.mjs`
+- **File**: `network-scan-task.mjs`
+
+### scripts.install-agent-hosts
+- **Functions**: 11
+- **File**: `install-agent-hosts.sh`
+
+### infra.local-recovery.context_snapshot
+- **Functions**: 11
+- **Classes**: 1
+- **File**: `context_snapshot.py`
+
+### infra.local-recovery.deploy
+- **Functions**: 11
+- **File**: `deploy.py`
+
+### packages.taskand-mcp.src.taskand_mcp.gateway
+- **Functions**: 10
+- **Classes**: 3
+- **File**: `gateway.py`
+
+### mcp.bridge
+- **Functions**: 10
+- **Classes**: 1
+- **File**: `bridge.py`
+
+### mcp.catalog
+- **Functions**: 10
+- **File**: `catalog.py`
+
+### gateway
+- **Functions**: 7
+- **Classes**: 1
+- **File**: `__init__.py`
+
+### gateway.auth
+- **Functions**: 7
+- **File**: `auth.py`
+
+### wellmanifest_governance
+- **Functions**: 6
+- **Classes**: 1
+- **File**: `wellmanifest_governance.py`
+
+### gateway.handlers.observers
+- **Functions**: 5
+- **File**: `observers.py`
+
+### app.runtime_canary
+- **Functions**: 5
+- **File**: `runtime_canary.py`
+
+### app.runtime_readiness
+- **Functions**: 5
+- **File**: `runtime_readiness.py`
+
+### gateway.handlers.monag_handler
+- **Functions**: 4
+- **File**: `monag_handler.py`
 
 ## Key Entry Points
 
 Main execution flows into the system:
 
-### generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.Map, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.Promise, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.createSocket, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.close, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.resolve, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.setTimeout, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.on, generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.clearTimeout
+### packages.taskand-mcp-control.control.Control.remote
+- **Calls**: self.server, self.profile, asyncio.timeout, self.client, next, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.require, None.fetchone
 
-### generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.probeMdns
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.Promise, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.createSocket, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.resolve, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.close, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.setTimeout, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.on, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.done
+### gateway.handlers.proc.handle_conversation
+> Conversation only: a fixed LLM URI, no intent dispatch or tool execution.
+- **Calls**: gateway.auth.require_grant, body.get, os.environ.get, handler._send, any, handler._send, gateway.utils.call_process, urlsplit
 
-### generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v1.bin.Promise, generated.admin.network-device-discovery.taskand.dev.v1.bin.createSocket, generated.admin.network-device-discovery.taskand.dev.v1.bin.setTimeout, generated.admin.network-device-discovery.taskand.dev.v1.bin.close, generated.admin.network-device-discovery.taskand.dev.v1.bin.resolve, generated.admin.network-device-discovery.taskand.dev.v1.bin.on, generated.admin.network-device-discovery.taskand.dev.v1.bin.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v1.bin.find
+### packages.taskand-mcp-control.control.Control.run
+- **Calls**: packages.taskand-mcp-control.control.require, set, data.get, packages.taskand-mcp-control.control.identifier, self.profile, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.identifier, self.lock
+
+### gateway.handlers.context.handle_mcp_catalog
+> Authenticated metadata projection, with a read-only dashboard capability.
+
+This capability grants no registry/core call, admission or tool execution.
+
+- **Calls**: gateway.auth.require_grant, examples.network-scan-task.registry, tools.sort, handler._send, isinstance, source.get, handler._send, entry.get
+
+### mcp.catalog.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
+
+### gateway.handlers.context.handle_context
+- **Calls**: gateway.handlers.context.identity, gateway.context.default_store, body.get, parse_qs, handler._send, gateway.auth.check_grant, handler._send, store.profile
+
+### gateway.context.Store.get
+- **Calls**: None.fetchone, dict, isinstance, EVENT_URN.fullmatch, None.fetchone, dict, ContextError, ContextError
+
+### app.runtime_readiness.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
+
+### gateway.context.Store._put
+- **Calls**: gateway.context.packed, db.execute, self.get, ContextError, self.get, self.get, ContextError, str
+
+### gateway.GatewayHTTPHandler.do_POST
+- **Calls**: gateway.auth.check_auth, int, json.loads, self._send, body.pop, body.pop, body.pop, body.pop
+
+### packages.taskand-mcp-control.control.Control.profile
+- **Calls**: None.get, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.require, profile.get, packages.taskand-mcp-control.control.require, profile.get, packages.taskand-mcp-control.control.require
+
+### app.runtime_readiness._probe
+- **Calls**: time.monotonic, http.client.HTTPConnection, connection.request, connection.getresponse, round, TimeoutError, response.read, connection.close
+
+### gateway.context.Store.begin
+- **Calls**: ContextError, self.connect, db.execute, gateway.context.prompts, self._put, db.execute, str, isinstance
+
+### packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request
+- **Calls**: packages.taskand-mcp.src.taskand_mcp.gateway.encode, GatewayError, json.loads, len, asyncio.timeout, ValueError, GatewayError, GatewayError
+
+### packages.taskand-mcp-control.control.Control.execute
+- **Calls**: packages.taskand-mcp-control.control.identifier, packages.taskand-mcp-control.control.identifier, gateway.handlers.observers.digest, None.fetchone, self.receipt, data.get, data.get, packages.taskand-mcp-control.control.require
+
+### packages.taskand-mcp-control.control.main
+- **Calls**: os.umask, scripts.install-agent-hosts.print, sys.stdin.buffer.read, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.envelope, Control, control.consume, packages.taskand-mcp-control.control.canonical
+
+### wellmanifest_governance.pytest_sessionstart
+> Run repository governance once before pytest collects product tests.
+- **Calls**: getattr, getattr, None.resolve, wellmanifest_governance._activate_managed_hook, wellmanifest_governance._resolve_base, wellmanifest_governance._changed_paths, dict, subprocess.run
+
+### gateway.context.Store.profile
+- **Calls**: any, ContextError, ContextError, ContextError, ContextError, self.connect, db.execute, self._put
+
+### infra.local-recovery.deploy.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
+
+### gateway.handlers.mcp_control.authorize
+- **Calls**: os.environ.get, json.dumps, handler._send, gateway.auth.check_grant, handler._send, len, handler._send, data.get
 
 ### gateway.handlers.chat.handle_chat
 > Jedna ścieżka: dev/chat trasuje organizmy i intencje; gateway nie zna organizmów ani LLM.
-- **Calls**: None.strip, gateway.auth.require_grant, None.lower, gateway.middleware.logging.log_event, gateway.utils.call_process, request_handler._send, request_handler._send, gateway.utils.status_for
+- **Calls**: None.strip, gateway.auth.require_grant, None.lower, gateway.middleware.logging.log_event, gateway.utils.call_process, request_handler._send, request_handler._send, result.get
 
-### generated.registry.core.taskand.dev.v1.exec.call
-- **Calls**: generated.registry.core.taskand.dev.v1.exec.Number, generated.registry.core.taskand.dev.v1.exec.fail, generated.registry.core.taskand.dev.v1.exec.wywołań, generated.registry.core.taskand.dev.v1.exec.resolve, generated.registry.core.taskand.dev.v1.exec.secretSource, generated.registry.core.taskand.dev.v1.exec.String, generated.registry.core.taskand.dev.v1.exec.fromEntries, generated.registry.core.taskand.dev.v1.exec.filter
+### infra.local-recovery.context_snapshot.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.parse_args
 
-### generated.registry.core.taskand.dev.v1.store.updateRegistry
-- **Calls**: generated.registry.core.taskand.dev.v1.store.join, generated.registry.core.taskand.dev.v1.store.now, generated.registry.core.taskand.dev.v1.store.openSync, generated.registry.core.taskand.dev.v1.store.statSync, generated.registry.core.taskand.dev.v1.store.unlinkSync, generated.registry.core.taskand.dev.v1.store.Error, generated.registry.core.taskand.dev.v1.store.sleep, generated.registry.core.taskand.dev.v1.store.readRegistry
+### operations.delivery.deliver
+- **Calls**: operations.delivery.parseDeliveryArgs, operations.delivery.buildDeliveryPlan, operations.delivery.statePath, operations.delivery.readState, operations.delivery.digest, operations.delivery.writeState, operations.delivery.Boolean, operations.delivery.Map
 
-### generated.admin.network-device-discovery.taskand.dev.v1.bin.ssdpProbe
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v1.bin.Promise, generated.admin.network-device-discovery.taskand.dev.v1.bin.createSocket, generated.admin.network-device-discovery.taskand.dev.v1.bin.setTimeout, generated.admin.network-device-discovery.taskand.dev.v1.bin.close, generated.admin.network-device-discovery.taskand.dev.v1.bin.resolve, generated.admin.network-device-discovery.taskand.dev.v1.bin.on, generated.admin.network-device-discovery.taskand.dev.v1.bin.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v1.bin.find
+### mcp.bridge.main
+- **Calls**: scripts.install-agent-hosts.print, mcp.bridge.load_json, Path, mcp.bridge.require, mcp.bridge.load_json, sys.stdin.buffer.read, mcp.bridge.require, asyncio.run
 
-### generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.probeSsdp
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.Promise, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.createSocket, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.resolve, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.close, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.setTimeout, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.on, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.done
+### app.mcp_task_executor.Gateway.call
+- **Calls**: urllib.request.Request, urllib.request.build_opener, json.loads, urllib.request.ProxyHandler, NoRedirect, opener.open, response.read, len
 
-### generated.registry.core.taskand.dev.v1.lifecycle.refresh
-- **Calls**: generated.registry.core.taskand.dev.v1.lifecycle.findEntry, generated.registry.core.taskand.dev.v1.lifecycle.filter, generated.registry.core.taskand.dev.v1.lifecycle.allEntries, generated.registry.core.taskand.dev.v1.lifecycle.parseUri, generated.registry.core.taskand.dev.v1.lifecycle.push, generated.registry.core.taskand.dev.v1.lifecycle.checkPackage, generated.registry.core.taskand.dev.v1.lifecycle.join, generated.registry.core.taskand.dev.v1.lifecycle.packageHash
+### gateway.context.Store.__init__
+- **Calls**: None.absolute, any, self.root.mkdir, os.chmod, self.path.is_symlink, os.open, os.close, os.chmod
 
-### generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.Promise, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.createSocket, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.close, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.resolve, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.setTimeout, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.on, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+### gateway.GatewayHTTPHandler.do_GET
+- **Calls**: self.send_response, self.send_header, self.send_header, self.send_header, self.send_header, self.end_headers, self.wfile.write, gateway.router.dispatch
 
-### generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.Promise, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.createSocket, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.close, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.resolve, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.setTimeout, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.on, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
+### app.mcp_task_executor.main
+- **Calls**: argparse.ArgumentParser, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument, parser.add_argument
 
-### generated.registry.core.taskand.dev.v1.package.checkPackage
-- **Calls**: generated.registry.core.taskand.dev.v1.package.existsSync, generated.registry.core.taskand.dev.v1.package.readManifest, generated.registry.core.taskand.dev.v1.package.push, generated.registry.core.taskand.dev.v1.package.packageFiles, generated.registry.core.taskand.dev.v1.package.includes, generated.registry.core.taskand.dev.v1.package.readdirSync, generated.registry.core.taskand.dev.v1.package.filter, generated.registry.core.taskand.dev.v1.package.endsWith
+### packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.catalog
+- **Calls**: value.get, set, sorted, self.request, GatewayError, packages.taskand-mcp.src.taskand_mcp.gateway.validate_uri, seen.add, isinstance
 
-### generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.probePing
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.cidrToIps, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.all, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.map, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.Promise, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.createSocket, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.resolve, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.close, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.on
-
-### generated.doctor.diagnose.taskand.dev.v1.bin.checkFailingProcesses
-- **Calls**: generated.doctor.diagnose.taskand.dev.v1.bin.readFileSync, generated.doctor.diagnose.taskand.dev.v1.bin.trim, generated.doctor.diagnose.taskand.dev.v1.bin.split, generated.doctor.diagnose.taskand.dev.v1.bin.slice, generated.doctor.diagnose.taskand.dev.v1.bin.Map, generated.doctor.diagnose.taskand.dev.v1.bin.parse, generated.doctor.diagnose.taskand.dev.v1.bin.has, generated.doctor.diagnose.taskand.dev.v1.bin.set
-
-### generated.admin.network-device-discovery.taskand.dev.v4.inventory.inventory
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v4.inventory.jsonIP, generated.admin.network-device-discovery.taskand.dev.v4.inventory.map, generated.admin.network-device-discovery.taskand.dev.v4.inventory.includes, generated.admin.network-device-discovery.taskand.dev.v4.inventory.filter, generated.admin.network-device-discovery.taskand.dev.v4.inventory.sort, generated.admin.network-device-discovery.taskand.dev.v4.inventory.localeCompare, generated.admin.network-device-discovery.taskand.dev.v4.inventory.flatMap, generated.admin.network-device-discovery.taskand.dev.v4.inventory.test
-
-### generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v1.bin.arp, generated.admin.network-device-discovery.taskand.dev.v1.bin.readFileSync, generated.admin.network-device-discovery.taskand.dev.v1.bin.split, generated.admin.network-device-discovery.taskand.dev.v1.bin.slice, generated.admin.network-device-discovery.taskand.dev.v1.bin.trim, generated.admin.network-device-discovery.taskand.dev.v1.bin.isIPv4, generated.admin.network-device-discovery.taskand.dev.v1.bin.push, generated.admin.network-device-discovery.taskand.dev.v1.bin.toLowerCase
-
-### gateway.handlers.proc.handle_proc_call
-- **Calls**: body.get, gateway.auth.require_grant, gateway.utils.call_process, gateway.middleware.logging.log_event, request_handler._send, request_handler._send, body.get, gateway.utils.status_for
-
-### generated.registry.core.taskand.dev.v1.lifecycle.targets
-- **Calls**: generated.registry.core.taskand.dev.v1.lifecycle.parseUri, generated.registry.core.taskand.dev.v1.lifecycle.push, generated.registry.core.taskand.dev.v1.lifecycle.checkPackage, generated.registry.core.taskand.dev.v1.lifecycle.join, generated.registry.core.taskand.dev.v1.lifecycle.packageHash, generated.registry.core.taskand.dev.v1.lifecycle.readManifest, generated.registry.core.taskand.dev.v1.lifecycle.updateRegistry, generated.registry.core.taskand.dev.v1.lifecycle.assign
-
-### generated.admin.network-device-discovery.taskand.dev.v2.stdin.readStdinJson
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.stdin.Promise, generated.admin.network-device-discovery.taskand.dev.v2.stdin.setTimeout, generated.admin.network-device-discovery.taskand.dev.v2.stdin.reject, generated.admin.network-device-discovery.taskand.dev.v2.stdin.Error, generated.admin.network-device-discovery.taskand.dev.v2.stdin.setEncoding, generated.admin.network-device-discovery.taskand.dev.v2.stdin.on, generated.admin.network-device-discovery.taskand.dev.v2.stdin.clearTimeout, generated.admin.network-device-discovery.taskand.dev.v2.stdin.resolve
-
-### generated.registry.core.taskand.dev.v1.vault.openSecret
-- **Calls**: generated.registry.core.taskand.dev.v1.vault.parse, generated.registry.core.taskand.dev.v1.vault.readFileSync, generated.registry.core.taskand.dev.v1.vault.join, generated.registry.core.taskand.dev.v1.vault.scryptSync, generated.registry.core.taskand.dev.v1.vault.createDecipheriv, generated.registry.core.taskand.dev.v1.vault.from, generated.registry.core.taskand.dev.v1.vault.setAuthTag, generated.registry.core.taskand.dev.v1.vault.concat
-
-### generated.registry.core.taskand.dev.v1.lifecycle.scan
-- **Calls**: generated.registry.core.taskand.dev.v1.lifecycle.organisms, generated.registry.core.taskand.dev.v1.lifecycle.flatMap, generated.registry.core.taskand.dev.v1.lifecycle.readdirSync, generated.registry.core.taskand.dev.v1.lifecycle.join, generated.registry.core.taskand.dev.v1.lifecycle.filter, generated.registry.core.taskand.dev.v1.lifecycle.isDirectory, generated.registry.core.taskand.dev.v1.lifecycle.existsSync, generated.registry.core.taskand.dev.v1.lifecycle.map
-
-### gateway.handlers.federation.handle_registry
-- **Calls**: body.get, ACTION_GRANTS.get, generated.validator.resolve.taskand.dev.v1.registry-client.registry, request_handler._send, request_handler._send, body.get, gateway.auth.require_grant, gateway.utils.status_for
-
-### generated.admin.network-device-discovery.taskand.dev.v1.bin.ouiMap
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v1.bin.Map, generated.admin.network-device-discovery.taskand.dev.v1.bin.existsSync, generated.admin.network-device-discovery.taskand.dev.v1.bin.readFileSync, generated.admin.network-device-discovery.taskand.dev.v1.bin.split, generated.admin.network-device-discovery.taskand.dev.v1.bin.startsWith, generated.admin.network-device-discovery.taskand.dev.v1.bin.trim, generated.admin.network-device-discovery.taskand.dev.v1.bin.replace, generated.admin.network-device-discovery.taskand.dev.v1.bin.toUpperCase
-
-### gateway.GatewayHTTPHandler._send
-- **Calls**: None.encode, self.send_response, self.send_header, gateway.middleware.cors.add_cors_headers, self.send_header, self.end_headers, self.wfile.write, str
-
-### generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.ips
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.Promise, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.createSocket, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.resolve, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.close, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.on, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.setTimeout, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.bind, generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.send
-
-### generated.registry.core.taskand.dev.v1.select.select
-- **Calls**: generated.registry.core.taskand.dev.v1.select.every, generated.registry.core.taskand.dev.v1.select.test, generated.registry.core.taskand.dev.v1.select.capability, generated.registry.core.taskand.dev.v1.select.allEntries, generated.registry.core.taskand.dev.v1.select.filter, generated.registry.core.taskand.dev.v1.select.startsWith, generated.registry.core.taskand.dev.v1.select.sort, generated.registry.core.taskand.dev.v1.select.Number
-
-### generated.dev.evolve.taskand.dev.v1.gate.compare
-- **Calls**: generated.dev.evolve.taskand.dev.v1.gate.call, generated.dev.evolve.taskand.dev.v1.gate.has, generated.dev.evolve.taskand.dev.v1.gate.false, generated.dev.evolve.taskand.dev.v1.gate.działa, generated.dev.evolve.taskand.dev.v1.gate.liczby, generated.dev.evolve.taskand.dev.v1.gate.compareCounts, generated.dev.evolve.taskand.dev.v1.gate.zdolności, generated.dev.evolve.taskand.dev.v1.gate.stringify
-
-### generated.admin.network-device-discovery.taskand.dev.v3.merge.mergeDevices
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v3.merge.isArray, generated.admin.network-device-discovery.taskand.dev.v3.merge.filter, generated.admin.network-device-discovery.taskand.dev.v3.merge.Map, generated.admin.network-device-discovery.taskand.dev.v3.merge.toUpperCase, generated.admin.network-device-discovery.taskand.dev.v3.merge.replace, generated.admin.network-device-discovery.taskand.dev.v3.merge.get, generated.admin.network-device-discovery.taskand.dev.v3.merge.push, generated.admin.network-device-discovery.taskand.dev.v3.merge.set
-
-### generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.networks.networkInterfaces, generated.admin.network-device-discovery.taskand.dev.v2.networks.entries, generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface, generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask, generated.admin.network-device-discovery.taskand.dev.v2.networks.push, generated.admin.network-device-discovery.taskand.dev.v2.networks.execFileP, generated.admin.network-device-discovery.taskand.dev.v2.networks.trim, generated.admin.network-device-discovery.taskand.dev.v2.networks.split
-
-### generated.admin.network-device-discovery.taskand.dev.v2.merge.mergeDevices
-- **Calls**: generated.admin.network-device-discovery.taskand.dev.v2.merge.Map, generated.admin.network-device-discovery.taskand.dev.v2.merge.has, generated.admin.network-device-discovery.taskand.dev.v2.merge.set, generated.admin.network-device-discovery.taskand.dev.v2.merge.get, generated.admin.network-device-discovery.taskand.dev.v2.merge.indexOf, generated.admin.network-device-discovery.taskand.dev.v2.merge.push, generated.admin.network-device-discovery.taskand.dev.v2.merge.lookupVendor, generated.admin.network-device-discovery.taskand.dev.v2.merge.addSource
+### packages.taskand-mcp-control.control.Control.tools
+- **Calls**: packages.taskand-mcp-control.control.require, set, items.extend, packages.taskand-mcp-control.control.require, packages.taskand-mcp-control.control.require, seen.add, client.list_tools, len
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: probeMdns
+### Flow 1: remote
 ```
-probeMdns [generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns]
-```
-
-### Flow 2: mdnsProbe
-```
-mdnsProbe [generated.admin.network-device-discovery.taskand.dev.v1.bin]
+remote [packages.taskand-mcp-control.control.Control]
 ```
 
-### Flow 3: handle_chat
+### Flow 2: handle_conversation
 ```
-handle_chat [gateway.handlers.chat]
+handle_conversation [gateway.handlers.proc]
   └─ →> require_grant
       └─> check_auth
           └─> load_grants
       └─> check_grant
-  └─ →> log_event
-  └─ →> call_process
-      └─> registry
 ```
 
-### Flow 4: call
+### Flow 3: run
 ```
-call [generated.registry.core.taskand.dev.v1.exec]
-  └─> fail
-```
-
-### Flow 5: updateRegistry
-```
-updateRegistry [generated.registry.core.taskand.dev.v1.store]
+run [packages.taskand-mcp-control.control.Control]
+  └─ →> require
+  └─ →> identifier
+      └─> require
 ```
 
-### Flow 6: ssdpProbe
+### Flow 4: handle_mcp_catalog
 ```
-ssdpProbe [generated.admin.network-device-discovery.taskand.dev.v1.bin]
-```
-
-### Flow 7: probeSsdp
-```
-probeSsdp [generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp]
-```
-
-### Flow 8: refresh
-```
-refresh [generated.registry.core.taskand.dev.v1.lifecycle]
+handle_mcp_catalog [gateway.handlers.context]
+  └─ →> require_grant
+      └─> check_auth
+          └─> load_grants
+      └─> check_grant
+  └─ →> registry
 ```
 
-### Flow 9: SSDP_PORT
+### Flow 5: main
 ```
-SSDP_PORT [generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp]
+main [mcp.catalog]
 ```
 
-### Flow 10: checkPackage
+### Flow 6: handle_context
 ```
-checkPackage [generated.registry.core.taskand.dev.v1.package]
-  └─> readManifest
+handle_context [gateway.handlers.context]
+  └─> identity
+      └─ →> check_auth
+          └─> load_grants
+  └─ →> default_store
+```
+
+### Flow 7: get
+```
+get [gateway.context.Store]
+```
+
+### Flow 8: _put
+```
+_put [gateway.context.Store]
+  └─ →> packed
+```
+
+### Flow 9: do_POST
+```
+do_POST [gateway.GatewayHTTPHandler]
+  └─ →> check_auth
+      └─> load_grants
+```
+
+### Flow 10: profile
+```
+profile [packages.taskand-mcp-control.control.Control]
+  └─ →> require
+  └─ →> require
 ```
 
 ## Key Classes
 
+### packages.taskand-mcp-control.control.Control
+- **Methods**: 13
+- **Key Methods**: packages.taskand-mcp-control.control.Control.__init__, packages.taskand-mcp-control.control.Control.close, packages.taskand-mcp-control.control.Control.consume, packages.taskand-mcp-control.control.Control.lock, packages.taskand-mcp-control.control.Control.profiles, packages.taskand-mcp-control.control.Control.profile, packages.taskand-mcp-control.control.Control.server, packages.taskand-mcp-control.control.Control.client, packages.taskand-mcp-control.control.Control.tools, packages.taskand-mcp-control.control.Control.receipt
+
+### gateway.context.Store
+- **Methods**: 10
+- **Key Methods**: gateway.context.Store.__init__, gateway.context.Store.connect, gateway.context.Store.get, gateway.context.Store._put, gateway.context.Store.profile, gateway.context.Store.list, gateway.context.Store.begin, gateway.context.Store.event, gateway.context.Store.finish, gateway.context.Store.graph
+
 ### gateway.GatewayHTTPHandler
-- **Methods**: 5
-- **Key Methods**: gateway.GatewayHTTPHandler._send, gateway.GatewayHTTPHandler.do_OPTIONS, gateway.GatewayHTTPHandler.do_GET, gateway.GatewayHTTPHandler.do_POST, gateway.GatewayHTTPHandler.log_message
+- **Methods**: 6
+- **Key Methods**: gateway.GatewayHTTPHandler._cors, gateway.GatewayHTTPHandler._send, gateway.GatewayHTTPHandler.do_OPTIONS, gateway.GatewayHTTPHandler.do_GET, gateway.GatewayHTTPHandler.do_POST, gateway.GatewayHTTPHandler.log_message
 - **Inherits**: BaseHTTPRequestHandler
+
+### packages.taskand-mcp.src.taskand_mcp.gateway.Gateway
+- **Methods**: 4
+- **Key Methods**: packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.__init__, packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request, packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.catalog, packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.call
+
+### packages.taskand-mcp.src.taskand_mcp.gateway.Settings
+- **Methods**: 2
+- **Key Methods**: packages.taskand-mcp.src.taskand_mcp.gateway.Settings.__post_init__, packages.taskand-mcp.src.taskand_mcp.gateway.Settings.from_env
+
+### app.mcp_task_executor.Gateway
+- **Methods**: 2
+- **Key Methods**: app.mcp_task_executor.Gateway.__init__, app.mcp_task_executor.Gateway.call
+
+### packages.taskand-mcp.src.taskand_mcp.gateway.GatewayError
+- **Methods**: 1
+- **Key Methods**: packages.taskand-mcp.src.taskand_mcp.gateway.GatewayError.__init__
+- **Inherits**: Exception
+
+### wellmanifest_governance.GovernanceGateError
+> Raised when deterministic governance rejects the current checkout.
+- **Methods**: 0
+- **Inherits**: RuntimeError
+
+### gateway.handlers.mesh.MeshError
+- **Methods**: 0
+- **Inherits**: ValueError
+
+### infra.local-recovery.context_snapshot.RecoveryError
+- **Methods**: 0
+- **Inherits**: ValueError
+
+### gateway.context.ContextError
+- **Methods**: 0
+- **Inherits**: ValueError
+
+### packages.taskand-mcp-control.control.Rejected
+- **Methods**: 0
+- **Inherits**: Exception
+
+### mcp.bridge.ContractError
+- **Methods**: 0
+- **Inherits**: Exception
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
-### generated.admin.network-device-discovery.taskand.dev.v1.bin.parseArpText
-- **Output to**: generated.admin.network-device-discovery.taskand.dev.v1.bin.split, generated.admin.network-device-discovery.taskand.dev.v1.bin.match, generated.admin.network-device-discovery.taskand.dev.v1.bin.push, generated.admin.network-device-discovery.taskand.dev.v1.bin.toLowerCase
-
-### generated.registry.core.taskand.dev.v1.federation.processes
-- **Output to**: generated.registry.core.taskand.dev.v1.federation.map
-
-### generated.dev.composite.taskand.dev.v1.bin.validate
-- **Output to**: generated.dev.composite.taskand.dev.v1.bin.call, generated.dev.composite.taskand.dev.v1.bin.say, generated.dev.composite.taskand.dev.v1.bin.forEach
-
-### generated.dev.act.taskand.dev.v1.bin.format
-- **Output to**: generated.dev.act.taskand.dev.v1.bin.stringify
+### gateway.utils.call_process
+- **Output to**: ACTIVE.get, gateway.utils.registry, str, None.event, None.event
 
 ### gateway.auth._parse_simple_yaml
 - **Output to**: text.splitlines, line.strip, clean.startswith, line.startswith, clean.endswith
 
-### gateway.utils.call_process
-- **Output to**: gateway.utils.registry
+### scripts.runtime.parseOptions
 
-### generated.admin.network-device-discovery.taskand.dev.v3.stdin.parsed
+### scripts.runtime.validatePolicyText
 
-### generated.registry.core.taskand.dev.v1.exec.parseJson
-- **Output to**: generated.registry.core.taskand.dev.v1.exec.trim, generated.registry.core.taskand.dev.v1.exec.split, generated.registry.core.taskand.dev.v1.exec.pop, generated.registry.core.taskand.dev.v1.exec.parse
+### scripts.runtime.validateMinimumShape
 
-### generated.registry.core.taskand.dev.v1.exec.parsed
-- **Output to**: generated.registry.core.taskand.dev.v1.exec.fail, generated.registry.core.taskand.dev.v1.exec.trim, generated.registry.core.taskand.dev.v1.exec.slice
+### scripts.runtime.validateEvaluation
 
-### generated.registry.core.taskand.dev.v1.store.parseUri
-- **Output to**: generated.registry.core.taskand.dev.v1.store.exec, generated.registry.core.taskand.dev.v1.store.String, generated.registry.core.taskand.dev.v1.store.join
+### infra.local-recovery.context_snapshot.validate_database
+- **Output to**: time.monotonic, closing, database.set_progress_handler, CONTEXT_COLUMNS.items, RecoveryError
 
-### generated.dev.chat.taskand.dev.v1.intent.parseIntent
-- **Output to**: generated.dev.chat.taskand.dev.v1.intent.toLowerCase, generated.dev.chat.taskand.dev.v1.intent.has, generated.dev.chat.taskand.dev.v1.intent.find, generated.dev.chat.taskand.dev.v1.intent.matches
+### operations.delivery.parseOption
+- **Output to**: operations.delivery.startsWith, operations.delivery.Error, operations.delivery.toUpperCase, operations.delivery.replaceAll
 
-### generated.doctor.diagnose.taskand.dev.v1.bin.checkFailingProcesses
-- **Output to**: generated.doctor.diagnose.taskand.dev.v1.bin.readFileSync, generated.doctor.diagnose.taskand.dev.v1.bin.trim, generated.doctor.diagnose.taskand.dev.v1.bin.split, generated.doctor.diagnose.taskand.dev.v1.bin.slice, generated.doctor.diagnose.taskand.dev.v1.bin.Map
+### operations.delivery.parseDeliveryArgs
+- **Output to**: operations.delivery.cwd, operations.delivery.parseOption, operations.delivery.Error, operations.delivery.test, operations.delivery.resolve
 
-### generated.doctor.prescribe.taskand.dev.v1.bin.parseUri
+### operations.delivery.parsed
+- **Output to**: operations.delivery.parse, operations.delivery.trim, operations.delivery.split, operations.delivery.pop
 
-### generated.admin.network-device-discovery.taskand.dev.v4.address.formatIP
-- **Output to**: generated.admin.network-device-discovery.taskand.dev.v4.address.map, generated.admin.network-device-discovery.taskand.dev.v4.address.Number, generated.admin.network-device-discovery.taskand.dev.v4.address.join, generated.admin.network-device-discovery.taskand.dev.v4.address.from, generated.admin.network-device-discovery.taskand.dev.v4.address.BigInt
+### packages.taskand-mcp.src.taskand_mcp.gateway.validate_uri
+- **Output to**: GatewayError, len, re.fullmatch
 
-### generated.registry.core.taskand.dev.v1.lifecycle.processes
+### packages.taskand-mcp.src.taskand_mcp.gateway.encode
+- **Output to**: None.encode, GatewayError, json.dumps
+
+### mcp.bridge.validate_schema
+- **Output to**: walk, Draft202012Validator.check_schema, isinstance, value.items, isinstance
+
+## Behavioral Patterns
+
+### recursion_prompts
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: gateway.context.prompts
+
+### recursion_failure_code
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: packages.taskand-mcp-control.control.failure_code
+
+### recursion_local_schema
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: packages.taskand-mcp-control.control.local_schema
+
+### recursion_error_code
+- **Type**: recursion
+- **Confidence**: 0.90
+- **Functions**: mcp.bridge.error_code
 
 ## Public API Surface
 
 Functions exposed as public API (no underscore prefix):
 
-- `generated.admin.network-device-discovery.taskand.dev.v4.bin.scan` - 20 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns` - 19 calls
-- `generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.probeMdns` - 19 calls
-- `generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe` - 18 calls
+- `app.mcp_task_executor.execute` - 80 calls
+- `infra.local-recovery.deploy.stage` - 55 calls
+- `gateway.handlers.health.release_identity` - 52 calls
+- `gateway.handlers.mesh.projection` - 50 calls
+- `packages.taskand-mcp-control.control.Control.remote` - 45 calls
+- `gateway.handlers.proc.handle_conversation` - 43 calls
+- `packages.taskand-mcp-control.control.Control.run` - 41 calls
+- `gateway.handlers.context.handle_mcp_catalog` - 38 calls
+- `mcp.catalog.main` - 37 calls
+- `gateway.handlers.context.handle_context` - 35 calls
+- `mcp.bridge.client` - 35 calls
+- `mcp.bridge.invoke` - 33 calls
+- `app.runtime_readiness.probe_all` - 33 calls
+- `mcp.catalog.normalize` - 32 calls
+- `mcp.catalog.emit` - 30 calls
+- `gateway.context.Store.get` - 29 calls
+- `app.runtime_readiness.main` - 29 calls
+- `packages.taskand-mcp.src.taskand_mcp.server.create_server` - 28 calls
+- `packages.taskand-mcp-control.control.envelope` - 28 calls
+- `gateway.GatewayHTTPHandler.do_POST` - 27 calls
+- `packages.taskand-mcp-control.control.Control.profile` - 25 calls
+- `infra.local-recovery.context_snapshot.restore` - 24 calls
+- `gateway.context.Store.begin` - 24 calls
+- `packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request` - 24 calls
+- `infra.local-recovery.context_snapshot.capture` - 23 calls
+- `infra.local-recovery.deploy.create` - 23 calls
+- `packages.taskand-mcp-control.control.Control.execute` - 22 calls
+- `packages.taskand-mcp-control.control.main` - 22 calls
+- `gateway.handlers.chat.handle_conversation` - 21 calls
+- `wellmanifest_governance.pytest_sessionstart` - 20 calls
+- `infra.local-recovery.context_snapshot.validate_database` - 20 calls
+- `gateway.context.Store.profile` - 20 calls
+- `infra.local-recovery.deploy.main` - 20 calls
+- `gateway.handlers.mcp_control.authorize` - 19 calls
 - `gateway.handlers.chat.handle_chat` - 18 calls
-- `generated.registry.core.taskand.dev.v1.exec.call` - 18 calls
-- `generated.registry.core.taskand.dev.v1.store.updateRegistry` - 17 calls
-- `gateway.auth.check_auth` - 16 calls
-- `generated.registry.core.taskand.dev.v1.store.sleep` - 16 calls
-- `generated.admin.network-device-discovery.taskand.dev.v1.bin.ssdpProbe` - 15 calls
-- `generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.probeSsdp` - 15 calls
-- `generated.registry.core.taskand.dev.v1.lifecycle.refresh` - 15 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT` - 14 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp` - 14 calls
-- `generated.registry.core.taskand.dev.v1.package.unquote` - 14 calls
-- `generated.registry.core.taskand.dev.v1.package.checkPackage` - 14 calls
-- `generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.probePing` - 14 calls
-- `generated.doctor.diagnose.taskand.dev.v1.bin.checkFailingProcesses` - 14 calls
-- `generated.registry.core.taskand.dev.v1.lifecycle.register` - 14 calls
-- `generated.admin.network-device-discovery.taskand.dev.v4.inventory.inventory` - 14 calls
-- `generated.admin.network-device-discovery.taskand.dev.v4.inventory.jsonIP` - 13 calls
-- `generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp` - 12 calls
-- `gateway.handlers.proc.handle_proc_call` - 12 calls
-- `generated.registry.core.taskand.dev.v1.lifecycle.targets` - 12 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.stdin.readStdinJson` - 11 calls
-- `generated.registry.core.taskand.dev.v1.package.readManifest` - 11 calls
-- `generated.registry.core.taskand.dev.v1.vault.openSecret` - 11 calls
-- `generated.registry.core.taskand.dev.v1.federation.install` - 11 calls
-- `generated.registry.core.taskand.dev.v1.lifecycle.scan` - 11 calls
-- `gateway.handlers.federation.handle_registry` - 11 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.execFileP` - 10 calls
-- `generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.readArpTable` - 10 calls
-- `generated.admin.network-device-discovery.taskand.dev.v1.bin.ouiMap` - 10 calls
-- `generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui` - 10 calls
-- `gateway.auth.load_grants` - 10 calls
-- `generated.admin.network-device-discovery.taskand.dev.v3.probe-ping.ips` - 10 calls
-- `generated.registry.core.taskand.dev.v1.select.select` - 10 calls
-- `generated.dev.evolve.taskand.dev.v1.gate.compare` - 10 calls
-- `generated.admin.network-device-discovery.taskand.dev.v3.merge.mergeDevices` - 10 calls
-- `generated.registry.core.taskand.dev.v1.lifecycle.setStatus` - 10 calls
+- `gateway.handlers.observers.normalize` - 18 calls
+- `infra.local-recovery.context_snapshot.database_from_tar` - 18 calls
+- `infra.local-recovery.context_snapshot.main` - 18 calls
+- `gateway.handlers.observers.simulate` - 17 calls
+- `operations.delivery.deliver` - 17 calls
 
 ## System Interactions
 
@@ -356,36 +446,36 @@ How components interact:
 
 ```mermaid
 graph TD
-    probeMdns --> Map
-    probeMdns --> Promise
-    probeMdns --> createSocket
-    probeMdns --> close
-    probeMdns --> resolve
-    probeMdns --> setTimeout
-    mdnsProbe --> Promise
-    mdnsProbe --> createSocket
-    mdnsProbe --> setTimeout
-    mdnsProbe --> close
-    mdnsProbe --> resolve
-    handle_chat --> strip
-    handle_chat --> require_grant
-    handle_chat --> lower
-    handle_chat --> log_event
-    handle_chat --> call_process
-    call --> Number
-    call --> fail
-    call --> wywołań
-    call --> resolve
-    call --> secretSource
-    updateRegistry --> join
-    updateRegistry --> now
-    updateRegistry --> openSync
-    updateRegistry --> statSync
-    updateRegistry --> unlinkSync
-    ssdpProbe --> Promise
-    ssdpProbe --> createSocket
-    ssdpProbe --> setTimeout
-    ssdpProbe --> close
+    remote --> server
+    remote --> profile
+    remote --> timeout
+    remote --> client
+    remote --> next
+    handle_conversation --> require_grant
+    handle_conversation --> get
+    handle_conversation --> _send
+    handle_conversation --> any
+    run --> require
+    run --> set
+    run --> get
+    run --> identifier
+    run --> profile
+    handle_mcp_catalog --> require_grant
+    handle_mcp_catalog --> registry
+    handle_mcp_catalog --> sort
+    handle_mcp_catalog --> _send
+    handle_mcp_catalog --> isinstance
+    main --> ArgumentParser
+    main --> add_argument
+    handle_context --> identity
+    handle_context --> default_store
+    handle_context --> get
+    handle_context --> parse_qs
+    handle_context --> _send
+    get --> fetchone
+    get --> dict
+    get --> isinstance
+    get --> fullmatch
 ```
 
 ## Reverse Engineering Guidelines

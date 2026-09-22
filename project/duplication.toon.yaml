@@ -1,30 +1,30 @@
-# redup/duplication | 5 groups | 96f 5598L | 2026-09-13
+# redup/duplication | 9 groups | 141f 12842L | 2026-09-21
 
 SUMMARY:
-  files_scanned: 96
-  total_lines:   5598
-  dup_groups:    5
-  actionable:    5
-  review:        0
+  files_scanned: 141
+  total_lines:   12842
+  dup_groups:    9
+  actionable:    6
+  review:        3
   generated:     0
-  actionable_L:  206
-  review_L:      0
+  actionable_L:  192
+  review_L:      18
   generated_L:   0
-  dup_fragments: 24
-  saved_lines:   206
-  scan_ms:       787
+  dup_fragments: 30
+  saved_lines:   210
+  scan_ms:       1864
 
 HOTSPOTS[7] (files with most duplication):
-  generated/admin/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/cluster/monitor/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/dev/act/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/dev/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/dev/codegen/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/dev/composite/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
-  generated/dev/evolve/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.3%)
+  generated/admin/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/cluster/monitor/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/dev/act/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/dev/chat/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/dev/codegen/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/dev/composite/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
+  generated/dev/evolve/taskand.dev/v1/registry-client.mjs  dup=14L  groups=1  frags=1  (0.1%)
 
-DUPLICATES[5] (ranked by impact):
-  [0e718323cab5c7af] !! EXAC  registry  L=14 N=14 saved=182 sim=1.00
+DUPLICATES[9] (ranked by impact):
+  [0e718323cab5c7af] !! EXAC  registry  L=14 N=13 saved=168 sim=1.00
       generated/admin/chat/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/cluster/monitor/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/dev/act/taskand.dev/v1/registry-client.mjs:8-21  (registry)
@@ -33,17 +33,23 @@ DUPLICATES[5] (ranked by impact):
       generated/dev/composite/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/dev/evolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/dev/spawn/taskand.dev/v1/registry-client.mjs:8-21  (registry)
-      generated/doctor/diagnose/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/doctor/heal/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/doctor/prescribe/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/orchestrator/execute/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/planner/plan/taskand.dev/v1/registry-client.mjs:8-21  (registry)
       generated/validator/resolve/taskand.dev/v1/registry-client.mjs:8-21  (registry)
-  [cfe7db247084402d]   EXAC  arrow_function  L=4 N=4 saved=12 sim=1.00
-      generated/dev/act/taskand.dev/v1/bin.mjs:19-22  (arrow_function)
+  [cfe7db247084402d]   EXAC  arrow_function  L=4 N=3 saved=8 sim=1.00
       generated/dev/codegen/taskand.dev/v1/bin.mjs:16-19  (arrow_function)
       generated/dev/evolve/taskand.dev/v1/bin.mjs:22-25  (arrow_function)
       generated/dev/spawn/taskand.dev/v1/bin.mjs:18-21  (arrow_function)
+  [989eccd063b851ae]   STRU  error_code  L=8 N=2 saved=8 sim=1.00
+      provenance=cross_component action=review
+      mcp/bridge.py:126-133  (error_code)
+      packages/taskand-mcp-control/control.py:45-52  (failure_code)
+  [47a9bb3e03523ea2]   STRU  registry  L=7 N=2 saved=7 sim=1.00
+      provenance=cross_component action=review
+      examples/network-scan-task.mjs:11-17  (registry)
+      examples/web-twin-task.mjs:18-24  (registry)
   [7f7e2d64ce928e6c]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
       generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:37-40  (arrow_function)
       generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:17-20  (arrow_function)
@@ -53,37 +59,69 @@ DUPLICATES[5] (ranked by impact):
   [831e87a319dbea5b]   EXAC  arrow_function  L=4 N=2 saved=4 sim=1.00
       generated/dev/file-router/taskand.dev/v1/bin.mjs:13-16  (arrow_function)
       generated/dev/llm/taskand.dev/v1/bin.mjs:14-17  (arrow_function)
+  [7a076f558273f2d2]   STRU  handle_monag_status  L=4 N=2 saved=4 sim=1.00
+      provenance=same_file action=refactor
+      gateway/handlers/monag_handler.py:45-48  (handle_monag_status)
+      gateway/handlers/monag_handler.py:50-53  (handle_monag_resume)
+  [c46454ff05fdd233]   STRU  require  L=3 N=2 saved=3 sim=1.00
+      provenance=cross_component action=review
+      mcp/bridge.py:20-22  (require)
+      packages/taskand-mcp-control/control.py:35-37  (require)
 
-REFACTOR[5] (ranked by priority):
+REFACTOR[9] (ranked by priority):
   [1] ○ extract_function   → generated/utils/registry.py
-      WHY: 14 occurrences of 14-line block across 14 files — saves 182 lines
-      FILES: generated/admin/chat/taskand.dev/v1/registry-client.mjs, generated/cluster/monitor/taskand.dev/v1/registry-client.mjs, generated/dev/act/taskand.dev/v1/registry-client.mjs, generated/dev/chat/taskand.dev/v1/registry-client.mjs, generated/dev/codegen/taskand.dev/v1/registry-client.mjs +9 more
+      WHY: 13 occurrences of 14-line block across 13 files — saves 168 lines
+      FILES: generated/admin/chat/taskand.dev/v1/registry-client.mjs, generated/cluster/monitor/taskand.dev/v1/registry-client.mjs, generated/dev/act/taskand.dev/v1/registry-client.mjs, generated/dev/chat/taskand.dev/v1/registry-client.mjs, generated/dev/codegen/taskand.dev/v1/registry-client.mjs +8 more
   [2] ○ extract_function   → generated/dev/utils/arrow_function.py
-      WHY: 4 occurrences of 4-line block across 4 files — saves 12 lines
-      FILES: generated/dev/act/taskand.dev/v1/bin.mjs, generated/dev/codegen/taskand.dev/v1/bin.mjs, generated/dev/evolve/taskand.dev/v1/bin.mjs, generated/dev/spawn/taskand.dev/v1/bin.mjs
-  [3] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v2/utils/arrow_function.py
+      WHY: 3 occurrences of 4-line block across 3 files — saves 8 lines
+      FILES: generated/dev/codegen/taskand.dev/v1/bin.mjs, generated/dev/evolve/taskand.dev/v1/bin.mjs, generated/dev/spawn/taskand.dev/v1/bin.mjs
+  [3] ◐ extract_function   → utils/error_code.py
+      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
+      FILES: mcp/bridge.py, packages/taskand-mcp-control/control.py
+  [4] ◐ extract_function   → examples/utils/registry.py
+      WHY: 2 occurrences of 7-line block across 2 files — saves 7 lines
+      FILES: examples/network-scan-task.mjs, examples/web-twin-task.mjs
+  [5] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v2/utils/arrow_function.py
       WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
       FILES: generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs, generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs
-  [4] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v3/utils/arrow_function.py
+  [6] ○ extract_function   → generated/admin/network-device-discovery/taskand.dev/v3/utils/arrow_function.py
       WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
       FILES: generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs, generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs
-  [5] ○ extract_function   → generated/dev/utils/arrow_function.py
+  [7] ○ extract_function   → generated/dev/utils/arrow_function.py
       WHY: 2 occurrences of 4-line block across 2 files — saves 4 lines
       FILES: generated/dev/file-router/taskand.dev/v1/bin.mjs, generated/dev/llm/taskand.dev/v1/bin.mjs
+  [8] ○ extract_function   → gateway/handlers/utils/handle_monag_status.py
+      WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
+      FILES: gateway/handlers/monag_handler.py
+  [9] ◐ extract_function   → utils/require.py
+      WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
+      FILES: mcp/bridge.py, packages/taskand-mcp-control/control.py
 
 QUICK_WINS[2] (low risk, high savings — do first):
-  [1] extract_function   saved=182L  → generated/utils/registry.py
-      FILES: registry-client.mjs, registry-client.mjs, registry-client.mjs +11
-  [2] extract_function   saved=12L  → generated/dev/utils/arrow_function.py
-      FILES: bin.mjs, bin.mjs, bin.mjs +1
+  [1] extract_function   saved=168L  → generated/utils/registry.py
+      FILES: registry-client.mjs, registry-client.mjs, registry-client.mjs +10
+  [2] extract_function   saved=8L  → generated/dev/utils/arrow_function.py
+      FILES: bin.mjs, bin.mjs, bin.mjs
 
-EFFORT_ESTIMATE (total ≈ 6.9h):
-  hard   registry                            saved=182L  ~364min
-  easy   arrow_function                      saved=12L  ~24min
+DEPENDENCY_RISK[2] (duplicates spanning multiple packages):
+  error_code  packages=2  files=2
+      mcp/bridge.py
+      packages/taskand-mcp-control/control.py
+  require  packages=2  files=2
+      mcp/bridge.py
+      packages/taskand-mcp-control/control.py
+
+EFFORT_ESTIMATE (total ≈ 7.4h):
+  hard   registry                            saved=168L  ~336min
+  easy   arrow_function                      saved=8L  ~16min
+  medium error_code                          saved=8L  ~32min
+  easy   registry                            saved=7L  ~14min
   easy   arrow_function                      saved=4L  ~8min
   easy   arrow_function                      saved=4L  ~8min
   easy   arrow_function                      saved=4L  ~8min
+  easy   handle_monag_status                 saved=4L  ~8min
+  easy   require                             saved=3L  ~12min
 
 METRICS-TARGET:
-  dup_groups:  5 → 0
-  saved_lines: 206 lines recoverable
+  dup_groups:  9 → 0
+  saved_lines: 210 lines recoverable
