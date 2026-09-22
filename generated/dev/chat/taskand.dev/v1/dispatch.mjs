@@ -1,5 +1,6 @@
 // Dispatch dev/chat: organizm/intencja → proces przez rejestr (URI + JSON), bez logiki domenowej
 import { call } from './registry-client.mjs';
+import { parseBrowserAction } from './intent.mjs';
 
 const P = name => `proc://taskand.dev/${name}/v1`;
 const LONG = 900000;
@@ -16,13 +17,20 @@ export const HANDLERS = {
   composite: ({ text }) => replyOf(call(P('dev/composite'), { task: text }, LONG)),
   telemetry: () => telemetry(),
   'file-ops': ({ text }) => replyOf(call(P('dev/file-router'), { message: text })),
+  'browser-action': ({ text }) => {
+    const parsed = parseBrowserAction(text);
+    return replyOf(call(P('browser/session'), parsed, LONG));
+  },
   'spawn-web': () => webStatus(),
   diagnose: () => diagnose(),
   prescribe: () => prescribe(),
   heal: ({ text }) => replyOf(call(P('doctor/heal'), { run: !/plan|bez wykon|dry/i.test(text) }, LONG)),
   vault: () => replyOf(call(P('vault/secrets'), { action: 'status' })),
   'file-list': ({ text }) => fileList(text),
-  browser: ({ text }) => replyOf(call(P('browser/session'), { action: 'open', url: text.match(/https?:\/\/\S+/)?.[0] })),
+  browser: ({ text }) => {
+    const parsed = parseBrowserAction(text);
+    return replyOf(call(P('browser/session'), parsed, LONG));
+  },
   // dev/act zwraca obiekt: reply dla człowieka + result dla --format json|yaml|csv
   'evolve-create': ({ text, organism }) => call(P('dev/act'), { message: text, organism, forceEvolve: true }, LONG),
   query: ({ text, organism }) => call(P('dev/act'), { message: text, organism }, LONG),

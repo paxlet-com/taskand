@@ -41,4 +41,6 @@
 | **ticket-039** | [`README.md`](./ticket-039/README.md) | - | - | - | - | - |
 | **ticket-040** | [`README.md`](./ticket-040/README.md) | - | - | - | - | - |
 | **ticket-041** | [`README.md`](./ticket-041/README.md) | - | - | - | - | - |
+| **ticket-042** | [`README.md`](./ticket-042/README.md) | - | - | - | - | - |
+| **ticket-043** | [`README.md`](./ticket-043/README.md) | - | - |  [`ai-antigravity.md`](./ticket-043/ai-antigravity.md) | - | - |
 <!-- AUTO:TICKET_INDEX:END -->
