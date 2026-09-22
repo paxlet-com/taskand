@@ -281,7 +281,13 @@ const ACTIONS = {
       const existing = pages.find(p => samePage(p.url, input.url) || samePage(p.url, targetUrl));
       if (existing) {
         try { await cdpWs(existing.webSocketDebuggerUrl, 'Page.bringToFront', {}); } catch (e) {}
-        return { ok: true, session: `session://browser/${existing.id}`, id: existing.id, url: existing.url, resolvedUrl: targetUrl, reused: true, summary: `Użyto otwartej karty ${existing.url} — podgląd: ${NOVNC}` };
+        if (existing.url !== targetUrl && existing.url !== input.url) {
+          try {
+            await cdpWs(existing.webSocketDebuggerUrl, 'Page.navigate', { url: targetUrl });
+            await new Promise(r => setTimeout(r, 1200));
+          } catch (e) {}
+        }
+        return { ok: true, session: `session://browser/${existing.id}`, id: existing.id, url: input.url, resolvedUrl: targetUrl, reused: true, summary: `Użyto otwartej karty ${input.url} — podgląd: ${NOVNC}` };
       }
     }
     const tab = await cdpHttp(`/json/new?${encodeURIComponent(targetUrl)}`, 'PUT');

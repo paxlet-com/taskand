@@ -25,7 +25,7 @@ export const INTENTS = [
   { name: 'ticket-lifecycle', re: /(?:uzgodnij|reconcile|preflight|sprawd[zź]\s+lifecycle|cykl\s+[zż]ycia)\s+(?:ticket[uów]*|zada[nń])/iu },
   { name: 'ticket-lifecycle', all: [['ticket', 'lifecycle'], ['uzgodn', 'reconcile', 'sprawdz', 'preflight', 'cykl']] },
   // Layer 1 Fast-Path matcher for browser actions (wellmanifest/nl-dsl-llm standard)
-  { name: 'browser-action', re: /(?:kliknij|wci[sś]nij|naci[sś]nij|click|wpisz|wype[lł]nij|zrzut|screenshot|otw[oó]rz\s+stron|otworz\s+stron|nawiguj)\b.*?(?:https?:\/\/\S+|przycisk|button|link|pole|ekran|\bkarcie\b|\bstronie\b)/iu },
+  { name: 'browser-action', re: /^(?:kliknij|wci[sś]nij|naci[sś]nij|click)\b|(?:wpisz|wype[lł]nij)\b.*?(?:pole|do|w)\b|(?:zrzut|screenshot|zrzuc\s+ekran)\b|(?:otw[oó]rz|otworz|nawiguj)\s+(?:stron|url|link|https?:\/\/)\b/iu },
   { name: 'browser-action', all: [[/https?:\/\/\S+/], ['klikn', 'wcisn', 'nacisn', 'otworz', 'zrzut', 'screenshot', 'wpisz', 'wypeln']] },
   { name: 'spawn-web', all: [['web', 'cockpit', 'gui', 'panel'], ['status', 'uruchom', 'pokaz', 'dziala', 'link']] },
   { name: 'spawn-web', all: [['jak'], ['uzywa']] },
