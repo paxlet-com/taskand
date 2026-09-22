@@ -76,7 +76,7 @@ export function parseBrowserAction(text) {
 
   // Click extraction
   const clickMatch = text.match(/(?:kliknij|wci[sś]nij|naci[sś]nij|click)\s+(?:w\s+|na\s+)?(?:przycisk\s+|button\s+|link\s+)?["'„”]?([^"'„”\n,]+?)["'„”]?(\s+(?:na\s+stronie|w\s+oknie|na|w|pod\s+adresem)\b|\s*$)/iu);
-  if (clickMatch && clickMatch[1] && !/^(stron|ekran|okno|buttony|przyciski)/i.test(clickMatch[1].trim())) {
+  if (clickMatch && clickMatch[1] && !/^(?:stron[aęy]?|ekran|okno|buttony|przyciski)$/i.test(clickMatch[1].trim())) {
     const rawTarget = clickMatch[1].trim().replace(/^na\s+/i, '').replace(/^przycisk\s+/i, '');
     const prefix = text.slice(0, (clickMatch.index || 0) + clickMatch[0].length);
     const isButton = /(?:przycisk|button)\b/iu.test(prefix);
