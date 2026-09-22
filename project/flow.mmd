@@ -1,30 +1,26 @@
 flowchart TD
-%% generated in 0.01s
+%% generated in 0.20s
 
     %% Entry points (blue)
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        generated__validator__resolve__taskand__dev__v1__registry_client__REGISTRY["REGISTRY"]
-        generated__validator__resolve__taskand__dev__v1__registry_client__registry["registry"]
-        generated__validator__resolve__taskand__dev__v1__registry_client__r["r"]
-        generated__validator__resolve__taskand__dev__v1__registry_client__call["call"]
-        generated__validator__resolve__taskand__dev__v1__bin__raw["raw"]
-        generated__validator__resolve__taskand__dev__v1__bin__blueprint["blueprint"]
-        generated__validator__resolve__taskand__dev__v1__bin__steps["steps"]
-        generated__validator__resolve__taskand__dev__v1__bin__ids["ids"]
-        generated__validator__resolve__taskand__dev__v1__bin__names["names"]
-        generated__validator__resolve__taskand__dev__v1__bin__color["color"]
-        generated__validator__resolve__taskand__dev__v1__bin__stepMap["stepMap"]
-        generated__validator__resolve__taskand__dev__v1__bin__hasCycle["hasCycle"]
-        generated__validator__resolve__taskand__dev__v1__bin__currentStep["currentStep"]
-        generated__validator__resolve__taskand__dev__v1__bin__p["p"]
-        generated__validator__resolve__taskand__dev__v1__bin__val["val"]
-        ...["+620 more"]
+        wellmanifest_governance__pytest_sessionstart["pytest_sessionstart"]
+        gateway__handlers__mcp_control__authorize["authorize"]
+        gateway__handlers__doctor__handle_doctor["handle_doctor"]
+        gateway__handlers__monag_handler__handle_monag_status["handle_monag_status"]
+        gateway__handlers__monag_handler__handle_monag_resume["handle_monag_resume"]
+        gateway__handlers__monag_handler__handle_notify["handle_notify"]
+        gateway__handlers__planner__handle_planner["handle_planner"]
+        gateway__handlers__chat__handle_conversation{{handle_conversation CC=18}}
+        gateway__handlers__chat__handle_chat["handle_chat"]
+        gateway__handlers__orchestrator__handle_orchestrator["handle_orchestrator"]
+        gateway__handlers__federation__handle_well_known_catalog["handle_well_known_catalog"]
+        gateway__handlers__federation__handle_federation["handle_federation"]
+        gateway__handlers__federation__handle_registry["handle_registry"]
+        gateway__handlers__context__handle_mcp_catalog["handle_mcp_catalog"]
+        gateway__handlers__context__handle_state["handle_state"]
+        ...["+110 more"]
     end
 
-    subgraph Exporters
-        generated__registry__core__taskand__dev__v1__federation__exportCatalog["exportCatalog"]
-    end
-
-    class generated__validator__resolve__taskand__dev__v1__registry_client__REGISTRY,generated__validator__resolve__taskand__dev__v1__registry_client__registry,generated__validator__resolve__taskand__dev__v1__registry_client__r,generated__validator__resolve__taskand__dev__v1__registry_client__call,generated__validator__resolve__taskand__dev__v1__bin__raw,generated__validator__resolve__taskand__dev__v1__bin__blueprint,generated__validator__resolve__taskand__dev__v1__bin__steps,generated__validator__resolve__taskand__dev__v1__bin__ids,generated__validator__resolve__taskand__dev__v1__bin__names,generated__validator__resolve__taskand__dev__v1__bin__color entry
+    class wellmanifest_governance__pytest_sessionstart,gateway__handlers__mcp_control__authorize,gateway__handlers__doctor__handle_doctor,gateway__handlers__monag_handler__handle_monag_status,gateway__handlers__monag_handler__handle_monag_resume,gateway__handlers__monag_handler__handle_notify,gateway__handlers__planner__handle_planner,gateway__handlers__chat__handle_chat,gateway__handlers__orchestrator__handle_orchestrator,gateway__handlers__federation__handle_well_known_catalog entry

@@ -1,56 +1,77 @@
 # code2llm call graph | /home/tom/github/paxlet-com/taskand
-# generated in 0.19s
-# nodes: 260 | edges: 242 | modules: 53
-# CC̄=3.3
+# generated in 0.21s
+# nodes: 176 | edges: 221 | modules: 34
+# CC̄=4.8
 
 HUBS[20]:
-  generated.admin.network-device-discovery.taskand.dev.v4.bin.scan
-    CC=30  in:1  out:20  total:21
-  gateway.auth._parse_simple_yaml
-    CC=14  in:1  out:19  total:20
-  generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns.probeMdns
-    CC=7  in:0  out:19  total:19
-  generated.registry.core.taskand.dev.v1.store.sleep
-    CC=7  in:3  out:16  total:19
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns
-    CC=8  in:0  out:19  total:19
-  generated.registry.core.taskand.dev.v1.exec.call
-    CC=7  in:0  out:18  total:18
-  gateway.handlers.chat.handle_chat
-    CC=4  in:0  out:18  total:18
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
-    CC=15  in:0  out:18  total:18
-  generated.registry.core.taskand.dev.v1.store.updateRegistry
-    CC=7  in:0  out:17  total:17
-  gateway.auth.check_auth
-    CC=9  in:1  out:16  total:17
-  generated.registry.core.taskand.dev.v1.lifecycle.register
-    CC=16  in:3  out:14  total:17
-  generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp.probeSsdp
-    CC=8  in:0  out:15  total:15
-  generated.admin.network-device-discovery.taskand.dev.v4.inventory.jsonIP
-    CC=7  in:2  out:13  total:15
-  generated.registry.core.taskand.dev.v1.package.unquote
-    CC=13  in:1  out:14  total:15
-  generated.registry.core.taskand.dev.v1.package.checkPackage
-    CC=13  in:0  out:14  total:14
-  generated.admin.network-device-discovery.taskand.dev.v4.inventory.inventory
-    CC=7  in:0  out:14  total:14
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp
-    CC=6  in:0  out:14  total:14
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT
-    CC=6  in:0  out:14  total:14
-  generated.registry.core.taskand.dev.v1.package.readManifest
-    CC=4  in:2  out:11  total:13
-  generated.registry.core.taskand.dev.v1.store.audit
-    CC=2  in:4  out:9  total:13
+  packages.taskand-mcp-control.control.require
+    CC=2  in:66  out:1  total:67
+  infra.local-recovery.deploy.stage
+    CC=20  in:1  out:55  total:56
+  gateway.handlers.health.release_identity
+    CC=35  in:1  out:52  total:53
+  gateway.handlers.mesh.projection
+    CC=19  in:1  out:50  total:51
+  packages.taskand-mcp-control.control.Control.remote
+    CC=11  in:0  out:45  total:45
+  gateway.handlers.proc.handle_conversation
+    CC=35  in:0  out:43  total:43
+  packages.taskand-mcp-control.control.Control.run
+    CC=16  in:0  out:41  total:41
+  gateway.handlers.context.handle_mcp_catalog
+    CC=24  in:0  out:38  total:38
+  mcp.bridge.client
+    CC=12  in:1  out:35  total:36
+  gateway.handlers.context.handle_context
+    CC=17  in:0  out:35  total:35
+  mcp.bridge.invoke
+    CC=12  in:1  out:33  total:34
+  app.runtime_readiness.probe_all
+    CC=19  in:1  out:33  total:34
+  mcp.catalog.normalize
+    CC=11  in:1  out:32  total:33
+  mcp.catalog.emit
+    CC=14  in:2  out:30  total:32
+  packages.taskand-mcp-control.control.envelope
+    CC=7  in:1  out:28  total:29
+  packages.taskand-mcp.src.taskand_mcp.server.create_server
+    CC=2  in:1  out:28  total:29
+  gateway.context.Store._put
+    CC=12  in:0  out:28  total:28
+  app.runtime_canary._request
+    CC=27  in:1  out:26  total:27
+  gateway.GatewayHTTPHandler.do_POST
+    CC=14  in:0  out:27  total:27
+  infra.local-recovery.context_snapshot.capture
+    CC=9  in:2  out:23  total:25
 
 MODULES:
-  gateway  [5 funcs]
-    _send  CC=1  out:10
-    do_GET  CC=1  out:1
-    do_OPTIONS  CC=1  out:3
-    do_POST  CC=4  out:6
+  app.runtime_canary  [5 funcs]
+    _loopback  CC=2  out:1
+    _request  CC=27  out:26
+    _token  CC=6  out:6
+    canary  CC=13  out:13
+    main  CC=4  out:11
+  app.runtime_readiness  [2 funcs]
+    probe_all  CC=19  out:33
+    source_identity  CC=4  out:16
+  examples.network-scan-task  [6 funcs]
+    approved  CC=1  out:1
+    before  CC=1  out:1
+    call  CC=1  out:1
+    registry  CC=2  out:4
+    result  CC=2  out:1
+    selected  CC=1  out:1
+  examples.web-twin-task  [6 funcs]
+    approved  CC=1  out:1
+    before  CC=1  out:1
+    call  CC=1  out:1
+    registry  CC=2  out:4
+    result  CC=1  out:1
+    selected  CC=1  out:1
+  gateway  [3 funcs]
+    do_GET  CC=4  out:16
+    do_POST  CC=14  out:27
     main  CC=3  out:9
   gateway.auth  [7 funcs]
     _parse_simple_yaml  CC=14  out:19
@@ -60,330 +81,200 @@ MODULES:
     is_loopback_bind  CC=1  out:1
     load_grants  CC=7  out:10
     require_grant  CC=3  out:6
-  gateway.handlers.chat  [1 funcs]
-    handle_chat  CC=4  out:18
+  gateway.context  [8 funcs]
+    _put  CC=12  out:28
+    begin  CC=8  out:24
+    graph  CC=6  out:12
+    list  CC=3  out:4
+    default_store  CC=2  out:7
+    main  CC=3  out:11
+    packed  CC=1  out:1
+    prompts  CC=11  out:14
+  gateway.handlers.chat  [2 funcs]
+    handle_chat  CC=7  out:18
+    handle_conversation  CC=18  out:21
+  gateway.handlers.context  [4 funcs]
+    handle_context  CC=17  out:35
+    handle_mcp_catalog  CC=24  out:38
+    handle_state  CC=3  out:8
+    identity  CC=2  out:2
   gateway.handlers.doctor  [1 funcs]
     handle_doctor  CC=3  out:5
   gateway.handlers.federation  [3 funcs]
     handle_federation  CC=2  out:5
     handle_registry  CC=6  out:11
     handle_well_known_catalog  CC=1  out:3
-  gateway.handlers.health  [1 funcs]
-    handle_healthz  CC=2  out:5
+  gateway.handlers.health  [2 funcs]
+    handle_healthz  CC=2  out:6
+    release_identity  CC=35  out:52
+  gateway.handlers.mcp_control  [1 funcs]
+    authorize  CC=7  out:19
+  gateway.handlers.mesh  [2 funcs]
+    handle_mesh  CC=3  out:6
+    projection  CC=19  out:50
+  gateway.handlers.monag_handler  [3 funcs]
+    _run_monag_json  CC=8  out:9
+    handle_monag_resume  CC=2  out:3
+    handle_monag_status  CC=2  out:3
+  gateway.handlers.observers  [4 funcs]
+    digest  CC=1  out:4
+    handle_pilot  CC=3  out:10
+    plan  CC=2  out:8
+    simulate  CC=7  out:17
   gateway.handlers.orchestrator  [1 funcs]
     handle_orchestrator  CC=3  out:7
   gateway.handlers.planner  [1 funcs]
     handle_planner  CC=3  out:5
-  gateway.handlers.proc  [1 funcs]
-    handle_proc_call  CC=3  out:12
-  gateway.middleware.cors  [1 funcs]
-    add_cors_headers  CC=1  out:3
+  gateway.handlers.proc  [2 funcs]
+    handle_conversation  CC=35  out:43
+    handle_proc_call  CC=6  out:13
   gateway.middleware.logging  [1 funcs]
     log_event  CC=2  out:8
   gateway.router  [1 funcs]
-    dispatch  CC=3  out:4
+    dispatch  CC=3  out:5
   gateway.utils  [3 funcs]
-    call_process  CC=1  out:1
+    call_process  CC=7  out:12
     registry  CC=3  out:5
     status_for  CC=1  out:2
-  generated.admin.network-device-discovery.taskand.dev.v1.bin  [19 funcs]
-    an  CC=5  out:2
-    errOut  CC=1  out:1
-    fin  CC=2  out:2
-    hostname  CC=11  out:6
-    loadOui  CC=11  out:10
-    mdnsProbe  CC=15  out:18
-    off  CC=5  out:4
-    out  CC=1  out:3
-    probeBudget  CC=3  out:8
-    qd  CC=2  out:1
-  generated.admin.network-device-discovery.taskand.dev.v2.merge  [4 funcs]
-    addSource  CC=2  out:2
-    get  CC=2  out:2
-    map  CC=2  out:3
-    mergeDevices  CC=13  out:9
-  generated.admin.network-device-discovery.taskand.dev.v2.networks  [5 funcs]
-    cidrFromAddrMask  CC=10  out:7
-    execFileP  CC=1  out:1
-    ifaces  CC=9  out:4
-    isDockerIface  CC=1  out:1
-    listLocalNetworks  CC=15  out:9
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp  [3 funcs]
-    execFileP  CC=6  out:10
-    readArpTable  CC=6  out:10
-    refreshArpWithIpNeigh  CC=2  out:2
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns  [2 funcs]
-    map  CC=3  out:3
-    reverseDns  CC=3  out:5
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns  [6 funcs]
-    extractNames  CC=6  out:4
-    finish  CC=2  out:2
-    ip  CC=4  out:5
-    len  CC=2  out:0
-    probeMdns  CC=8  out:19
-    timer  CC=1  out:3
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp  [4 funcs]
-    SSDP_PORT  CC=6  out:14
-    finish  CC=2  out:2
-    probeSsdp  CC=6  out:14
-    timer  CC=1  out:3
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp  [4 funcs]
-    CONNECT_TIMEOUT  CC=3  out:8
-    finish  CC=3  out:2
-    probePort  CC=3  out:8
-    probeTcp  CC=5  out:5
-  generated.admin.network-device-discovery.taskand.dev.v3.network  [2 funcs]
-    cidrToIps  CC=10  out:6
-    numToIp  CC=1  out:1
-  generated.admin.network-device-discovery.taskand.dev.v3.probe-mdns  [3 funcs]
-    done  CC=2  out:2
-    probeMdns  CC=7  out:19
-    timer  CC=1  out:3
-  generated.admin.network-device-discovery.taskand.dev.v3.probe-ping  [2 funcs]
-    fin  CC=2  out:2
-    ips  CC=5  out:10
-  generated.admin.network-device-discovery.taskand.dev.v3.probe-ssdp  [3 funcs]
-    done  CC=2  out:2
-    probeSsdp  CC=8  out:15
-    timer  CC=1  out:3
-  generated.admin.network-device-discovery.taskand.dev.v4.address  [8 funcs]
-    contains  CC=3  out:2
-    family  CC=1  out:2
-    first  CC=1  out:2
-    formatIP  CC=2  out:6
-    ipNumber  CC=8  out:8
-    reserve  CC=1  out:2
-    size  CC=1  out:2
-    subnet  CC=8  out:7
-  generated.admin.network-device-discovery.taskand.dev.v4.bin  [6 funcs]
-    add  CC=4  out:3
-    count  CC=3  out:6
-    ip  CC=3  out:3
-    params  CC=2  out:2
-    scan  CC=30  out:20
-    xml  CC=3  out:6
-  generated.admin.network-device-discovery.taskand.dev.v4.inventory  [3 funcs]
-    interfaces  CC=4  out:6
-    inventory  CC=7  out:14
-    jsonIP  CC=7  out:13
-  generated.alert.telegram.taskand.dev.v1.bin  [5 funcs]
-    body  CC=2  out:1
-    chatId  CC=3  out:1
-    emit  CC=1  out:5
-    threshold  CC=2  out:1
-    token  CC=3  out:1
-  generated.browser.session.taskand.dev.v1.bin  [5 funcs]
-    cdp  CC=3  out:5
-    tab  CC=1  out:2
-    tabs  CC=1  out:3
-    text  CC=2  out:1
-    v  CC=1  out:1
-  generated.cluster.monitor.taskand.dev.v1.bin  [4 funcs]
-    base  CC=2  out:2
-    cat  CC=1  out:1
-    checkPeer  CC=10  out:8
-    fetchJson  CC=2  out:4
-  generated.cluster.monitor.taskand.dev.v1.registry-client  [2 funcs]
-    call  CC=1  out:1
-    registry  CC=6  out:5
-  generated.dev.act.taskand.dev.v1.bin  [8 funcs]
-    capabilityContext  CC=3  out:8
-    decide  CC=5  out:3
-    decision  CC=1  out:1
-    evolve  CC=6  out:3
-    format  CC=7  out:1
-    r  CC=4  out:3
-    result  CC=2  out:1
-    run  CC=2  out:2
-  generated.dev.chat.taskand.dev.v1.dispatch  [11 funcs]
-    P  CC=1  out:0
-    d  CC=1  out:2
-    diagnose  CC=3  out:4
-    fileList  CC=4  out:6
-    organismChat  CC=2  out:3
-    path  CC=1  out:2
-    prescribe  CC=3  out:4
-    r  CC=1  out:2
-    replyOf  CC=4  out:1
-    telemetry  CC=8  out:7
-  generated.dev.chat.taskand.dev.v1.intent  [7 funcs]
-    DEVELOPER  CC=5  out:3
-    hasAny  CC=5  out:2
-    low  CC=3  out:1
-    match  CC=2  out:0
-    matches  CC=5  out:3
-    org  CC=4  out:4
-    parseIntent  CC=8  out:4
-  generated.dev.composite.taskand.dev.v1.bin  [5 funcs]
-    done  CC=1  out:4
-    evolveStep  CC=4  out:6
-    say  CC=1  out:4
-    val  CC=3  out:2
-    validate  CC=4  out:3
-  generated.dev.evolve.taskand.dev.v1.bin  [10 funcs]
-    GEN  CC=4  out:2
-    MAX_ATTEMPTS  CC=4  out:2
-    capability  CC=4  out:1
-    done  CC=1  out:3
-    entries  CC=2  out:1
-    name  CC=4  out:2
-    organism  CC=4  out:2
-    previous  CC=4  out:2
-    slug  CC=4  out:2
-    writeAndTest  CC=3  out:5
-  generated.dev.evolve.taskand.dev.v1.gate  [9 funcs]
-    CRASH  CC=10  out:6
-    clip  CC=10  out:5
-    compare  CC=12  out:10
-    compareCounts  CC=5  out:6
-    digest  CC=10  out:6
-    fmt  CC=1  out:2
-    judge  CC=1  out:4
-    keys  CC=2  out:1
-    visit  CC=10  out:5
-  generated.dev.file-router.taskand.dev.v1.bin  [4 funcs]
-    emit  CC=1  out:3
-    kind  CC=1  out:1
-    path  CC=2  out:2
-    st  CC=1  out:1
-  generated.dev.llm.taskand.dev.v1.bin  [5 funcs]
-    choice  CC=6  out:3
-    content  CC=6  out:3
-    data  CC=6  out:3
-    emit  CC=1  out:3
-    json  CC=2  out:1
-  generated.dev.spawn.taskand.dev.v1.bin  [2 funcs]
-    done  CC=1  out:3
-    organism  CC=2  out:2
-  generated.doctor.diagnose.taskand.dev.v1.bin  [10 funcs]
-    checkDependencies  CC=4  out:3
-    checkPeers  CC=6  out:3
-    checkRegistry  CC=8  out:7
-    checkServices  CC=6  out:3
-    entry  CC=1  out:1
-    find  CC=1  out:1
-    lastError  CC=1  out:1
-    probe  CC=2  out:2
-    recent  CC=1  out:1
-    v  CC=2  out:2
-  generated.doctor.heal.taskand.dev.v1.bin  [4 funcs]
-    forHumans  CC=6  out:3
-    forOrganisms  CC=6  out:3
-    heal  CC=5  out:4
-    recentlyHealed  CC=4  out:7
-  generated.doctor.heal.taskand.dev.v1.registry-client  [2 funcs]
-    call  CC=1  out:1
-    registry  CC=6  out:5
-  generated.doctor.prescribe.taskand.dev.v1.bin  [4 funcs]
-    human  CC=1  out:0
-    parseUri  CC=2  out:0
-    prescriptions  CC=3  out:2
-    reEvolve  CC=2  out:1
-  generated.hw.monitor.taskand.dev.v1.bin  [2 funcs]
-    cpuTimes  CC=1  out:2
-    cpuUsagePct  CC=2  out:4
-  generated.registry.core.taskand.dev.v1.exec  [13 funcs]
-    actual  CC=2  out:1
-    call  CC=7  out:18
-    credentialEnv  CC=11  out:7
-    entry  CC=2  out:1
-    errorType  CC=3  out:3
-    fail  CC=1  out:0
-    matches  CC=11  out:6
-    outcome  CC=13  out:4
-    parseJson  CC=5  out:4
-    parsed  CC=6  out:3
-  generated.registry.core.taskand.dev.v1.federation  [6 funcs]
-    fetchJson  CC=2  out:4
-    install  CC=9  out:11
-    pkg  CC=2  out:3
-    pull  CC=6  out:8
-    pullOne  CC=10  out:7
-    remote  CC=1  out:2
-  generated.registry.core.taskand.dev.v1.lifecycle  [9 funcs]
-    approve  CC=1  out:1
-    deprecate  CC=1  out:1
-    initialStatus  CC=5  out:2
-    register  CC=16  out:14
-    results  CC=2  out:2
-    scan  CC=3  out:11
-    setStatus  CC=6  out:10
-    src  CC=8  out:5
-    unregistered  CC=2  out:2
-  generated.registry.core.taskand.dev.v1.package  [6 funcs]
-    checkPackage  CC=13  out:14
-    h  CC=2  out:4
-    packageFiles  CC=1  out:6
-    packageHash  CC=2  out:6
-    readManifest  CC=4  out:11
-    unquote  CC=13  out:14
-  generated.registry.core.taskand.dev.v1.store  [21 funcs]
-    addPeer  CC=5  out:8
-    adoptOwnership  CC=4  out:7
-    allEntries  CC=1  out:4
-    audit  CC=2  out:9
-    clean  CC=1  out:1
-    deadline  CC=7  out:6
-    findEntry  CC=2  out:2
-    lock  CC=7  out:6
-    organisms  CC=2  out:6
-    parseUri  CC=3  out:3
-  generated.validator.resolve.taskand.dev.v1.bin  [3 funcs]
-    currentStep  CC=7  out:3
-    dfs  CC=7  out:3
-    hasCycle  CC=7  out:4
-  generated.validator.resolve.taskand.dev.v1.registry-client  [2 funcs]
-    call  CC=1  out:1
-    registry  CC=6  out:5
+  infra.local-recovery.context_snapshot  [9 funcs]
+    capture  CC=9  out:23
+    checked_file  CC=1  out:8
+    database_from_tar  CC=14  out:18
+    new_target  CC=5  out:7
+    restore  CC=8  out:24
+    safe_path  CC=4  out:5
+    snapshot  CC=3  out:14
+    stopped_container  CC=6  out:11
+    validate_database  CC=9  out:20
+  infra.local-recovery.deploy  [10 funcs]
+    create  CC=13  out:23
+    digest  CC=1  out:2
+    load_stage  CC=5  out:12
+    metadata  CC=2  out:4
+    predecessor  CC=3  out:5
+    rollback  CC=4  out:10
+    run  CC=1  out:1
+    safe  CC=3  out:6
+    stage  CC=20  out:55
+    switch  CC=8  out:15
+  mcp.bridge  [10 funcs]
+    canonical  CC=1  out:1
+    client  CC=12  out:35
+    digest  CC=1  out:4
+    error_code  CC=4  out:4
+    invoke  CC=12  out:33
+    load_json  CC=2  out:9
+    main  CC=3  out:17
+    require  CC=2  out:1
+    tool_catalog  CC=6  out:16
+    validate_schema  CC=1  out:10
+  mcp.catalog  [9 funcs]
+    configurations  CC=2  out:12
+    discover  CC=2  out:15
+    emit  CC=14  out:30
+    merged_configurations  CC=5  out:6
+    normalize  CC=11  out:32
+    package_files  CC=2  out:13
+    register  CC=2  out:10
+    slug  CC=3  out:9
+    write_private  CC=4  out:15
+  operations.delivery  [33 funcs]
+    TERMINAL  CC=1  out:3
+    base  CC=2  out:1
+    branch  CC=2  out:1
+    buildDeliveryPlan  CC=3  out:3
+    commands  CC=7  out:2
+    deliver  CC=37  out:17
+    digest  CC=1  out:2
+    dirty  CC=2  out:3
+    discoverPullRequest  CC=10  out:3
+    discovered  CC=2  out:1
+  operations.delivery_controller.test  [2 funcs]
+    observation  CC=1  out:1
+    result  CC=2  out:4
+  packages.taskand-mcp-control.control  [17 funcs]
+    __init__  CC=1  out:7
+    execute  CC=6  out:22
+    lock  CC=4  out:5
+    profile  CC=6  out:25
+    profiles  CC=5  out:11
+    receipt  CC=5  out:10
+    remote  CC=11  out:45
+    run  CC=16  out:41
+    server  CC=2  out:6
+    tools  CC=6  out:14
+  packages.taskand-mcp.src.taskand_mcp.gateway  [5 funcs]
+    call  CC=5  out:8
+    catalog  CC=8  out:14
+    request  CC=16  out:24
+    encode  CC=2  out:3
+    validate_uri  CC=3  out:3
+  packages.taskand-mcp.src.taskand_mcp.server  [4 funcs]
+    create_server  CC=2  out:28
+    failure  CC=1  out:2
+    main  CC=1  out:2
+    result  CC=5  out:11
+  scripts.install-agent-hosts  [1 funcs]
+    print  CC=0  out:0
+  scripts.runtime  [2 funcs]
+    canonical  CC=0  out:0
+    git  CC=0  out:0
+  wellmanifest_governance  [6 funcs]
+    _activate_managed_hook  CC=11  out:11
+    _changed_paths  CC=5  out:5
+    _git  CC=2  out:2
+    _github_event_base  CC=7  out:10
+    _resolve_base  CC=9  out:12
+    pytest_sessionstart  CC=7  out:20
 
 EDGES:
-  generated.validator.resolve.taskand.dev.v1.registry-client.call → generated.validator.resolve.taskand.dev.v1.registry-client.registry
-  generated.validator.resolve.taskand.dev.v1.bin.hasCycle → generated.validator.resolve.taskand.dev.v1.bin.dfs
-  generated.validator.resolve.taskand.dev.v1.bin.currentStep → generated.validator.resolve.taskand.dev.v1.bin.dfs
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.execFileP
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.refreshArpWithIpNeigh → generated.admin.network-device-discovery.taskand.dev.v2.probe-arp.readArpTable
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.reverseDns → generated.admin.network-device-discovery.taskand.dev.v2.probe-dns.map
-  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
-  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
-  generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks → generated.admin.network-device-discovery.taskand.dev.v2.networks.execFileP
-  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.isDockerIface
-  generated.admin.network-device-discovery.taskand.dev.v2.networks.ifaces → generated.admin.network-device-discovery.taskand.dev.v2.networks.cidrFromAddrMask
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.SSDP_PORT → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.probeSsdp → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.timer → generated.admin.network-device-discovery.taskand.dev.v2.probe-ssdp.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.probeMdns → generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.timer → generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.ip → generated.admin.network-device-discovery.taskand.dev.v2.probe-mdns.extractNames
-  generated.admin.network-device-discovery.taskand.dev.v2.merge.mergeDevices → generated.admin.network-device-discovery.taskand.dev.v2.merge.get
-  generated.admin.network-device-discovery.taskand.dev.v2.merge.mergeDevices → generated.admin.network-device-discovery.taskand.dev.v2.merge.addSource
-  generated.admin.network-device-discovery.taskand.dev.v2.merge.map → generated.admin.network-device-discovery.taskand.dev.v2.merge.get
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.CONNECT_TIMEOUT → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.finish
-  generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probeTcp → generated.admin.network-device-discovery.taskand.dev.v2.probe-tcp.probePort
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.errOut → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.vendorFromMac → generated.admin.network-device-discovery.taskand.dev.v1.bin.loadOui
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp → generated.admin.network-device-discovery.taskand.dev.v1.bin.run
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe → generated.admin.network-device-discovery.taskand.dev.v1.bin.fin
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.hostname → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.off → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.qd → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.an → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.r → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.rdlen → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.type → generated.admin.network-device-discovery.taskand.dev.v1.bin.readName
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.tcpProbe
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.probeBudget → generated.admin.network-device-discovery.taskand.dev.v1.bin.r
-  generated.admin.network-device-discovery.taskand.dev.v1.bin.selfIps → generated.admin.network-device-discovery.taskand.dev.v1.bin.out
-  generated.hw.monitor.taskand.dev.v1.bin.cpuUsagePct → generated.hw.monitor.taskand.dev.v1.bin.cpuTimes
-  generated.registry.core.taskand.dev.v1.package.packageHash → generated.registry.core.taskand.dev.v1.package.packageFiles
-  generated.registry.core.taskand.dev.v1.package.h → generated.registry.core.taskand.dev.v1.package.packageFiles
-  generated.registry.core.taskand.dev.v1.package.readManifest → generated.registry.core.taskand.dev.v1.package.unquote
-  generated.registry.core.taskand.dev.v1.package.unquote → generated.registry.core.taskand.dev.v1.package.readManifest
-  generated.registry.core.taskand.dev.v1.package.unquote → generated.registry.core.taskand.dev.v1.package.packageFiles
-  generated.registry.core.taskand.dev.v1.package.checkPackage → generated.registry.core.taskand.dev.v1.package.readManifest
-  generated.registry.core.taskand.dev.v1.package.checkPackage → generated.registry.core.taskand.dev.v1.package.packageFiles
-  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.fetchJson
-  generated.registry.core.taskand.dev.v1.federation.pull → generated.registry.core.taskand.dev.v1.federation.pullOne
-  generated.registry.core.taskand.dev.v1.federation.remote → generated.registry.core.taskand.dev.v1.federation.fetchJson
-  generated.registry.core.taskand.dev.v1.federation.pullOne → generated.registry.core.taskand.dev.v1.federation.fetchJson
+  examples.network-scan-task.call → examples.network-scan-task.registry
+  examples.network-scan-task.before → examples.network-scan-task.registry
+  examples.network-scan-task.selected → examples.network-scan-task.registry
+  examples.network-scan-task.approved → examples.network-scan-task.call
+  examples.network-scan-task.result → examples.network-scan-task.call
+  examples.web-twin-task.call → examples.web-twin-task.registry
+  examples.web-twin-task.before → examples.web-twin-task.registry
+  examples.web-twin-task.selected → examples.web-twin-task.registry
+  examples.web-twin-task.approved → examples.web-twin-task.call
+  examples.web-twin-task.result → examples.web-twin-task.call
+  wellmanifest_governance._github_event_base → wellmanifest_governance._git
+  wellmanifest_governance._resolve_base → wellmanifest_governance._github_event_base
+  wellmanifest_governance._resolve_base → wellmanifest_governance._git
+  wellmanifest_governance._changed_paths → wellmanifest_governance._git
+  wellmanifest_governance.pytest_sessionstart → wellmanifest_governance._activate_managed_hook
+  wellmanifest_governance.pytest_sessionstart → wellmanifest_governance._resolve_base
+  wellmanifest_governance.pytest_sessionstart → wellmanifest_governance._changed_paths
+  gateway.handlers.mcp_control.authorize → gateway.auth.check_grant
+  gateway.handlers.doctor.handle_doctor → gateway.utils.call_process
+  gateway.handlers.doctor.handle_doctor → gateway.auth.require_grant
+  gateway.handlers.doctor.handle_doctor → gateway.utils.status_for
+  gateway.handlers.monag_handler.handle_monag_status → gateway.handlers.monag_handler._run_monag_json
+  gateway.handlers.monag_handler.handle_monag_resume → gateway.handlers.monag_handler._run_monag_json
+  gateway.handlers.planner.handle_planner → gateway.utils.call_process
+  gateway.handlers.planner.handle_planner → gateway.auth.require_grant
+  gateway.handlers.planner.handle_planner → gateway.utils.status_for
+  gateway.handlers.chat.handle_conversation → gateway.utils.call_process
+  gateway.handlers.chat.handle_conversation → gateway.auth.require_grant
+  gateway.handlers.chat.handle_chat → gateway.auth.require_grant
+  gateway.handlers.chat.handle_chat → gateway.middleware.logging.log_event
+  gateway.handlers.chat.handle_chat → gateway.utils.call_process
+  gateway.utils.call_process → gateway.utils.registry
+  gateway.utils.call_process → gateway.context.Store.list
+  gateway.auth.is_loopback_bind → gateway.auth.bind_address
+  gateway.auth.load_grants → gateway.auth._parse_simple_yaml
+  gateway.auth.check_auth → gateway.auth.load_grants
+  gateway.auth.require_grant → gateway.auth.check_auth
+  gateway.auth.require_grant → gateway.auth.check_grant
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.auth.require_grant
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.utils.call_process
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.middleware.logging.log_event
+  gateway.handlers.orchestrator.handle_orchestrator → gateway.utils.status_for
+  gateway.handlers.federation.handle_well_known_catalog → examples.network-scan-task.registry
+  gateway.handlers.federation.handle_well_known_catalog → gateway.utils.status_for
+  gateway.handlers.federation.handle_federation → examples.network-scan-task.registry
+  gateway.handlers.federation.handle_registry → examples.network-scan-task.registry
+  gateway.handlers.federation.handle_registry → gateway.auth.require_grant
+  gateway.handlers.federation.handle_registry → gateway.utils.status_for
+  gateway.handlers.context.handle_mcp_catalog → gateway.auth.require_grant
+  gateway.handlers.context.handle_mcp_catalog → examples.network-scan-task.registry

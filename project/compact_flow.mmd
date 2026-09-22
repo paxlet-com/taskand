@@ -1,20 +1,51 @@
 flowchart TD
-%% generated in 0.01s
+%% generated in 0.20s
+    app__mcp_task_executor["app.mcp_task_executor<br/>4 funcs"]
+    app__runtime_canary["app.runtime_canary<br/>5 funcs"]
+    app__runtime_readiness["app.runtime_readiness<br/>5 funcs"]
+    examples__network_scan_task["examples.network-scan-task<br/>12 funcs"]
     gateway["gateway<br/>1 funcs"]
-    gateway__GatewayHTTPHandler["gateway.GatewayHTTPHandler<br/>5 funcs"]
+    gateway__GatewayHTTPHandler["gateway.GatewayHTTPHandler<br/>6 funcs"]
     gateway__auth["gateway.auth<br/>7 funcs"]
-    gateway__handlers["gateway.handlers<br/>9 funcs"]
+    gateway__context["gateway.context<br/>15 funcs"]
+    gateway__handlers["gateway.handlers<br/>29 funcs"]
     gateway__middleware["gateway.middleware<br/>2 funcs"]
     gateway__router["gateway.router<br/>1 funcs"]
     gateway__utils["gateway.utils<br/>3 funcs"]
-    generated__admin["generated.admin<br/>243 funcs"]
-    generated__validator["generated.validator<br/>21 funcs"]
-    gateway__handlers ==>|12| gateway__utils
-    gateway__handlers ==>|6| gateway__auth
-    gateway__handlers ==>|4| generated__validator
+    infra__local_recovery["infra.local-recovery<br/>22 funcs"]
+    mcp__bridge["mcp.bridge<br/>10 funcs"]
+    mcp__catalog["mcp.catalog<br/>10 funcs"]
+    packages__taskand_mcp_control["packages.taskand-mcp-control<br/>21 funcs"]
+    scripts__install_agent_hosts["scripts.install-agent-hosts<br/>9 funcs"]
+    scripts__runtime["scripts.runtime<br/>24 funcs"]
+    mcp__catalog ==>|27| packages__taskand_mcp_control
+    gateway__handlers ==>|17| gateway__auth
+    gateway__handlers ==>|15| gateway__utils
+    app__mcp_task_executor ==>|15| gateway__context
+    packages__taskand_mcp_control ==>|11| gateway__handlers
+    gateway__handlers ==>|7| examples__network_scan_task
+    infra__local_recovery ==>|7| scripts__install_agent_hosts
+    mcp__catalog ==>|5| scripts__runtime
+    gateway__handlers ==>|4| gateway__context
+    mcp__catalog ==>|4| mcp__bridge
+    app__runtime_readiness ==>|4| scripts__runtime
     gateway__handlers -->|3| gateway__middleware
-    gateway__GatewayHTTPHandler -->|2| gateway__middleware
+    packages__taskand_mcp_control -->|3| scripts__runtime
+    gateway -->|3| scripts__install_agent_hosts
+    packages__taskand_mcp_control -->|2| gateway__context
+    mcp__bridge -->|2| gateway__context
+    mcp__catalog -->|2| scripts__install_agent_hosts
     gateway__GatewayHTTPHandler -->|2| gateway__router
     gateway -->|2| gateway__auth
-    gateway__GatewayHTTPHandler -->|1| generated__admin
-    gateway__handlers -->|1| generated__admin
+    app__runtime_readiness -->|2| scripts__install_agent_hosts
+    gateway__utils -->|1| gateway__context
+    app__runtime_canary -->|1| scripts__install_agent_hosts
+    gateway__context -->|1| scripts__install_agent_hosts
+    packages__taskand_mcp_control -->|1| scripts__install_agent_hosts
+    mcp__bridge -->|1| scripts__install_agent_hosts
+    mcp__catalog -->|1| gateway__handlers
+    gateway__GatewayHTTPHandler -->|1| gateway__auth
+    gateway__GatewayHTTPHandler -->|1| gateway__context
+    gateway__GatewayHTTPHandler -->|1| gateway__handlers
+    app__runtime_readiness -->|1| mcp__catalog
+    app__mcp_task_executor -->|1| scripts__install_agent_hosts
