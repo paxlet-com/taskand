@@ -105,7 +105,7 @@ function cdpWs(wsUrl, method, params = {}) {
           s.write(Buffer.concat([header, mask, masked]));
         }
       }
-      if (handshaked && buf.length >= 2) {
+      while (handshaked && buf.length >= 2) {
         const lenByte = buf[1] & 0x7f;
         let dataStart = 2;
         let payloadLen = lenByte;
@@ -118,21 +118,45 @@ function cdpWs(wsUrl, method, params = {}) {
           payloadLen = Number(buf.readBigUInt64BE(2));
           dataStart = 10;
         }
-        if (buf.length >= dataStart + payloadLen) {
-          const rawMsg = buf.subarray(dataStart, dataStart + payloadLen).toString('utf8');
-          clearTimeout(timeoutTimer);
-          s.end();
-          try {
-            const parsed = JSON.parse(rawMsg);
+        if (buf.length < dataStart + payloadLen) return;
+        const rawMsg = buf.subarray(dataStart, dataStart + payloadLen).toString('utf8');
+        buf = buf.subarray(dataStart + payloadLen);
+        try {
+          const parsed = JSON.parse(rawMsg);
+          if (parsed.id === 1) {
+            clearTimeout(timeoutTimer);
+            s.end();
             if (parsed.error) reject(new Error(parsed.error.message || JSON.stringify(parsed.error)));
             else resolve(parsed.result);
-          } catch (e) {
-            reject(e);
+            return;
           }
-        }
+        } catch (e) {}
       }
     });
   });
+}
+
+function samePage(urlA, urlB) {
+  if (!urlA || !urlB) return false;
+  if (urlA === urlB) return true;
+  if (urlA.includes(urlB) || urlB.includes(urlA)) return true;
+  try {
+    const u1 = new URL(urlA);
+    const u2 = new URL(urlB);
+    const hostA = u1.hostname;
+    const hostB = u2.hostname;
+    const isLocalA = ['localhost', '127.0.0.1', 'displaynet.local'].includes(hostA);
+    const isLocalB = ['localhost', '127.0.0.1', 'displaynet.local'].includes(hostB);
+    const hostsMatch = hostA === hostB || (isLocalA && isLocalB);
+    const portsMatch = (u1.port || '80') === (u2.port || '80');
+    if (hostsMatch && portsMatch) {
+      if (u1.pathname === u2.pathname) return true;
+    }
+    if (u1.pathname === u2.pathname && u1.pathname.length > 1) {
+      return true;
+    }
+  } catch (e) {}
+  return false;
 }
 
 async function resolveTargetPage() {
@@ -148,8 +172,11 @@ async function resolveTargetPage() {
   if (input.url) {
     const rawTarget = input.url;
     const gatewayTarget = resolveGatewayUrl(rawTarget);
-    const found = pages.find(p => p.url === rawTarget || p.url === gatewayTarget || p.url.includes(rawTarget) || p.url.includes(gatewayTarget));
+    const found = pages.find(p => samePage(p.url, rawTarget) || samePage(p.url, gatewayTarget));
     if (found) return found;
+    const tab = await cdpHttp(`/json/new?${encodeURIComponent(gatewayTarget)}`, 'PUT');
+    await new Promise(r => setTimeout(r, 1500));
+    return tab;
   }
   return pages[0];
 }
@@ -249,6 +276,14 @@ const ACTIONS = {
   open: async () => {
     if (!/^https?:\/\//.test(input.url || '')) return { ok: false, error: 'Wymagane: url (http/https)' };
     const targetUrl = resolveGatewayUrl(input.url);
+    if (!input.force_new) {
+      const pages = await getPages();
+      const existing = pages.find(p => samePage(p.url, input.url) || samePage(p.url, targetUrl));
+      if (existing) {
+        try { await cdpWs(existing.webSocketDebuggerUrl, 'Page.bringToFront', {}); } catch (e) {}
+        return { ok: true, session: `session://browser/${existing.id}`, id: existing.id, url: existing.url, resolvedUrl: targetUrl, reused: true, summary: `Użyto otwartej karty ${existing.url} — podgląd: ${NOVNC}` };
+      }
+    }
     const tab = await cdpHttp(`/json/new?${encodeURIComponent(targetUrl)}`, 'PUT');
     return { ok: true, session: `session://browser/${tab.id}`, id: tab.id, url: input.url, resolvedUrl: targetUrl, summary: `Otwarto ${input.url} — podgląd: ${NOVNC}` };
   },
@@ -299,18 +334,7 @@ const ACTIONS = {
     const selector = input.selector || '';
     if (!targetText && !role && !selector) return { ok: false, error: 'Wymagane: text, role lub selector' };
 
-    let page;
-    if (input.url) {
-      const targetUrl = resolveGatewayUrl(input.url);
-      const pages = await getPages();
-      page = pages.find(p => p.url === input.url || p.url === targetUrl || p.url.includes(targetUrl));
-      if (!page) {
-        page = await cdpHttp(`/json/new?${encodeURIComponent(targetUrl)}`, 'PUT');
-        await new Promise(r => setTimeout(r, 1500));
-      }
-    } else {
-      page = await resolveTargetPage();
-    }
+    const page = await resolveTargetPage();
 
     const expr = `(function() {
       const find = ${_CDP_FIND_JS};
