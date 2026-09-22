@@ -18,6 +18,12 @@ export const INTENTS = [
   { name: 'composite', any: COMPLEXITY_SIGNALS },
   { name: 'telemetry', any: ['temperatur', 'temp', 'sprzet', 'cpu', 'procesor', 'pamiec', 'dysk'] },
   { name: 'file-ops', all: [['plik'], ['istnieje', 'zawarto', 'czytaj', 'pokaz']] },
+  // Subactor Account Twin queries
+  { name: 'twin-account', re: /(?:bli[źz]niak\w*\s+konta|twin\s+konta|konta\s+w\s+twin|twin\s+(?:projekty|repozytoria|tickety|wdro[zż]enia|organizacje))/iu },
+  { name: 'twin-account', all: [['twin', 'blizniak'], ['konto', 'subactor', 'organizacj', 'repozytor', 'ticket', 'wdrozen']] },
+  // Subactor Ticket Lifecycle
+  { name: 'ticket-lifecycle', re: /(?:uzgodnij|reconcile|preflight|sprawd[zź]\s+lifecycle|cykl\s+[zż]ycia)\s+(?:ticket[uów]*|zada[nń])/iu },
+  { name: 'ticket-lifecycle', all: [['ticket', 'lifecycle'], ['uzgodn', 'reconcile', 'sprawdz', 'preflight', 'cykl']] },
   // Layer 1 Fast-Path matcher for browser actions (wellmanifest/nl-dsl-llm standard)
   { name: 'browser-action', re: /(?:kliknij|wci[sś]nij|naci[sś]nij|click|wpisz|wype[lł]nij|zrzut|screenshot|otw[oó]rz\s+stron|otworz\s+stron|nawiguj)\b.*?(?:https?:\/\/\S+|przycisk|button|link|pole|ekran|\bkarcie\b|\bstronie\b)/iu },
   { name: 'browser-action', all: [[/https?:\/\/\S+/], ['klikn', 'wcisn', 'nacisn', 'otworz', 'zrzut', 'screenshot', 'wpisz', 'wypeln']] },

@@ -17,6 +17,21 @@ export const HANDLERS = {
   composite: ({ text }) => replyOf(call(P('dev/composite'), { task: text }, LONG)),
   telemetry: () => telemetry(),
   'file-ops': ({ text }) => replyOf(call(P('dev/file-router'), { message: text })),
+  'twin-account': ({ text }) => {
+    let resource = 'summary';
+    if (/repozytor/i.test(text)) resource = 'repositories';
+    else if (/projekt/i.test(text)) resource = 'projects';
+    else if (/ticket/i.test(text)) resource = 'tickets';
+    else if (/wdro[zż]en/i.test(text)) resource = 'deployments';
+    else if (/organizac/i.test(text)) resource = 'organizations';
+    else if (/source|źr[oó]d[lł]/i.test(text)) resource = 'sources';
+    return replyOf(call(P('twin/account'), { action: resource }, LONG));
+  },
+  'ticket-lifecycle': ({ text }) => {
+    const ticketMatch = text.match(/\b(PLF-[0-9]+|ticket-[0-9]{3})\b/i);
+    const ticketId = ticketMatch ? ticketMatch[1] : undefined;
+    return replyOf(call(P('subactor/ticket-lifecycle'), { action: 'inspect', ticket_id: ticketId }, LONG));
+  },
   'browser-action': ({ text }) => {
     const parsed = parseBrowserAction(text);
     return replyOf(call(P('browser/session'), parsed, LONG));

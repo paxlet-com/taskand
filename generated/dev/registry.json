@@ -38,11 +38,11 @@
         "proc.yaml",
         "registry-client.mjs"
       ],
-      "hash": "sha256:eefe97a434fba4b6f50ec29115afc3c10119449c7954d725f5d68561c56900ef",
+      "hash": "sha256:5cb1bb1e85a78d90f1481764df694ead00d33017a1d80be3078ac23adbe6d2b3",
       "status": "active",
       "registered": "2026-09-12T19:09:04.961Z",
       "capability": "Jedyne wejście konwersacyjne: organizm/intencja → proces przez rejestr",
-      "refreshedAt": "2026-09-22T08:59:09.114Z"
+      "refreshedAt": "2026-09-22T12:55:56.602Z"
     },
     "proc://taskand.dev/dev/codegen/v1": {
       "uri": "proc://taskand.dev/dev/codegen/v1",
@@ -161,5 +161,5 @@
       "capability": "Ewolucja: codegen → guard → pakiet → test kontraktu → rejestracja (wersje niezmienne)"
     }
   },
-  "updated": "2026-09-22T08:59:09.114Z"
+  "updated": "2026-09-22T12:55:56.602Z"
 }

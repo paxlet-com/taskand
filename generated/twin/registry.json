@@ -43,7 +43,27 @@
       "hash": "sha256:743aff98330166713f15565597b94b9812a815300aff411564eca3324e05c1d2",
       "status": "active",
       "registered": "2026-09-13T07:28:34.893Z"
+    },
+    "proc://taskand.dev/twin/account/v1": {
+      "uri": "proc://taskand.dev/twin/account/v1",
+      "organism": "twin",
+      "path": "generated/twin/account/taskand.dev/v1",
+      "desc": "Odczyt cyfrowego bliźniaka Subactor: organizacje, projekty, repozytoria, tickety, wdrożenia z kanonicznej projekcji Twin",
+      "capability": "Odczyt cyfrowego bliźniaka Subactor: organizacje, projekty, repozytoria, tickety, wdrożenia z kanonicznej projekcji Twin",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml",
+        "registry-client.mjs"
+      ],
+      "hash": "sha256:5807510889076f3146c414f8afd6650402cdbd2e3e3a604e1f2f8df0810f173b",
+      "status": "active",
+      "registered": "2026-09-22T12:54:00.000Z",
+      "refreshedAt": "2026-09-22T12:54:54.168Z"
     }
   },
-  "updated": "2026-09-15T20:40:50.066Z"
+  "updated": "2026-09-22T12:54:54.168Z"
 }

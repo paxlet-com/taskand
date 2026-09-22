@@ -1,10 +1,10 @@
 {
   "schema": "new-project.intent/v3",
   "ticket": "ticket-043",
-  "summary": "Fix browser CDP interaction and NL intent dispatch",
+  "summary": "Fix browser CDP interaction, NL intent dispatch and integrate twin and subactor connectors",
   "workstream": "integration",
   "classification": {
-    "kind": "BUG",
+    "kind": "FEATURE",
     "priority": "P1",
     "origin": "requested"
   },
@@ -18,7 +18,11 @@
     "generated/dev/chat/taskand.dev/v1/intent.mjs",
     "generated/dev/chat/taskand.dev/v1/dispatch.mjs",
     "generated/dev/registry.json",
-    "tests/cli_routing.test.mjs"
+    "generated/twin/registry.json",
+    "generated/twin/account/**",
+    "generated/subactor/**",
+    "tests/cli_routing.test.mjs",
+    "tests/connectors_twin_lifecycle.test.mjs"
   ],
   "forbiddenPaths": [
     "project/ticket-*/user-*.md"
@@ -30,7 +34,7 @@
   "delivery": {
     "acceptedBaseSha": "73b8ed45cd09f2479eb833b897a4cd8de380917e",
     "targetBranch": "main",
-    "outcome": "Fix browser CDP interaction, gateway routing and NL intent dispatch for automated scenario execution.",
+    "outcome": "Fix browser CDP interaction, gateway routing and NL intent dispatch for automated scenario execution, and integrate twin/account and subactor/ticket-lifecycle URI processes.",
     "nonGoals": [
       "Replacing Chromium sandbox architecture in web-model",
       "Modifying doctor or vault subsystems"
@@ -38,14 +42,14 @@
     "complexity": "L",
     "estimatedMinutes": 30,
     "budgets": {
-      "maxImplementationFiles": 8,
-      "maxAffectedComponents": 4,
-      "maxPublicInterfaceChanges": 1,
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 2,
       "maxRuntimeDependencies": 0
     },
     "architecture": {
       "status": "accepted",
-      "decision": "Extend browser session process with DOM interaction and host gateway mapping, and route browser action NL phrases in intent/dispatch.",
+      "decision": "Extend browser session process with DOM interaction and host gateway mapping, route browser action NL phrases in intent/dispatch, and integrate twin account and subactor ticket lifecycle URI processes.",
       "components": [
         {
           "name": "governance-manifest",
@@ -66,16 +70,24 @@
           ]
         },
         {
+          "name": "twin-subactor-connectors",
+          "paths": [
+            "generated/twin/**",
+            "generated/subactor/**"
+          ]
+        },
+        {
           "name": "tests",
           "paths": [
-            "tests/cli_routing.test.mjs"
+            "tests/cli_routing.test.mjs",
+            "tests/connectors_twin_lifecycle.test.mjs"
           ]
         }
       ],
       "responsibilityChanges": false,
       "interfaceChanges": [],
       "dataChanges": [
-        "Declare generated/browser/** in integration ownedPaths",
+        "Declare generated/browser/**, generated/twin/**, and generated/subactor/** in integration ownedPaths",
         "Update bindingHash in generated registries"
       ],
       "ui": {
@@ -99,6 +111,13 @@
           "node tests/cli_routing.test.mjs"
         ],
         "evidence": "CLI routing test passes."
+      },
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "node tests/connectors_twin_lifecycle.test.mjs"
+        ],
+        "evidence": "Twin and lifecycle connectors test passes."
       }
     ],
     "runtimeDependencies": []
