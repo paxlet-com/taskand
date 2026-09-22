@@ -1,0 +1,28 @@
+uri: "proc://taskand.dev/subactor/ticket-lifecycle/v1"
+organism: "subactor"
+name: "ticket-lifecycle"
+version: "1.0.0"
+desc: "Weryfikacja i uzgadnianie cyklu życia ticketów zarządzanych (reconcile preflight) w standardzie wellmanifest/nl-api-llm"
+capability: "Weryfikacja i uzgadnianie cyklu życia ticketów zarządzanych (reconcile preflight) w standardzie wellmanifest/nl-api-llm"
+kind: "task"
+origin: "builtin"
+inputs:
+  type: object
+  properties:
+    action:
+      type: string
+      enum: ["reconcile", "preflight", "inspect", "list"]
+    ticket_id:
+      type: string
+    apply:
+      type: boolean
+      default: false
+outputs:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    reconciled:
+      type: boolean
+    tickets:
+      type: array

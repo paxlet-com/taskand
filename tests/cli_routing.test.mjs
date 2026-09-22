@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseIntent } from '../generated/dev/chat/taskand.dev/v1/intent.mjs';
+import { parseIntent, parseBrowserAction } from '../generated/dev/chat/taskand.dev/v1/intent.mjs';
 
 const discovery = 'generated/admin/github-projects-discovery/taskand.dev/v2/bin.mjs';
 const runDiscovery = input => JSON.parse(spawnSync('node', [discovery], { input: JSON.stringify(input), encoding: 'utf8', timeout: 20000 }).stdout);
@@ -129,3 +129,25 @@ test('universal cli query lists GitHub repositories and keeps large structured r
     rmSync(home, { recursive: true, force: true });
   }
 });
+
+test('browser-action parses natural language commands and parameters', () => {
+  const t1 = parseIntent('kliknij przycisk "Ponów zapis" na stronie http://localhost:8100/connect-scenario?test=test.oql');
+  assert.equal(t1.name, 'browser-action');
+  const a1 = parseBrowserAction(t1.text);
+  assert.equal(a1.action, 'click');
+  assert.equal(a1.text, 'Ponów zapis');
+  assert.equal(a1.url, 'http://localhost:8100/connect-scenario?test=test.oql');
+
+  const t2 = parseIntent('otwórz stronę http://localhost:8100/connect-scenario');
+  assert.equal(t2.name, 'browser-action');
+  const a2 = parseBrowserAction(t2.text);
+  assert.equal(a2.action, 'open');
+  assert.equal(a2.url, 'http://localhost:8100/connect-scenario');
+
+  const t3 = parseIntent('zrób zrzut ekranu do pliku /tmp/screen.png');
+  assert.equal(t3.name, 'browser-action');
+  const a3 = parseBrowserAction(t3.text);
+  assert.equal(a3.action, 'screenshot');
+  assert.equal(a3.output, '/tmp/screen.png');
+});
+

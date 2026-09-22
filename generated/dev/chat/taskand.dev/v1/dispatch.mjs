@@ -1,5 +1,6 @@
 // Dispatch dev/chat: organizm/intencja → proces przez rejestr (URI + JSON), bez logiki domenowej
 import { call } from './registry-client.mjs';
+import { parseBrowserAction } from './intent.mjs';
 
 const P = name => `proc://taskand.dev/${name}/v1`;
 const LONG = 900000;
@@ -16,13 +17,35 @@ export const HANDLERS = {
   composite: ({ text }) => replyOf(call(P('dev/composite'), { task: text }, LONG)),
   telemetry: () => telemetry(),
   'file-ops': ({ text }) => replyOf(call(P('dev/file-router'), { message: text })),
+  'twin-account': ({ text }) => {
+    let resource = 'summary';
+    if (/repozytor/i.test(text)) resource = 'repositories';
+    else if (/projekt/i.test(text)) resource = 'projects';
+    else if (/ticket/i.test(text)) resource = 'tickets';
+    else if (/wdro[zż]en/i.test(text)) resource = 'deployments';
+    else if (/organizac/i.test(text)) resource = 'organizations';
+    else if (/source|źr[oó]d[lł]/i.test(text)) resource = 'sources';
+    return replyOf(call(P('twin/account'), { action: resource }, LONG));
+  },
+  'ticket-lifecycle': ({ text }) => {
+    const ticketMatch = text.match(/\b(PLF-[0-9]+|ticket-[0-9]{3})\b/i);
+    const ticketId = ticketMatch ? ticketMatch[1] : undefined;
+    return replyOf(call(P('subactor/ticket-lifecycle'), { action: 'inspect', ticket_id: ticketId }, LONG));
+  },
+  'browser-action': ({ text }) => {
+    const parsed = parseBrowserAction(text);
+    return replyOf(call(P('browser/session'), parsed, LONG));
+  },
   'spawn-web': () => webStatus(),
   diagnose: () => diagnose(),
   prescribe: () => prescribe(),
   heal: ({ text }) => replyOf(call(P('doctor/heal'), { run: !/plan|bez wykon|dry/i.test(text) }, LONG)),
   vault: () => replyOf(call(P('vault/secrets'), { action: 'status' })),
   'file-list': ({ text }) => fileList(text),
-  browser: ({ text }) => replyOf(call(P('browser/session'), { action: 'open', url: text.match(/https?:\/\/\S+/)?.[0] })),
+  browser: ({ text }) => {
+    const parsed = parseBrowserAction(text);
+    return replyOf(call(P('browser/session'), parsed, LONG));
+  },
   // dev/act zwraca obiekt: reply dla człowieka + result dla --format json|yaml|csv
   'evolve-create': ({ text, organism }) => call(P('dev/act'), { message: text, organism, forceEvolve: true }, LONG),
   query: ({ text, organism }) => call(P('dev/act'), { message: text, organism }, LONG),

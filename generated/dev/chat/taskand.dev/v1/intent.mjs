@@ -1,6 +1,6 @@
 // Tabela intencji dev/chat — nowa intencja = nowy wiersz (kolejność = priorytet)
 // Normalizacja polskiej diakrytyki: ą→a, ę→e, ś→s, ź/ż→z, ć→c, ń→n, ó→o, ł→l
-const stripDiacritics = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0142/g, 'l').replace(/\u0141/g, 'L');
+export const stripDiacritics = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u0142/g, 'l').replace(/\u0141/g, 'L');
 
 const COMPLEXITY_SIGNALS = [
   'zbuduj', 'stworz system', 'utworz system', 'skonfiguruj',
@@ -18,7 +18,16 @@ export const INTENTS = [
   { name: 'composite', any: COMPLEXITY_SIGNALS },
   { name: 'telemetry', any: ['temperatur', 'temp', 'sprzet', 'cpu', 'procesor', 'pamiec', 'dysk'] },
   { name: 'file-ops', all: [['plik'], ['istnieje', 'zawarto', 'czytaj', 'pokaz']] },
-  { name: 'spawn-web', any: ['przegladar', 'web', 'interfejs', 'gui', 'stron'] },
+  // Subactor Account Twin queries
+  { name: 'twin-account', re: /(?:bli[źz]niak\w*\s+konta|twin\s+konta|konta\s+w\s+twin|twin\s+(?:projekty|repozytoria|tickety|wdro[zż]enia|organizacje))/iu },
+  { name: 'twin-account', all: [['twin', 'blizniak'], ['konto', 'subactor', 'organizacj', 'repozytor', 'ticket', 'wdrozen']] },
+  // Subactor Ticket Lifecycle
+  { name: 'ticket-lifecycle', re: /(?:uzgodnij|reconcile|preflight|sprawd[zź]\s+lifecycle|cykl\s+[zż]ycia)\s+(?:ticket[uów]*|zada[nń])/iu },
+  { name: 'ticket-lifecycle', all: [['ticket', 'lifecycle'], ['uzgodn', 'reconcile', 'sprawdz', 'preflight', 'cykl']] },
+  // Layer 1 Fast-Path matcher for browser actions (wellmanifest/nl-dsl-llm standard)
+  { name: 'browser-action', re: /^(?:kliknij|wci[sś]nij|naci[sś]nij|click)\b|(?:wpisz|wype[lł]nij)\b.*?(?:pole|do|w)\b|(?:zrzut|screenshot|zrzuc\s+ekran)\b|(?:otw[oó]rz|otworz|nawiguj)\s+(?:stron|url|link|https?:\/\/)\b/iu },
+  { name: 'browser-action', all: [[/https?:\/\/\S+/], ['klikn', 'wcisn', 'nacisn', 'otworz', 'zrzut', 'screenshot', 'wpisz', 'wypeln']] },
+  { name: 'spawn-web', all: [['web', 'cockpit', 'gui', 'panel'], ['status', 'uruchom', 'pokaz', 'dziala', 'link']] },
   { name: 'spawn-web', all: [['jak'], ['uzywa']] },
   { name: 'heal', any: ['napraw', 'wylecz', 'samonapraw'] },
   { name: 'prescribe', any: ['recept', 'zalece', 'co zrobic'] },
@@ -59,4 +68,39 @@ export function parseIntent(text, organism = '') {
     if (match) return { name: intent.name, match, text, organism: 'dev' };
   }
   return { name: 'query', match: [text], text, organism: 'dev' };
+}
+
+export function parseBrowserAction(text) {
+  const urlMatch = text.match(/https?:\/\/[^\s<>"']+/);
+  const url = urlMatch ? urlMatch[0] : undefined;
+
+  // Click extraction
+  const clickMatch = text.match(/(?:kliknij|wci[sś]nij|naci[sś]nij|click)\s+(?:w\s+|na\s+)?(?:przycisk\s+|button\s+|link\s+)?["'„”]?([^"'„”\n,]+?)["'„”]?(\s+(?:na\s+stronie|w\s+oknie|na|w|pod\s+adresem)\b|\s*$)/iu);
+  if (clickMatch && clickMatch[1] && !/^(?:stron[aęy]?|ekran|okno|buttony|przyciski)$/i.test(clickMatch[1].trim())) {
+    const rawTarget = clickMatch[1].trim().replace(/^na\s+/i, '').replace(/^przycisk\s+/i, '');
+    const prefix = text.slice(0, (clickMatch.index || 0) + clickMatch[0].length);
+    const isButton = /(?:przycisk|button)\b/iu.test(prefix);
+    const isLink = /(?:link|odno[sś]nik)\b/iu.test(prefix);
+    const role = isButton ? 'button' : (isLink ? 'link' : undefined);
+    return { action: 'click', text: rawTarget, role, url };
+  }
+
+  // Fill extraction
+  const fillMatch = text.match(/(?:wpisz|wype[lł]nij|set)\s+["'„”]?([^"'„”]+)["'„”]?\s+(?:w|do)\s+(?:pole\s+)?["'„”]?([^"'„”]+)["'„”]?/iu);
+  if (fillMatch) {
+    return { action: 'fill', value: fillMatch[1].trim(), text: fillMatch[2].trim(), url };
+  }
+
+  // Screenshot extraction
+  if (/zrzut|screenshot|zrzuc\s+ekran/iu.test(text)) {
+    const fileMatch = text.match(/(?:do\s+pliku|jako|zapisz\s+w)\s+(\S+\.png)/i);
+    return { action: 'screenshot', output: fileMatch ? fileMatch[1] : undefined, url };
+  }
+
+  // Open / navigate
+  if (url) {
+    return { action: 'open', url };
+  }
+
+  return { action: 'status' };
 }

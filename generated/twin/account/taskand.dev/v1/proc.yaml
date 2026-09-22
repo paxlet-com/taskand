@@ -1,0 +1,35 @@
+uri: "proc://taskand.dev/twin/account/v1"
+organism: "twin"
+name: "account"
+version: "1.0.0"
+desc: "Odczyt cyfrowego bliźniaka Subactor: organizacje, projekty, repozytoria, tickety, wdrożenia z kanonicznej projekcji Twin"
+capability: "Odczyt cyfrowego bliźniaka Subactor: organizacje, projekty, repozytoria, tickety, wdrożenia z kanonicznej projekcji Twin"
+kind: "task"
+origin: "builtin"
+inputs:
+  type: object
+  properties:
+    action:
+      type: string
+      enum: ["query", "summary", "sources", "organizations", "repositories", "projects", "tickets", "deployments", "project-reconciliations", "combinations", "entities"]
+    resource:
+      type: string
+    organization:
+      type: string
+    project:
+      type: string
+    ticket:
+      type: string
+    repository:
+      type: string
+    limit:
+      type: integer
+outputs:
+  type: object
+  properties:
+    ok:
+      type: boolean
+    resource:
+      type: string
+    data:
+      type: array
