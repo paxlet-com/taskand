@@ -1,14 +1,12 @@
 source: code2llm
-# generated in 0.03s
+# generated in 0.11s
 schema: code2llm.planfile_tickets.v1
 project_root: /home/tom/github/paxlet-com/taskand
 tickets:
 - signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v3.merge.mergeDevices
-    (CC=25)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v3.merge.mergeDevices`
-    at `generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:2` with
-    cyclomatic complexity 25 (limit 15).
+  title: 'Reduce cyclomatic complexity: app.mcp_task_executor.execute (CC=36)'
+  description: 'code2llm reports `app.mcp_task_executor.execute` at `app/mcp_task_executor.py:52`
+    with cyclomatic complexity 36 (limit 15).
 
 
     Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
@@ -20,14 +18,12 @@ tickets:
   - complexity
   - refactor
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:generated.admin.network-device-discovery.taskand.dev.v3.merge.mergeDevices
+  - app/mcp_task_executor.py
+  dedupe_key: code2llm:cc:app/mcp_task_executor.py:app.mcp_task_executor.execute
 - signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v4.bin.scan
-    (CC=30)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v4.bin.scan`
-    at `generated/admin/network-device-discovery/taskand.dev/v4/bin.mjs:6` with cyclomatic
-    complexity 30 (limit 15).
+  title: 'Reduce cyclomatic complexity: app.runtime_canary._request (CC=27)'
+  description: 'code2llm reports `app.runtime_canary._request` at `app/runtime_canary.py:52`
+    with cyclomatic complexity 27 (limit 15).
 
 
     Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
@@ -39,8 +35,94 @@ tickets:
   - complexity
   - refactor
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v4/bin.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v4/bin.mjs:generated.admin.network-device-discovery.taskand.dev.v4.bin.scan
+  - app/runtime_canary.py
+  dedupe_key: code2llm:cc:app/runtime_canary.py:app.runtime_canary._request
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.health.release_identity (CC=35)'
+  description: 'code2llm reports `gateway.handlers.health.release_identity` at `gateway/handlers/health.py:13`
+    with cyclomatic complexity 35 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/health.py
+  dedupe_key: code2llm:cc:gateway/handlers/health.py:gateway.handlers.health.release_identity
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.observers.normalize (CC=26)'
+  description: 'code2llm reports `gateway.handlers.observers.normalize` at `gateway/handlers/observers.py:92`
+    with cyclomatic complexity 26 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/observers.py
+  dedupe_key: code2llm:cc:gateway/handlers/observers.py:gateway.handlers.observers.normalize
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.proc.handle_conversation
+    (CC=35)'
+  description: 'code2llm reports `gateway.handlers.proc.handle_conversation` at `gateway/handlers/proc.py:14`
+    with cyclomatic complexity 35 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/proc.py
+  dedupe_key: code2llm:cc:gateway/handlers/proc.py:gateway.handlers.proc.handle_conversation
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: operations.delivery.deliver (CC=37)'
+  description: 'code2llm reports `operations.delivery.deliver` at `operations/delivery.mjs:184`
+    with cyclomatic complexity 37 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - operations/delivery.mjs
+  dedupe_key: code2llm:cc:operations/delivery.mjs:operations.delivery.deliver
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: operations.delivery.parseDeliveryArgs (CC=30)'
+  description: 'code2llm reports `operations.delivery.parseDeliveryArgs` at `operations/delivery.mjs:34`
+    with cyclomatic complexity 30 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - operations/delivery.mjs
+  dedupe_key: code2llm:cc:operations/delivery.mjs:operations.delivery.parseDeliveryArgs
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: _parse_simple_yaml'
   description: 'code2llm reports `God Function: _parse_simple_yaml` in `gateway/auth.py:25`.
@@ -59,145 +141,355 @@ tickets:
   files:
   - gateway/auth.py
   dedupe_key: 'code2llm:smell:god_function:gateway/auth.py:25:God Function: _parse_simple_yaml'
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
-    (CC=15)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe`
-    at `generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:138` with
-    cyclomatic complexity 15 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:generated.admin.network-device-discovery.taskand.dev.v1.bin.mdnsProbe
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
-    (CC=20)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp`
-    at `generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:70` with cyclomatic
-    complexity 20 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:generated.admin.network-device-discovery.taskand.dev.v1.bin.readArp
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks
-    (CC=15)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks`
-    at `generated/admin/network-device-discovery/taskand.dev/v2/networks.mjs:27` with
-    cyclomatic complexity 15 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/networks.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v2/networks.mjs:generated.admin.network-device-discovery.taskand.dev.v2.networks.listLocalNetworks
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v3.merge.byKey
-    (CC=16)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v3.merge.byKey`
-    at `generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:4` with
-    cyclomatic complexity 16 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:generated.admin.network-device-discovery.taskand.dev.v3.merge.byKey
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.admin.network-device-discovery.taskand.dev.v3.merge.list
-    (CC=16)'
-  description: 'code2llm reports `generated.admin.network-device-discovery.taskand.dev.v3.merge.list`
-    at `generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:3` with
-    cyclomatic complexity 16 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs
-  dedupe_key: code2llm:cc:generated/admin/network-device-discovery/taskand.dev/v3/merge.mjs:generated.admin.network-device-discovery.taskand.dev.v3.merge.list
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.dev.evolve.taskand.dev.v1.contract.guard
-    (CC=16)'
-  description: 'code2llm reports `generated.dev.evolve.taskand.dev.v1.contract.guard`
-    at `generated/dev/evolve/taskand.dev/v1/contract.mjs:44` with cyclomatic complexity
-    16 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/dev/evolve/taskand.dev/v1/contract.mjs
-  dedupe_key: code2llm:cc:generated/dev/evolve/taskand.dev/v1/contract.mjs:generated.dev.evolve.taskand.dev.v1.contract.guard
-- signal: code2llm_cc
-  title: 'Reduce cyclomatic complexity: generated.registry.core.taskand.dev.v1.lifecycle.register
-    (CC=16)'
-  description: 'code2llm reports `generated.registry.core.taskand.dev.v1.lifecycle.register`
-    at `generated/registry/core/taskand.dev/v1/lifecycle.mjs:14` with cyclomatic complexity
-    16 (limit 15).
-
-
-    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
-    code2llm after the change and keep tests green.'
-  priority: normal
-  labels:
-  - llm-ready
-  - code2llm
-  - complexity
-  - refactor
-  files:
-  - generated/registry/core/taskand.dev/v1/lifecycle.mjs
-  dedupe_key: code2llm:cc:generated/registry/core/taskand.dev/v1/lifecycle.mjs:generated.registry.core.taskand.dev.v1.lifecycle.register
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: SSDP_PORT'
-  description: 'code2llm reports `God Function: SSDP_PORT` in `generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:4`.
+  title: 'Address code smell: God Function: create'
+  description: 'code2llm reports `God Function: create` in `infra/local-recovery/deploy.py:118`.
 
 
-    Function ''SSDP_PORT'' is oversized: CC=6, fan-out=14, mutations=0.
+    Function ''create'' is oversized: CC=13, fan-out=16, mutations=20.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - infra/local-recovery/deploy.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/deploy.py:118:God
+    Function: create'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: emit'
+  description: 'code2llm reports `God Function: emit` in `mcp/catalog.py:136`.
+
+
+    Function ''emit'' is oversized: CC=14, fan-out=22, mutations=15.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:136:God Function: emit'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `mcp/catalog.py:187`.
+
+
+    Function ''main'' is oversized: CC=9, fan-out=25, mutations=24.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:187:God Function: main'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `app/runtime_readiness.py:192`.
+
+
+    Function ''main'' is oversized: CC=8, fan-out=20, mutations=18.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - app/runtime_readiness.py
+  dedupe_key: 'code2llm:smell:god_function:app/runtime_readiness.py:192:God Function:
+    main'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: manifest'
+  description: 'code2llm reports `Shotgun Surgery: manifest` in `infra/local-recovery/deploy.py:204`.
+
+
+    Mutation of variable ''manifest'' spans 6 functions in /home/tom/github/paxlet-com/taskand/infra/local-recovery/deploy.py.
+    Changing this logic requires work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - infra/local-recovery/deploy.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:infra/local-recovery/deploy.py:204:Shotgun
+    Surgery: manifest'
+- signal: code2llm_smell_shotgun_surgery
+  title: 'Address code smell: Shotgun Surgery: path'
+  description: 'code2llm reports `Shotgun Surgery: path` in `infra/local-recovery/context_snapshot.py:35`.
+
+
+    Mutation of variable ''path'' spans 5 functions in /home/tom/github/paxlet-com/taskand/infra/local-recovery/context_snapshot.py.
+    Changing this logic requires work in many places.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: high
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - shotgun-surgery
+  files:
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:shotgun_surgery:infra/local-recovery/context_snapshot.py:35:Shotgun
+    Surgery: path'
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: app.runtime_readiness._probe (CC=17)'
+  description: 'code2llm reports `app.runtime_readiness._probe` at `app/runtime_readiness.py:50`
+    with cyclomatic complexity 17 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - app/runtime_readiness.py
+  dedupe_key: code2llm:cc:app/runtime_readiness.py:app.runtime_readiness._probe
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: app.runtime_readiness.assess (CC=18)'
+  description: 'code2llm reports `app.runtime_readiness.assess` at `app/runtime_readiness.py:154`
+    with cyclomatic complexity 18 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - app/runtime_readiness.py
+  dedupe_key: code2llm:cc:app/runtime_readiness.py:app.runtime_readiness.assess
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: app.runtime_readiness.probe_all (CC=19)'
+  description: 'code2llm reports `app.runtime_readiness.probe_all` at `app/runtime_readiness.py:96`
+    with cyclomatic complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - app/runtime_readiness.py
+  dedupe_key: code2llm:cc:app/runtime_readiness.py:app.runtime_readiness.probe_all
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.context.Store.profile (CC=15)'
+  description: 'code2llm reports `gateway.context.Store.profile` at `gateway/context.py:154`
+    with cyclomatic complexity 15 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/context.py
+  dedupe_key: code2llm:cc:gateway/context.py:gateway.context.Store.profile
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.chat.handle_conversation
+    (CC=18)'
+  description: 'code2llm reports `gateway.handlers.chat.handle_conversation` at `gateway/handlers/chat.py:9`
+    with cyclomatic complexity 18 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/chat.py
+  dedupe_key: code2llm:cc:gateway/handlers/chat.py:gateway.handlers.chat.handle_conversation
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.context.handle_context (CC=17)'
+  description: 'code2llm reports `gateway.handlers.context.handle_context` at `gateway/handlers/context.py:75`
+    with cyclomatic complexity 17 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/context.py
+  dedupe_key: code2llm:cc:gateway/handlers/context.py:gateway.handlers.context.handle_context
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.context.handle_mcp_catalog
+    (CC=24)'
+  description: 'code2llm reports `gateway.handlers.context.handle_mcp_catalog` at
+    `gateway/handlers/context.py:11` with cyclomatic complexity 24 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/context.py
+  dedupe_key: code2llm:cc:gateway/handlers/context.py:gateway.handlers.context.handle_mcp_catalog
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.mesh.peer_url (CC=19)'
+  description: 'code2llm reports `gateway.handlers.mesh.peer_url` at `gateway/handlers/mesh.py:28`
+    with cyclomatic complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/mesh.py
+  dedupe_key: code2llm:cc:gateway/handlers/mesh.py:gateway.handlers.mesh.peer_url
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: gateway.handlers.mesh.projection (CC=19)'
+  description: 'code2llm reports `gateway.handlers.mesh.projection` at `gateway/handlers/mesh.py:56`
+    with cyclomatic complexity 19 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - gateway/handlers/mesh.py
+  dedupe_key: code2llm:cc:gateway/handlers/mesh.py:gateway.handlers.mesh.projection
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: infra.local-recovery.deploy.stage (CC=20)'
+  description: 'code2llm reports `infra.local-recovery.deploy.stage` at `infra/local-recovery/deploy.py:44`
+    with cyclomatic complexity 20 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - infra/local-recovery/deploy.py
+  dedupe_key: code2llm:cc:infra/local-recovery/deploy.py:infra.local-recovery.deploy.stage
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.taskand-mcp-control.control.Control.run
+    (CC=16)'
+  description: 'code2llm reports `packages.taskand-mcp-control.control.Control.run`
+    at `packages/taskand-mcp-control/control.py:258` with cyclomatic complexity 16
+    (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: code2llm:cc:packages/taskand-mcp-control/control.py:packages.taskand-mcp-control.control.Control.run
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request
+    (CC=16)'
+  description: 'code2llm reports `packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request`
+    at `packages/taskand-mcp/src/taskand_mcp/gateway.py:81` with cyclomatic complexity
+    16 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/taskand-mcp/src/taskand_mcp/gateway.py
+  dedupe_key: code2llm:cc:packages/taskand-mcp/src/taskand_mcp/gateway.py:packages.taskand-mcp.src.taskand_mcp.gateway.Gateway.request
+- signal: code2llm_cc
+  title: 'Reduce cyclomatic complexity: packages.taskand-mcp.src.taskand_mcp.gateway.Settings.__post_init__
+    (CC=21)'
+  description: 'code2llm reports `packages.taskand-mcp.src.taskand_mcp.gateway.Settings.__post_init__`
+    at `packages/taskand-mcp/src/taskand_mcp/gateway.py:46` with cyclomatic complexity
+    21 (limit 15).
+
+
+    Extract smaller functions, flatten conditionals, or split strategy branches. Re-run
+    code2llm after the change and keep tests green.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - complexity
+  - refactor
+  files:
+  - packages/taskand-mcp/src/taskand_mcp/gateway.py
+  dedupe_key: code2llm:cc:packages/taskand-mcp/src/taskand_mcp/gateway.py:packages.taskand-mcp.src.taskand_mcp.gateway.Settings.__post_init__
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: __init__'
+  description: 'code2llm reports `God Function: __init__` in `gateway/context.py:59`.
+
+
+    Function ''__init__'' is oversized: CC=4, fan-out=14, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -208,15 +500,125 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:4:God
-    Function: SSDP_PORT'
+  - gateway/context.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/context.py:59:God Function: __init__'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _activate_managed_hook'
+  description: 'code2llm reports `God Function: _activate_managed_hook` in `wellmanifest_governance.py:30`.
+
+
+    Function ''_activate_managed_hook'' is oversized: CC=11, fan-out=10, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - wellmanifest_governance.py
+  dedupe_key: 'code2llm:smell:god_function:wellmanifest_governance.py:30:God Function:
+    _activate_managed_hook'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _put'
+  description: 'code2llm reports `God Function: _put` in `gateway/context.py:133`.
+
+
+    Function ''_put'' is oversized: CC=12, fan-out=16, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/context.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/context.py:133:God Function: _put'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _resolve_base'
+  description: 'code2llm reports `God Function: _resolve_base` in `wellmanifest_governance.py:87`.
+
+
+    Function ''_resolve_base'' is oversized: CC=9, fan-out=6, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - wellmanifest_governance.py
+  dedupe_key: 'code2llm:smell:god_function:wellmanifest_governance.py:87:God Function:
+    _resolve_base'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: _send'
+  description: 'code2llm reports `God Function: _send` in `gateway/__init__.py:23`.
+
+
+    Function ''_send'' is oversized: CC=4, fan-out=12, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/__init__.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/__init__.py:23:God Function: _send'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: authorize'
+  description: 'code2llm reports `God Function: authorize` in `gateway/handlers/mcp_control.py:15`.
+
+
+    Function ''authorize'' is oversized: CC=7, fan-out=14, mutations=4.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/handlers/mcp_control.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/handlers/mcp_control.py:15:God
+    Function: authorize'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: begin'
+  description: 'code2llm reports `God Function: begin` in `gateway/context.py:178`.
+
+
+    Function ''begin'' is oversized: CC=8, fan-out=18, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/context.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/context.py:178:God Function: begin'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: call'
-  description: 'code2llm reports `God Function: call` in `generated/registry/core/taskand.dev/v1/exec.mjs:49`.
+  description: 'code2llm reports `God Function: call` in `app/mcp_task_executor.py:31`.
 
 
-    Function ''call'' is oversized: CC=7, fan-out=18, mutations=0.
+    Function ''call'' is oversized: CC=5, fan-out=14, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -227,15 +629,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/exec.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/exec.mjs:49:God
-    Function: call'
+  - app/mcp_task_executor.py
+  dedupe_key: 'code2llm:smell:god_function:app/mcp_task_executor.py:31:God Function:
+    call'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: checkFailingProcesses'
-  description: 'code2llm reports `God Function: checkFailingProcesses` in `generated/doctor/diagnose/taskand.dev/v1/bin.mjs:67`.
+  title: 'Address code smell: God Function: call_process'
+  description: 'code2llm reports `God Function: call_process` in `gateway/utils.py:44`.
 
 
-    Function ''checkFailingProcesses'' is oversized: CC=13, fan-out=14, mutations=0.
+    Function ''call_process'' is oversized: CC=7, fan-out=11, mutations=6.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -246,15 +648,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/doctor/diagnose/taskand.dev/v1/bin.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/doctor/diagnose/taskand.dev/v1/bin.mjs:67:God
-    Function: checkFailingProcesses'
+  - gateway/utils.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/utils.py:44:God Function: call_process'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: checkPackage'
-  description: 'code2llm reports `God Function: checkPackage` in `generated/registry/core/taskand.dev/v1/package.mjs:43`.
+  title: 'Address code smell: God Function: canary'
+  description: 'code2llm reports `God Function: canary` in `app/runtime_canary.py:121`.
 
 
-    Function ''checkPackage'' is oversized: CC=13, fan-out=14, mutations=0.
+    Function ''canary'' is oversized: CC=13, fan-out=10, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -265,9 +666,28 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/package.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/package.mjs:43:God
-    Function: checkPackage'
+  - app/runtime_canary.py
+  dedupe_key: 'code2llm:smell:god_function:app/runtime_canary.py:121:God Function:
+    canary'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: capture'
+  description: 'code2llm reports `God Function: capture` in `infra/local-recovery/context_snapshot.py:52`.
+
+
+    Function ''capture'' is oversized: CC=9, fan-out=16, mutations=6.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:52:God
+    Function: capture'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: check_auth'
   description: 'code2llm reports `God Function: check_auth` in `gateway/auth.py:79`.
@@ -287,11 +707,11 @@ tickets:
   - gateway/auth.py
   dedupe_key: 'code2llm:smell:god_function:gateway/auth.py:79:God Function: check_auth'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: install'
-  description: 'code2llm reports `God Function: install` in `generated/registry/core/taskand.dev/v1/federation.mjs:61`.
+  title: 'Address code smell: God Function: create_server'
+  description: 'code2llm reports `God Function: create_server` in `packages/taskand-mcp/src/taskand_mcp/server.py:26`.
 
 
-    Function ''install'' is oversized: CC=9, fan-out=11, mutations=0.
+    Function ''create_server'' is oversized: CC=2, fan-out=16, mutations=4.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -302,15 +722,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/federation.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/federation.mjs:61:God
-    Function: install'
+  - packages/taskand-mcp/src/taskand_mcp/server.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp/src/taskand_mcp/server.py:26:God
+    Function: create_server'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: inventory'
-  description: 'code2llm reports `God Function: inventory` in `generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs:13`.
+  title: 'Address code smell: God Function: database_from_tar'
+  description: 'code2llm reports `God Function: database_from_tar` in `infra/local-recovery/context_snapshot.py:100`.
 
 
-    Function ''inventory'' is oversized: CC=7, fan-out=14, mutations=0.
+    Function ''database_from_tar'' is oversized: CC=14, fan-out=11, mutations=6.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -321,15 +741,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs:13:God
-    Function: inventory'
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:100:God
+    Function: database_from_tar'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: jsonIP'
-  description: 'code2llm reports `God Function: jsonIP` in `generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs:11`.
+  title: 'Address code smell: God Function: discover'
+  description: 'code2llm reports `God Function: discover` in `mcp/catalog.py:95`.
 
 
-    Function ''jsonIP'' is oversized: CC=7, fan-out=13, mutations=0.
+    Function ''discover'' is oversized: CC=2, fan-out=14, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -340,9 +760,175 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v4/inventory.mjs:11:God
-    Function: jsonIP'
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:95:God Function: discover'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: do_GET'
+  description: 'code2llm reports `God Function: do_GET` in `gateway/__init__.py:47`.
+
+
+    Function ''do_GET'' is oversized: CC=4, fan-out=12, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/__init__.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/__init__.py:47:God Function: do_GET'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: do_POST'
+  description: 'code2llm reports `God Function: do_POST` in `gateway/__init__.py:67`.
+
+
+    Function ''do_POST'' is oversized: CC=14, fan-out=18, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/__init__.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/__init__.py:67:God Function: do_POST'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: envelope'
+  description: 'code2llm reports `God Function: envelope` in `packages/taskand-mcp-control/control.py:65`.
+
+
+    Function ''envelope'' is oversized: CC=7, fan-out=13, mutations=3.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp-control/control.py:65:God
+    Function: envelope'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: execute'
+  description: 'code2llm reports `God Function: execute` in `packages/taskand-mcp-control/control.py:230`.
+
+
+    Function ''execute'' is oversized: CC=6, fan-out=12, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp-control/control.py:230:God
+    Function: execute'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: executed'
+  description: 'code2llm reports `God Function: executed` in `operations/delivery.mjs:212`.
+
+
+    Function ''executed'' is oversized: CC=13, fan-out=7, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - operations/delivery.mjs
+  dedupe_key: 'code2llm:smell:god_function:operations/delivery.mjs:212:God Function:
+    executed'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: get'
+  description: 'code2llm reports `God Function: get` in `gateway/context.py:102`.
+
+
+    Function ''get'' is oversized: CC=11, fan-out=15, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/context.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/context.py:102:God Function: get'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: handle_chat'
+  description: 'code2llm reports `God Function: handle_chat` in `gateway/handlers/chat.py:33`.
+
+
+    Function ''handle_chat'' is oversized: CC=7, fan-out=10, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/handlers/chat.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/handlers/chat.py:33:God Function:
+    handle_chat'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: handle_notify'
+  description: 'code2llm reports `God Function: handle_notify` in `gateway/handlers/monag_handler.py:55`.
+
+
+    Function ''handle_notify'' is oversized: CC=3, fan-out=4, mutations=7.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - gateway/handlers/monag_handler.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/handlers/monag_handler.py:55:God
+    Function: handle_notify'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: invoke'
+  description: 'code2llm reports `God Function: invoke` in `mcp/bridge.py:94`.
+
+
+    Function ''invoke'' is oversized: CC=12, fan-out=18, mutations=0.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - mcp/bridge.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/bridge.py:94:God Function: invoke'
 - signal: code2llm_smell_god_function
   title: 'Address code smell: God Function: load_grants'
   description: 'code2llm reports `God Function: load_grants` in `gateway/auth.py:52`.
@@ -362,11 +948,11 @@ tickets:
   - gateway/auth.py
   dedupe_key: 'code2llm:smell:god_function:gateway/auth.py:52:God Function: load_grants'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: mergeDevices'
-  description: 'code2llm reports `God Function: mergeDevices` in `generated/admin/network-device-discovery/taskand.dev/v2/merge.mjs:1`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `app/runtime_canary.py:148`.
 
 
-    Function ''mergeDevices'' is oversized: CC=13, fan-out=9, mutations=0.
+    Function ''main'' is oversized: CC=4, fan-out=8, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -377,15 +963,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/merge.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v2/merge.mjs:1:God
-    Function: mergeDevices'
+  - app/runtime_canary.py
+  dedupe_key: 'code2llm:smell:god_function:app/runtime_canary.py:148:God Function:
+    main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: openSecret'
-  description: 'code2llm reports `God Function: openSecret` in `generated/registry/core/taskand.dev/v1/vault.mjs:7`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `infra/local-recovery/context_snapshot.py:213`.
 
 
-    Function ''openSecret'' is oversized: CC=6, fan-out=11, mutations=0.
+    Function ''main'' is oversized: CC=12, fan-out=10, mutations=10.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -396,15 +982,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/vault.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/vault.mjs:7:God
-    Function: openSecret'
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:213:God
+    Function: main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: outcome'
-  description: 'code2llm reports `God Function: outcome` in `generated/registry/core/taskand.dev/v1/exec.mjs:84`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `gateway/context.py:248`.
 
 
-    Function ''outcome'' is oversized: CC=13, fan-out=4, mutations=0.
+    Function ''main'' is oversized: CC=3, fan-out=10, mutations=7.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -415,15 +1001,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/exec.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/exec.mjs:84:God
-    Function: outcome'
+  - gateway/context.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/context.py:248:God Function: main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probeMdns'
-  description: 'code2llm reports `God Function: probeMdns` in `generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:32`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `infra/local-recovery/deploy.py:204`.
 
 
-    Function ''probeMdns'' is oversized: CC=8, fan-out=19, mutations=0.
+    Function ''main'' is oversized: CC=7, fan-out=12, mutations=15.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -434,15 +1019,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v2/probe-mdns.mjs:32:God
-    Function: probeMdns'
+  - infra/local-recovery/deploy.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/deploy.py:204:God
+    Function: main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probeMdns'
-  description: 'code2llm reports `God Function: probeMdns` in `generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs:4`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `packages/taskand-mcp-control/control.py:300`.
 
 
-    Function ''probeMdns'' is oversized: CC=7, fan-out=19, mutations=0.
+    Function ''main'' is oversized: CC=7, fan-out=20, mutations=9.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -453,15 +1038,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v3/probe-mdns.mjs:4:God
-    Function: probeMdns'
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp-control/control.py:300:God
+    Function: main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probePing'
-  description: 'code2llm reports `God Function: probePing` in `generated/admin/network-device-discovery/taskand.dev/v3/probe-ping.mjs:6`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `mcp/bridge.py:136`.
 
 
-    Function ''probePing'' is oversized: CC=6, fan-out=14, mutations=0.
+    Function ''main'' is oversized: CC=3, fan-out=14, mutations=6.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -472,15 +1057,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/probe-ping.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v3/probe-ping.mjs:6:God
-    Function: probePing'
+  - mcp/bridge.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/bridge.py:136:God Function: main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probeSsdp'
-  description: 'code2llm reports `God Function: probeSsdp` in `generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:12`.
+  title: 'Address code smell: God Function: main'
+  description: 'code2llm reports `God Function: main` in `app/mcp_task_executor.py:170`.
 
 
-    Function ''probeSsdp'' is oversized: CC=6, fan-out=14, mutations=0.
+    Function ''main'' is oversized: CC=2, fan-out=8, mutations=11.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -491,15 +1075,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v2/probe-ssdp.mjs:12:God
-    Function: probeSsdp'
+  - app/mcp_task_executor.py
+  dedupe_key: 'code2llm:smell:god_function:app/mcp_task_executor.py:170:God Function:
+    main'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: probeSsdp'
-  description: 'code2llm reports `God Function: probeSsdp` in `generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs:4`.
+  title: 'Address code smell: God Function: merged_configurations'
+  description: 'code2llm reports `God Function: merged_configurations` in `mcp/catalog.py:56`.
 
 
-    Function ''probeSsdp'' is oversized: CC=8, fan-out=15, mutations=0.
+    Function ''merged_configurations'' is oversized: CC=5, fan-out=6, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -510,15 +1094,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v3/probe-ssdp.mjs:4:God
-    Function: probeSsdp'
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:56:God Function: merged_configurations'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: readManifest'
-  description: 'code2llm reports `God Function: readManifest` in `generated/registry/core/taskand.dev/v1/package.mjs:25`.
+  title: 'Address code smell: God Function: normalize'
+  description: 'code2llm reports `God Function: normalize` in `mcp/catalog.py:68`.
 
 
-    Function ''readManifest'' is oversized: CC=4, fan-out=11, mutations=0.
+    Function ''normalize'' is oversized: CC=11, fan-out=8, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -529,15 +1112,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/package.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/package.mjs:25:God
-    Function: readManifest'
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:68:God Function: normalize'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: readStdinJson'
-  description: 'code2llm reports `God Function: readStdinJson` in `generated/admin/network-device-discovery/taskand.dev/v2/stdin.mjs:3`.
+  title: 'Address code smell: God Function: package_files'
+  description: 'code2llm reports `God Function: package_files` in `mcp/catalog.py:122`.
 
 
-    Function ''readStdinJson'' is oversized: CC=4, fan-out=11, mutations=0.
+    Function ''package_files'' is oversized: CC=2, fan-out=12, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -548,15 +1130,14 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v2/stdin.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v2/stdin.mjs:3:God
-    Function: readStdinJson'
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:122:God Function: package_files'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: refresh'
-  description: 'code2llm reports `God Function: refresh` in `generated/registry/core/taskand.dev/v1/lifecycle.mjs:66`.
+  title: 'Address code smell: God Function: profile'
+  description: 'code2llm reports `God Function: profile` in `packages/taskand-mcp-control/control.py:132`.
 
 
-    Function ''refresh'' is oversized: CC=12, fan-out=15, mutations=0.
+    Function ''profile'' is oversized: CC=6, fan-out=13, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -567,15 +1148,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/lifecycle.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/lifecycle.mjs:66:God
-    Function: refresh'
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp-control/control.py:132:God
+    Function: profile'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: scan'
-  description: 'code2llm reports `God Function: scan` in `generated/registry/core/taskand.dev/v1/lifecycle.mjs:111`.
+  title: 'Address code smell: God Function: pytest_sessionstart'
+  description: 'code2llm reports `God Function: pytest_sessionstart` in `wellmanifest_governance.py:129`.
 
 
-    Function ''scan'' is oversized: CC=3, fan-out=11, mutations=0.
+    Function ''pytest_sessionstart'' is oversized: CC=7, fan-out=16, mutations=10.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -586,15 +1167,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/lifecycle.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/lifecycle.mjs:111:God
-    Function: scan'
+  - wellmanifest_governance.py
+  dedupe_key: 'code2llm:smell:god_function:wellmanifest_governance.py:129:God Function:
+    pytest_sessionstart'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: sleep'
-  description: 'code2llm reports `God Function: sleep` in `generated/registry/core/taskand.dev/v1/store.mjs:60`.
+  title: 'Address code smell: God Function: remote'
+  description: 'code2llm reports `God Function: remote` in `packages/taskand-mcp-control/control.py:197`.
 
 
-    Function ''sleep'' is oversized: CC=7, fan-out=16, mutations=0.
+    Function ''remote'' is oversized: CC=11, fan-out=25, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -605,15 +1186,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/store.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/store.mjs:60:God
-    Function: sleep'
+  - packages/taskand-mcp-control/control.py
+  dedupe_key: 'code2llm:smell:god_function:packages/taskand-mcp-control/control.py:197:God
+    Function: remote'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: ssdpProbe'
-  description: 'code2llm reports `God Function: ssdpProbe` in `generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:199`.
+  title: 'Address code smell: God Function: restore'
+  description: 'code2llm reports `God Function: restore` in `infra/local-recovery/context_snapshot.py:185`.
 
 
-    Function ''ssdpProbe'' is oversized: CC=9, fan-out=15, mutations=0.
+    Function ''restore'' is oversized: CC=8, fan-out=19, mutations=8.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -624,15 +1205,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:199:God
-    Function: ssdpProbe'
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:185:God
+    Function: restore'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: targets'
-  description: 'code2llm reports `God Function: targets` in `generated/registry/core/taskand.dev/v1/lifecycle.mjs:67`.
+  title: 'Address code smell: God Function: run'
+  description: 'code2llm reports `God Function: run` in `operations/delivery.mjs:213`.
 
 
-    Function ''targets'' is oversized: CC=11, fan-out=12, mutations=0.
+    Function ''run'' is oversized: CC=13, fan-out=7, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -643,15 +1224,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/lifecycle.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/lifecycle.mjs:67:God
-    Function: targets'
+  - operations/delivery.mjs
+  dedupe_key: 'code2llm:smell:god_function:operations/delivery.mjs:213:God Function:
+    run'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: unquote'
-  description: 'code2llm reports `God Function: unquote` in `generated/registry/core/taskand.dev/v1/package.mjs:40`.
+  title: 'Address code smell: God Function: runner'
+  description: 'code2llm reports `God Function: runner` in `operations/delivery.mjs:211`.
 
 
-    Function ''unquote'' is oversized: CC=13, fan-out=14, mutations=0.
+    Function ''runner'' is oversized: CC=13, fan-out=6, mutations=0.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -662,15 +1243,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/package.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/package.mjs:40:God
-    Function: unquote'
+  - operations/delivery.mjs
+  dedupe_key: 'code2llm:smell:god_function:operations/delivery.mjs:211:God Function:
+    runner'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Function: updateRegistry'
-  description: 'code2llm reports `God Function: updateRegistry` in `generated/registry/core/taskand.dev/v1/store.mjs:63`.
+  title: 'Address code smell: God Function: simulate'
+  description: 'code2llm reports `God Function: simulate` in `gateway/handlers/observers.py:147`.
 
 
-    Function ''updateRegistry'' is oversized: CC=7, fan-out=17, mutations=0.
+    Function ''simulate'' is oversized: CC=7, fan-out=15, mutations=6.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -681,17 +1262,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/store.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/store.mjs:63:God
-    Function: updateRegistry'
+  - gateway/handlers/observers.py
+  dedupe_key: 'code2llm:smell:god_function:gateway/handlers/observers.py:147:God Function:
+    simulate'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Module: generated.admin.network-device-discovery.taskand.dev.v1.bin'
-  description: 'code2llm reports `God Module: generated.admin.network-device-discovery.taskand.dev.v1.bin`
-    in `generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:1`.
+  title: 'Address code smell: God Function: snapshot'
+  description: 'code2llm reports `God Function: snapshot` in `infra/local-recovery/context_snapshot.py:166`.
 
 
-    Module ''generated.admin.network-device-discovery.taskand.dev.v1.bin'' is too
-    large (65 functions, 0 classes). Consider splitting into sub-modules.
+    Function ''snapshot'' is oversized: CC=3, fan-out=12, mutations=5.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -702,17 +1281,15 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/admin/network-device-discovery/taskand.dev/v1/bin.mjs:1:God
-    Module: generated.admin.network-device-discovery.taskand.dev.v1.bin'
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:166:God
+    Function: snapshot'
 - signal: code2llm_smell_god_function
-  title: 'Address code smell: God Module: generated.registry.core.taskand.dev.v1.store'
-  description: 'code2llm reports `God Module: generated.registry.core.taskand.dev.v1.store`
-    in `generated/registry/core/taskand.dev/v1/store.mjs:1`.
+  title: 'Address code smell: God Function: source_identity'
+  description: 'code2llm reports `God Function: source_identity` in `app/runtime_readiness.py:31`.
 
 
-    Module ''generated.registry.core.taskand.dev.v1.store'' is too large (44 functions,
-    0 classes). Consider splitting into sub-modules.
+    Function ''source_identity'' is oversized: CC=4, fan-out=11, mutations=3.
 
 
     Make the smallest refactor that removes the smell and run local tests.'
@@ -723,8 +1300,83 @@ tickets:
   - code-smell
   - god-function
   files:
-  - generated/registry/core/taskand.dev/v1/store.mjs
-  dedupe_key: 'code2llm:smell:god_function:generated/registry/core/taskand.dev/v1/store.mjs:1:God
-    Module: generated.registry.core.taskand.dev.v1.store'
+  - app/runtime_readiness.py
+  dedupe_key: 'code2llm:smell:god_function:app/runtime_readiness.py:31:God Function:
+    source_identity'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: switch'
+  description: 'code2llm reports `God Function: switch` in `infra/local-recovery/deploy.py:167`.
+
+
+    Function ''switch'' is oversized: CC=8, fan-out=11, mutations=8.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - infra/local-recovery/deploy.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/deploy.py:167:God
+    Function: switch'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: validate_database'
+  description: 'code2llm reports `God Function: validate_database` in `infra/local-recovery/context_snapshot.py:127`.
+
+
+    Function ''validate_database'' is oversized: CC=9, fan-out=12, mutations=4.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - infra/local-recovery/context_snapshot.py
+  dedupe_key: 'code2llm:smell:god_function:infra/local-recovery/context_snapshot.py:127:God
+    Function: validate_database'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Function: write_private'
+  description: 'code2llm reports `God Function: write_private` in `mcp/catalog.py:163`.
+
+
+    Function ''write_private'' is oversized: CC=4, fan-out=14, mutations=3.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - mcp/catalog.py
+  dedupe_key: 'code2llm:smell:god_function:mcp/catalog.py:163:God Function: write_private'
+- signal: code2llm_smell_god_function
+  title: 'Address code smell: God Module: operations.delivery'
+  description: 'code2llm reports `God Module: operations.delivery` in `operations/delivery.mjs:1`.
+
+
+    Module ''operations.delivery'' is too large (49 functions, 0 classes). Consider
+    splitting into sub-modules.
+
+
+    Make the smallest refactor that removes the smell and run local tests.'
+  priority: normal
+  labels:
+  - llm-ready
+  - code2llm
+  - code-smell
+  - god-function
+  files:
+  - operations/delivery.mjs
+  dedupe_key: 'code2llm:smell:god_function:operations/delivery.mjs:1:God Module: operations.delivery'
 applied: []
 skipped: []
