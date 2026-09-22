@@ -15,7 +15,7 @@ try {
 setInterval(() => {}, 60000);
 const CDP = (process.env.TASKAND_BROWSER_CDP || 'http://localhost:9222').replace(/\/$/, '');
 const NOVNC = process.env.TASKAND_BROWSER_NOVNC || 'http://localhost:3010';
-const HOST_GATEWAY = process.env.TASKAND_HOST_GATEWAY || '10.64.13.1';
+const HOST_GATEWAY = process.env.TASKAND_HOST_GATEWAY || 'displaynet.local';
 
 const action = input.action || (input.click || input.text || input.selector ? 'click' : input.url ? 'open' : 'status');
 
@@ -158,6 +158,7 @@ const _CDP_FIND_JS = `
 function(text, role, selector) {
   const strip = s => (s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/\\u0142/g, 'l').replace(/\\u0141/g, 'L');
   const norm = s => strip(s).replace(/\\s+/g, ' ').trim().toLowerCase();
+  const clean = s => norm(s).replace(/[^a-z0-9]/g, '');
   const visible = n => {
     if (!n) return false;
     const style = window.getComputedStyle(n);
@@ -187,25 +188,51 @@ function(text, role, selector) {
   }
 
   const want = norm(text);
+  const wantClean = clean(text);
   const wantRole = norm(role);
   const pool = Array.from(document.querySelectorAll(
     'button, a, input, textarea, select, [role], [contenteditable], [aria-label], [tabindex]'
   ));
   const roleOk = n => !wantRole || roleOf(n) === wantRole;
 
+  const tagWeight = n => {
+    const t = n.tagName.toLowerCase();
+    if (t === 'button' || (t === 'input' && /^(button|submit)$/i.test(n.type))) return 10;
+    if (t === 'a' || t === 'input') return 5;
+    return 1;
+  };
+
   const namesOf = n => [
-    norm(n.innerText),
-    norm(n.value),
-    norm(n.getAttribute && n.getAttribute('aria-label')),
-    norm(n.getAttribute && n.getAttribute('title')),
-    norm(n.getAttribute && n.getAttribute('placeholder'))
+    n.innerText,
+    n.value,
+    n.getAttribute && n.getAttribute('aria-label'),
+    n.getAttribute && n.getAttribute('title'),
+    n.getAttribute && n.getAttribute('placeholder')
   ].filter(Boolean);
 
-  const exact = pool.filter(n => roleOk(n) && visible(n) && (!want || namesOf(n).some(name => name === want)));
-  if (exact.length) return exact[0];
+  const candidates = pool.filter(n => roleOk(n) && visible(n));
 
-  const loose = pool.filter(n => roleOk(n) && visible(n) && want && namesOf(n).some(name => name.includes(want)));
-  return loose[0] || null;
+  // 1. Exact match (strict norm or stripped of punctuation)
+  const exact = candidates.filter(n => {
+    const names = namesOf(n);
+    return names.some(nm => norm(nm) === want || (wantClean && clean(nm) === wantClean));
+  });
+  if (exact.length) {
+    exact.sort((a, b) => (tagWeight(b) - tagWeight(a)) || (norm(a.innerText || a.value || '').length - norm(b.innerText || b.value || '').length));
+    return exact[0];
+  }
+
+  // 2. Loose match
+  const loose = candidates.filter(n => {
+    const names = namesOf(n);
+    return names.some(nm => norm(nm).includes(want) || (wantClean && clean(nm).includes(wantClean)));
+  });
+  if (loose.length) {
+    loose.sort((a, b) => (tagWeight(b) - tagWeight(a)) || (norm(a.innerText || a.value || '').length - norm(b.innerText || b.value || '').length));
+    return loose[0];
+  }
+
+  return null;
 }
 `;
 
@@ -236,7 +263,33 @@ const ACTIONS = {
     const expr = input.expr || input.expression;
     if (!expr) return { ok: false, error: 'Wymagane: expr' };
     const page = await resolveTargetPage();
-    const res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    let res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    if (res?.exceptionDetails || res?.result?.value === undefined) {
+      try {
+        const tree = await cdpWs(page.webSocketDebuggerUrl, 'Page.getFrameTree', {});
+        const childFrames = tree?.frameTree?.childFrames || [];
+        for (const child of childFrames) {
+          const frameId = child?.frame?.id;
+          if (!frameId) continue;
+          const isolated = await cdpWs(page.webSocketDebuggerUrl, 'Page.createIsolatedWorld', {
+            frameId,
+            worldName: 'TaskandEval'
+          });
+          const contextId = isolated?.executionContextId;
+          if (!contextId) continue;
+          const childRes = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', {
+            contextId,
+            expression: expr,
+            returnByValue: true,
+            awaitPromise: true
+          });
+          if (childRes && !childRes.exceptionDetails && childRes.result?.value !== undefined) {
+            res = childRes;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
     if (res?.exceptionDetails) return { ok: false, error: res.exceptionDetails.text };
     return { ok: true, id: page.id, value: res?.result?.value, type: res?.result?.type };
   },
@@ -264,11 +317,43 @@ const ACTIONS = {
       const el = find(${JSON.stringify(targetText)}, ${JSON.stringify(role)}, ${JSON.stringify(selector)});
       if (!el) return { ok: false, error: 'Element nie został znaleziony: ' + JSON.stringify({ text: ${JSON.stringify(targetText)}, role: ${JSON.stringify(role)}, selector: ${JSON.stringify(selector)} }) };
       el.scrollIntoView({ block: 'center' });
+      try {
+        el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, view: window }));
+        el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+        el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, view: window }));
+        el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+      } catch (e) {}
       el.click();
       return { ok: true, action: 'click', tag: el.tagName, name: (el.innerText || el.value || '').slice(0, 80) };
     })()`;
 
-    const res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    let res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    if (!res?.result?.value?.ok) {
+      try {
+        const tree = await cdpWs(page.webSocketDebuggerUrl, 'Page.getFrameTree', {});
+        const childFrames = tree?.frameTree?.childFrames || [];
+        for (const child of childFrames) {
+          const frameId = child?.frame?.id;
+          if (!frameId) continue;
+          const isolated = await cdpWs(page.webSocketDebuggerUrl, 'Page.createIsolatedWorld', {
+            frameId,
+            worldName: 'TaskandSearch'
+          });
+          const contextId = isolated?.executionContextId;
+          if (!contextId) continue;
+          const childRes = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', {
+            contextId,
+            expression: expr,
+            returnByValue: true,
+            awaitPromise: true
+          });
+          if (childRes?.result?.value?.ok) {
+            res = childRes;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
     if (res?.exceptionDetails) return { ok: false, error: res.exceptionDetails.text };
     const val = res?.result?.value;
     if (val && !val.ok) return { ok: false, error: val.error, target: { text: targetText, role, selector } };
@@ -301,7 +386,33 @@ const ACTIONS = {
       return { ok: true, action: 'fill', tag: el.tagName, value: VALUE };
     })()`;
 
-    const res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    let res = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
+    if (!res?.result?.value?.ok) {
+      try {
+        const tree = await cdpWs(page.webSocketDebuggerUrl, 'Page.getFrameTree', {});
+        const childFrames = tree?.frameTree?.childFrames || [];
+        for (const child of childFrames) {
+          const frameId = child?.frame?.id;
+          if (!frameId) continue;
+          const isolated = await cdpWs(page.webSocketDebuggerUrl, 'Page.createIsolatedWorld', {
+            frameId,
+            worldName: 'TaskandSearch'
+          });
+          const contextId = isolated?.executionContextId;
+          if (!contextId) continue;
+          const childRes = await cdpWs(page.webSocketDebuggerUrl, 'Runtime.evaluate', {
+            contextId,
+            expression: expr,
+            returnByValue: true,
+            awaitPromise: true
+          });
+          if (childRes?.result?.value?.ok) {
+            res = childRes;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
     if (res?.exceptionDetails) return { ok: false, error: res.exceptionDetails.text };
     const val = res?.result?.value;
     if (val && !val.ok) return { ok: false, error: val.error };

@@ -18,10 +18,10 @@
         "bin.mjs",
         "proc.yaml"
       ],
-      "hash": "sha256:35f39b68e6356c659706f67336c6b9b38ee664ae728e3762eb5091f94bb3883e",
+      "hash": "sha256:086ceea6f1bc103031c51798df8b00c0566b5fdc29c2dcd75e441146e33e8808",
       "status": "active",
       "registered": "2026-09-12T19:09:04.958Z",
-      "refreshedAt": "2026-09-22T07:29:47.309Z",
+      "refreshedAt": "2026-09-22T08:59:09.103Z",
       "capability": "Sterowanie przeglądarką digital twin przez CDP: status, open, list, close"
     },
     "proc://taskand.dev/browser/web-model/v1": {
@@ -49,5 +49,5 @@
       "refreshedAt": "2026-09-13T07:42:45.615Z"
     }
   },
-  "updated": "2026-09-22T07:29:47.309Z"
+  "updated": "2026-09-22T08:59:09.103Z"
 }
