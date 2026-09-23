@@ -1,0 +1,74 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-049",
+  "summary": "Stage and verify immutable Taskand shell runtime",
+  "workstream": "infrastructure",
+  "classification": {
+    "kind": "SERVICE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-049/**",
+    "infra/shell-runtime/**"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-048"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "82e192c14881b2138dfd34c8ab1b543c57ba08e1",
+    "targetBranch": "main",
+    "outcome": "Publish reproducible shell runtime staging and canary tooling, verify configured live provider, and deploy to the selected gateway with rollback.",
+    "nonGoals": [
+      "Changing other active tickets",
+      "Changing protected Validator configuration",
+      "Replacing a gateway before target selection"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Stage exact Git source and local dependency wheels outside checkout; isolate canary state; preserve existing runtime until target and catalog compatibility are established.",
+      "components": [
+        {
+          "name": "runtime",
+          "paths": [
+            "infra/shell-runtime/**"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Stop canary and preserve previous release; any selected service switch records exact previous unit and restores it on failure."
+    },
+    "validation": [
+      {
+        "criterion": "AC-02",
+        "commands": [
+          "python3 -m unittest discover -s infra/shell-runtime -p \"test_*.py\"",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Staging rejection tests and real gateway/Paxlet canary; live provider receipt without credentials."
+      }
+    ],
+    "runtimeDependencies": []
+  }
+}
