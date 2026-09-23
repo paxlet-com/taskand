@@ -1,0 +1,9 @@
+uri: "proc://taskand.dev/mcp/shell-run/v1"
+organism: "mcp"
+name: "shell-run"
+version: "1.0.0"
+desc: "Explicitly execute a reviewed Paxlet package by digest"
+kind: "task"
+origin: "builtin"
+env: [TASKAND_SHELL_PYTHON, TASKAND_SHELL_WORKSPACE]
+credentials: []

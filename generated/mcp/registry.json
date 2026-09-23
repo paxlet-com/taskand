@@ -22,6 +22,53 @@
       "hash": "sha256:3c5c0aed1e573cb7bd02bc65f74ab41c771bc0802b1249e34a12661203cb322a",
       "status": "candidate",
       "registered": "2026-09-19T17:25:00Z"
+    },
+    "proc://taskand.dev/mcp/shell-build/v1": {
+      "uri": "proc://taskand.dev/mcp/shell-build/v1",
+      "organism": "mcp",
+      "path": "generated/mcp/shell-build/taskand.dev/v1",
+      "desc": "Prepare NL plans, scripts and verified Paxlet packages without execution",
+      "capability": "Prepare NL plans, scripts and verified Paxlet packages without execution",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [
+        "TASKAND_SHELL_PYTHON",
+        "TASKAND_SHELL_WORKSPACE",
+        "TASKAND_SHELL_ENV_FILE"
+      ],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:35018d1305eae33cf0bd3724ee63df08815094919b5e39e02b5c8e2d4cb141d1",
+      "status": "active",
+      "registered": "2026-09-23T21:40:56.997Z",
+      "refreshedAt": "2026-09-23T21:41:32.558Z"
+    },
+    "proc://taskand.dev/mcp/shell-run/v1": {
+      "uri": "proc://taskand.dev/mcp/shell-run/v1",
+      "organism": "mcp",
+      "path": "generated/mcp/shell-run/taskand.dev/v1",
+      "desc": "Explicitly execute a reviewed Paxlet package by digest",
+      "capability": "Explicitly execute a reviewed Paxlet package by digest",
+      "kind": "task",
+      "origin": "builtin",
+      "env": [
+        "TASKAND_SHELL_PYTHON",
+        "TASKAND_SHELL_WORKSPACE"
+      ],
+      "credentials": [],
+      "files": [
+        "bin.mjs",
+        "proc.yaml"
+      ],
+      "hash": "sha256:e7b92b8616325e0d27648160f6e1dac495d285f5d3f0737d347daac166f0421d",
+      "status": "active",
+      "registered": "2026-09-23T21:40:57.134Z",
+      "refreshedAt": "2026-09-23T21:41:32.708Z"
     }
-  }
+  },
+  "node": "nvidia",
+  "updated": "2026-09-23T21:41:32.708Z"
 }

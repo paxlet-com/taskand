@@ -1,0 +1,9 @@
+uri: "proc://taskand.dev/mcp/shell-build/v1"
+organism: "mcp"
+name: "shell-build"
+version: "1.0.0"
+desc: "Prepare NL plans, scripts and verified Paxlet packages without execution"
+kind: "task"
+origin: "builtin"
+env: [TASKAND_SHELL_PYTHON, TASKAND_SHELL_WORKSPACE, TASKAND_SHELL_ENV_FILE]
+credentials: []
