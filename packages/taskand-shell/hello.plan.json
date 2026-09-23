@@ -1,0 +1,7 @@
+{
+  "schema_version": "0.1",
+  "name": "Taskand hello",
+  "steps": [
+    {"id": "hello", "kind": "generate", "language": "python", "code": "print('Witaj z Taskand + nl-dsl-sh + Paxlet!')\n"}
+  ]
+}
