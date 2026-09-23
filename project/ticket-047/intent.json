@@ -1,0 +1,84 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-047",
+  "summary": "Integrate Paxlet and nl-dsl-sh in Taskand local shell workflow",
+  "workstream": "application",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-047/**",
+    "app/shell_workflow.py",
+    "tests/shell_workflow_test.py",
+    "packages/taskand-shell/**"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "9c8a2a7ae5b50c8be2c19a0ca78e0b977a4176bc",
+    "targetBranch": "main",
+    "outcome": "Installable local Paxlet/nl-dsl-sh adapter with bounded JSON process API, tested and published through protected review.",
+    "nonGoals": [
+      "Gateway and registry integration (dependent integration ticket)"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 9,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 2,
+      "maxRuntimeDependencies": 2
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Reuse installed Python APIs through a local Taskand application module with separate planning, export and execution commands.",
+      "components": [
+        {
+          "name": "shell-workflow",
+          "paths": [
+            "app/shell_workflow.py",
+            "packages/taskand-shell/**"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/shell_workflow_test.py"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "Local Python CLI"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Remove the optional module and its local virtual environment."
+    },
+    "validation": [
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "python tests/shell_workflow_test.py",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Real upstream package integration tests and managed gate"
+      }
+    ],
+    "runtimeDependencies": [
+      "paxlet==0.1.4",
+      "nl-dsl-sh==0.2.0"
+    ]
+  }
+}
