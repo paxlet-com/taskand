@@ -2,15 +2,17 @@
 import contextlib
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.shell_workflow import (
-    compile_plan, export_package, main, make_engine, run_package, verify_package,
+    compile_plan, export_package, main, make_engine, run_package, verify_package, process_request,
 )
 from nl_dsl_sh import Catalog
 from paxlet.errors import PaxletError
@@ -118,6 +120,35 @@ class ShellWorkflowTests(unittest.TestCase):
                                 cwd=Path(__file__).resolve().parents[1], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0)
         self.assertIn("export", result.stdout)
+
+    def test_process_json_roundtrip(self):
+        env = {**os.environ, "TASKAND_SHELL_WORKSPACE": str(self.root)}
+        def call(operation, data):
+            result = subprocess.run([sys.executable, "-m", "app.shell_workflow", "process", operation],
+                                    input=json.dumps(data), text=True, capture_output=True, env=env,
+                                    cwd=Path(__file__).resolve().parents[1])
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return json.loads(result.stdout)["result"]
+        exported = call("export", {"plan": self.plan, "id": "hello", "urn": "urn:paxlet:taskand:hello", "permissions": {}})
+        result = call("run", {"id": "hello", "expected_digest": exported["digest"]})
+        self.assertEqual(result["output"]["stdout"], "Witaj Taskand!\n")
+        self.assertEqual(call("verify", {"id": "hello"})["digest"], exported["digest"])
+
+    def test_process_forbids_host_paths_and_unknown_fields(self):
+        with patch.dict(os.environ, {"TASKAND_SHELL_WORKSPACE": str(self.root)}):
+            for identifier in ("../escape", "/tmp/task", "", None):
+                with self.subTest(identifier=identifier), self.assertRaises(ValueError):
+                    process_request("verify", {"id": identifier})
+            with self.assertRaises(ValueError):
+                process_request("plan", {"prompt": "hello", "env_file": "/tmp/secret"})
+            (self.root / "packages").symlink_to(self.root)
+            with self.assertRaisesRegex(ValueError, "symlinks"):
+                process_request("verify", {"id": "hello"})
+
+    def test_process_llm_requires_operator_configuration(self):
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(ValueError, "configuration is unavailable"):
+                process_request("plan", {"prompt": "hello", "use_llm": True})
 
 
 if __name__ == "__main__":

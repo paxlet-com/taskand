@@ -24,10 +24,9 @@
   "delivery": {
     "acceptedBaseSha": "9c8a2a7ae5b50c8be2c19a0ca78e0b977a4176bc",
     "targetBranch": "main",
-    "outcome": "Integrate Paxlet and nl-dsl-sh in Taskand local shell workflow",
+    "outcome": "Installable local Paxlet/nl-dsl-sh adapter with bounded JSON process API, tested and published through protected review.",
     "nonGoals": [
-      "Gateway and registry integration",
-      "Remote publication"
+      "Gateway and registry integration (dependent integration ticket)"
     ],
     "complexity": "M",
     "estimatedMinutes": 90,

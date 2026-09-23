@@ -9,9 +9,8 @@ Moduł nie jest jeszcze podłączony do `bin/taskand`, gateway ani rejestru URI.
 Python 3.11+. Osobne środowisko zachowuje opcjonalny charakter integracji:
 
 ```bash
-python -m venv .subactor/cache/shell-venv
+bash packages/taskand-shell/install.sh /home/tom/github/paxlet-com/paxlet /home/tom/github/paxlet-com/nl-dsl-sh
 . .subactor/cache/shell-venv/bin/activate
-pip install /home/tom/github/paxlet-com/paxlet /home/tom/github/paxlet-com/nl-dsl-sh
 python -m app.shell_workflow --help
 ```
 
@@ -71,3 +70,24 @@ python tests/shell_workflow_test.py
 
 Testy używają rzeczywistych bibliotek oraz interpreterów Python i Bash.
 Nie potrzebują LLM, sieci ani sekretów.
+
+## Interfejs JSON dla procesów Taskand
+
+`python -m app.shell_workflow process <plan|compile|export|verify|run>` czyta
+jeden obiekt JSON ze stdin (maks. 256 KiB) i zwraca `{ok, result}` lub `{ok: false, error}`.
+Operację wybiera zaufany wrapper procesu. Żądanie nie może podawać dowolnych
+ścieżek hosta ani pliku konfiguracji LLM.
+
+- `plan`: `prompt`, opcjonalnie `catalog`, `language`, `reuse_only`, `use_llm`.
+- `compile`: `plan`, opcjonalnie `catalog`, `format`; zwraca skrypt bez wykonania.
+- `export`: `plan`, `id`, `urn`, `permissions`, opcjonalnie `catalog`.
+- `verify`: `id`.
+- `run`: `id`, `expected_digest`, opcjonalnie `stdin`, `timeout` (maks. 120 s).
+
+Operator ustawia `TASKAND_SHELL_WORKSPACE` (domyślnie `log/shell` w checkout).
+Paczki są w `packages/<id>`, katalogi skryptów w `catalogs/<id>.json`.
+Identyfikatory składają się z 1–64 małych liter, cyfr, `_` i `-`.
+Dowiązania w ścieżkach workspace są odrzucane. Workspace musi należeć do
+zaufanego operatora; nie jest izolacją między użytkownikami.
+`use_llm: true` wymaga ustawienia przez operatora `TASKAND_SHELL_ENV_FILE`.
+Uprawnienie do przygotowania kodu i do `run` powinny być osobnymi grantami URI.
