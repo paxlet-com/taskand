@@ -237,6 +237,18 @@ async function waitHealthz(url, ms = 45000) {
 }
 
 const COMMANDS = {
+  async shell([operation, data = '{}']) {
+    if (!['plan', 'compile', 'export', 'verify', 'run'].includes(operation)) {
+      return print({ ok: false, error: 'Użycie: taskand shell <plan|compile|export|verify|run> <JSON lub @plik.json>' });
+    }
+    let input;
+    try {
+      input = JSON.parse(data.startsWith('@') ? readFileSync(data.slice(1), 'utf8') : data);
+      if (!input || typeof input !== 'object' || Array.isArray(input) || 'operation' in input) throw new Error('Wymagany obiekt JSON bez pola operation');
+    } catch (error) { return print({ ok: false, error: error.message }); }
+    const uri = `proc://taskand.dev/mcp/shell-${operation === 'run' ? 'run' : 'build'}/v1`;
+    print(await reg('call', { uri, input: operation === 'run' ? input : { operation, ...input }, timeout_ms: 130000 }));
+  },
   // Twin needs the operator host's network inventory and user namespaces.
   // Explicit local transport also avoids mistaking a container's network for the host.
   async twin([action = 'run', id]) {
@@ -384,6 +396,7 @@ const HELP = `taskand — organizmy wywoływane przez rejestr (URI + JSON)
   taskand "<zadanie>"              automatyczny routing przez wewnętrzny router i orkiestrator DAG
   taskand <organizm> "<zadanie>"   dev | doc | sec | hw | file | browser | admin | <dowolny powołany>
   taskand proc <uri> ['<json>']    bezpośrednie wywołanie procesu proc://
+  taskand shell <plan|compile|export|verify|run> '<json>'  NL → skrypt → Paxlet; obsługuje @plik.json
   taskand twin [run|create|status] [id]    lokalny bliźniak sieci i weryfikacja skanu URI
   taskand twin web <URL|plik.json>        bliźniak strony/API i scenariusz offline (URL = test widoczności body)
   taskand procs [organizm]         procesy w rejestrze (status, URI, opis)

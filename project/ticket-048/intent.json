@@ -1,0 +1,98 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-048",
+  "summary": "Expose Paxlet shell workflow through Taskand CLI and URI interfaces",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-048/**",
+    "bin/taskand",
+    "generated/mcp/shell-build/**",
+    "generated/mcp/shell-run/**",
+    "generated/mcp/registry.json",
+    "genome.yaml",
+    "tests/cli_routing.test.mjs",
+    "docs/information/taskand-shell.md"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-047"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "b320b86529e5c53ed132d8e2ab7a6faedee4e338",
+    "targetBranch": "main",
+    "outcome": "Expose installed shell adapter through CLI and separate preparation/execution URIs, verify gateway/MCP authorization and prepare dependent publication.",
+    "nonGoals": [
+      "Changing active tickets 030-032",
+      "Changing protected Validator configuration",
+      "Replacing existing deployments"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Two native URI wrappers over ticket-047 JSON API, reusing existing registry, gateway grants and MCP call_process; pin adapter source digest.",
+      "components": [
+        {
+          "name": "interfaces",
+          "paths": [
+            "bin/taskand",
+            "generated/mcp/**",
+            "genome.yaml"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/cli_routing.test.mjs"
+          ]
+        },
+        {
+          "name": "docs",
+          "paths": [
+            "docs/information/taskand-shell.md"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "taskand shell",
+        "mcp/shell-build/v1",
+        "mcp/shell-run/v1"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Remove the optional module and its local virtual environment."
+    },
+    "validation": [
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "node --test tests/cli_routing.test.mjs",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Real CLI, gateway and MCP transport; separate run grant; tamper and malformed input tests"
+      }
+    ],
+    "runtimeDependencies": []
+  }
+}
