@@ -1,0 +1,80 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-053",
+  "summary": "Bound gateway process admission under overload",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-053/**",
+    "gateway/utils.py",
+    "tests/health_identity_test.py",
+    "docs/information/execution-admission.md"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "41268dd4bd7407ba55c75bb64c0074c9f2a4aabb",
+    "targetBranch": "main",
+    "outcome": "Publish a bounded gateway registry subprocess admission fix with separate execution/control capacity and deterministic overload errors, validated without production deployment.",
+    "nonGoals": [
+      "Protected CI/profile changes",
+      "Changes to preserved tickets 051/052 or tests PR7",
+      "Gossip/catalog cutover",
+      "Exactly-once execution after timeout",
+      "Production deployment"
+    ],
+    "complexity": "S",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 5,
+      "maxAffectedComponents": 2,
+      "maxPublicInterfaceChanges": 1,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Nonblocking bounded semaphores at the registry subprocess boundary; execution and control use separate slots. Reject overload before spawning, release slots in finally, classify failed registry output and OS resource errors. Environment limits are operator configuration, not request-controlled.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/utils.py",
+            "tests/health_identity_test.py",
+            "docs/information/execution-admission.md"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "HTTP 503 BUSY for saturated gateway registry capacity; HTTP 502 for unclassified failed results"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert the code change; no state migration and no live configuration changes."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "python3 -m unittest discover -s tests -p health_identity_test.py -v",
+          "./project/governance-check.sh --base origin/main --head HEAD"
+        ],
+        "evidence": "Deterministic concurrent admission tests, HTTP status tests, isolated real gateway burst and receipt counts."
+      }
+    ]
+  }
+}
