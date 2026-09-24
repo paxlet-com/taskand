@@ -17,7 +17,7 @@ try {
   const payload = { ...input };
   if (prepare) delete payload.operation;
   const entry = join(root, 'app/shell_workflow.py');
-  if (createHash('sha256').update(readFileSync(entry)).digest('hex') !== 'd170dc732d64d54c90e33668c39aa77cc27dd7848ef6ad51746efd377a02e6c5') throw new Error('SHELL_ADAPTER_INTEGRITY_MISMATCH');
+  if (createHash('sha256').update(readFileSync(entry)).digest('hex') !== '53dd535c624adcb6326e6e440105bef5b54c162de37355507ce3e45d4739cff1') throw new Error('SHELL_ADAPTER_INTEGRITY_MISMATCH');
   const python = process.env.TASKAND_SHELL_PYTHON || join(root, '.subactor/cache/shell-venv/bin/python');
   if (!isAbsolute(python)) throw new Error('SHELL_PYTHON_ABSOLUTE_PATH_REQUIRED');
   const result = spawnSync(python, [entry, 'process', operation], {
