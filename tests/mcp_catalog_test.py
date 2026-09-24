@@ -41,9 +41,42 @@ if "--fixture" in sys.argv:
 
 import bridge
 import catalog
+import reprofile
+from unittest.mock import AsyncMock, patch
 
 
 class CatalogTests(unittest.IsolatedAsyncioTestCase):
+    async def test_reprofile_creates_candidate_without_dispatch_or_rewriting_old_version(self):
+        uri, tool = await self.prepared()
+        self.assertTrue(self.registry_call("approve", uri=uri)["ok"])
+        old = next((self.root / "mcp").rglob("tool.json"))
+        original = old.read_bytes()
+        changed = {**self.profile, "env": {"PROFILE_RECOVERY_FIXTURE": "1"}}
+        self.profiles.write_text(json.dumps({"fixture": changed}))
+        result = await reprofile.reprofile(self.root, self.profiles, uri, 2)
+        self.assertEqual(result["status"], "candidate")
+        self.assertFalse(result["admitted"])
+        self.assertEqual(old.read_bytes(), original)
+        self.assertFalse((self.state / "result.json").exists())
+        self.assertEqual(self.registry_call("call", uri=result["candidateUri"], input={"left": 1, "right": 2})["errorType"], "DENIED")
+        self.assertTrue(self.registry_call("approve", uri=result["candidateUri"])["ok"])
+        self.assertTrue(self.registry_call("call", uri=result["candidateUri"], input={"left": 1, "right": 2})["ok"])
+        with self.assertRaisesRegex(bridge.ContractError, "CANDIDATE_VERSION_EXISTS"):
+            await reprofile.reprofile(self.root, self.profiles, uri, 2)
+        with self.assertRaisesRegex(bridge.ContractError, "NEW_VERSION_REQUIRED"):
+            await reprofile.reprofile(self.root, self.profiles, uri, 1)
+
+    async def test_reprofile_rejects_unadmitted_or_changed_contract(self):
+        uri, tool = await self.prepared()
+        with self.assertRaisesRegex(bridge.ContractError, "ADMITTED_MCP_REQUIRED"):
+            await reprofile.reprofile(self.root, self.profiles, uri, 2)
+        self.registry_call("approve", uri=uri)
+        self.profiles.write_text(json.dumps({"fixture": {**self.profile, "env": {"CHANGED": "1"}}}))
+        with patch.object(reprofile, "tool_catalog", AsyncMock(return_value=[{**tool, "description": "changed"}])):
+            with self.assertRaisesRegex(bridge.ContractError, "TOOL_CONTRACT_CHANGED"):
+                await reprofile.reprofile(self.root, self.profiles, uri, 2)
+        self.assertEqual(len(list((self.root / "mcp").rglob("tool.json"))), 1)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
