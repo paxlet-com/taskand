@@ -109,10 +109,24 @@ configuration and activation state belong to one node. Backups must preserve its
 accepted revisions and withdrawals: restoring an older database can lose rollback
 protection. This slice provides no backup recovery protocol or key rotation.
 
-Resolved plans are data, not execution permission. The future shared invocation
-boundary must recheck current local approval/grants and the pinned digest at the
-time of execution. This module provides no remote execution, exactly-once promise
-or automatic conversion of existing `proc.yaml` packages.
+Resolved plans are data, not execution permission. The opt-in local shell process
+operation `run_catalog` checks local approval and an exact client-supplied digest,
+then materializes verified bytes into a fresh run-ID workspace and runs the selected
+action with another digest check. The operator configures `TASKAND_SHELL_WORKSPACE`,
+`TASKAND_PAXLET_CATALOG_ROOT` and `PAXLET_STORE_DIR`; request JSON never supplies
+host paths. For example:
+
+```json
+{"id":"run-001","selector":"urn:paxlet:example:hello","action":"run","version":"1.0.0","expected_digest":"sha256:<64 lowercase hex>","stdin":""}
+```
+
+Pass that JSON to `python3 -m app.shell_workflow process run_catalog` only after
+installing and explicitly approving the package in the configured native catalog.
+The execution copy and receipt remain under `TASKAND_SHELL_WORKSPACE/catalog-runs`;
+reuse of a run ID is rejected. Approval is checked during resolution, so an
+operator must stop in-flight local calls before relying on revocation. Gateway/MCP
+grants, remote execution and conversion of existing `proc.yaml` packages remain
+separate integration work.
 
 ```bash
 PYTHONPATH=/path/to/paxlet-checkout PYTHONDONTWRITEBYTECODE=1 \
