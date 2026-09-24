@@ -1,0 +1,103 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-050",
+  "summary": "Autonomous cluster background gossip and continuous registry sync",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-050/**",
+    "project/TICKETS.md",
+    ".governance/manifest.json",
+    "gateway/__init__.py",
+    "gateway/gossip.py",
+    "gateway/handlers/gossip.py",
+    "gateway/router.py",
+    "bin/taskand",
+    "tests/gossip_test.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "1046dbdabad3fd857aa33291474f4a546dd16009",
+    "targetBranch": "main",
+    "outcome": "Autonomous background gossip and continuous registry synchronization across Taskand cluster peers",
+    "nonGoals": [
+      "Replacing SSH occupy mechanism",
+      "Modifying doctor diagnostics logic"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 5,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Introduce background gossip daemon in Gateway lifecycle with periodic peer probe, catalog pull, auto-approval, and HTTP API.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/__init__.py",
+            "gateway/gossip.py",
+            "gateway/handlers/gossip.py",
+            "gateway/router.py"
+          ]
+        },
+        {
+          "name": "cli",
+          "paths": [
+            "bin/taskand"
+          ]
+        },
+        {
+          "name": "tests",
+          "paths": [
+            "tests/gossip_test.py"
+          ]
+        },
+        {
+          "name": "governance",
+          "paths": [
+            ".governance/manifest.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "GET /api/cluster/gossip",
+        "POST /api/cluster/gossip",
+        "taskand gossip"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Disable TASKAND_GOSSIP_ENABLED=0 to revert to manual monitor pull."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "python3 tests/gossip_test.py",
+          "./project/governance-check.sh"
+        ],
+        "evidence": "Gossip unit tests and governance check pass"
+      }
+    ]
+  }
+}
