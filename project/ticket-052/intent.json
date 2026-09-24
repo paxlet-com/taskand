@@ -22,14 +22,14 @@
   "conflictsWith": [],
   "integrationTicket": null,
   "delivery": {
-    "acceptedBaseSha": "41268dd4bd7407ba55c75bb64c0074c9f2a4aabb",
+    "acceptedBaseSha": "b816a953a35f8b4a7c39a045a96167f63a24fc79",
     "targetBranch": "main",
     "outcome": "A usable local operator CLI and transactional Paxlet-native catalog with explicit namespace ownership, local approvals and bounded revisioned snapshots that preserve withdrawals.",
     "nonGoals": [
       "Replacing live gateway/MCP/legacy registry consumers in this slice",
       "HTTP transport or discovery changes",
       "Production migration or deployment",
-      "Protected policy changes and publication",
+      "Protected policy changes",
       "Execution grants or automatic activation from remote snapshots"
     ],
     "complexity": "M",

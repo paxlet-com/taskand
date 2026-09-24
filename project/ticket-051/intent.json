@@ -1,0 +1,96 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-051",
+  "summary": "Bounded authorized gossip and isolated peer tests",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-051/**",
+    "project/TICKETS.md",
+    "gateway/gossip.py",
+    "gateway/handlers/gossip.py",
+    "generated/registry/core/taskand.dev/v1/federation.mjs",
+    "tests/gossip_test.py",
+    "docs/information/cluster-sync.md",
+    "generated/registry/registry.json"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "4a2334119919139a73eb52f79a6425e462c8ca9f",
+    "targetBranch": "main",
+    "outcome": "Explicitly authorized bounded peer synchronization with staged package import and reproducible isolated node tests",
+    "nonGoals": [
+      "Replacing the Taskand catalog/schema in this slice",
+      "Publisher authentication by package hashes",
+      "Production deployment",
+      "Remote execution or automatic grants"
+    ],
+    "complexity": "L",
+    "estimatedMinutes": 100,
+    "budgets": {
+      "maxImplementationFiles": 15,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 3,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "One existing gossip worker; configured peers are authority, learned peers are observations; peer-scoped credentials, bounded transport, serialized rounds, candidate-only default, content conflicts surfaced and staged imports. Paxlet remains the target shared package contract.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/**"
+          ]
+        },
+        {
+          "name": "registry",
+          "paths": [
+            "generated/registry/**"
+          ]
+        },
+        {
+          "name": "validation",
+          "paths": [
+            "tests/**",
+            "docs/**"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "Gossip requires operation grants and peer-scoped credential configuration",
+        "Gossip status reports bounded discovery/conflicts/partial failures",
+        "Federation rejects redirects, oversized or inconsistent packages and installs atomically"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Disable TASKAND_GOSSIP_ENABLED and clear TASKAND_PEERS; revert implementation if needed; imported packages remain candidates and existing data is preserved"
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-05",
+        "commands": [
+          "python3 -m unittest discover -s tests -p gossip_test.py",
+          "./project/governance-check.sh --base origin/main --head HEAD"
+        ],
+        "evidence": "Exact-head local reports and isolated peer test receipts"
+      }
+    ]
+  }
+}
