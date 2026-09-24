@@ -16,6 +16,8 @@ def module(name):
 
 stage = module("stage").stage
 canary = module("canary").canary
+compose = module("compose").compose
+move_state = module("move_state").move_state
 
 
 class StagingTest(unittest.TestCase):
@@ -89,6 +91,49 @@ class StagingTest(unittest.TestCase):
         (self.release / "gateway.py").write_text("tampered")
         with self.assertRaisesRegex(ValueError, "inventory mismatch"):
             canary(self.release, self.root / "nonexistent-python")
+
+    def test_composition_preserves_catalog_and_binds_shell_source(self):
+        for name in ("bin/taskand", "packages/taskand-shell/hello.plan.json",
+                     "generated/mcp/shell-build/bin.mjs", "generated/mcp/shell-run/bin.mjs"):
+            path = self.repo / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("fixture")
+        entries = {"proc://taskand.dev/mcp/" + n + "/v1": {"hash": n}
+                   for n in ("shell-build", "shell-run")}
+        (self.repo / "generated/mcp/registry.json").write_text(json.dumps({"processes": entries}))
+        self.commit()
+        stage(self.repo, self.sha, self.release)
+        base = self.root / "base"
+        stage(self.repo, self.sha, base)
+        original = {"organism": "mcp", "processes": {"existing": {"hash": "preserve", "status": "active"}}}
+        (base / "generated/mcp/registry.json").write_text(json.dumps(original))
+        (base / "log").mkdir()
+        (base / "log/private").write_text("runtime state")
+        target = self.root / "composed"
+        pin = hashlib.sha256((base / "release-manifest.json").read_bytes()).hexdigest()
+        receipt = compose(base, self.release, target, pin)
+        combined = json.loads((target / "generated/mcp/registry.json").read_text())
+        self.assertEqual(combined["processes"]["existing"], original["processes"]["existing"])
+        self.assertEqual(len(combined["processes"]), 3)
+        self.assertFalse((target / "log").exists())
+        self.assertEqual(receipt["shellSourceSha"], self.sha)
+        with self.assertRaises(ValueError):
+            compose(base, self.release, self.root / "bad-pin", "0" * 64)
+
+    def test_state_move_retry_and_rollback_preserve_directory_identity(self):
+        source, target = self.root / "state", self.root / "next-state"
+        source.mkdir()
+        (source / "database").write_text("existing state")
+        identity = source.stat()
+        move_state(source, target, identity.st_dev, identity.st_ino)
+        move_state(source, target, identity.st_dev, identity.st_ino)
+        move_state(target, source, identity.st_dev, identity.st_ino)
+        self.assertEqual((source / "database").read_text(), "existing state")
+        with self.assertRaises(ValueError):
+            move_state(source, target, identity.st_dev, identity.st_ino + 1)
+        target.mkdir()
+        with self.assertRaises(ValueError):
+            move_state(source, target, identity.st_dev, identity.st_ino)
 
 
 if __name__ == "__main__":
