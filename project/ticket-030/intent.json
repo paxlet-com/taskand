@@ -11,14 +11,8 @@
   "allowedPaths": [
     "project/ticket-030/**",
     "mcp/**",
-    "generated/registry/registry.json",
     "tests/mcp_catalog_test.py",
-    "tests/mcp_registry.test.mjs",
-    "docs/information/mcp-uri-catalog.md",
-    "docs/README.md",
-    ".governance/manifest.json",
-    "generated/registry/core/taskand.dev/v1/**",
-    "Makefile"
+    "docs/information/mcp-uri-catalog.md"
   ],
   "forbiddenPaths": [
     "project/ticket-*/user-*.md"
@@ -28,9 +22,9 @@
   "conflictsWith": [],
   "integrationTicket": null,
   "delivery": {
-    "acceptedBaseSha": "8804583ef82342ad7870659cf79e9ad8278e2369",
+    "acceptedBaseSha": "82e192c14881b2138dfd34c8ab1b543c57ba08e1",
     "targetBranch": "main",
-    "outcome": "Discover all local MCP configurations; build versioned process packages and native registry catalogs under mcp; invoke real tools through Taskand URI with pinned schemas and bounded SDK transport.",
+    "outcome": "Recover existing admitted MCP Git/Tillm tool bindings using immutable new versions after profile relocation; preserve shell deployment and original tool permissions.",
     "nonGoals": [
       "Replacing or merging PR38 controller",
       "Autonomous tool admission or arbitrary tool execution",
@@ -56,30 +50,15 @@
           ]
         },
         {
-          "name": "registry",
-          "paths": [
-            "generated/registry/**"
-          ]
-        },
-        {
           "name": "tests",
           "paths": [
-            "tests/mcp_catalog_test.py",
-            "tests/mcp_registry.test.mjs",
-            "Makefile"
+            "tests/mcp_catalog_test.py"
           ]
         },
         {
           "name": "docs",
           "paths": [
-            "docs/information/mcp-uri-catalog.md",
-            "docs/README.md"
-          ]
-        },
-        {
-          "name": "ownership",
-          "paths": [
-            ".governance/manifest.json"
+            "docs/information/mcp-uri-catalog.md"
           ]
         }
       ],

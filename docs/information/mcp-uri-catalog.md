@@ -289,3 +289,27 @@ Rollback pilota: `systemctl --user stop taskand-mcp030-release.service`.
 Zachować katalog pilota, profile i receipts do uzgodnienia efektów; istniejące
 instancje 8077/8082 pozostają niezależne. Jednostka jest lokalnym pilotem sesji,
 nie deklaracją wdrożenia produkcyjnego ani konfiguracji startu po restarcie hosta.
+
+## Odzyskanie zgodności po przeniesieniu profilu
+
+`PROFILE_CHANGED` oznacza, że prywatny profil różni się od przypiętego kontraktu.
+Nie edytuj `tool.json` istniejącej wersji i nie wyłączaj sprawdzania skrótu.
+Sprawdź również, czy polecenie i katalog wskazują istniejące zasoby: archiwum
+kodu bez `.git` nie jest repozytorium dla `mcp-server-git --repository`.
+
+Dla wcześniej dopuszczonego narzędzia przygotuj osobny snapshot profili (0600)
+i nową wersję pakietu w izolowanym wydaniu:
+
+```sh
+python mcp/reprofile.py --root /path/to/staged-runtime \
+  --profiles /private/profiles.json \
+  --uri proc://taskand.dev/mcp-git-9a881b9b/git-status-798e060c/v1 --version 2
+```
+
+Polecenie sprawdza integralność starego pakietu, pobiera świeży katalog MCP
+i wymaga identycznego kontraktu narzędzia. Nie wywołuje narzędzia i tworzy
+wyłącznie kandydata. Operator osobno dopuszcza nową wersję, sprawdza ją oraz
+przenosi istniejący grant na nowy URI; poprzednia wersja pozostaje niezmienna.
+Zmiana schematu, niezmieniony profil i niedopuszczony pakiet są odrzucane.
+Przy wdrożeniu zachowaj poprzednie pliki rejestru/grantów i konfigurację systemd;
+cofanie dotyczy tych powiązań, nie bazy kontekstu ani integracji shell.
