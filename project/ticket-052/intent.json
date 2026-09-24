@@ -1,0 +1,81 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-052",
+  "summary": "Native Paxlet node catalog and revisioned withdrawal snapshots",
+  "workstream": "application",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-052/**",
+    "app/paxlet_catalog.py",
+    "tests/paxlet_catalog_test.py",
+    "packages/taskand-catalog/**"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "b816a953a35f8b4a7c39a045a96167f63a24fc79",
+    "targetBranch": "main",
+    "outcome": "A usable local operator CLI and transactional Paxlet-native catalog with explicit namespace ownership, local approvals and bounded revisioned snapshots that preserve withdrawals.",
+    "nonGoals": [
+      "Replacing live gateway/MCP/legacy registry consumers in this slice",
+      "HTTP transport or discovery changes",
+      "Production migration or deployment",
+      "Protected policy changes",
+      "Execution grants or automatic activation from remote snapshots"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 100,
+    "budgets": {
+      "maxImplementationFiles": 9,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 2,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Use verified Paxlet content storage unchanged; SQLite owns node identity, namespace ownership, logical entries/revisions and local activation/aliases. One namespace writer, immutable identity/version assignments and permanent withdrawal markers prevent rollback/resurrection; no replicated approvals or execution. Start with an explicit operator CLI and test independent nodes before routing live consumers. The new opt-in catalog.sqlite is component-local state only. No existing persistent data is moved, re-keyed or migrated; existing generated registries and live consumers are untouched.",
+      "components": [
+        {
+          "name": "catalog",
+          "paths": [
+            "app/paxlet_catalog.py",
+            "tests/paxlet_catalog_test.py",
+            "packages/taskand-catalog/**"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "Operator catalog CLI and Python API",
+        "Versioned full snapshots with explicit authenticated-origin binding"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Stop using the opt-in catalog; preserve its database and Paxlet objects. No existing files are migrated or deleted."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-05",
+        "commands": [
+          "python3 -m unittest discover -s tests -p paxlet_catalog_test.py -v",
+          "./project/governance-check.sh --base origin/main --head HEAD"
+        ],
+        "evidence": "Host and isolated Docker native catalog tests, actual Paxlet import, three independent nodes, stale/withdrawn/conflict/failure/concurrency cases."
+      }
+    ]
+  }
+}
