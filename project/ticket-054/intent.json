@@ -1,0 +1,92 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-054",
+  "summary": "Preserve catalog BUSY responses during peer package pulls",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P1",
+    "origin": "requested"
+  },
+  "allowedPaths": [
+    "project/ticket-054/**",
+    "project/TICKETS.md",
+    "generated/registry/core/taskand.dev/v1/federation.mjs",
+    "generated/registry/registry.json",
+    "tests/gossip_test.py",
+    "docs/information/cluster-sync.md"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "b86fa6d905ae5233aaa42c4bd260b6a30a7297b2",
+    "targetBranch": "main",
+    "outcome": "A catalog HTTP503 remains an explicit BUSY result for bounded client retries; other failures remain errors",
+    "nonGoals": [
+      "Automatic retries inside the registry",
+      "Treating redirects or generic errors as retryable",
+      "Production deployment",
+      "Changing per-package partial failure semantics"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 30,
+    "budgets": {
+      "maxImplementationFiles": 5,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 1,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Preserve peer catalog HTTP503 as registry BUSY, mapped by the existing gateway status boundary to HTTP503. Clients may retry this explicit outcome within a bound; redirects and other upstream failures retain existing rejection.",
+      "components": [
+        {
+          "name": "gateway",
+          "paths": [
+            "gateway/**"
+          ]
+        },
+        {
+          "name": "registry",
+          "paths": [
+            "generated/registry/**"
+          ]
+        },
+        {
+          "name": "validation",
+          "paths": [
+            "tests/**",
+            "docs/**"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [
+        "Catalog overload has errorType BUSY, retryable true and gateway HTTP503"
+      ],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Revert this change; previous catalog overload remains a generic upstream error"
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "python3 -m unittest discover -s tests -p gossip_test.py",
+          "./project/governance-check.sh --base origin/main --head HEAD"
+        ],
+        "evidence": "Real isolated HTTP overload/failure tests and downstream cluster diagnostics"
+      }
+    ]
+  }
+}

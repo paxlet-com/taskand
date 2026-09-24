@@ -88,3 +88,11 @@ równoległy import, odzyskanie po przerwaniu i przejście Taskand → adapter P
 → magazyn → kopia wykonawcza z przypiętym digestem. Bez `PAXLET_TEST_ROOT`
 test przejścia przez Paxlet jest oznaczony jako pominięty. Żaden test nie używa
 rejestru ani poświadczeń działającego węzła.
+## Catalog backpressure
+
+When the configured peer's catalog returns HTTP 503, `registry/pull` returns
+`ok: false`, `errorType: BUSY` and `retryable: true`; the gateway preserves HTTP
+503. No package is installed and the registry does not retry internally. A
+caller may retry that explicit result with a deadline and attempt bound.
+Redirects and other catalog failures remain errors; package-level partial
+failures retain their existing per-package report semantics.
