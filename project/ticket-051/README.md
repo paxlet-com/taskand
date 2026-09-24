@@ -64,3 +64,12 @@ Reports and the bounded recovery chain are external under
 and delivery state belong to that external ledger, avoiding a closure commit.
 The operator contract and remaining architecture work are documented in
 [`cluster-sync.md`](../../docs/information/cluster-sync.md).
+
+## Publication continuation (2026-09-24)
+
+SESSION_EXECUTION_AUTHORIZATION: user requested push, merge and testing. Resume
+this ticket after its explicit clean handoff. Refresh against merged admission
+control `4a2334119919139a73eb52f79a6425e462c8ca9f` and validate the combined
+gossip/admission behavior before independent protected review. The tests
+repository ticket-007 cluster suite depends on this change. Preserve historical
+branches; they grant no write or discard authority. No live deployment is included.

@@ -26,7 +26,7 @@
   "conflictsWith": [],
   "integrationTicket": null,
   "delivery": {
-    "acceptedBaseSha": "41268dd4bd7407ba55c75bb64c0074c9f2a4aabb",
+    "acceptedBaseSha": "4a2334119919139a73eb52f79a6425e462c8ca9f",
     "targetBranch": "main",
     "outcome": "Explicitly authorized bounded peer synchronization with staged package import and reproducible isolated node tests",
     "nonGoals": [
