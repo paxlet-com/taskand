@@ -123,8 +123,16 @@ def main() -> None:
     print(f"Taskand Gateway listening on {bind}:{port}")
     if not is_loopback_bind():
         print("UWAGA: bind poza loopback — domyślne tokeny z grants.yaml są odrzucane; ustaw własne tokeny.")
+    gossip_enabled = os.environ.get("TASKAND_GOSSIP_ENABLED", "0") in ("1", "true", "True") or bool(os.environ.get("TASKAND_PEERS"))
+    if gossip_enabled:
+        from gateway.gossip import start_gossip_service
+        start_gossip_service()
     server = ThreadingHTTPServer((bind, port), GatewayHTTPHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         print("\nGateway stopped.")
+    finally:
+        if gossip_enabled:
+            from gateway.gossip import stop_gossip_service
+            stop_gossip_service()

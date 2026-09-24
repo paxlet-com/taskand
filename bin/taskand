@@ -296,6 +296,24 @@ const COMMANDS = {
     if (verb === 'remove' || verb === 'rm') return print(await reg('peer_remove', { url }), o => (o.ok ? `✓ peer usunięty; pozostają: ${(o.peers || []).join(', ') || '—'}` : `✗ ${o.error}`));
     print({ ok: false, error: 'Użycie: taskand peer add|remove <http://host:8077>' });
   },
+  async gossip([action = 'status']) {
+    if (action === 'sync') {
+      print(await post('/api/cluster/gossip', {}));
+    } else {
+      if (await gatewayUp()) {
+        try {
+          const r = await fetch(`${GATEWAY}/api/cluster/gossip`, {
+            headers: { Authorization: `Bearer ${credential}` }
+          });
+          print(await r.json());
+        } catch (err) {
+          print({ ok: false, error: err.message });
+        }
+      } else {
+        print({ ok: false, error: 'Gateway offline — gossip requires running gateway daemon' });
+      }
+    }
+  },
   async deliver(rawArgs) {
     print(runDelivery(rawArgs, { root: ROOT }), renderDelivery);
   },

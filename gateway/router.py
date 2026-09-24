@@ -10,6 +10,7 @@ from gateway.handlers.context import handle_context, handle_state, handle_mcp_ca
 from gateway.handlers.mesh import handle_mesh
 from gateway.handlers.observers import handle_pilot
 from gateway.handlers.monag_handler import handle_monag_status, handle_monag_resume, handle_notify
+from gateway.handlers.gossip import handle_gossip_status, handle_gossip_trigger
 from urllib.parse import urlsplit
 
 ROUTES: Dict[Tuple[str, str], Callable] = {
@@ -32,6 +33,8 @@ ROUTES: Dict[Tuple[str, str], Callable] = {
     ("GET", "/api/monag/status"): handle_monag_status,
     ("GET", "/api/monag/resume"): handle_monag_resume,
     ("POST", "/api/notify"): handle_notify,
+    ("GET", "/api/cluster/gossip"): handle_gossip_status,
+    ("POST", "/api/cluster/gossip"): handle_gossip_trigger,
 }
 
 def dispatch(method: str, path: str, request_handler, body: dict) -> None:
