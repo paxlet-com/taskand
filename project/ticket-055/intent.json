@@ -1,0 +1,40 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-055",
+  "summary": "Execute approved native Paxlet actions through Taskand shell",
+  "workstream": "application",
+  "classification": {"kind": "FEATURE", "priority": "P1", "origin": "requested"},
+  "allowedPaths": [
+    "project/ticket-055/**",
+    "project/TICKETS.md",
+    "app/shell_workflow.py",
+    "tests/shell_workflow_test.py",
+    "packages/taskand-catalog/README.md"
+  ],
+  "forbiddenPaths": ["project/ticket-*/user-*.md"],
+  "stacks": [],
+  "dependsOn": ["ticket-052"],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "f008a27743b20334236d1534715c0fc60a8ba8d4",
+    "targetBranch": "main",
+    "outcome": "Explicit digest-pinned local execution of an approved native catalog action through the bounded shell process API, with a fresh preserved execution workspace and Paxlet receipt.",
+    "nonGoals": ["Gateway/MCP or generated-registry cutover", "Remote catalog approval or execution grants", "Production deployment or data migration", "Changing the native catalog schema or Paxlet runtime"],
+    "complexity": "M",
+    "estimatedMinutes": 60,
+    "budgets": {"maxImplementationFiles": 5, "maxAffectedComponents": 2, "maxPublicInterfaceChanges": 1, "maxRuntimeDependencies": 0},
+    "architecture": {
+      "status": "accepted",
+      "decision": "Resolve the caller-selected action and exact digest against the operator's local catalog, materialize verified bytes outside the immutable Paxlet store into a fresh run-ID workspace, and invoke the existing Paxlet action runtime with its digest check. Preserve the workspace and receipt; never re-execute an existing run ID.",
+      "components": [{"name": "shell workflow", "paths": ["app/shell_workflow.py", "tests/shell_workflow_test.py", "packages/taskand-catalog/README.md"]}],
+      "responsibilityChanges": false,
+      "interfaceChanges": ["Opt-in process run_catalog operation with selector, action, expected_digest and fresh run ID"],
+      "dataChanges": [],
+      "ui": {"impact": "none", "states": [], "evidence": []},
+      "rollback": "Stop using run_catalog; retain prior local catalog and execution receipts without deleting workspaces. Existing shell operations are unchanged."
+    },
+    "runtimeDependencies": [],
+    "validation": [{"criterion": "AC-03", "commands": ["python3 -m unittest discover -s tests -p shell_workflow_test.py", "python3 -m unittest discover -s tests -p paxlet_catalog_test.py", "./project/governance-check.sh --base origin/main --head HEAD"], "evidence": "Real Paxlet store/materialization and local catalog approval/withdrawal cases, exact-head governance and hosted protected checks"}]
+  }
+}

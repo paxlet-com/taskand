@@ -50,5 +50,8 @@
 | **ticket-049** | [`README.md`](./ticket-049/README.md) | - | - | - | - | - |
 | **ticket-050** | [`README.md`](./ticket-050/README.md) | - | - | - | - | - |
 | **ticket-051** | [`README.md`](./ticket-051/README.md) | - | - | - | - | - |
+| **ticket-052** | [`README.md`](./ticket-052/README.md) | - | - | - | - | - |
 | **ticket-053** | [`README.md`](./ticket-053/README.md) | - | - | - | - | - |
+| **ticket-054** | [`README.md`](./ticket-054/README.md) | - | - | - | - | - |
+| **ticket-055** | [`README.md`](./ticket-055/README.md) | - | - | - | - | - |
 <!-- AUTO:TICKET_INDEX:END -->

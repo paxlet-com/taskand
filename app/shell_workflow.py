@@ -76,6 +76,7 @@ def process_request(operation, request):
         "export": {"plan", "catalog", "id", "urn", "permissions"},
         "verify": {"id"},
         "run": {"id", "expected_digest", "stdin", "timeout"},
+        "run_catalog": {"id", "selector", "action", "version", "expected_digest", "stdin", "timeout"},
     }
     if operation not in fields or not isinstance(request, dict) or set(request) - fields[operation]:
         raise ValueError("Unsupported operation or request fields")
@@ -106,7 +107,7 @@ def process_request(operation, request):
     if operation == "compile":
         artifact = compile_plan(request["plan"], catalog=catalog, format=request.get("format", "python"))
         return {"script": artifact.script, "sha256": artifact.sha256, "report": artifact.report}
-    directory = location(request.get("id"), "packages")
+    directory = location(request.get("id"), "catalog-runs" if operation == "run_catalog" else "packages")
     if operation == "export":
         if not isinstance(request.get("urn"), str) or not isinstance(request.get("permissions"), dict):
             raise ValueError("urn and explicit permissions object are required")
@@ -120,6 +121,29 @@ def process_request(operation, request):
     timeout = request.get("timeout", 30)
     if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not 0 < timeout <= 120:
         raise ValueError("Process timeout must be within (0, 120] seconds")
+    if operation == "run_catalog":
+        from app.paxlet_catalog import Catalog
+        from paxlet.references import exact_digest
+        from paxlet.runtime import run_action
+        from paxlet.store import materialize_package
+
+        pin = request.get("expected_digest")
+        if not isinstance(pin, str):
+            raise ValueError("An exact Paxlet digest is required")
+        exact_digest(pin)
+        stdin = request.get("stdin", "")
+        if not isinstance(stdin, str):
+            raise ValueError("stdin must be a string")
+        catalog_root = Path(os.environ.get("TASKAND_PAXLET_CATALOG_ROOT", root / "paxlet-catalog")).absolute()
+        if not (catalog_root / "catalog.sqlite").is_file():
+            raise ValueError("Native Paxlet catalog is unavailable")
+        selected = Catalog(catalog_root).resolve(request.get("selector"),
+            action=request.get("action"), version=request.get("version"), digest=pin)
+        materialize_package(selected["digest"], directory, version=selected["version"])
+        output, receipt, receipt_path = run_action(directory, selected["action"],
+            {"stdin": stdin}, expected_digest=selected["digest"], timeout=timeout)
+        return {"selection": selected, "output": output, "receipt": receipt,
+                "receipt_path": str(receipt_path)}
     return run_package(directory, expected_digest=request.get("expected_digest"),
                        stdin=request.get("stdin", ""), timeout=timeout)
 
@@ -128,7 +152,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     process = commands.add_parser("process", help="Bounded JSON stdin/stdout API for Taskand processes")
-    process.add_argument("operation", choices=("plan", "compile", "export", "verify", "run"))
+    process.add_argument("operation", choices=("plan", "compile", "export", "verify", "run", "run_catalog"))
     plan = commands.add_parser("plan", help="Plan NL; offline unless --env-file is given")
     plan.add_argument("prompt")
     plan.add_argument("--catalog")

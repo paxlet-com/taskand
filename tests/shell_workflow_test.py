@@ -14,8 +14,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.shell_workflow import (
     compile_plan, export_package, main, make_engine, run_package, verify_package, process_request,
 )
+from app.paxlet_catalog import Catalog as NativeCatalog, CatalogError
 from nl_dsl_sh import Catalog
 from paxlet.errors import PaxletError
+from paxlet.manifest import load_manifest
 
 
 class ShellWorkflowTests(unittest.TestCase):
@@ -133,6 +135,62 @@ class ShellWorkflowTests(unittest.TestCase):
         result = call("run", {"id": "hello", "expected_digest": exported["digest"]})
         self.assertEqual(result["output"]["stdout"], "Witaj Taskand!\n")
         self.assertEqual(call("verify", {"id": "hello"})["digest"], exported["digest"])
+
+    def test_process_run_catalog_requires_approval_and_fresh_pinned_workspace(self):
+        environment = {"TASKAND_SHELL_WORKSPACE": str(self.root / "workspace"),
+                       "TASKAND_PAXLET_CATALOG_ROOT": str(self.root / "native"),
+                       "PAXLET_STORE_DIR": str(self.root / "store")}
+        with patch.dict(os.environ, environment):
+            exported = self.export()
+            _, manifest = load_manifest(self.package)
+            urn = manifest["identity"]["urn"]
+            version = manifest["identity"]["version"]
+            native = NativeCatalog(self.root / "native", node_id="node-a")
+            native.trust_namespace("taskand", "node-a")
+            native.install(self.package, expected_digest=exported["digest"])
+            request = {"id": "first", "selector": urn, "action": "run", "version": version,
+                       "expected_digest": exported["digest"]}
+            with self.assertRaises(CatalogError):
+                process_request("run_catalog", request)
+            self.assertFalse((self.root / "workspace/catalog-runs/first").exists())
+            native.approve(urn, version, exported["digest"])
+            result = process_request("run_catalog", request)
+            self.assertEqual(result["selection"]["digest"], exported["digest"])
+            self.assertEqual(result["output"]["stdout"], "Witaj Taskand!\n")
+            self.assertEqual(result["receipt"]["package_digest"], exported["digest"])
+            receipt = Path(result["receipt_path"])
+            self.assertEqual(json.loads(receipt.read_text()), result["receipt"])
+            cli = subprocess.run([sys.executable, "-m", "app.shell_workflow", "process", "run_catalog"],
+                input=json.dumps({**request, "id": "cli"}), text=True, capture_output=True,
+                env=os.environ.copy(), cwd=Path(__file__).resolve().parents[1])
+            self.assertEqual(cli.returncode, 0, cli.stdout + cli.stderr)
+            self.assertEqual(json.loads(cli.stdout)["result"]["output"]["stdout"], "Witaj Taskand!\n")
+            with self.assertRaises(PaxletError):
+                process_request("run_catalog", request)
+            self.assertEqual(json.loads(receipt.read_text()), result["receipt"])
+            with self.assertRaises(CatalogError):
+                process_request("run_catalog", {**request, "id": "wrong-pin",
+                    "expected_digest": "sha256:" + "0" * 64})
+            self.assertFalse((self.root / "workspace/catalog-runs/wrong-pin").exists())
+            native.withdraw(urn, version, exported["digest"])
+            with self.assertRaises(CatalogError):
+                process_request("run_catalog", {**request, "id": "withdrawn"})
+            self.assertFalse((self.root / "workspace/catalog-runs/withdrawn").exists())
+
+    def test_process_run_catalog_rejects_paths_and_missing_operator_catalog(self):
+        with patch.dict(os.environ, {"TASKAND_SHELL_WORKSPACE": str(self.root / "workspace"),
+                                  "TASKAND_PAXLET_CATALOG_ROOT": str(self.root / "native")}):
+            base = {"selector": "urn:paxlet:taskand:test", "action": "run",
+                    "expected_digest": "sha256:" + "0" * 64}
+            for identifier in ("../escape", "/tmp/escape", "", None):
+                with self.subTest(identifier=identifier), self.assertRaises(ValueError):
+                    process_request("run_catalog", {**base, "id": identifier})
+            with self.assertRaisesRegex(ValueError, "unavailable"):
+                process_request("run_catalog", {**base, "id": "new"})
+            with self.assertRaises(ValueError):
+                process_request("run_catalog", {**base, "id": "new", "catalog_root": "/tmp"})
+            with self.assertRaises(ValueError):
+                process_request("run_catalog", {**base, "id": "new", "expected_digest": None})
 
     def test_process_forbids_host_paths_and_unknown_fields(self):
         with patch.dict(os.environ, {"TASKAND_SHELL_WORKSPACE": str(self.root)}):
