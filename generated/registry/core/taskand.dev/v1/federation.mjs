@@ -17,6 +17,7 @@ const HASH = /^sha256:[0-9a-f]{64}$/;
 const URI = /^proc:\/\/taskand\.dev\/[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*\/v[0-9]+$/;
 const validUri = value => typeof value === 'string' && value.length <= 512 && URI.test(value);
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+class PeerBusyError extends Error {}
 
 export function exportCatalog() {
   const processes = allEntries().filter(e => e.status === 'active')
@@ -57,6 +58,7 @@ async function fetchJson(url, limit, init = {}) {
   const response = await fetch(url, { ...init, redirect: 'manual', signal: AbortSignal.timeout(10000) });
   if (response.status !== 200 || !response.body) {
     await response.body?.cancel();
+    if (response.status === 503) throw new PeerBusyError('Peer catalog is busy');
     throw new Error('Peer request failed or redirected');
   }
   const length = response.headers.get('content-length');
@@ -89,7 +91,15 @@ export async function pull({ peer, token, uris, expected }) {
     throw new Error('Expected package pins must match requested URIs');
   }
   // Catalog is public. Credentials are sent only to the exact origin's package endpoint.
-  const remote = await fetchJson(origin + '/.well-known/catalog.json', MAX_CATALOG_BYTES);
+  let remote;
+  try {
+    remote = await fetchJson(origin + '/.well-known/catalog.json', MAX_CATALOG_BYTES);
+  } catch (error) {
+    if (error instanceof PeerBusyError) {
+      return { ok: false, errorType: 'BUSY', error: 'Peer catalog is busy; retry later', retryable: true };
+    }
+    throw error;
+  }
   if (remote.ok !== true || remote.standard !== 'taskand-registry/1' || !Array.isArray(remote.processes)
       || remote.processes.length > MAX_CATALOG_ENTRIES || typeof remote.node !== 'string' || remote.node.length > 256) {
     throw new Error('Invalid peer catalog');

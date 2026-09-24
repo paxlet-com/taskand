@@ -354,6 +354,43 @@ class IsolatedPeerTests(unittest.TestCase):
         self.assertEqual(self.sync(engine, self.b)['synced_this_round'], [])
         self.assertEqual(self.b.registry('list')['processes'][0]['status'], 'candidate')
 
+    def test_catalog_backpressure_is_explicit_and_recovery_preserves_package(self):
+        from gateway.utils import status_for
+        path, digest = self.a.add_package()
+        self.a.overrides[('GET', '/.well-known/catalog.json')] = (503, b'{}', {})
+        before_requests = len(self.a.requests)
+        result = self.pull()
+        self.assertEqual(result['errorType'], 'BUSY', result)
+        self.assertTrue(result['retryable'])
+        self.assertFalse(result['ok'])
+        self.assertEqual(status_for(result), 503)
+        self.assertEqual(len(self.a.requests) - before_requests, 1, 'No hidden retry')
+        self.assertEqual(self.b.registry('list')['processes'], [])
+        imported = self.b.root / path.relative_to(self.a.root)
+        self.assertFalse(imported.exists())
+        self.a.overrides.clear()
+        self.assertEqual(self.pull()['report'][0]['result'], 'imported')
+        stamp = (imported / 'bin.mjs').stat().st_mtime_ns
+        self.assertEqual(self.pull()['report'][0]['result'], 'same')
+        self.assertEqual((imported / 'bin.mjs').stat().st_mtime_ns, stamp)
+        entry = self.b.registry('list')['processes'][0]
+        self.assertEqual((entry['hash'], entry['status']), (digest, 'candidate'))
+
+    def test_other_catalog_failures_are_not_retryable_busy(self):
+        from gateway.utils import status_for
+        self.a.add_package()
+        for status in (302, 401, 403, 429, 500, 502):
+            self.a.overrides[('GET', '/.well-known/catalog.json')] = (
+                status, b'{}', {'Location': self.c.url + '/capture'})
+            with self.subTest(status=status):
+                result = self.pull()
+                self.assertFalse(result['ok'])
+                self.assertEqual(result['errorType'], 'REGISTRY_ERROR', result)
+                self.assertFalse(result.get('retryable', False))
+                self.assertEqual(status_for(result), 502)
+                self.assertEqual(self.b.registry('list')['processes'], [])
+        self.assertEqual(self.c.requests, [])
+
     def test_http_redirects_never_contact_discovered_target(self):
         self.a.add_package()
         self.a.overrides[('GET', '/api/cluster/gossip')] = (302, b'', {'Location': self.c.url + '/capture'})
