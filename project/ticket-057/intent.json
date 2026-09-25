@@ -1,0 +1,97 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-057",
+  "summary": "Opt-in native catalog gateway surface and peer replication",
+  "workstream": "integration",
+  "classification": {
+    "kind": "FEATURE",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-057/**",
+    "project/TICKETS.md",
+    ".governance/manifest.json",
+    "gateway/handlers/catalog.py",
+    "gateway/router.py",
+    "gateway/gossip.py",
+    "tests/catalog_gateway_test.py"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [
+    "ticket-052",
+    "ticket-054"
+  ],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "b9943a356c74aea74a1beb15ac672a3ff81f2c63",
+    "targetBranch": "main",
+    "outcome": "An opt-in gateway surface exposes the native Paxlet catalog (records, snapshot, package archive) under existing grants, and gossip pulls authenticated catalog snapshots plus missing verified package bytes only for explicitly mapped peers.",
+    "nonGoals": [
+      "Replacing the legacy proc:// registry or package carrier",
+      "Executing resolved packages or changing grants",
+      "Serving catalog data without TASKAND_CATALOG_ROOT",
+      "Production gateway deployment",
+      "MCP tool admission changes"
+    ],
+    "complexity": "M",
+    "estimatedMinutes": 90,
+    "budgets": {
+      "maxImplementationFiles": 5,
+      "maxAffectedComponents": 3,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "TASKAND_CATALOG_ROOT opts the gateway into a native Catalog read/snapshot surface behind proc://taskand.dev/catalog/core/v1 grants; TASKAND_CATALOG_PEERS binds peer origins to node ids so gossip applies their snapshots via apply_snapshot after fetching only missing digest-pinned archives.",
+      "components": [
+        {
+          "name": "gateway catalog surface",
+          "paths": [
+            "gateway/handlers/catalog.py",
+            "gateway/router.py"
+          ]
+        },
+        {
+          "name": "gossip peer catalog sync",
+          "paths": [
+            "gateway/gossip.py",
+            "tests/catalog_gateway_test.py"
+          ]
+        },
+        {
+          "name": "workstream ownership registry",
+          "paths": [
+            ".governance/manifest.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "Unset TASKAND_CATALOG_ROOT/TASKAND_CATALOG_PEERS; the surface and sync are inert without them."
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-03",
+        "commands": [
+          "python3 -m unittest discover -s tests -p catalog_gateway_test.py -v",
+          "python3 -m unittest discover -s tests -p gossip_test.py -v",
+          "./project/governance-check.sh --base origin/main --head HEAD"
+        ],
+        "evidence": "Handler auth/disabled cases, real catalog snapshot apply between node stores, and gossip peer pull with digest-pinned archives"
+      }
+    ]
+  }
+}

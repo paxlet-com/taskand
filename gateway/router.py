@@ -11,6 +11,8 @@ from gateway.handlers.mesh import handle_mesh
 from gateway.handlers.observers import handle_pilot
 from gateway.handlers.monag_handler import handle_monag_status, handle_monag_resume, handle_notify
 from gateway.handlers.gossip import handle_gossip_status, handle_gossip_trigger
+from gateway.handlers.catalog import (handle_catalog, handle_catalog_snapshot,
+                                      handle_catalog_snapshot_apply, handle_catalog_package)
 from urllib.parse import urlsplit
 
 ROUTES: Dict[Tuple[str, str], Callable] = {
@@ -35,6 +37,10 @@ ROUTES: Dict[Tuple[str, str], Callable] = {
     ("POST", "/api/notify"): handle_notify,
     ("GET", "/api/cluster/gossip"): handle_gossip_status,
     ("POST", "/api/cluster/gossip"): handle_gossip_trigger,
+    ("GET", "/api/catalog"): handle_catalog,
+    ("GET", "/api/catalog/snapshot"): handle_catalog_snapshot,
+    ("GET", "/api/catalog/package"): handle_catalog_package,
+    ("POST", "/api/catalog/snapshot"): handle_catalog_snapshot_apply,
 }
 
 def dispatch(method: str, path: str, request_handler, body: dict) -> None:
