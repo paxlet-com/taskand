@@ -7,11 +7,13 @@ import logging
 import math
 import os
 import re
+import tempfile
 import threading
 import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from urllib.parse import urlsplit
 
 from gateway.utils import registry
@@ -21,10 +23,12 @@ MAX_PEERS = 16
 MAX_CATALOG_ENTRIES = 256
 MAX_IMPORTS = 16
 MAX_RESPONSE_BYTES = 1024 * 1024
+MAX_PACKAGE_BYTES = 64 * 1024 * 1024
 ROUND_SECONDS = 30.0
 HTTP_SECONDS = 3.0
 PROCESS_URI = re.compile(r"proc://taskand\.dev/[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*/v[0-9]+")
 DIGEST = re.compile(r"sha256:[0-9a-f]{64}")
+CATALOG_NODE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 _GLOBAL_ENGINE = None
 _GLOBAL_LOCK = threading.Lock()
 
@@ -94,6 +98,17 @@ class GossipEngine:
             if origin in self._peer_tokens or not isinstance(token, str) or not re.fullmatch(r"[\x21-\x7e]{1,4096}", token):
                 raise ValueError("invalid or duplicate peer credential mapping")
             self._peer_tokens[origin] = token
+        # Authenticated catalog peer transport is separate opt-in: each mapped
+        # origin asserts exactly one node identity for apply_snapshot.
+        mapping = json.loads(os.environ.get("TASKAND_CATALOG_PEERS", "{}"), object_pairs_hook=_json_object)
+        if not isinstance(mapping, dict) or len(mapping) > MAX_PEERS:
+            raise ValueError("catalog peer mapping must be a bounded object")
+        self._catalog_peers = {}
+        for endpoint, node in mapping.items():
+            origin = peer_origin(endpoint)
+            if origin in self._catalog_peers or not isinstance(node, str) or not CATALOG_NODE.fullmatch(node):
+                raise ValueError("invalid or duplicate catalog peer mapping")
+            self._catalog_peers[origin] = node
         # Do not inherit proxy routing from ambient HTTP_PROXY/HTTPS_PROXY.
         self._http = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
         self._lock = threading.Lock()
@@ -121,7 +136,8 @@ class GossipEngine:
     def _http_get_json(self, url, timeout=HTTP_SECONDS, *, authenticated=False):
         parsed = urlsplit(url)
         origin = peer_origin(f"{parsed.scheme}://{parsed.netloc}")
-        if parsed.path not in {"/healthz", "/api/cluster/gossip", "/.well-known/catalog.json"} or parsed.query or parsed.fragment:
+        if parsed.path not in {"/healthz", "/api/cluster/gossip", "/.well-known/catalog.json",
+                               "/api/catalog/snapshot"} or parsed.query or parsed.fragment:
             raise ValueError("unsupported peer request")
         headers = {"Accept": "application/json", "User-Agent": "taskand-gossip/2"}
         # Public health/catalog probes carry no credentials. Status can use an
@@ -155,6 +171,72 @@ class GossipEngine:
         if not isinstance(result, dict):
             raise ValueError("peer response must be a JSON object")
         return result
+
+    def _http_get_bytes(self, url, timeout=HTTP_SECONDS, *, authenticated=False):
+        parsed = urlsplit(url)
+        origin = peer_origin(f"{parsed.scheme}://{parsed.netloc}")
+        if parsed.scheme != "http" or parsed.path != "/api/catalog/package" \
+                or not parsed.query.startswith("digest=sha256:") or parsed.fragment:
+            raise ValueError("unsupported peer request")
+        headers = {"User-Agent": "taskand-gossip/2"}
+        if authenticated and origin in self._peer_tokens:
+            headers["Authorization"] = "Bearer " + self._peer_tokens[origin]
+        deadline = time.monotonic() + timeout
+        req = urllib.request.Request(url, headers=headers)
+        with self._http.open(req, timeout=timeout) as response:
+            if response.status != 200 or response.headers.get("Content-Encoding", "identity") != "identity":
+                raise ValueError("unsupported peer response")
+            length = response.headers.get("Content-Length")
+            if length is not None and (not length.isdigit() or int(length) > MAX_PACKAGE_BYTES):
+                raise ValueError("peer response exceeds size limit")
+            payload = bytearray()
+            while True:
+                if time.monotonic() >= deadline or self._stop_event.is_set():
+                    raise TimeoutError("peer request deadline exceeded")
+                block = response.read1(min(65536, MAX_PACKAGE_BYTES + 1 - len(payload)))
+                if not block:
+                    break
+                payload.extend(block)
+                if len(payload) > MAX_PACKAGE_BYTES:
+                    raise ValueError("peer response exceeds size limit")
+            if length is not None and len(payload) != int(length):
+                raise ValueError("truncated peer response")
+        return bytes(payload)
+
+    def _sync_catalog(self, peer, node_id, budget):
+        """Pull a mapped peer's Paxlet catalog snapshot; failures never break the round."""
+        report = {"node": node_id, "applied": False, "changed": False, "revision": None, "error": None}
+        try:
+            root = os.environ.get("TASKAND_CATALOG_ROOT", "").strip()
+            if not root:
+                report["error"] = "catalog replication is not configured locally"
+                return report
+            from app.paxlet_catalog import Catalog
+            from paxlet.store import get_package
+            snapshot = self._http_get_json(peer + "/api/catalog/snapshot", budget(), authenticated=True)
+            entries = Catalog._check_snapshot(snapshot, node_id)
+            catalog = Catalog(root)
+            archives, temp = {}, None
+            try:
+                missing = [e["digest"] for e in entries
+                           if not e["withdrawn"] and get_package(e["digest"]) is None][:MAX_IMPORTS]
+                for digest in missing:
+                    if temp is None:
+                        temp = tempfile.TemporaryDirectory(prefix="taskand-catalog-pull-")
+                    target = Path(temp.name) / (digest[7:] + ".paxlet.zip")
+                    target.write_bytes(self._http_get_bytes(
+                        peer + "/api/catalog/package?digest=" + digest, budget(20), authenticated=True))
+                    archives[digest] = target
+                outcome = catalog.apply_snapshot(snapshot, authenticated_origin=node_id, archives=archives)
+                report.update(applied=True, changed=outcome["changed"], revision=outcome["revision"])
+            finally:
+                if temp is not None:
+                    temp.cleanup()
+        except Exception:
+            # Category only: peer errors must not reflect hostile bodies or
+            # credentials into gossip status.
+            report["error"] = "catalog synchronization failed"
+        return report
 
     @staticmethod
     def _entries(value, *, remote=False):
@@ -246,6 +328,9 @@ class GossipEngine:
                                     status["approved_count"] += 1
                     if status["conflicts"]:
                         status["error"] = "immutable URI content conflict"
+                    node_id = self._catalog_peers.get(peer)
+                    if node_id is not None:
+                        status["catalog"] = self._sync_catalog(peer, node_id, budget)
                 except (ValueError, OSError, TimeoutError) as exc:
                     # Report categories only: peer errors must not reflect tokens
                     # or hostile response bodies into logs/status endpoints.
