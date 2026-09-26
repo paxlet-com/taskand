@@ -133,10 +133,10 @@
         "bin.mjs",
         "proc.yaml"
       ],
-      "hash": "sha256:c756f0af3fc42fe1c2f7f1613ad3eec9ac8ed3aa85a43ceb13b012299cffb0db",
+      "hash": "sha256:9f77947f7248cbc187144b7812031e0d99f5c6fbad31db9468a81bb2f2607bd9",
       "status": "active",
       "registered": "2026-09-15T14:41:21.012Z",
-      "refreshedAt": "2026-09-15T17:24:41.404Z"
+      "refreshedAt": "2026-09-26T21:30:00.000Z"
     }
   },
   "updated": "2026-09-15T17:29:05.240Z"
