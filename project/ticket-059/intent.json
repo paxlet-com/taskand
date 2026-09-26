@@ -1,0 +1,76 @@
+{
+  "schema": "new-project.intent/v3",
+  "ticket": "ticket-059",
+  "summary": "Fix github-projects-discovery timeout",
+  "workstream": "integration",
+  "classification": {
+    "kind": "BUG",
+    "priority": "P2",
+    "origin": "health"
+  },
+  "allowedPaths": [
+    "project/ticket-059/**",
+    "project/TICKETS.md",
+    "TODO.md",
+    "generated/admin/github-projects-discovery/taskand.dev/v2/**",
+    "generated/admin/registry.json"
+  ],
+  "forbiddenPaths": [
+    "project/ticket-*/user-*.md"
+  ],
+  "stacks": [],
+  "dependsOn": [],
+  "conflictsWith": [],
+  "integrationTicket": null,
+  "delivery": {
+    "acceptedBaseSha": "667b3e31b440bfe82ff3623f7783e8005f8488cf",
+    "targetBranch": "main",
+    "outcome": "Optimize github-projects-discovery v2 commit resolution using .git/logs/HEAD and avoid unnecessary subtree recursion to prevent 60s timeout in contract tests.",
+    "nonGoals": [
+      "Modifying core registry semantics",
+      "Altering network-isolated execution sandbox"
+    ],
+    "complexity": "S",
+    "estimatedMinutes": 30,
+    "budgets": {
+      "maxImplementationFiles": 4,
+      "maxAffectedComponents": 1,
+      "maxPublicInterfaceChanges": 0,
+      "maxRuntimeDependencies": 0
+    },
+    "architecture": {
+      "status": "accepted",
+      "decision": "Use fast file-based commit log reading (.git/logs/HEAD) with git log fallback in lastCommit and prune recursion on git repository boundaries in scan.",
+      "components": [
+        {
+          "name": "github-projects-discovery",
+          "paths": [
+            "generated/admin/github-projects-discovery/taskand.dev/v2/bin.mjs",
+            "generated/admin/registry.json"
+          ]
+        }
+      ],
+      "responsibilityChanges": false,
+      "interfaceChanges": [],
+      "dataChanges": [],
+      "ui": {
+        "impact": "none",
+        "states": [],
+        "evidence": []
+      },
+      "rollback": "git revert HEAD"
+    },
+    "runtimeDependencies": [],
+    "validation": [
+      {
+        "criterion": "AC-01",
+        "commands": [
+          "node tests/conformance.mjs",
+          "node tests/contract_tests.mjs",
+          "node tests/negative_tests.mjs"
+        ],
+        "evidence": "All conformance, contract (34/34) and negative tests pass 100%"
+      }
+    ]
+  }
+}

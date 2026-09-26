@@ -56,7 +56,33 @@ function branchOf(gitDir) {
   return head.startsWith('ref: refs/heads/') ? head.slice('ref: refs/heads/'.length) : 'detached';
 }
 
-function lastCommit(dir) {
+function lastCommit(dir, gitDir) {
+  if (gitDir) {
+    try {
+      const headLog = join(gitDir, 'logs', 'HEAD');
+      if (existsSync(headLog)) {
+        const content = readFileSync(headLog, 'utf8');
+        const lastLine = content.trim().split('\n').pop();
+        if (lastLine) {
+          const parts = lastLine.split('\t');
+          const header = parts[0].split(' ');
+          const hash = header[1];
+          const msg = parts.slice(1).join('\t');
+          const timestamp = parseInt(header[header.length - 2], 10);
+          const tz = header[header.length - 1];
+          let date = '';
+          if (!isNaN(timestamp)) {
+            const d = new Date(timestamp * 1000);
+            const pad = n => String(n).padStart(2, '0');
+            date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} ${tz || '+0000'}`;
+          }
+          if (hash && hash.length >= 12) {
+            return { hash: hash.slice(0, 12), date, message: (msg || '').slice(0, 120) };
+          }
+        }
+      }
+    } catch {}
+  }
   try {
     const log = execFileSync('git', ['-C', dir, 'log', '-1', '--format=%H|%ai|%s'], {
       encoding: 'utf8', timeout: 5000, stdio: ['ignore', 'pipe', 'ignore']
@@ -73,13 +99,16 @@ function inspect(dir) {
   if (!gh) return null;
   // URL budowany od nowa: poświadczenia wpisane w origin nie trafiają na wyjście
   return { path: dir, url: `https://github.com/${gh.account}/${gh.repo}`, account: gh.account, repo: gh.repo,
-    branch: branchOf(dirs.gitDir), lastCommit: lastCommit(dir) };
+    branch: branchOf(dirs.gitDir), lastCommit: lastCommit(dir, dirs.gitDir) };
 }
 
 function scan(dir, depth, maxDepth, found) {
   if (existsSync(join(dir, '.git'))) {
     const project = inspect(dir);
-    if (project) found.set(dir, project);
+    if (project) {
+      found.set(dir, project);
+      return;
+    }
   }
   if (depth >= maxDepth) return;
   let entries;
