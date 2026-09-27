@@ -50,6 +50,7 @@ def export_package(plan, directory, *, urn, permissions, catalog=None):
 
 def run_package(directory, *, expected_digest, stdin="", timeout=30):
     from paxlet.runtime import run_action
+    from app.paxlet_adapter import attempt_store
 
     if not isinstance(stdin, str):
         raise ValueError("stdin must be a string")
@@ -58,10 +59,39 @@ def run_package(directory, *, expected_digest, stdin="", timeout=30):
     verified = verify_package(directory)
     if not expected_digest or expected_digest != verified["digest"]:
         raise ValueError("Paxlet digest mismatch; review the current package before running")
+
+    import time
+    t0 = time.perf_counter()
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
     output, receipt, receipt_path = run_action(
         directory, "run", {"stdin": stdin}, timeout=timeout,
     )
-    return {"output": output, "receipt": receipt, "receipt_path": str(receipt_path)}
+
+    finished_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    duration_ms = (time.perf_counter() - t0) * 1000.0
+
+    attempt = attempt_store.record_attempt(
+        urn=verified["urn"],
+        action="run",
+        digest=verified["digest"],
+        status="SUCCESS" if output.get("exit_code", 0) == 0 else "FAILED",
+        input_payload={"stdin": stdin},
+        output=output,
+        receipt=receipt,
+        started_at=started_at,
+        finished_at=finished_at,
+        duration_ms=duration_ms,
+        exit_code=output.get("exit_code", 0),
+    )
+
+    return {
+        "output": output,
+        "receipt": receipt,
+        "receipt_path": str(receipt_path),
+        "attempt_id": attempt.attempt_id,
+        "receipt_digest": attempt.receipt_digest,
+    }
 
 
 def read_json(path):
@@ -76,6 +106,7 @@ def process_request(operation, request):
         "export": {"plan", "catalog", "id", "urn", "permissions"},
         "verify": {"id"},
         "run": {"id", "expected_digest", "stdin", "timeout"},
+        "run_urn": {"id", "action", "expected_digest", "stdin", "timeout"},
         "run_catalog": {"id", "selector", "action", "version", "expected_digest", "stdin", "timeout"},
     }
     if operation not in fields or not isinstance(request, dict) or set(request) - fields[operation]:
@@ -144,6 +175,17 @@ def process_request(operation, request):
             {"stdin": stdin}, expected_digest=selected["digest"], timeout=timeout)
         return {"selection": selected, "output": output, "receipt": receipt,
                 "receipt_path": str(receipt_path)}
+    if operation == "run_urn":
+        from app.paxlet_adapter import paxlet_executor
+        action = request.get("action", "run")
+        stdin = request.get("stdin", "")
+        return paxlet_executor.execute_urn(
+            package_directory=directory,
+            action=action,
+            input_data={"stdin": stdin},
+            expected_digest=request.get("expected_digest"),
+            timeout=timeout,
+        )
     return run_package(directory, expected_digest=request.get("expected_digest"),
                        stdin=request.get("stdin", ""), timeout=timeout)
 
@@ -152,7 +194,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     process = commands.add_parser("process", help="Bounded JSON stdin/stdout API for Taskand processes")
-    process.add_argument("operation", choices=("plan", "compile", "export", "verify", "run", "run_catalog"))
+    process.add_argument("operation", choices=("plan", "compile", "export", "verify", "run", "run_urn", "run_catalog"))
     plan = commands.add_parser("plan", help="Plan NL; offline unless --env-file is given")
     plan.add_argument("prompt")
     plan.add_argument("--catalog")
