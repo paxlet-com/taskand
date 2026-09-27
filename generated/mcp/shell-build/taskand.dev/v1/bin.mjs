@@ -17,11 +17,12 @@ try {
   const payload = { ...input };
   if (prepare) delete payload.operation;
   const entry = join(root, 'app/shell_workflow.py');
-  if (createHash('sha256').update(readFileSync(entry)).digest('hex') !== '53dd535c624adcb6326e6e440105bef5b54c162de37355507ce3e45d4739cff1') throw new Error('SHELL_ADAPTER_INTEGRITY_MISMATCH');
+  if (createHash('sha256').update(readFileSync(entry)).digest('hex') !== 'ea8adbb85c1a006547003c529629d83fc686eebdcd28e3a97beded62ea686f45') throw new Error('SHELL_ADAPTER_INTEGRITY_MISMATCH');
   const python = process.env.TASKAND_SHELL_PYTHON || join(root, '.subactor/cache/shell-venv/bin/python');
   if (!isAbsolute(python)) throw new Error('SHELL_PYTHON_ABSOLUTE_PATH_REQUIRED');
+  const pythonEnv = { ...process.env, PYTHONPATH: [root, process.env.PYTHONPATH].filter(Boolean).join(':') };
   const result = spawnSync(python, [entry, 'process', operation], {
-    input: JSON.stringify(payload), encoding: 'utf8', cwd: root, env: process.env,
+    input: JSON.stringify(payload), encoding: 'utf8', cwd: root, env: pythonEnv,
     timeout: 125000, maxBuffer: 1024 * 1024
   });
   if (result.error || result.signal) {

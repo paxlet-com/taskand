@@ -41,10 +41,10 @@
         "bin.mjs",
         "proc.yaml"
       ],
-      "hash": "sha256:a90b54684099d852f23aca14ae95f62016aefa0da97b47759af31a14f3983005",
+      "hash": "sha256:607551c3bb7da7ddd0e3d0d415276d9b39ceee85a57647397d62afb16947e5fc",
       "status": "active",
       "registered": "2026-09-23T21:40:56.997Z",
-      "refreshedAt": "2026-09-26T19:54:53.476Z"
+      "refreshedAt": "2026-09-27T18:04:09.603Z"
     },
     "proc://taskand.dev/mcp/shell-run/v1": {
       "uri": "proc://taskand.dev/mcp/shell-run/v1",
@@ -63,12 +63,12 @@
         "bin.mjs",
         "proc.yaml"
       ],
-      "hash": "sha256:28a5ab5c854b89c0eb1192e9ec9fd08fbc5277303c50ac9afd86145d80649457",
+      "hash": "sha256:c296b27f1b07ff5ae2694180d3d5ed5dcf65431f0901c2294a5bbe3a11f8d202",
       "status": "active",
       "registered": "2026-09-23T21:40:57.134Z",
-      "refreshedAt": "2026-09-24T16:17:10.100Z"
+      "refreshedAt": "2026-09-27T18:04:09.627Z"
     }
   },
   "node": "nvidia",
-  "updated": "2026-09-26T19:54:53.476Z"
+  "updated": "2026-09-27T18:04:09.627Z"
 }
